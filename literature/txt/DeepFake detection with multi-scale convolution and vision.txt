@@ -1,0 +1,1164 @@
+
+
+--- PAGE 1 ---
+
+Digital Signal Processing 134 (2023) 103895
+Contents lists available at ScienceDirect
+Digital Signal Processing
+journal homepage: www.elsevier.com/locate/dsp
+DeepFake detection with multi-scale convolution and vision 
+transformer
+Hao Lin, Wenmin Huang, Weiqi Luo ∗, Wei Lu
+GuangDong Key Lab of Information Security Technology, School of Computer Science and Engineering, Sun Yat-sen University, Guangzhou, China
+a r t i c l e 
+i n f o
+a b s t r a c t
+Article history:
+Available online 21 December 2022
+Keywords:
+Deepfake
+Convolutional neural network
+Multi-scale feature
+Vision transformer
+With the help of some modern image generative techniques, it is possible to generate or manipulate 
+image or video contents without introducing any obvious visual artifacts. If these manipulated 
+images/videos are abused, it probably has a huge negative impact on society and individuals. Thus, 
+deepfake detection has attracted considerable attention in recent years. Although the existing methods 
+can achieve good detection performance on high-quality datasets, they are still far from satisfactory 
+for low-quality dataset and cross-dataset evaluation. In this paper, therefore, we propose a new CNN-
+based method via multi-scale convolution and vision transformer for deepfake detection. In the proposed 
+model, we design a multi-scale module with dilation convolution and depthwise separable convolution to 
+capture more face details and tampering artifacts at different scales. Unlike the traditional classiﬁcation 
+module, furthermore, we employ a vision transformer to further learn the global information of face 
+features for classiﬁcation. Extensive experiments demonstrate that in most cases the proposed method 
+achieves better detection results on both high-quality and low-quality datasets compared with related 
+modern methods, and the cross-dataset generalization capabilities of the proposed method are good. In 
+addition, many ablation experiments are provided to verify the rationality of the proposed network.
+© 2022 Elsevier Inc. All rights reserved.
+1. Introduction
+With the rapid development of some modern image generative 
+techniques, especially for generative adversarial networks (GANs), 
+more and more sophisticated deepfake methods have been pro-
+vided to generate or manipulate realistic faces that people can 
+not distinguish them from real ones. Nowadays, many open source 
+code1,2 and mobile applications (e.g., FaceApp3 and Zao4) are 
+available so that we can easily and effectively create manipulated 
+face images and videos without any specialized knowledge [41]. If 
+these face faces are used for nefarious purposes, for things like re-
+venge, porn or fraud, which would have a huge negative impact on 
+society and individuals. Thus, it is important to develop effective 
+methods for deepfake detection.
+* Corresponding author.
+E-mail addresses: linh233@mail2.sysu.edu.cn (H. Lin), 
+huangwm36@mail2.sysu.edu.cn (W. Huang), luoweiqi@mail.sysu.edu.cn (W. Luo), 
+luwei3@mail.sysu.edu.cn (W. Lu).
+1 https://github .com /deepfakes /faceswap.
+2 https://github .com /MarekKowalski /FaceSwap.
+3 https://apps .apple .com /gb /app /faceapp -ai -face -editor /id1180884341.
+4 https://apps .apple .com /cn /app /id1465199127.
+Up to now, many deepfake detection methods based on con-
+volutional neural network (CNN), such as [1,20,29,31,22,3,26,27,14,
+37,34], have been proposed. Typically, most existing methods take 
+deepfake detection as a binary classiﬁcation problem, and they of-
+ten employ a convolutional neural network to extract features of 
+the suspect face images and get the ﬁnal classiﬁcation by one or 
+several layers of full connection. The modern methods can achieve 
+very good detection performances on those high-quality images (or 
+image frames within a video). However, images or videos probably 
+are undergone lossy compression and/or other post-processing in 
+real applications so that the quality would decline. As illustrated in 
+Fig. 1, many tampering artifacts introduced by deepfake would be 
+reduced and become blurring for the low-quality versions. In this 
+case, the corresponding performance of deepfake detectors would 
+drop signiﬁcantly. Up to now, the detection performances of ex-
+isting methods are still far from satisfactory for those low-quality 
+images. In addition, their generalization performances need further 
+enhancement too.
+In this paper, we propose a new CNN-based method via multi-
+scale convolution and vision transformer for deepfake detection. 
+Speciﬁcally, we employ a dual-subnet structure to catch high-
+level face semantic information and employ a vision transformer 
+module for the ﬁnal classiﬁcation in the proposed model. The 
+dual-subnet includes a multi-scale module branch and a MBConv 
+https://doi.org/10.1016/j.dsp.2022.103895
+1051-2004/© 2022 Elsevier Inc. All rights reserved.
+
+
+--- PAGE 2 ---
+
+H. Lin, W. Huang, W. Luo et al.
+Digital Signal Processing 134 (2023) 103895
+Fig. 1. Two fake face examples with different quality from FaceForensics++ [35]. Im-
+ages in the ﬁrst row are high-quality (HQ), while those in the second row are the 
+corresponding low-quality (LQ) versions after lossy compression.
+blocks module branch. In the multi-scale module branch, we ﬁrst 
+set 4 dilation convolutions with different dilation ratios to cap-
+ture the face details at different scales, and then we concatenate 
+the extracted face detail information at different scales, and reﬁne 
+the concatenated features with depthwise separable convolutions 
+for the model to fully learn the local discontinuities of manip-
+ulated images. In the MBConv blocks module branch, we learn 
+high-dimensional face semantic information by stacking multiple 
+MBConv Blocks. In the ﬁnal classiﬁcation, we introduce a vision 
+transformer module to replace global average pooling (GAP) and 
+fully connection layers (FC) used in most existing methods. Ex-
+tensive comparative experiments show that the superiority of the 
+proposed method. In summary, we propose a dual-subnet struc-
+ture and combines vision transformer for deepfake detection and 
+the main contributions of this paper are as follows:
+• We propose a dual-subnet structure which combines the 
+multi-scale module and the MBConv block module for deep-
+fake detection, and employ the vision transformer for ﬁnal 
+classiﬁcation.
+• We carefully design and analyze each important module in 
+the proposed model. For instance, we propose a multi-scale 
+module and show that the multi-scale module can effectively 
+capture the face details at different scales and enhance the de-
+tection performance of the proposed model.
+• Extensive comparative results show that the proposed method 
+outperforms the most modern methods and achieves advanced 
+detection performance on both high-quality and low-quality 
+databases, and the generalization ability of the proposed 
+method is also good.
+The rest of this paper is arranged as follows. Section 2 describes 
+the relative work. Section 3 describes the proposed method in de-
+tails. Section 4 shows comparative results and discussions. Finally, 
+the concluding remarks of this paper and future works are given 
+in Section 5.
+Table 1
+Six deepfake databases commonly used in recent literatures. 
+LQ denotes low-quality, while HQ denotes high-quality.
+Dataset
+Real
+Fake
+Year
+UADFV [23]
+49
+49
+2018
+Deepfake-TIMIT [18]
+320
+LQ:320
+2018
+HQ:320
+Celeb-DF [25]
+890
+5639
+2019
+DFDC Preview [8]
+1131
+4119
+2019
+DFDC Full [9]
+20,000
+100,000
+2020
+FaceForensics++ [35]
+RAW:1000
+RAW:4000
+2019
+LQ:1000
+LQ:4000
+HQ:1000
+HQ:4000
+WildDeepfake [48]
+3805
+3509
+2020
+2. Relative work
+In this section, we will give a brief overview of deepfake tech-
+nique, deepfake datasets, and deepfake detection methods that 
+used in recent literatures.
+2.1. DeepFake technique
+Typically, the existing deepfake techniques can be divided into 
+4 categories [41]: entire face synthesis, identity swap, attribute 
+manipulation, and expression swap. Entire face synthesis aims to 
+generate entire non-existent face images, the typical methods in-
+clude the StyleGAN [16] and PGGAN [15]; identity swap tries to 
+swap the face of one person (source face) in videos with the face 
+of another person (target face), such as FSGAN [32] and FaceShifter
+[21]; attribute manipulation aims to modify some attributes (e.g., 
+hair or skin) of the target face, such as StarGAN [5] and AttGAN 
+[12]; expression swap tries to change the facial expression (e.g., 
+excitement and frustration) of the target face, such as NeuralTex-
+tures [39] and Face2Face [40].
+Among the four categories, identity swap is currently recog-
+nized as the most harmful and widely studied type of face tam-
+pering [41]. For tampering a video, this technique usually includes 
+three steps: it ﬁrstly divides the video into frames and locates 
+the faces in each frame; and then it swaps the face of a per-
+son (i.e., source face) in a frame with the face of another person 
+(i.e., target face) through some deep learning methods. Finally, it 
+applies some image fusion techniques to stitch face images to re-
+duce tampering artifact and synthesize a fake video. Up to now, 
+many effective identity swap methods have been proposed. For in-
+stance, Korshunova et al. [19] proposed the ﬁrst face swap method 
+to transform the identity. They use convolution neural networks to 
+capture the appearance of the target images and propose a new 
+loss function to produce highly realistic results; Olszewski et al. 
+[33] propose a method to realistically puppeteer and animate a 
+face from RGB images using a source video sequence; Li et al. 
+[21] try to generate the swapped face with high-quality by ex-
+ploiting and integrating the target attributes thoroughly and adap-
+tively, and propose a novel two-stage face swapping method, called 
+FaceShiter.
+2.2. DeepFake datasets
+Up to now, there are some public deepfake datasets avail-
+able online. As illustrated in Table 1, we will describe six typical 
+datasets that are commonly used for comparative studies in recent 
+literatures in the following.
+• UADFV [23] includes 49 real videos from Youtube, which are 
+then used to generate 49 fake videos. These videos are about 
+11.14 seconds, and each video represents one identity and has 
+the resolution of 294 × 500.
+2
+
+
+--- PAGE 3 ---
+
+H. Lin, W. Huang, W. Luo et al.
+Digital Signal Processing 134 (2023) 103895
+• Deepfake-TIMIT [18] includes 320 real videos and 640 fake 
+videos. Among fake videos, there are 320 high-quality videos 
+and 320 low-quality videos separately.
+• Celeb-DF [25] includes 890 real videos and 5,639 fake videos. 
+The videos in this dataset have better visual quality and higher 
+resolution.
+• DFDC [8] includes two different versions: preview version and 
+full version. The preview version includes 1131 real videos 
+from 66 paid actors and 4119 fake videos generated by 2 dif-
+ferent unknown approaches, while the full version includes 
+more than 20,000 real videos and more than 100,000 fake 
+videos generated by 8 different unknown approaches.
+• FaceFornesics++ [35] includes 1,000 original videos from You-
+Tube, and then generates the corresponding fake videos 
+with four deepfake techniques, called DeepFakes,5 FaceSwap, 
+Face2Face [40], and NeuralTexture [39] separately. Note that 
+three different quality versions are considered in this dataset: 
+RAW denotes the original videos without any post-processing; 
+HQ denotes the videos compressed with a ﬁxed rate quantiza-
+tion parameter of 23; LQ denotes the videos compressed with 
+the ﬁxed rate quantization parameter of 40. For each quality 
+version, therefore, there are 1,000 real videos and 4,000 ma-
+nipulated videos.
+• WildDeepfake [48] includes 3,805 real videos and 3,509 fake 
+videos that are downloaded from the Internet, meaning that 
+these videos come from various sources. What is more, they 
+probably have been compressed more than one time. Thus, the 
+quality of videos in this dataset is relatively poor.
+Note that the numbers of videos in UADFV and Deepfake-TIMIT 
+are relatively fewer, and the modern deepfake detection methods 
+can achieve better performances on the two datasets. In this paper, 
+therefore, we employ the other 4 datasets (i.e., Celeb-DF, DFDC, 
+FaceFornesics++, and WildDeepfake) that are more diﬃcult to de-
+tect in our experiments.
+2.3. Deepfake detection method
+In the past several years, many CNN-based methods, such as 
+[1,20,29,31,22,3,26,27,14,37,24,34], have been proposed for deek-
+fake detection. For example, Afchar et al. [1] focused on the meso-
+scopic properties of images, and proposed a MesoNet to detect 
+online videos; Hguyen et al. [31] ﬁrst introduced the capsule net-
+works to detect forged images and videos; Li et al. [20] analyzed 
+the differences among the color components within the gener-
+ated images for classiﬁcation; Rössler et al. [35] ﬁrst introduced 
+the Xception model into deepfake detection, and show that the 
+detection performances of Xception can outperform most related 
+methods at that time; Li et al. [24] proposed a new method that 
+can effectively distinguish manipulated videos from real videos 
+without using fake images as negative training; Qian et al. [34] em-
+ployed two different but complementary frequency-aware clues to 
+describe subtle forgery artifacts and proposed a new method (F3-
+Net) for deepfake detection; Zhao et al. [45] formulated deepfake 
+detection as a ﬁne-grained classiﬁcation problem and proposed a 
+new multi-attentional deepfake detection network; Li et al. [22]
+proposed a new image representation called Face-X-Ray to show 
+the blending boundary for a forged image and the absence of 
+blending for a real image, and achieved a high detection accuracy 
+and generalization performance in high-quality videos; Castillo et 
+al. [3] proposed two different methods of initializing convolutional 
+neural networks for image manipulation detection; Shang et al. 
+5 https://github .com /deepfakes /faceswap.
+[37] proposed a Pixel-Region Relation Network (PRRNet) to cap-
+ture pixel-wise and region-wise relations respectively for deepfake 
+detection; Jia et al. [14] proposed an inconsistency-aware wavelet 
+dual-branch network to detect inter-image and intra-image incon-
+sistencies in deepfake; Liu et al. [26] employed spatial image and 
+phase spectrum to capture the up-sampling artifacts of deepfake 
+to improve the transferability, and achieved the very good results 
+on multi-class classiﬁcation on FaceFornesics++ dataset.
+Note that some modern methods, such as Dual-Branch [14] and 
+PRRnet [37], can achieve very good performances for those high-
+quality images (e.g., on Celeb-DF [25] and high-quality versions 
+of FaceForensics++ [35]). However, the detection performances are 
+still from satisfactory for low-quality images. In addition, the gen-
+eralization ability of existing methods needs further improvement.
+3. Proposed method
+As illustrated in Fig. 2, The network architecture includes 
+four different modules, that is, pre-processing module, multi-scale 
+module, MBConv block module, and vision transformer module. 
+Note that here we select the EﬃcientNet-b4 [38] as the back-
+bone of the proposed method (see the pre-processing module 
+and MBConv block module) since the EﬃcientNet-b4 can provide 
+a good trade-off in dimensionality, computing time, and classi-
+ﬁcation performance on deepfake detection. Thus EﬃcientNet-b4 
+usually serves as a backbone or baseline in many existing litera-
+tures. In the following, we will describe the four modules in detail.
+3.1. Pre-processing module
+The pre-processing module includes a 3 × 3 convolution, 2 
+MBConv1 Blocks and 8 MBConv6 Blocks, which is deﬁned in 
+EﬃcientNet-B4 [38]. As reported in [38], the EﬃcitentNet-b4 is 
+one version of the EﬃcientNet, which consists of 2 classical con-
+volutions, 2 MBConv1 blocks, 30 MBConv6 blocks and a fully con-
+nected layer. Besides, the EﬃcientNet-b4 has good image classiﬁca-
+tion performance with 19 millions of parameters and 4.2 billions 
+of FLOPs and reaches the 83.8% top-1 accuracy on the ImageNet 
+database. The network architecture of MBConv1 block and MB-
+Conv6 block which are deﬁned in EﬃcientNet-b4 are as illustrated 
+in Fig. 3. Note that the MBConv1 block consists of Depthwise con-
+volution, Batch Normalization (BN), Squeeze-and-Excitation mod-
+ule (SE) [13] and Pointwise convolution & BN. Compared with the 
+MBConv1 block, the MBConv6 block adds a Pointwise convolution 
+and a BN layer.
+For a face image, the pre-processing module aims to produce a 
+preliminary feature map f p ∈RH×W ×C , where (H, W ) is the fea-
+ture resolution and C is the number of the feature channel. Then 
+f p is then fed into a dual-subnet in the proposed model.
+3.2. Dual-subnet: multi-scale module & MBConv block module
+In the proposed network architecture, we employ a dual-subnet 
+structure, that is, a multi-scale module and a MBConv block mod-
+ule, to deal with the feature map f p which is obtained in the pre-
+processing module. The multi-scale module aims to learn multi-
+scale face information, while the MBConv block module aims to 
+learn high-dimensional face semantic information.
+3.2.1. Multi-scale module
+Most existing CNN-based methods for deepfake detection, such 
+as [1,29,31], usually stack single-scale convolutional layers to ex-
+tract high-dimensional face semantic information. In the proposed 
+method, however, we propose a multi-scale module with differ-
+ent dilation convolutions and depthwise separable convolutions in 
+3
+
+
+--- PAGE 4 ---
+
+H. Lin, W. Huang, W. Luo et al.
+Digital Signal Processing 134 (2023) 103895
+Fig. 2. The network architecture of the proposed method. It includes four modules: pre-processing module, multi-scale module, MBConv block module and vision transformer 
+module. The symbol Dilation = N denotes the dilation rate is N. The symbol ⊗denotes the operation of concatenation.
+Fig. 3. The network architecture of the MBConv1 Block and MBConv6 Block used in 
+the pre-processing module and MBConv block module.
+order to capture more face details and tampering artifacts at dif-
+ferent scales. The dilation convolution and depthwise separable 
+convolution used in this module are described as follows:
+• Dilation convolution: Firstly, we use dilation convolutions 
+with four different dilation rates (i.e., 3, 6, 12, and 18) to pro-
+cess the input feature map in order to extract multi-scale face 
+information of the feature map f p. In this way, we can obtain 
+four different scale face feature maps which have the same 
+resolution and channel as f p. Finally, we concatenate the four 
+different scale face feature maps and the original one (i.e., f p) 
+to get a multi-scale face feature map f ′
+p ∈RH×W ×5C
+• Depthwise separable convolution: And then, we employ 2 
+SeparableConv Blocks and 4 Residual SeparableConv Blocks to 
+learn channel correlation and spatial correlation separately for 
+Fig. 4. The network architecture of “Residual SeparableConv block (n)” used in the 
+multi-scale module, where n denotes the number of the separableConv block used 
+in this architecture.
+the feature map f ′
+p. Speciﬁcally, each separableConv block con-
+tains a relu non-linearity, a depthwise separable convolution, 
+and a batch normalization. The ﬁrst three residual separa-
+bleConv blocks include 4 separableConv blocks (i.e., Residual 
+SparableConv Block (4) as illustrated in Fig. 4), while the last 
+residual separableConv block includes 6 separableConv block 
+(i.e., Residual SparableConv Block (6)), and each residual sepa-
+rableConv block has a linear residual connection. In this way, 
+we can reﬁne the f ′
+p, learn more multi-scale face details infor-
+mation, and capture manipulated artifacts at different scales 
+effectively. In summary, the proposed depthwise separable 
+convolution block can enhance the representation ability of 
+the model and get the richer face feature of manipulated im-
+ages.
+Finally, we can get a high-dimensional multi-scale feature map, 
+denoted as f1, after dilation convolution and depthwise separable 
+convolution as described about.
+3.2.2. MBConv block module
+The proposed MBConv block module follows the same setting 
+that are used in the EﬃcientNet-B4 [38]. Speciﬁcally, we stack 22 
+MBConv6 Blocks together to obtain a high-dimensional face se-
+mantic feature map f2 for face forgery detection. Note that the 
+MBConv Block architecture [36] (both MBConv1 block and MB-
+4
+
+
+--- PAGE 5 ---
+
+H. Lin, W. Huang, W. Luo et al.
+Digital Signal Processing 134 (2023) 103895
+Conv6 block that are illustrated in Fig. 3) is based on an inverted 
+residual structure. Compared with the traditional residual models, 
+the MBConv blocks use lightweight depthwise convolutions to ﬁl-
+ter features in the intermediate expansion layer. In this way, we 
+can effectively reduce the model parameters while ensuring the 
+accuracy of the model based on our experiments.
+Finally, we concatenate the resulting feature maps (i.e., f1 in 
+Stream #1 and f2 in Stream #2) in the dual-subnet for subsequent 
+processing. Note that here f1 and f2 have the same resolution and 
+channel.
+3.3. Vision transformer module
+Most existing methods, including the EﬃcientNet-b4 and meth-
+ods [1,31,27,14], usually feed the concatenated feature map (i.e., 
+f1 ⊗f2) into a global average pooling and full connection for the 
+ﬁnal classiﬁcation. Inspired by [7], we employ a vision transformer 
+module for classiﬁcation. Firstly, we use a separableConv block to 
+increase the dimension of f1 ⊗f2 and output fin. Since the stan-
+dard transformer receives a 1D sequence of token embedding as 
+input, we reshape fin into f ′
+in as it did in [10]. Then, we ﬂatten 
+f ′
+in and map the ﬂattened f ′
+in into D dimensions by trainable liner 
+projection, where the value of D is the size of the constant hid-
+den vector which is used in the all layers of transformer. And then 
+the position embeddings are added to the patch embedding to re-
+tain the positional information. The result of embedding is used 
+as the input of the transformer encoder. The transformer encoder 
+is composed of alternating layers of multi-head self-attention and 
+multilayer perceptron (MLP) blocks. In this way, the transformer 
+can not only integrate the information of the entire feature maps 
+via self-attention, but also understand the image structure through 
+the learnable position embedding. Finally, we can get the ﬁnal clas-
+siﬁcation result through an MLP.
+4. Experiments
+Four popular datasets, including Celeb-DF [25], DFDC [8], Face-
+Forensics++ (denoted as FF++) [35], and WildDeepfake [48] are 
+considered in our experiments. First of all, we use the MTCNN [44]
+to detect and extract faces for each frame and enlarge the face re-
+gion by a factor of 1.3 around the center of the detected face, and 
+then we resize the face images into 320 × 320 as the input of the 
+proposed method. For a fair comparison, all experimental results 
+are evaluated on the same test dataset for all compared methods. 
+Like most related methods, we directly use the reported perfor-
+mances of existing methods for comparative study.
+In training stage, we employ the cross-entropy and Adam opti-
+mizer with the batch size 48. We train the proposed networks in 
+total of 20 epochs and reduce the learning rate to 1/10 of the orig-
+inal every 10 epochs. We set the initial learning rate to 0.0001 and 
+select the model with the best accuracy as the ﬁnal model.6
+4.1. Comparative results with related methods
+To show the effectiveness of the proposed method, we com-
+pare the proposed method with some modern methods on four 
+different datasets respectively. Note that the source codes of most 
+existing methods are not available, and most existing methods do 
+not provide detection results on the four datasets simultaneously. 
+Like related methods, therefore, the compared methods are differ-
+ent for different datasets. However, the comparison is fair since all 
+6 The source codes are now available on https://github .com /mouse1998mouse /
+muti -scale -vit so that the readers can understand the proposed model clearly and 
+repeat our experimental results easily.
+Table 2
+The AUC (%) evaluated on the 
+Celeb-DF dataset for different 
+methods. Note that in the fol-
+lowing tables, those highlighted 
+values with an asterisk “*” de-
+note the best results in the cor-
+responding cases.
+Method
+AUC
+Xception [6]
+97.60
+Multi-task [30]
+90.50
+Capsule [31]
+93.20
+DSW-FPA [24]
+94.80
+DCViT [42]
+97.20
+PRRnet [37]
+99.80 *
+Dual-Branch [14]
+99.50
+Zhou et al. [47]
+99.78
+Proposed Method
+99.80 *
+Table 3
+The AUC (%) evaluated on the 
+DFDC dataset for different meth-
+ods.
+Method
+AUC
+Meso-4 [1]
+82.20
+Meso-Inception [1]
+81.76
+DSLRFN [17]
+84.48
+DSP-FWA [24]
+85.26
+Xception [6]
+85.89
+Proposed Method
+88.47 *
+the detection performances are evaluated on exactly the same par-
+tition (i.e., training, veriﬁcation and test set) in each dataset.
+4.1.1. Experiments on Celeb-DF
+In this section, we use the Celeb-DF for evaluation. As described 
+in Section 2.2, the videos in Celeb-DF have better visual quality and 
+higher resolution. Following the original data division, we use the 
+designated 518 videos for testing. In the remaining videos, we ran-
+domly select 20% videos as the validation set. In the training and 
+validation stage, we extract 50 image frames for each manipulated 
+video and original video. Like related methods, AUC (area under 
+the receiver operating characteristic curve) is used as evaluation 
+metric since the class in this dataset is imbalance.
+The comparative results are shown in Table 2. From the Table 2, 
+we observe that all AUC of modern methods are higher than 90%, 
+which means that this database is relatively easier to detect due 
+to its high-quality. Both the proposed method and the PRRNet [37]
+can achieve the current best performance with the AUC as high as 
+99.80%.
+4.1.2. Experiments on DFDC
+Like most existing methods, such as [17,24], we employ the 
+preview version of DFDC for evaluation in the section. As described 
+in Section 2.2, this version contains 1131 real videos and 4105 fake 
+videos. In our experiment, we follow the same data division and 
+randomly select 20% training videos as the validation set. In the 
+training and validation stage, we extract 50 image frames for each 
+manipulated video and original video. Similarly, AUC on the test 
+dataset is considered due to the imbalance of data categories.
+The comparative results are shown in Table 3. From Table 3, we 
+observe that the proposed method achieves the best performance 
+in AUC of 88.47%. Compared with the Xception [6], the proposed 
+method achieves 2.58% improvement in AUC. From Table 3 and Ta-
+ble 2, we observe that compared with Celeb-DF, the DFDC dataset 
+is much more diﬃcult to detect since it employs a variety of un-
+known algorithms to generate manipulated videos.
+5
+
+
+--- PAGE 6 ---
+
+H. Lin, W. Huang, W. Luo et al.
+Digital Signal Processing 134 (2023) 103895
+Table 4
+The ACC (%) and AUC (%) evaluated on the 
+FF++(LQ) dataset for different methods.
+Method
+ACC
+AUC
+MesoNet [1]
+70.47
+-
+Face X-ray [22]
+-
+61.60
+Xception [6]
+86.86
+89.30
+F3-Net [34]
+90.43
+93.30
+Two Branch [27]
+-
+86.59
+EﬃcientNet-b4 [38]
+86.67
+88.20
+Multi-attention [45]
+88.69
+90.40
+Dual-Branch [14]
+88.96
+92.97
+Spatial-Phase [26]
+81.57
+82.82
+CFFExtractor [43]
+-
+90.35
+PRRnet [37]
+86.13
+-
+FRLM [28]
+90.71
+93.69
+Patch diffusion [2]
+86.11
+89.29
+Proposed Method
+90.74 *
+94.86 *
+Table 5
+The ACC (%) evaluated on the 
+WildDeepfake dataset for differ-
+ent methods.
+Method
+ACC
+ResNetv2-50 [11]
+63.99
+MesoNet [1]
+64.74
+Meso-inception [1]
+66.03
+Xception [6]
+76.27
+ADDNet-2D [48]
+76.25
+Zhou et al. [47]
+79.87
+Proposed Method
+82.63 *
+4.1.3. Experiments on FF++ (LQ)
+In this section, we use the low quality (LQ) videos in Face-
+Forensics++ (denoted as FF++ (LQ)) for evaluation. This dataset 
+contains 1,000 original videos collected from YouTube, and each 
+original video has been manipulated with four different deepfake 
+techniques separately. Like existing methods, we divide the orig-
+inal video clips (as well as the corresponding fake versions) into 
+training, validation and test parts, which contain 720, 140, and 
+140 original videos respectively. In training stage, to alleviate the 
+class imbalance problem, we extract 200 frames from each original 
+video and extract 50 frames (= 200 × 1
+4 ) from the 4 corresponding 
+fake video. Like related methods, both ACC (accuracy) and AUC are 
+used as evaluation metrics in this dataset.
+The comparative results are shown in Table 4. From Table 4, 
+we observe that the proposed method always achieves the best re-
+sults with regard to both ACC and AUC. Note that the ACC and AUC 
+of most existing methods are less than 90%, while the proposed 
+gets 90.74% ACC and 94.86% AUC. Compared with the current best 
+method (i.e., FRLM [28]), the proposed method can still obtain 
+0.03% improvement on ACC and 1.17% improvement on AUC.
+4.1.4. Experiments on WildDeepfake
+In this section, we use the WildDeepfake dataset for evaluation. 
+Note that the WildDeepfake is a challenging real-world dataset for 
+deepfake detection. Unlike other datasets, both real and fake videos 
+in WildDeepfake are collected from the Internet. Therefore, these 
+videos are probably from different sources and/or compressed sev-
+eral times, which makes the detection very diﬃcult.
+The comparative results are shown in Table 5. From Table 5, we 
+observe that the detection accuracies of existing methods are less 
+than 80%. However, the proposed method can achieve state-of-the-
+art result with the detection accuracy as high as 82.63%. Compared 
+with the current best method (i.e., method [47]) on this database, 
+we can still obtain 2.76% improvements.
+4.2. Cross-dataset evaluation
+In this section, we evaluate the generalization performance of 
+the proposed model. In the following, two different cross-dataset 
+evaluations are included in our experiments.
+4.2.1. Evaluation on unknown deepfake techniques within FF++
+As described in section 2.2, there are 1,000 original real videos 
+in FF++. For each original video, there are four different fake 
+videos generated by four manipulated techniques, including Deep-
+Fake (denoted as DF), Face2Face (i.e., F2F), FaceSwap (i.e., FS), and 
+NeuralTextures (i.e., NT). In this section, we ﬁrstly train a classiﬁer 
+on the images generated by one manipulated technique, and then 
+use the resulting classiﬁer on other images generated by other 
+three manipulated techniques. For a fair comparison, all the exper-
+imental results are evaluated on raw quality images without any 
+post-processing as it did in [4]. The comparative results are shown 
+in Table 6. From Table 6, we have three following observations:
+• If the training data and test data are generated by the same 
+manipulated technique, the performances of the proposed 
+method are all over 99.25%, as shown in the diagonal results 
+of the table. Similar good results can be obtained for the other 
+two detection methods (i.e., Xception and Res-Layer1), which 
+means that the tampering artifacts introduced by the four ma-
+nipulated techniques are relatively easy to detect.
+• If the training dataset does not match the test dataset, the cor-
+responding performances would decline in different ranges for 
+the three detection methods. Taking DF as training dataset for 
+instance, our detection accuracies would drop from 99.97% to 
+90.32%, 44.73% and 94.53% when evaluating the F2F, FS and 
+NT separately, which means that the inherent statistical prop-
+erties of the fake images generated by different manipulated 
+techniques are different.
+• Overall, the proposed method outperforms two other detection 
+methods (i.e., Xception and Res-Layer1) in most cases. The de-
+tection improvements are signiﬁcant in some cases. Taking FS 
+as training dataset for instance, our detection accuracy on NT 
+is as high as 96.24%, while they are less than 70% for the other 
+two methods, which means that the cross-dataset generaliza-
+tion capabilities of the proposed method are better.
+Note that when we use F2F as our training dataset, the results 
+are relatively poor for FS. The main reason is that statistical differ-
+ences between F2F and FS are relatively huge.
+4.2.2. Evaluation on unknown dataset
+As it did in most related methods (such as [34,45]), in this 
+section, we ﬁrstly train the proposed model on the FF++ (HQ) 
+dataset, and then use the resulting classiﬁer to evaluate those im-
+ages from the Celeb-DF dataset. The comparative results are shown 
+in Table 7. From Table 7, we observe that the detection results 
+are lower than 68% for all existing methods, while the proposed 
+method achieves result as high as 71.41%. Compared with the cur-
+rent best method (i.e., multi-attention [45]), we can still achieve 
+3.97% improvements, which means that the proposed method has 
+much better generalization ability compared with existing ones.
+4.3. Ablation study
+In order to verify the rationality of the proposed network, some 
+ablation studies are conducted in this section. For simpliﬁcation, 
+just the WildDeepfake dataset is used for performance evaluation. 
+WildDeepfake is a more challenging dataset, and using this dataset 
+for ablation experiments can amplify the variance of each module 
+in the proposed method.
+6
+
+
+--- PAGE 7 ---
+
+H. Lin, W. Huang, W. Luo et al.
+Digital Signal Processing 134 (2023) 103895
+Table 6
+The AUC(%) evaluated on different manipulated methods. Those highlighted val-
+ues with an asterisk “*” denote the best results in the corresponding cases. The 
+results of other methods are from related papers.
+training set
+method
+DF
+F2F
+FS
+NT
+DF
+Xception [6]
+98.38
+75.05
+49.13
+80.38
+Res-Layer1 [4]
+98.97
+71.74
+57.15 *
+74.99
+Proposed Method
+99.97 *
+90.32 *
+44.73
+94.53 *
+F2F
+Xception [6]
+87.56 *
+99.53 *
+65.23 *
+65.90
+Res-Layer1 [4]
+84.39
+97.66
+60.53
+79.72 *
+Proposed Method
+86.13
+99.26
+50.16
+74.53
+FS
+Xception [6]
+70.12
+61.70
+99.36
+68.71
+Res-Layer1 [4]
+59.49
+62.00
+97.13
+52.56
+Proposed Method
+89.50 *
+86.74 *
+99.97 *
+96.24 *
+NT
+Xception [6]
+93.09
+84.82
+47.98
+99.50 *
+Res-Layer1 [4]
+70.32
+65.04
+53.37
+86.93
+Proposed Method
+99.41 *
+89.57 *
+66.69 *
+99.47
+Table 7
+Cross-dataset evaluation on Celeb-
+DF(AUC(%)) by training FF++(HQ). 
+Some results of other methods are 
+cited directly from [45]. Note that 
+in all following tables, those high-
+lighted values with an asterisk “*” 
+denote the best results in the cor-
+responding cases.
+Method
+AUC
+Two-stream [46]
+53.80
+Meso-Inception [1]
+53.60
+FWA [24]
+56.90
+DSP-FWA [24]
+64.60
+Multi-task [30]
+54.30
+Capsule [31]
+57.50
+F3-Net [34]
+65.17
+Xception [6]
+65.30
+Multi-attention [45]
+67.44
+Proposed Method
+71.41 *
+4.3.1. Analysis on the proposed modules
+In this section, we show the detection accuracies when an im-
+portant module in the proposed model is removed or replaced, 
+including vision transformer module, MBConv blocks module and 
+Multi-scale block module separately. The comparative results are 
+shown in Table 8. From Table 8, we can obtain three following ob-
+servations:
+• First of all, the proposed method can achieve the detection ac-
+curacy as high as 82.63%, which are higher than three variants 
+of the proposed method as well as some modern methods (re-
+fer to Table 5);
+• For the ﬁnal classiﬁcation, we replace the vision transformer 
+module as the typical classiﬁcation module, that is the global 
+average pooling and full connection. The corresponding detec-
+tion accuracy will drop from 82.63% to 80.17%, which means 
+that capturing the global information via vision transformer 
+are helpful to detect deepfake images;
+• The proposed network employs a dual-subnet architecture. 
+If any one of streams in the proposed network is removed, 
+i.e., Stream #1: Multi-scale Block module or Stream #2: the 
+MBConv Block module, the detection accuracies will drop to 
+79.53% or 78.13% respectively, which means that combining
+the multi-scale face information (i.e., f1) and high-dimensional 
+face semantic information (i.e., f2) is useful to enhance the de-
+tection performance.
+4.3.2. Analysis on the pre-processing module
+In the proposed pre-processing module, we use a 3 × 3 convo-
+lution, 2 MBConv1 blocks and eight MBConv6 block to extract the 
+feature of the manipulated images. In order to ensure the rational-
+Table 8
+Ablation results on WildDeepfake dataset. Note 
+that * indicates that we adjusted its learning 
+rate to 1/10 of the original.
+Variants
+ACC
+w/o Vision Transformer module
+80.17
+w/o Multi-scale Block module
+79.53
+w/o MBConv Block module
+78.13
+Proposed Method
+82.63 *
+Table 9
+Ablation results on the proposed pre-
+processing module.
+number
+ACC
+7
+78.83
+9
+81.00
+8 (the proposed method)
+82.63
+Table 10
+Detection accuracy (%) on WildDeepfake dataset 
+with different quantity dilation convolutions.
+Number
+Dilation Rate
+WildDeepfake
+0
+-
+76.29
+3
+3, 6, 12
+77.10
+3
+6, 12, 18
+78.62
+4
+3, 6, 9, 12
+80.09
+4 (Proposed)
+3, 6, 12, 18
+82.63 *
+5
+3, 6, 9, 12, 18
+80.85
+ity of using 8 MBConv6 blocks, we preform ablation experiments. 
+We reduce the 8 MBConv6 blocks in the pre-processing module 
+to 7 and increase to 9. The experimental results are shown in the 
+Table 9.
+From the Table 9, we observe that the number of MBCov6 
+would affect the ﬁnal detection performance of the proposed 
+model. Using 8 MBCov6 can achieve the best results (i.e., 82.63%). 
+When adding/reducing one MBCov6 in the proposed model, the 
+corresponding detection accuracy will drop around 1.63% - 3.8%.
+4.3.3. Analysis on the dilation convolution in the multi-scale module
+In the proposed multi-scale module, we respectively use four 
+dilation convolutions with the dilation rates of 3, 6, 12 and 18 
+to obtain the multi-scale face information of the feature map f p, 
+which is generated in pre-processing module. Some comparative 
+experiments evaluation on different dilation convolutions is shown
+in Table 10. From Table 10, we observe that two following obser-
+vations:
+• First of all, the proposed method always works the best com-
+pared with other ﬁve variants. If all dilation convolutions are 
+removed (refer to the ﬁrst row in Table 10) in the proposed 
+7
+
+
+--- PAGE 8 ---
+
+H. Lin, W. Huang, W. Luo et al.
+Digital Signal Processing 134 (2023) 103895
+Fig. 5. Illustration of the output feature map (i.e., f p) of the pre-processing module, and its four modiﬁed versions after dilation convolution with 4 different dilation rates 
+(i.e., Dilation =3, Dilation =6,Dilation =12, and Dilation =18).
+network, the detection performance would become the poor-
+est, which means that the dilation convolution is very neces-
+sary in our model.
+• On average, the detection accuracy of the proposed model will 
+drop around 1.78% - 5.53% if adding a dilation convolution 
+with a dilation rate of 12, removing a dilation convolution 
+with a dilation rate of 18 or 6, or changing a dilation rate from 
+18 to 9, which means that the parameters (i.e., number and 
+dilation rate) of the dilation convolution will also signiﬁcantly 
+improve the detection performance of the proposed model.
+Fig. 5 illustrates some output feature maps (i.e., f p) of the pre-
+processing module and the four corresponding modiﬁed versions 
+after the dilation convolution with a dilation rate of 3, 6, 12, and 
+18 separately. Compared with normal convolution, dilation convo-
+lution can increase the receptive ﬁeld and get multi-scale infor-
+mation about the image. From Fig. 5, we observe that the feature 
+maps after different dilation convolutions can provide more details 
+of the input face image. It is well known that most manipulated 
+face images generated by the modern deepfake techniques are vi-
+sually imperceptible, those tampering artifacts usually reﬂected in 
+image details. Therefore, it is expected that the dilation convolu-
+tion used in the proposed model can enrich the face details at 
+different scales and thus enhance the detection performance.
+5. Conclusion
+In this paper, we propose a new CNN-based method combin-
+ing with multi-scale feature and vision transformer for deepfake 
+detection, and show that the proposed method can achieve the 
+advanced results evaluated on four popular datasets. The proposed 
+method achieves the state-of-the-art result both on FF++ and Wild-
+Deepfake. Taking Wilddeepfake for instance, the proposed method 
+can obtain 2.76% improvement on ACC compared with the current 
+best method [47]. In addition, we also show that the generalization 
+ability of the proposed model is good by cross-database evaluation. 
+Furthermore, we provide many ablation studies to verify the ratio-
+nality of the proposed network.
+In the proposed method, face images in the spatial domain are 
+considered. In future, the multi-scale information will be extracted 
+in both the spatial and frequency (such as DCT and/or wavelet) 
+domains for further improving detection performances. Combined 
+with image segmentation technology, furthermore, some content 
+adaptive schemes will be integrated in the proposed network so 
+that the features can be focused on different facial parts, such as 
+eyes, nose, and mouth, which probably have more tampering arti-
+facts.
+CRediT authorship contribution statement
+Hao Lin: Formal analysis, Methodology, Writing – original draft.
+Wenmin Huang: Writing – review & editing. Weiqi Luo: Method-
+ology, Writing – review & editing. Wei Lu: Writing – review & 
+editing.
+Declaration of competing interest
+The authors declare that they have no known competing ﬁnan-
+cial interests or personal relationships that could have appeared to 
+inﬂuence the work reported in this paper.
+Data availability
+No data was used for the research described in the article.
+Acknowledgments
+This work is supported by the National Science Foundation of 
+China (U2001202, 61972430).
+8
+
+
+--- PAGE 9 ---
+
+H. Lin, W. Huang, W. Luo et al.
+Digital Signal Processing 134 (2023) 103895
+References
+[1] D. Afchar, V. Nozick, J. Yamagishi, I. Echizen, MesoNet: a compact facial video 
+forgery detection network, in: 2018 IEEE International Workshop on Informa-
+tion Forensics and Security (WIFS), 2018, pp. 1–7.
+[2] Baogen Zhang, Sheng Li, G. F., Z. Q., X. Zhang, Patch diffusion: a general mod-
+ule for face manipulation detection, in: 2022 Association for the Advance of 
+Artiﬁcial Intelligence (AAAI), 2022.
+[3] I.C. Camacho, K. Wang, Convolutional neural network initialization approaches 
+for image manipulation detection, Digit. Signal Process. 122 (2022) 103376.
+[4] L. Chai, D. Bau, S.N. Lim, P. Isola, What makes fake images detectable? Un-
+derstanding properties that generalize, in: 2020 European Conference on Com-
+puter Vision (ECCV), 2020, pp. 103–120.
+[5] Y. Choi, M. Choi, M. Kim, J. Ha, S. Kim, J. Choo, StarGAN: uniﬁed gener-
+ative adversarial networks for multi-domain image-to-image translation, in: 
+2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 
+2018, pp. 8789–8797.
+[6] F. Chollet, Xception: deep learning with depthwise separable convolutions, in: 
+2017 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 
+2017, pp. 1800–1807.
+[7] D. Coccomini, N. Messina, C. Gennaro, F. Falchi, Combining eﬃcientnet and vi-
+sion transformers for video deepfake detection, arXiv:2107.02612, 2021.
+[8] B. Dolhansky, R. Howes, B. Pﬂaum, N. Baram, C. Canton-Ferrer, The deepfake 
+detection challenge (DFDC) preview dataset, arXiv:1910 .08854, 2019.
+[9] B. Dolhansky, R. Howes, B. Pﬂaum, N. Baram, C. Canton-Ferrer, The deepfake 
+detection challenge dataset, arXiv:2006 .07397, 2020.
+[10] A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner, 
+M. Dehghani, M. Minderer, G. Heigold, S. Gelly, J. Uszkoreit, N. Houlsby, An 
+image is worth 16x16 words: Transformers for image recognition at scale, 
+arXiv:2010 .11929, 2021.
+[11] K. He, X. Zhang, S. Ren, J. Sun, Identity mappings in deep residual networks, 
+in: 2016 European Conference on Computer Vision (ECCV), 2016, pp. 630–645.
+[12] Z. He, W. Zuo, M. Kan, S. Shan, X. Chen, AttGAN: facial attribute editing by only 
+changing what you want, IEEE Trans. Image Process. 28 (2019) 5464–5478.
+[13] J. Hu, L. Shen, G. Sun, Squeeze-and-excitation networks, in: 2018 IEEE 
+Conference on Computer Vision and Pattern Recognition (CVPR), 2018, 
+pp. 7132–7141.
+[14] G. Jia, M. Zheng, C. Hu, X. Ma, Y. Xu, L. Liu, Y. Deng, R. He, Inconsistency-aware 
+wavelet dual-branch network for face forgery detection, IEEE Trans. Biom. Be-
+hav. Identity Sci. 3 (2021) 308–319.
+[15] T. Karras, T. Aila, S. Laine, J. Lehtinen, Progressive growing of GANs for im-
+proved quality, stability, and variation, arXiv:1710 .10196, 2017.
+[16] T. Karras, S. Laine, T. Aila, A style-based generator architecture for generative 
+adversarial networks, in: 2019 IEEE/CVF Conference on Computer Vision and 
+Pattern Recognition (CVPR), 2019, pp. 4401–4410.
+[17] A.H. Khalifa, N.A. Zaher, A.S. Abdallah, M.W. Fakhr, Convolutional neural net-
+work based on diverse Gabor ﬁlters for deepfake recognition, IEEE Access 10 
+(2022) 22678–22686.
+[18] P. Korshunov, S. Marcel, Deepfakes: a new threat to face recognition? Assess-
+ment and detection, arXiv:1812 .08685, 2018.
+[19] I. Korshunova, W. Shi, J. Dambre, L. Theis, Fast face-swap using convolutional 
+neural networks, in: 2017 IEEE International Conference on Computer Vision 
+(ICCV), 2017, pp. 3697–3705.
+[20] H. Li, B. Li, S. Tan, J. Huang, Identiﬁcation of deep network generated images 
+using disparities in color components, Signal Process. 174 (2020) 107616.
+[21] L. Li, J. Bao, H. Yang, D. Chen, F. Wen, Advancing high ﬁdelity identity swapping 
+for forgery detection, in: 2020 IEEE/CVF Conference on Computer Vision and 
+Pattern Recognition (CVPR), 2020, pp. 5073–5082.
+[22] L. Li, J. Bao, T. Zhang, H. Yang, D. Chen, F. Wen, B. Guo, Face X-Ray for more 
+general face forgery detection, in: 2020 IEEE/CVF Conference on Computer Vi-
+sion and Pattern Recognition (CVPR), 2020, pp. 5000–5009.
+[23] Y. Li, M. Chang, S. Lyu, In ictu oculi: exposing AI generated fake face videos by 
+detecting eye blinking, arXiv:1806 .02877, 2018.
+[24] Y. Li, S. Lyu, Exposing deepfake videos by detecting face warping artifacts, in: 
+2019 IEEE/CVF Conference on Computer Vision and Pattern Recognition Work-
+shops (CVPRW), 2019, pp. 46–52.
+[25] Y. Li, X. Yang, P. Sun, H. Qi, S. Lyu, Celeb-DF: a large-scale challenging dataset 
+for deepfake forensics, in: 2020 IEEE/CVF Conference on Computer Vision and 
+Pattern Recognition (CVPR), 2020, pp. 3204–3213.
+[26] H. Liu, X. Li, W. Zhou, Y. Chen, Y. He, H. Xue, W. Zhang, N. Yu, Spatial-phase 
+shallow learning: rethinking face forgery detection in frequency domain, in: 
+2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 
+2021, pp. 772–781.
+[27] I. Masi, A. Killekar, R.M. Mascarenhas, S.P. Gurudatt, W. AbdAlmageed, Two-
+branch recurrent network for isolating deepfakes in videos, in: 2020 European 
+Conference on Computer Vision (ECCV), 2020, pp. 667–684.
+[28] C. Miao, Q. Chu, W. Li, S. Li, Z. Tan, W. Zhuang, N. Yu, Learning forgery region-
+aware and ID-independent features for face manipulation detection, IEEE Trans. 
+Biom. Behav. Identity Sci. 4 (2022) 71–84.
+[29] H. Mo, B. Chen, W. Luo, Fake faces identiﬁcation via convolutional neural net-
+work, in: 2018 ACM Workshop on Information Hiding and Multimedia Security 
+(IH&MMSec), 2018, pp. 43–47.
+[30] H.H. Nguyen, F. Fang, J. Yamagishi, I. Echizen, Multi-task learning for detecting 
+and segmenting manipulated facial images and videos, in: 2019 IEEE Inter-
+national Conference on Biometrics Theory, Applications and Systems (BTAS), 
+2019, pp. 1–8.
+[31] H.H. Nguyen, J. Yamagishi, I. Echizen, Capsule-forensics: using capsule networks 
+to detect forged images and videos, in: 2019 IEEE International Conference on 
+Acoustics, Speech and Signal Processing (ICASSP), 2019, pp. 2307–2311.
+[32] Y. Nirkin, Y. Keller, T. Hassner, FSGAN: subject agnostic face swapping and 
+reenactment, in: 2019 IEEE/CVF International Conference on Computer Vision 
+(ICCV), 2019, pp. 7183–7192.
+[33] K. Olszewski, Z. Li, C. Yang, Y. Zhou, R. Yu, Z. Huang, S. Xiang, S. Saito, 
+P. Kohli, H. Li, Realistic dynamic facial textures from a single image using 
+GANs, in: 2017 IEEE International Conference on Computer Vision (ICCV), 2017, 
+pp. 5439–5448.
+[34] Y. Qian, G. Yin, L. Sheng, Z. Chen, J. Shao, Thinking in frequency: face forgery 
+detection by mining frequency-aware clues, in: 2020 European Conference on 
+Computer Vision (ECCV), 2020, pp. 86–103.
+[35] A. Rössler, D. Cozzolino, L. Verdoliva, C. Riess, J. Thies, M. Nießner, FaceForen-
+sics++: learning to detect manipulated facial images, in: 2019 IEEE/CVF Inter-
+national Conference on Computer Vision (ICCV), 2019, pp. 1–11.
+[36] M. Sandler, A. Howard, M. Zhu, A. Zhmoginov, L.C. Chen, MobileNetV2: inverted 
+residuals and linear bottlenecks, in: 2018 IEEE/CVF Conference on Computer 
+Vision and Pattern Recognition (CVPR), 2018, pp. 4510–4520.
+[37] Z. Shang, H. Xie, Z. Zha, L. Yu, Y. Li, Y. Zhang, PRRNet: pixel-region relation 
+network for face forgery detection, Pattern Recognit. 116 (2021) 107950.
+[38] M. Tan, Q.V. Le, EﬃcientNet: rethinking model scaling for convolutional neural 
+networks, in: 2019 International Conference on Machine Learning (ICML), 2019, 
+pp. 6105–6114.
+[39] J. Thies, M. Zollhöfer, M. Nießner, Deferred neural rendering: image synthesis 
+using neural textures, ACM Trans. Graph. 38 (2019) 66.
+[40] J. Thies, M. Zollhöfer, M. Stamminger, C. Theobalt, M. Nießner, Face2Face: real-
+time face capture and reenactment of RGB videos, Commun. ACM 62 (2019) 
+96–104.
+[41] R. Tolosana, R. Vera-Rodríguez, J. Fiérrez, A. Morales, J. Ortega-Garcia, Deep-
+fakes and beyond: a survey of face manipulation and fake detection, Inf. Fusion 
+64 (2020) 131–148.
+[42] D. Wodajo, S. Atnafu, Deepfake video detection using convolutional vision 
+transformer, arXiv preprint, arXiv:2102 .11126, 2021.
+[43] P. Yu, J. Fei, Z. Xia, Z. Zhou, J. Weng, Improving generalization by commonality 
+learning in face forgery detection, IEEE Trans. Inf. Forensics Secur. 17 (2022) 
+547–558.
+[44] K. Zhang, Z. Zhang, Z. Li, Y. Qiao, Joint face detection and alignment using mul-
+titask cascaded convolutional networks, IEEE Signal Process. Lett. 23 (2016) 
+1499–1503.
+[45] H. Zhao, W. Zhou, D. Chen, T. Wei, W. Zhang, N. Yu, Multi-attentional deep-
+fake detection, in: 2021 IEEE/CVF Conference on Computer Vision and Pattern 
+Recognition, CVPR, 2021, pp. 2185–2194.
+[46] P. Zhou, X. Han, V.I. Morariu, L.S. Davis, Two-stream neural networks for tam-
+pered face detection, in: 2017 IEEE Conference on Computer Vision and Pattern 
+Recognition Workshops (CVPRW), 2017, pp. 1831–1839.
+[47] Y. Zhou, A. Luo, X. Kang, S. Lyu, Face forgery detection based on segmentation 
+network, in: 2021 IEEE International Conference on Image Processing (ICIP), 
+2021, pp. 3597–3601.
+[48] B. Zi, M. Chang, J. Chen, X. Ma, Y. Jiang, WildDeepfake: a challenging real-world 
+dataset for deepfake detection, in: 2020 ACM International Conference on Mul-
+timedia (ACM MM), 2020, pp. 2382–2390.
+Hao Lin was born in Guangdong, China, in 1998. 
+He is currently working towards his M.S. degree at 
+Sun Yat-sen University. His research interests include 
+face forgery detection, watermarking and deep learn-
+ing.
+Wenmin Huang was born in Guangdong, China, in 
+1994. He is currently working towards his Ph.D. de-
+gree at Sun Yat-sen University. His research interests 
+include face attribute editing and face forgery detec-
+tion.
+9
+
+
+--- PAGE 10 ---
+
+H. Lin, W. Huang, W. Luo et al.
+Digital Signal Processing 134 (2023) 103895
+Weiqi Luo (Senior Member, IEEE) received the 
+Ph.D. degree from Sun Yat-sen University, Guangzhou, 
+China, in 2008. He is currently a Professor with the 
+School of Computer and Engineering, Sun Yat-sen Uni-
+versity, where he is also a Researcher with the Guang-
+dong Key Laboratory of Information Security Technol-
+ogy. His current research interests include digital mul-
+timedia forensics, steganography, and steganalysis.
+Wei Lu received the Ph.D. degree from Shanghai 
+Jiao Tong University, China in 2005 and 2007 respec-
+tively. He is currently a Professor with the School of 
+Computer Science and Engineering, Sun Yat-sen Uni-
+versity, Guangzhou, China. His research interests in-
+clude multimedia forensics and security, data hiding 
+and watermarking, AI security. He is an Associate Edi-
+tor for the Signal Processing and the Journal of Visual 
+Communication and Image Representation.
+10

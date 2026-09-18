@@ -1,0 +1,1110 @@
+
+
+--- PAGE 1 ---
+
+Adaptive Gated Deepfake Detection for 
+Low-Resolution and Resource-Constrained 
+Environments 
+ 
+Vaishnavi Sen 
+Department of Computer Science 
+California State University, Northridge 
+California, USA 
+0009-0009-2245-9596 
+Cody Laurie 
+Department of Computer Science 
+California State University, Northridge 
+California, USA 
+0009-0003-2740-964X 
+Rashida Hasan 
+Department of Computer Science 
+California State University, Northridge 
+California, USA 
+0000-0002-6231-8116 
+ 
+ 
+ 
+Abstract—Deepfake detection models often rely on high-
+quality inputs, fixed inference paths, and computationally ex-
+pensive architectures, limiting their use in low-resolution and 
+resource-constrained settings. This paper proposes AdaGate-
+DF, an adaptive gated deepfake detection framework that uses 
+image-quality cues to route samples through a dual multi-exit 
+system so high-quality images can exit earlier and save compute. 
+We evaluated AdaGate-DF against MaD-CoRN, DefakeHop++, 
+and ShuffleNetV2 on two benchmark datasets (Celeb-DF and 
+FaceForensics++) under multiple configurations to test image 
+resolution dependence and training and inference efficiency. 
+On Celeb-DF, AdaGate-DF achieves an AUC of 0.9370, out-
+performing MaD-CoRN and DefakeHop++ while maintaining a 
+low inference latency. Resolution-based testing shows consistent 
+improvement as input resolution increases, reaching an AUC of 
+0.9708 at 384 × 384. The FaceForensics++ results highlight that 
+AdaGate-DF remains effective under class imbalance, following 
+competitive results with evaluated models. Overall, AdaGate-DF 
+demonstrated a practical balance between detection performance, 
+uncertainty-aware prediction, and computational efficiency for 
+variable-quality deepfake detection. 
+Index Terms—Deepfake detection, adaptive inference, low-
+resolution images, frequency-domain analysis, uncertainty esti-
+mation 
+ 
+I. INTRODUCTION 
+The rapid improvement of generative models has made 
+manipulated facial media, which is increasingly realistic and 
+difficult to distinguish from authentic content. As a result, 
+deepfake detection has become a major problem for digital 
+forensics, media verification, and maintaining online trust. 
+Benchmark datasets such as FaceForensics++ (FF++) [1] and 
+Celeb-DF [2] have supported progress in this area by pro-
+viding standardized evaluation settings for manipulated facial 
+media. Recent literature also shows that deepfake detection 
+has expanded in multiple research directions, including spatial 
+artifact learning, frequency-domain analysis, lightweight archi-
+tectures, low-quality image detection, and multimodal feature 
+fusion [3]. 
+Despite this progress, detecting deepfakes under low-
+resolution and resource-constrained conditions remains chal-
+lenging. In real-world settings, images and video frames are 
+often compressed, resized, blurred, or captured at inconsistent 
+resolutions. These degradations can reduce or distort fine-
+grained facial artifacts that are useful for detecting manip-
+ulation. Prior work has therefore studied low-quality and 
+low-resolution deepfake detection through optimized prepro-
+cessing, machine learning-based low-resolution analysis, and 
+resolution-aware feature extraction [4]–[7]. Other studies have 
+explored super-resolution as a preprocessing strategy for im-
+proving low-quality deepfake detection, showing that image 
+enhancement can recover useful visual detail but may also 
+introduce preprocessing-dependent artifacts [8], [9]. 
+Frequency-domain analysis has become an important di-
+rection for robust deepfake detection because manipulation 
+and compression artifacts may remain visible outside the 
+RGB domain. The Discrete Cosine Transform (DCT) [10] is 
+often used to provide a compact representation of frequency 
+information and has been widely used in image process-
+ing. Deepfake detection methods have used DCT, wavelet, 
+and broader frequency-aware representations to identify high-
+frequency inconsistencies and manipulation artifacts that may 
+not be easily captured from RGB inputs alone [11]–[14]. 
+Multi-modal and multi-branch methods further support this 
+direction by combining complementary cues from spatial, 
+frequency, and attention-based representations [15]–[17]. 
+Nevertheless, deepfake detection presents continuous chal-
+lenges in computational efficiency. Many deepfake detectors 
+process every input using the same fixed inference path, 
+regardless of image quality or sample difficulty. This approach 
+is often inefficient for real-world deployment, particularly in 
+settings where large volumes of images and video frames 
+must be processed in real time under limited computational 
+resources, such as social media. As a result, lightweight 
+model design has emerged as a promising direction for real-
+world deepfake detection, with prior work exploring effi-
+cient CNNs, convolutional reservoir networks, multi-feature 
+fusion, and application-specific lightweight detectors [18]–
+[21]. Low-quality video detection methods have also examined 
+multi-scale and branch-based mechanisms to handle degraded 
+inputs [22], but still rely on the fixed inference behavior 
+
+
+--- PAGE 2 ---
+
+irrespective of the image quality. The research usually focuses 
+on one of the challenges at a time, often leading to complex 
+architecture for low resolution images or not considering the 
+degraded resolution of the images when focused on making 
+the architecture lightweight. 
+To address these challenges, this work proposes AdaGate-
+DF, an adaptive gated deepfake detection framework for low-
+resolution and resource-constrained environments. AdaGate-
+DF uses a dual-branch representation that combines RGB spa-
+tial features with frequency-domain features obtained through 
+DCT. The framework also incorporates a multi-exit gated in-
+ference mechanism that routes samples through fast, medium, 
+or full inference paths based on resolution and image-quality 
+cues. This adaptive design is motivated by early-exit inference, 
+where samples can exit at different network depths to reduce 
+unnecessary computation [23]. In contrast to fixed-depth detec-
+tion pipelines, AdaGate-DF adjusts the inference path based 
+on input quality, allowing simpler samples to be processed 
+efficiently while reserving deeper analysis for more difficult 
+or degraded inputs. 
+We evaluated AdaGate-DF on Celeb-DF and FF++ and 
+compared it with three state-of-the-art models, including 
+lightweight and frequency-aware detection approaches. The 
+evaluation considers the overall detection performance, the 
+uncertainty-aware prediction behavior, resolution-based ro-
+bustness, and computational efficiency in terms of training 
+time and inference latency. The Uncertainty rate along with 
+accuracy, AUC, precision, recall, and F1-score allows for a 
+more reliable evaluation by overcoming the high-confident 
+misclassifications. By examining these factors together, this 
+work focuses on the practical requirements of deploying 
+deepfake detectors for variable-quality and low-resource en-
+vironments. 
+The main contributions of this work are summarized as 
+follows: 
+• We propose AdaGate-DF, a dual-branch adaptive gated 
+framework that integrates RGB and frequency-domain 
+representations with a multi-exit inference mechanism for 
+low resource and quality-aware deepfake detection. 
+• We evaluate the proposed approach on two benchmark 
+datasets, Celeb-DF and FF++, and compared its perfor-
+mance with state-of-the-art methods, which additional 
+evaluation for resolution based performance. 
+• We incorporate uncertainty-aware evaluation to compare 
+how often each model produces low-confidence pre-
+dictions, providing additional insight beyond standard 
+accuracy-based metrics. 
+• We analyze computational efficiency by comparing train-
+ing time and inference latency across the evaluated mod-
+els, with an emphasis on practical deployment in low-
+resource environments. 
+Reproducibility: To support future researchers, all of our 
+code, dataset sources, preprocessing, and evaluation scripts are 
+available at https://github.com/CodeGhost157/AdaGate-DF. 
+II. RELATED WORK 
+ 
+Deepfake detection is commonly formulated as a binary 
+classification task that distinguishes authentic facial media 
+from manipulated content. Benchmark datasets such as FF++ 
+and Celeb-DF have supported standardized evaluation in dif-
+ferent types of manipulation, compression settings, and visual 
+conditions [1], [2]. Early detectors relied mainly on CNN-
+based spatial artifact learning, including Xception-style models 
+and compact architectures such as MesoNet [24], [25]. Later, 
+efficient architectures emerged, including EfficientNet, Mo-
+bileNetV3, and ShuffleNetV2, improving the balance between 
+model size and detection accuracy [18], [26], [27]. However, 
+these methods generally use fixed inference paths and can 
+be sensitive to changes in image quality, compression, and 
+resolution. 
+Therefore, Low-resolution and low-quality detection has 
+become an important research direction. In real-world settings, 
+deepfake images and video frames may be repeatedly resized, 
+compressed, down-sampled, or blurred before being uploaded 
+to social media. These operations can suppress fine-grained 
+facial artifacts and make spatial-only detection less reliable. 
+Degraded deepfake inputs have been addressed through op-
+timized preprocessing, low-resolution classification pipelines, 
+multi-scale DCT features, and lightweight frequency-domain 
+CNNs [4]–[7]. Super-resolution has also been used to enhance 
+low-quality inputs before detection [8], [9]. These studies show 
+that resolution and preprocessing strongly influence detector 
+performance. However, most focus on improving input quality 
+or feature representation rather than adapting computation to 
+the difficulty of each sample. 
+Manipulation, compression, and resizing artifacts may re-
+main visible outside the RGB domain, even when they are 
+difficult to detect spatially. As a result, frequency-domain 
+methods have been used to capture frequency level incon-
+sistencies in manipulated faces through DCT, wavelet, and 
+broader spectral representations [10]–[14]. Multi-modal and 
+multi-branch methods further combine complementary RGB, 
+frequency, and attention-based cues to improve robustness 
+under challenging conditions [15]–[17]. While these methods 
+improve representation quality, they often increase model 
+complexity and typically retain a fixed inference pipeline. 
+Several works have also focused on lightweight or effi-
+cient deepfake detection. MaD-CoRN, DefakeHop++, compact 
+CNNs, and multi-feature fusion methods reduce computational 
+cost compared with heavier deep models [19]–[21], [28]. 
+Complementary work on degraded video detection, such as 
+BZNet, uses multi-scale branch processing to improve ro-
+bustness under low-quality conditions [22]. Although these 
+approaches improve efficiency, they generally use a fixed 
+computational pathway for all inputs. This limits their ability 
+to save computation on easier samples while applying more 
+rigorous analysis to difficult or ambiguous cases. Such adap-
+tive inference is important for low-resource deployment, where 
+large volumes of images or video frames must be processed 
+efficiently without sacrificing reliability. 
+
+
+--- PAGE 3 ---
+
+rgb 
+freq , z 
+, z 
+rgb 
+3 
+Adaptive inference addresses this limitation by assign-
+ing different network depths to different samples, reducing 
+ 
+ 
+Algorithm 1 Overview of Quality-Aware Gated Deepfake 
+Detection Training Pipeline 
+ 
+unnecessary computation for easier inputs while preserving 
+Require: Dataset D = {(xi, yi)}N , resolutions r ∈ R 
+greater capacity for difficult or ambiguous cases. BranchyNet 
+Ensure: Predicted probability 
+i=1 
+yˆ ∈ [0, 1] 
+introduced early-exit classifiers that allow confident samples 
+to exit earlier while difficult samples continue through deeper 
+layers [23]. However, most early-exit methods rely primarily 
+on prediction confidence rather than explicit image-quality 
+cues. In low-resolution deepfake detection, quality features 
+such as resolution, blur, sharpness, compression, brightness, 
+and contrast are directly related to the visibility of manipu-
+lation artifacts. Using these features for routing can therefore 
+provide a more task-specific form of adaptive inference. 
+1: Initialize model parameters Θ and gate parameters Φ 
+2: for each training epoch do 
+3: 
+for each mini-batch (x, y) ⊂ D do 
+4: 
+r ∼ R 
+5: 
+x ← RESIZE(x, r); 
+x ← NORMALIZE(x) 
+6: 
+xrgb ← x 
+7: 
+xfreq ← DCT(GRAY(x)) 
+8: 
+q ← QUALITYFEATURES(x) 
+9: 
+g∗ ← ROUTETARGET(q) 
+In Summary, existing work has addressed low-resolution 
+10: 
+{z1 
+2 rgb 
+3 rgb } ← Ergb(xrgb) 
+robustness, frequency-domain modeling, lightweight architec- 
+11: 
+{z1 
+2 freq 
+3 freq } ← Efreq (xfreq ) 
+tures, and adaptive inference, but these directions are usually 
+studied separately. Low-resolution methods improve robust- 
+12: 
+zfused ← FUSE(z3 
+freq ) 
+13: 
+gˆ ← G(q) 
+ness but often do not reduce inference cost; lightweight 
+14: 
+Lcls 
+← 
+P3 
+ℓ(zk , y) + ℓ(zk 
+, y) + 
+methods improve efficiency but rarely adapt to input quality; 
+ℓ(z  fused , y) 
+k=1 
+rgb 
+freq 
+and multi-branch frequency models improve representation 
+strength but may increase complexity. AdaGate-DF addresses 
+this gap by combining RGB and DCT representations with a 
+quality-aware gated mechanism that routes samples through 
+fast, medium, or full inference paths based on image-quality 
+features. 
+III. METHODOLOGY 
+AdaGate-DF uses a dual branch architecture that combines 
+spatial features and frequency features derived using DCT for 
+a deeper analysis. An adaptive gating module is added to 
+utilize the image-quality cues to select a dynamic inference 
+path, allowing the model to adjust computation based on input 
+quality. The following subsections describe the preprocessing, 
+feature extraction, gating, and training procedure. The entire 
+architecture flow is shown in the Figure 1. 
+A. Dataset and Preprocessing 
+We consider a supervised deepfake detection setting, where 
+each input image x is associated with a binary label y ∈ {0, 1} 
+indicating real or fake. To simulate real-world conditions, we 
+incorporate multi-resolution inputs during training. Specifi-
+cally, a target resolution r is randomly sampled from a prede- 
+fined set R ∈ {128 × 128, 224 × 224, 256 × 256, 384 × 384}, 
+and each image is resized accordingly. This enables the model 
+to learn robustness to varying input resolution. 
+All images are normalized before being passed into the 
+network. In addition to the standard RGB representation, 
+a frequency-domain representation is generated by applying 
+DCT on the grayscale images. This produces complementary 
+inputs that capture both spatial and frequency-based artifacts. 
+B. Quality-Feature Estimation and Quality-Aware Adaptive 
+Routing 
+To enable adaptive computation, a set of lightweight quality 
+features is extracted from each input image. These features 
+capture low-level image characteristics, including resolution, 
+15: 
+Lgate ← ℓ(gˆ, g∗) 
+16: 
+Ltotal ← Lcls + Lgate 
+17: 
+Update Θ, Φ using Ltotal 
+18: 
+end for 
+19: end for 
+ 20: return trained model 
+ 
+ 
+ 
+sharpness, blur, compression artifacts, brightness, and contrast. 
+The resulting feature vector is denoted as q. 
+A lightweight gating network G(·) is used to map the quality 
+feature vector q to a routing decision gˆ = G(q). This routing 
+decision determines the level of computation required for 
+processing the input. The gating mechanism allows the model 
+to dynamically adjust its computational effort based on input 
+quality, enabling efficient processing of high-quality samples 
+while reserving deeper computation for more challenging 
+inputs. 
+ 
+C. Dual-Brach Gated Architecture 
+The proposed framework employs a dual-branch architec-
+ture consisting of a spatial and a frequency branch, with multi-
+ple exits. The spatial branch processes RGB information, while 
+the frequency branch operates on DCT-transformed inputs to 
+capture compression and manipulation artifacts. Each branch 
+is implemented as a convolutional encoder with three exit 
+points. These exits allow the network to produce predictions at 
+different depths, corresponding to shallow, intermediate, and 
+deep representations. Shallow layers capture low-level pat-
+terns, while deeper layers encode more complex and abstract 
+forgery features. This multi-exit architecture enables the model 
+to avoid unnecessary computation by selecting an appropriate 
+inference path based on the input characteristics. 
+The proposed framework incorporates a multi-exit design 
+that supports three inference paths corresponding to different 
+computational budgets. 
+, z 
+, z 
+, z 
+
+
+--- PAGE 4 ---
+
+ 
+Fig. 1: Architecture Diagram of AdaGate-DF 
+ 
+• The Fast path utilizes shallow features from both the 
+RGB and frequency branches to generate predictions with 
+minimal computational cost. This path is primarily used 
+for high-quality or less complex inputs. 
+• The Medium path leverages intermediate features to 
+provide a balance between computational efficiency and 
+detection performance. 
+• The Full path utilizes the deepest feature representations 
+from both branches. These features are fused and passed 
+through a final classifier to produce the most accurate 
+prediction, particularly for low-quality or challenging 
+inputs. 
+ 
+ 
+D. Training and Inference Strategy 
+ 
+During training, all branches and exit points are optimized 
+jointly. Each exit produces a prediction, and a classification 
+loss is applied to all outputs to ensure that meaningful repre-
+sentations are learned at different depths. The entire training 
+pipeline is explained in Algorithm 1. 
+The gating network is trained using supervision derived 
+from quality-based routing rules, which assign target paths 
+based on the input characteristics. This encourages the model 
+to route simpler inputs to shallow paths and more complex 
+inputs to deeper paths. The overall training objective consists 
+of a combination of classification losses from all exits and a 
+gating loss for the routing decision. This joint optimization 
+allows both the detection model and the gating mechanism to 
+be learned simultaneously. 
+During inference, the quality feature vector q is first 
+computed and passed through the gating network to obtain 
+the routing decision gˆ. Based on this decision, the input is 
+processed through the selected path (fast, medium, or full). 
+This adaptive inference strategy reduces computational cost for 
+simpler inputs while maintaining strong detection performance 
+for more challenging cases. 
+IV. EXPERIMENTAL SETUP 
+We conduct experiments across multiple configurations, to 
+evaluate performance from multiple perspectives: uncertainty-
+aware performance on the held out dataset (test), robustness 
+to input resolution, and computational efficiency. We include 
+both balanced and imbalanced dataset conditions, multiple 
+input resolutions, and timing measurements for training and 
+inference. Since the state-of-the-art models did not include 
+uncertainty in their original implementation, we added it in our 
+re-implementation for fair comparison between the models. 
+TABLE I: Summary of Experimental Configuration 
+ 
+Setting 
+Value 
+ 
+Datasets 
+Celeb-DF, FF++ 
+Input resolutions 
+128, 224, 256, 384 
+Base inference resolution 
+ 
+224×224 
+Batch size 
+ 
+ 
+32 
+Random seed 
+42 
+AdaGate-DF optimizer 
+AdamW 
+AdaGate-DF learning rate 
+2 × 10−4 
+AdaGate-DF weight decay 
+1 × 10−4 
+AdaGate-DF epochs 
+15 
+FF++ frame extraction rate 
+2 FPS 
+FF++ max frames per video 
+ 8 
+A. Dataset split and configuration 
+The experiments were conducted on two widely used deep-
+fake detection benchmarks: Celeb-DF [2] and FF++ [1]. These 
+datasets provide a controlled evaluation setting for analyz-
+ing detection performance under different input resolutions 
+while minimizing the influence of background context. In our 
+processed split, Celeb-DF contains 80,824 training images, 
+10,104 validation images, and 10,103 testing images, with 
+approximately balanced real and fake classes. 
+
+
+--- PAGE 5 ---
+
+FF++ is used to evaluate model behavior under a more 
+naturally imbalanced setting. We extract image frames from 
+videos containing real samples and multiple manipulation 
+types. The dataset contains 7,000 videos, including 1,000 
+real videos and 6,000 manipulated videos, resulting in an 
+approximate 1:6 real-to-fake ratio. Frames are extracted at 
+2 FPS, with a maximum of 8 frames per video, producing 
+55,953 total frames. The resulting frame-level split contains 
+44,756 training frames, 5,600 validation frames, and 5,597 
+testing frames. To prevent frame-level leakage, the dataset is 
+split at the video level using an 80/10/10 train, validation, and 
+test partition. 
+B. Model Configuration 
+All images are resized before feature extraction and model 
+evaluation. To evaluate performance under varying image-
+quality conditions, we test all models at four input resolutions: 
+128 × 128, 224 × 224, 256 × 256, and 384 × 384. These 
+resolutions are selected to represent low-resolution, standard-
+resolution, and higher-resolution input settings. The 224 × 224 
+setting is used as the base resolution for the main performance 
+and inference-time comparisons, while the remaining resolu-
+tions are used to evaluate robustness to resolution changes. 
+Images are normalized using ImageNet mean and standard 
+deviation values. For AdaGate-DF, each input is represented 
+using two complementary branches: an RGB spatial branch 
+and a frequency branch. The frequency branch is generated by 
+converting the input image to grayscale and applying DCT. In 
+addition, lightweight image-quality features are extracted from 
+each sample, including resolution, blur, sharpness, compres-
+sion proxy, brightness, and contrast. These quality features are 
+used by the gating module to select the appropriate inference 
+path. 
+AdaGate-DF is trained using the AdamW optimizer with a 
+learning rate of 2 × 10−4, weight decay of 1 × 10−4, batch 
+size 32, and 15 training epochs. The complete experimental 
+configurations is summarized in Table I. The model is trained 
+using a combined loss that includes classification losses from 
+the RGB branch, frequency branch, fused prediction output, 
+and a gate-routing loss. The adaptive model is evaluated 
+in four configurations: the full gated model, fast-only exit, 
+medium-only exit, and full-only exit. The fixed-exit variants 
+are included to measure the contribution of the adaptive 
+gating mechanism. The combined loss function is shown in 
+Equation 1, where Lrgb and Ldct supervise the RGB and 
+frequency branches, Lfused supervises the fused prediction, 
+Lgate supervises the routing decision, and λ controls the 
+contribution of the gate loss. 
+ 
+Ltotal = Lrgb + Ldct + Lfused + λLgate 
+(1) 
+All experiments were implemented in PyTorch and executed 
+on the CSU TIDE high-performance computing infrastruc-
+ture [29]. Training and evaluation were performed using GPU-
+accelerated compute nodes equipped with NVIDIA L40 GPUs, 
+each with 48 GB of GPU memory. The same computing 
+environment was used for the proposed method and the 
+compared models to ensure that training-time and inference-
+latency comparisons were measured under consistent hardware 
+conditions. 
+C. Evaluation Metrics 
+We evaluate all models using accuracy, AUC, precision, 
+recall, F1-score, uncertainty rate, training time, and inference 
+latency. AUC is particularly important for the FF++ evaluation 
+because the dataset split is highly imbalanced and accuracy-
+based metrics can be influenced by the majority class. 
+In addition to standard classification metrics, we report 
+uncertainty rate to measure how often a model produces a low-
+confidence prediction. For AdaGate-DF, a prediction is marked 
+uncertain when the maximum predicted class confidence is 
+below the threshold τ = 0.65. For probability-based models, 
+predictions near the decision boundary are treated as uncertain 
+using the interval [0.4, 0.6]. This protocol allows uncertainty 
+to be estimated across models with different output formats 
+while preserving a common interpretation of low-confidence 
+predictions. The uncertainty rate is computed as the percentage 
+of test samples marked uncertain: 
+UR = Nuncertain × 100. 
+(2) 
+Ntotal 
+D. State-of-the-Art Model Comparison 
+We compare AdaGate-DF with three state-of-the-art effi-
+cient deepfake detection models: MaD-CoRN [19], Defake-
+Hop++ [28], and ShuffleNetV2 [27]. These models were 
+selected because they represent different lightweight detection 
+strategies relevant to low-resource deepfake detection. 
+MaD-CoRN is a lightweight deepfake detection approach 
+based on convolutional reservoir networks, while Defake-
+Hop++ is an enhanced lightweight detector that uses hand-
+crafted feature extraction with classifier-based prediction. 
+ShuffleNetV2 is included as an efficient CNN architecture 
+designed for low-latency inference. 
+V. RESULTS AND DISCUSSION 
+This section discusses the results observed across all our 
+experiments organized into three subsections. First we discuss 
+the uncertainty-aware performance for all the models, followed 
+by the resolution based performance for more generalized 
+analysis. Later, we analyze the training and inference latency 
+by comparing the time taken by each model to provide results. 
+A. Uncertainty-Aware Performance on Celeb-DF and FF++ 
+datasets 
+Table II compares the proposed gated model with the state-
+of-the-art methods on Celeb-DF and FF++. On Celeb-DF, 
+the proposed gated model achieves an AUC of 0.9370, and 
+an F1-score of 0.8654, performing better than two of the 
+three compared models, MaD-CoRN and DefakeHop++. Shuf-
+fleNetV2 obtains the highest overall classification performance 
+on Celeb-DF; however, the proposed method remains compet-
+itive while also providing adaptive routing and uncertainty-
+aware prediction. The benefit of the proposed architecture is 
+
+
+--- PAGE 6 ---
+
+TABLE II: Test dataset performance on Celeb-DF and FF++. U Rate denotes the percentage of samples marked uncertain 
+under the evaluation protocol. 
+ 
+Model 
+Celeb-DF 
+FF++ 
+Acc 
+AUC 
+Prec 
+Rec 
+F1 
+U Rate 
+Acc 
+AUC 
+Prec 
+Rec 
+F1 
+U Rate 
+Gated Dual Branch 
+0.8637 
+0.9370 
+0.8572 
+0.8737 
+0.8654 
+22.23 
+0.8571 
+0.5163 
+0.8571 
+1.0000 
+0.9230 
+0.00 
+Fast Only 
+0.6535 
+0.7114 
+0.6478 
+0.6774 
+0.6622 
+83.31 
+0.8571 
+0.5295 
+0.8571 
+1.0000 
+0.9230 
+0.00 
+Medium Only 
+0.8205 
+0.9047 
+0.8164 
+0.8285 
+0.8224 
+37.25 
+0.8571 
+0.5101 
+0.8571 
+1.0000 
+0.9230 
+0.00 
+Full Only 
+0.9088 
+0.9709 
+0.8941 
+0.9280 
+0.9107 
+6.61 
+0.8571 
+0.4182 
+0.8571 
+1.0000 
+0.9230 
+0.00 
+MaD-CoRN 
+0.5780 
+0.6096 
+0.5782 
+0.5864 
+0.5823 
+85.01 
+0.8571 
+0.5592 
+0.8571 
+1.0000 
+0.9230 
+0.00 
+DefakeHop++ 
+0.8002 
+0.8831 
+0.7858 
+0.8269 
+0.8058 
+20.25 
+0.8531 
+0.2331 
+0.8565 
+0.9954 
+0.9207 
+1.55 
+ShuffleNetV2 
+0.9876 
+0.9993 
+0.9858 
+0.9895 
+0.9877 
+0.54 
+0.8571 
+0.5693 
+0.8571 
+1.0000 
+0.9230 
+0.27 
+ 
+further highlighted in the training and inference time compar-
+ison, explained in Section V-C. 
+We also conducted further experiments to analyze if having 
+the gated approach results in performance changes. The gated 
+model substantially improves over the fast-only and medium-
+only configurations, indicating that relying on a single shallow 
+or intermediate representation is insufficient for many samples. 
+The full-only model achieves the strongest performance among 
+the proposed variants, but it applies the deepest computation 
+to every input. In contrast, the gated model provides a more 
+deployment-oriented tradeoff by adapting the inference path 
+according to input quality. Therefore while the gated approach 
+leads to slight performance degradation compared to the forced 
+binary decision, it offers a faster training pipeline and makes it 
+generalized for all the images instead of one particular image 
+type. 
+Uncertainty rate provides additional insight beyond standard 
+classification metrics. On Celeb-DF, the fast-only exit has 
+a high uncertainty rate of 83.31%, while the gated model 
+reduces this value to 22.23%, showing that adaptive routing 
+helps reduce low-confidence predictions by allowing more 
+difficult samples to receive deeper analysis. However, uncer-
+tainty must be interpreted together with AUC and F1-score, 
+since a low uncertainty rate alone does not necessarily indi-
+cate strong discriminative performance. Compared with MaD-
+CoRN, AdaGate-DF achieves substantially higher AUC and 
+F1-score on Celeb-DF while reducing the uncertainty rate from 
+85.01% to 22.23%. This suggests that the proposed adaptive 
+spatial-frequency design produces more reliable predictions 
+under this evaluation setting. 
+To evaluate model behavior under a more realistic class 
+distribution, we retained the imbalanced FF++ setting, which 
+contains an approximate 1:6 ratio of real to fake samples. Be-
+cause this imbalance can inflate threshold-dependent metrics 
+such as accuracy, precision, recall, and F1-score, we use AUC 
+as the primary comparison metric for this dataset. Although 
+several models achieve similar accuracy and F1-score values, 
+their low AUC scores indicate limited class separation and 
+suggest bias toward the majority class. ShuffleNetV2 obtains 
+the highest AUC of 0.5693, followed closely by MaD-CoRN, 
+while the proposed gated model achieves an AUC of 0.5163 
+and outperforms DefakeHop++ on this metric. These results 
+show that the proposed method is affected by the imbalanced 
+FF++ setting, but it remains competitive with the evaluated 
+models and performs more more stable than DefakeHop++ 
+across the tested resolutions. The near-zero uncertainty rates 
+observed for several models further indicate that confidence 
+alone is insufficient under class imbalance, since models 
+may produce confident predictions despite weak discriminative 
+performance. Therefore, the FF++ results should be interpreted 
+cautiously and supplemented with balanced accuracy, speci-
+ficity, false positive rate, false negative rate, and confusion-
+matrix analysis, which will be addressed in the future work. 
+TABLE III: Resolution-Based Accuracy and AUC Across 
+Models on Celeb-DF and FF++ 
+ 
+Model 
+Resolution 
+Celeb-DF 
+FF++ 
+Accuracy 
+AUC 
+Accuracy 
+AUC 
+128 
+0.8112 
+0.8954 
+0.8571 
+0.5043 
+Gated Dual Branch 
+224 
+0.8638 
+0.9364 
+0.8571 
+0.5253 
+256 
+0.8689 
+0.9400 
+0.8571 
+0.5214 
+384 
+0.9108 
+0.9708 
+0.8571 
+0.5202 
+128 
+0.5582 
+0.6085 
+0.8571 
+0.5639 
+MaD-CoRN 
+224 
+0.5900 
+0.6250 
+0.8571 
+0.5569 
+256 
+0.5898 
+0.6243 
+0.8571 
+0.5590 
+384 
+0.5741 
+0.5987 
+0.8571 
+0.5575 
+128 
+0.5100 
+0.7711 
+0.8565 
+0.4883 
+DefakeHop++ 
+224 
+0.8002 
+0.8831 
+0.8531 
+0.2331 
+256 
+0.7695 
+0.8700 
+0.8569 
+0.3304 
+384 
+0.6324 
+0.7896 
+0.8571 
+0.4094 
+128 
+0.5716 
+0.8731 
+0.8571 
+0.5451 
+ShuffleNetV2 
+224 
+0.9876 
+0.9993 
+0.8571 
+0.5836 
+256 
+0.9840 
+0.9989 
+0.8571 
+0.5717 
+384 
+0.8927 
+0.9742 
+0.8571 
+0.5765 
+ 
+B. Resolution-Based Evaluation 
+Resolution-based testing was conducted to evaluate how 
+each model responds to changes in input quality. This is 
+important for real-world deepfake detection because images 
+and video frames are often compressed, resized, downsampled, 
+or captured at inconsistent resolutions. Since the proposed 
+gated framework uses quality-related features to determine the 
+inference path, testing across multiple resolutions allows us to 
+examine whether the model remains reliable when the amount 
+of available visual detail changes. 
+We evaluate all models at 128×128, 224×224, 256×256, 
+and 384×384 resolutions. These settings represent low- 
+resolution, standard-resolution, and higher-resolution input 
+conditions. Lower resolutions test whether the models can still 
+
+
+--- PAGE 7 ---
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Training Time (hours) / Inference Time (ms) 
+ 
+ 
+ 
+ 
+60 
+60 
+ 
+ 
+40 
+40 
+ 
+ 
+20 
+20 
+ 
+ 
+0 
+0 
+ 
+ 
+ 
+ 
+(a) Celeb-DF 
+(b) FF++ 
+Fig. 2: Training (hrs) and inference (ms) time comparison across evaluated models. The shared y-axis is used only for compact 
+visualization; the bars should be interpreted using their respective units. 
+ 
+identify manipulation cues when fine-grained facial artifacts 
+are reduced, while higher resolutions evaluate whether addi-
+tional spatial and frequency information improves detection. 
+However, higher resolution does not always guarantee better 
+performance, since resizing and upscaling can introduce inter-
+polation artifacts or alter high-frequency patterns. Therefore, 
+384 × 384 is used as the high-resolution evaluation setting. 
+As shown in Table III, the proposed gated model shows a 
+consistent improvement on Celeb-DF as resolution increases, 
+with AUC improving from 0.8954 at 128×128 to 0.9708 
+at 384×384, indicating the proposed spatial-frequency rep-
+resentation benefits from additional image detail while still 
+maintaining strong performance at lower resolution. Compared 
+with the SOTA models, the proposed method performs more 
+consistently than MaD-CoRN and DefakeHop++ across the 
+tested resolutions. ShuffleNetV2 achieves the highest AUC 
+at 224×224 and 256×256, but its performance decreases at 
+384×384, showing that higher resolution does not uniformly 
+improve all architectures. 
+For FF++, the high class imbalance leads to consistently 
+high accuracy values across resolutions, while AUC remains 
+low for most models. Even under this setting, the proposed 
+gated model shows more stable behavior than DefakeHop++ 
+across all tested resolutions. Specifically, the proposed method 
+achieves AUC values between 0.5043 and 0.5253, whereas De-
+fakeHop++ varies more substantially from 0.2331 to 0.4883. 
+This indicates that although the proposed model is affected by 
+the imbalanced evaluation setting, it maintains more consis-
+tent class-separation behavior across resolutions than Defake-
+Hop++. ShuffleNetV2 and MaD-CoRN obtain slightly higher 
+AUC values on FF++, but the gated model remains competitive 
+while also providing adaptive routing and uncertainty-aware 
+prediction. 
+C. Training and Inference Efficiency 
+In addition to classification performance, we evaluate the 
+computational efficiency of the proposed method and the 
+compared models. Figure 2 reports the training and inference 
+efficiency of the evaluated models on Celeb-DF and FF++. 
+Training time is reported in hours, while inference time is 
+reported in milliseconds per image at 224×224 resolution. 
+The 224×224 setting is used as the base inference resolution 
+because it provides a common evaluation point across all 
+compared models and corresponds to a standard input size 
+used in many image-based detection pipelines. 
+The results show that training time and inference time do 
+not always follow the same trend. For example, DefakeHop++ 
+has relatively low training time, but it has the highest inference 
+latency on both datasets. This makes it less suitable for 
+high-throughput deployment settings where many images or 
+frames must be processed. In contrast, MaD-CoRN requires 
+the highest training time on both datasets and also has higher 
+inference latency than the proposed method. The proposed 
+gated model provides a more favorable efficiency profile, 
+requiring 6.07 hours of training and 0.14 ms inference time on 
+Celeb-DF, and 5.58 hours of training and 0.25 ms inference 
+time on FF++. 
+These results support the deployment motivation of the 
+proposed approach. Although ShuffleNetV2 has the lowest 
+training time on Celeb-DF, the proposed gated model achieves 
+lower inference latency while also providing adaptive routing 
+and uncertainty-aware prediction. On FF++, the proposed 
+Training Time 
+Inference Time 
+Training Time 
+Inference Time 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Training Time (hours) / Inference Time (ms) 
+
+
+--- PAGE 8 ---
+
+model has the lowest inference latency among the compared 
+methods. This indicates that the gated architecture is effective 
+not only as a detection model, but also as a practical inference 
+framework for resource-constrained deepfake detection. 
+VI. CONCLUSION 
+This paper presented AdaGate-DF, an adaptive gated 
+deepfake detection framework designed for low-resolution 
+and resource-constrained environments. The proposed method 
+combines RGB spatial representations with DCT-based fre-
+quency representations and uses lightweight image-quality fea-
+tures to route samples through fast, medium, or full inference 
+paths. The results show that AdaGate-DF provides a strong 
+balance between detection performance, uncertainty-aware 
+prediction, and computational efficiency. On Celeb-DF, the 
+proposed method outperforms MaD-CoRN and DefakeHop++ 
+while maintaining low inference latency, and the resolution-
+based results show consistent improvement as input resolution 
+increases. These findings support the value of quality-aware 
+adaptive routing for practical deepfake detection under variable 
+image-quality conditions. The FF++ results further highlight 
+the importance of AUC and class-balanced analysis when 
+evaluating under imbalanced dataset conditions. 
+Future work will extend this evaluation by incorporating 
+additional class-balanced metrics, including balanced accu-
+racy, specificity, false positive rate, false negative rate, and 
+confusion matrices, particularly for the imbalanced dataset. We 
+will also evaluate timing under a unified hardware protocol and 
+analyze the percentage of samples assigned to each gate across 
+different resolutions. This would provide a more detailed 
+understanding of how the adaptive routing mechanism be-
+haves under changing input quality. Additional extensions may 
+include improved gate supervision, and video-level temporal 
+modeling. 
+REFERENCES 
+[1] A. Rossler, D. Cozzolino, L. Verdoliva, C. Riess, J. Thies, and 
+M. Nießner, “Faceforensics++: Learning to detect manipulated facial 
+images,” in Proceedings of the IEEE/CVF international conference on 
+computer vision, 2019, pp. 1–11. 
+[2] Y. Li, X. Yang, P. Sun, H. Qi, and S. Lyu, “Celeb-df: A large-
+scale challenging dataset for deepfake forensics,” in Proceedings of the 
+IEEE/CVF conference on computer vision and pattern recognition, 2020, 
+pp. 3207–3216. 
+[3] V. K. Sharma, R. Garg, and Q. Caudron, “A systematic literature review 
+on deepfake detection techniques,” Multimedia Tools and Applications, 
+vol. 84, no. 20, pp. 22 187–22 229, 2025. 
+[4] S. Sharma and A. Selwal, “Improved deepfake detection with optimized 
+preprocessing for low-quality images,” Procedia Computer Science, vol. 
+258, pp. 507–516, 2025. 
+[5] M. Pandey, S. Singh, A. Malik, and R. Kumar, “Detecting low-resolution 
+deepfakes: an exploration of machine learning techniques,” Multimedia 
+Tools and Applications, vol. 83, no. 25, pp. 66 283–66 298, 2024. 
+[6] M. Uddin, Z. Fu, X. Zhang, and A. B. H. Arnob, “Low resolution 
+deepfake face detection using multi-scale discrete cosine transform and 
+vision transformer,” in 2025 3rd International Conference on Intelligent 
+Systems, Advanced Computing and Communication (ISACC). IEEE, 
+2025, pp. 1134–1139. 
+[7] D. Sabareshwar, S. Raghul, M. Varalakshmi, P. Peer Mohamed et al., 
+“A lightweight cnn for efficient deepfake detection of low-resolution 
+images in frequency domain,” in 2024 Second International Confer-
+ence on Emerging Trends in Information Technology and Engineering 
+(ICETITE). IEEE, 2024, pp. 1–6. 
+[8] A. S. Perera, A. S. Atukorale, and P. Kumarasinghe, “Employing super 
+resolution to improve low-quality deepfake detection,” in 2022 22nd 
+International Conference on Advances in ICT for Emerging Regions 
+(ICTer). IEEE, 2022, pp. 013–018. 
+[9] N. S. Ivanov, A. V. Arzhskov, and V. G. Ivanenko, “Combining deep 
+learning and super-resolution algorithms for deep fake detection,” in 
+2020 IEEE Conference of Russian Young Researchers in Electrical and 
+Electronic Engineering (EIConRus). IEEE, 2020, pp. 326–328. 
+[10] N. Ahmed, T. Natarajan, and K. R. Rao, “Discrete cosine transform,” 
+IEEE transactions on Computers, vol. 100, no. 1, pp. 90–93, 1974. 
+[11] Y. Qian, G. Yin, L. Sheng, Z. Chen, and J. Shao, “Thinking in frequency: 
+Face forgery detection by mining frequency-aware clues,” in European 
+conference on computer vision. Springer, 2020, pp. 86–103. 
+[12] J. Frank, T. Eisenhofer, L. Scho¨nherr, A. Fischer, D. Kolossa, and 
+T. Holz, “Leveraging frequency analysis for deep fake image recogni-
+tion,” in International conference on machine learning. PMLR, 2020, 
+pp. 3247–3258. 
+[13] M. Sharafudeen and V. Chandra SS, “Frequency forensics for deep 
+fake face detection using dual residual networks,” Multimedia Tools and 
+Applications, vol. 84, no. 35, pp. 44 063–44 088, 2025. 
+[14] M. Uddin, Z. Fu, and X. Zhang, “Deepfake face detection via multi-
+level discrete wavelet transform and vision transformer,” The Visual 
+Computer, vol. 41, no. 10, pp. 7049–7061, 2025. 
+[15] J. Wang, Z. Wu, W. Ouyang, X. Han, J. Chen, Y.-G. Jiang, and S.-N. 
+Li, “M2tr: Multi-modal multi-scale transformers for deepfake detection,” 
+in Proceedings of the 2022 international conference on multimedia 
+retrieval, 2022, pp. 615–623. 
+[16] J. Sun and W. Hou, “A study of two-branch fusion network model for 
+low-quality deepfake detection in face videos,” Signal, Image and Video 
+Processing, vol. 19, no. 8, p. 631, 2025. 
+[17] V. Sen, C. Laurie, and R. Hasan, “Multi-stream fusion of spatial, 
+frequency, and attention features for robust deepfake detection in low-
+resolution images,” The International FLAIRS Conference Proceedings, 
+vol. 39, no. 1, May 2026. 
+[18] M. Tan and Q. Le, “Efficientnet: Rethinking model scaling for con-
+volutional neural networks,” in International conference on machine 
+learning. PMLR, 2019, pp. 6105–6114. 
+[19] R. Budhiraja, M. Kumar, M. Das, A. S. Bafila, A. Pundir, and S. Singh, 
+“Mad-corn: an efficient and lightweight deepfake detection approach 
+using convolutional reservoir network,” Multimedia Tools and Applica-
+tions, vol. 84, no. 24, pp. 28 603–28 641, 2025. 
+[20] S. M. Yasir and H. Kim, “Lightweight deepfake detection based on 
+multi-feature fusion,” Applied Sciences, vol. 15, no. 4, p. 1954, 2025. 
+[21] V. S.-H. Pan, A. Gaurav, S. Mahfoudh, T. Althaqafi, W. Alhalabi, 
+R. Raman, and C.-H. Hsu, “Semantic-aware lightweight ai model 
+for deepfake image detection in online retail platforms,” International 
+Journal on Semantic Web and Information Systems (IJSWIS), vol. 21, 
+no. 1, pp. 1–16, 2025. 
+[22] S. Lee, J. An, and S. S. Woo, “Bznet: Unsupervised multi-scale 
+branch zooming network for detecting low-quality deepfake videos,” in 
+Proceedings of the ACM Web Conference 2022, 2022, pp. 3500–3510. 
+[23] S. Teerapittayanon, B. McDanel, and H.-T. Kung, “Branchynet: Fast 
+inference via early exiting from deep neural networks,” in 2016 23rd 
+international conference on pattern recognition (ICPR). IEEE, 2016, 
+pp. 2464–2469. 
+[24] F. Chollet, “Xception: Deep learning with depthwise separable convolu-
+tions,” in Proceedings of the IEEE conference on computer vision and 
+pattern recognition, 2017, pp. 1251–1258. 
+[25] D. Afchar, V. Nozick, J. Yamagishi, and I. Echizen, “Mesonet: a compact 
+facial video forgery detection network,” in 2018 IEEE international 
+workshop on information forensics and security (WIFS). IEEE, 2018, 
+pp. 1–7. 
+[26] A. Howard, M. Sandler, G. Chu, L.-C. Chen, B. Chen, M. Tan, W. Wang, 
+Y. Zhu, R. Pang, V. Vasudevan et al., “Searching for mobilenetv3,” 
+in Proceedings of the IEEE/CVF international conference on computer 
+vision, 2019, pp. 1314–1324. 
+[27] N. Ma, X. Zhang, H.-T. Zheng, and J. Sun, “Shufflenet v2: Practical 
+guidelines for efficient cnn architecture design,” in Proceedings of the 
+European conference on computer vision (ECCV), 2018, pp. 116–131. 
+[28] H.-S. Chen, S. Hu, S. You, and C.-C. J. Kuo, “Defakehop++: An en-
+hanced lightweight deepfake detector,” arXiv preprint arXiv:2205.00211, 
+2022. 
+[29] “Csu tide high performance computing infrastructure,” https://csu-tide. 
+github.io/, 2025, accessed: 2026-06-01. 

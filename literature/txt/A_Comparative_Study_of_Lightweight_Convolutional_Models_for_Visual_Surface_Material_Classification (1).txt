@@ -1,0 +1,953 @@
+
+
+--- PAGE 1 ---
+
+Received 2 March 2026, accepted 17 April 2026, date of publication 23 April 2026, date of current version 5 May 2026.
+Digital Object Identifier 10.1109/ACCESS.2026.3686791
+A Comparative Study of Lightweight
+Convolutional Models for Visual Surface
+Material Classification
+JEREMY SEAN TAN1, AARON RAYMOND SEE
+2, (Member, IEEE),
+AND AARON BENJMIN ALCUITAS
+2
+1School of Electrical Engineering and Computer Science, Oregon State University, Corvallis, OR 97331, USA
+2Department of Electronic Engineering, National Chin-Yi University of Technology, Taichung 41170, Taiwan
+Corresponding author: Aaron Raymond See (aaronsee@gm.ncut.edu.tw)
+This work was supported in part by the National Science and Technology Council of Taiwan under
+Grant NSTC 114-2221-E-167-007-MY2.
+ABSTRACT Surface material classification is essential for robotic perception, enabling grasp adaptation,
+slip prediction, and safe manipulation. This work presents a systematic analysis of accuracy-efficiency trade-
+offs among lightweight convolutional neural networks for visual-only surface material classification on the
+LMT-108 database. The evaluation spans both classical and compact models, including AlexNet, ResNet-18,
+ShuffleNetV2 (x0.5, x1.0, x1.5), MobileNetV2, MobileNetV3 (Small and Large), and EfficientNet (B0–B2),
+all trained under an identical pipeline and assessed in terms of accuracy, parameter count, floating-point
+operations (FLOPs), and inference latency. We apply a lightweight augmentation and regularization strategy
+to enhance generalization on texture-rich visual data. Across all architectures, EfficientNet-B2 achieved the
+highest mean Top-1 accuracy (97.8%). However, multi-objective analysis reveals that ShuffleNetV2 and
+MobileNet architectures provided the best accuracy–efficiency balance, attaining ≈97% accuracy while
+reducing parameters and latency by more than 70% relative to larger models. These results highlight the
+suitability of modern lightweight CNNs for computationally efficient surface material classification. A
+supplementary haptic fusion experiment further demonstrates that top lightweight visual backbones extend
+naturally to compact multimodal perception systems.
+INDEX TERMS Convolutional neural networks, deep learning, lightweight architectures, surface material
+classification.
+I. INTRODUCTION
+Perceiving and interpreting surface materials is a funda-
+mental component of embodied intelligence [1], [2]. For
+robotic systems, the ability to recognize and characterize
+surfaces enables autonomous systems to infer object prop-
+erties, adapt grasping strategies, and navigate unstructured
+environments [3], [4], [5]. Whether an autonomous entity
+must determine the slipperiness of a metallic component or
+distinguish carpet from tile, surface material classification
+forms the foundation for numerous downstream tasks in
+The associate editor coordinating the review of this manuscript and
+approving it for publication was Jose Saldana
+.
+robotics, industrial inspection, and assistive technologies [1],
+[6], [7].
+Early computational approaches relied on engineered
+visual texture descriptors such as filter bank features [8],
+Local Binary Patterns (LBP) [9], and co-occurrence matri-
+ces [10]. Deep CNNs such as AlexNet, VGG, and ResNet
+significantly improved texture and material recognition by
+learning hierarchical representations [11], [12], [13]. How-
+ever, their large parameter counts and computational cost
+hinder deployment in embedded systems [14], [15]. Recent
+architectural discoveries, including depthwise separable con-
+volutions, channel shuffling, and compound scaling, have
+enabled lightweight models such as MobileNetV2 [16],
+ShuffleNetV2 [17], and EfficientNet-B0 [18] to maintain
+VOLUME 14, 2026
+ 2026 The Authors. This work is licensed under a Creative Commons Attribution 4.0 License.
+For more information, see https://creativecommons.org/licenses/by/4.0/
+66179
+
+
+--- PAGE 2 ---
+
+J. S. Tan et al.: Comparative Study of Lightweight Convolutional Models
+competitive accuracy while drastically reducing computation.
+However, their relative accuracy–efficiency trade-offs under
+a unified training and evaluation protocol for surface material
+classification have not been consistently characterized [19].
+Rather than proposing a new architecture, this work
+presents a systematic evaluation of accuracy–efficiency
+trade-offs among representative lightweight CNNs for visual
+surface material classification on the LMT-108 dataset. Clas-
+sical baselines (AlexNet, ResNet-18) and modern compact
+models (MobileNetV2/V3, ShuffleNetV2, EfficientNet-B0–
+B2) are trained under a unified pipeline and evaluated
+using accuracy, parameter count, floating-point operations
+(FLOPs), model size, and inference latency. While multi-
+modal approaches incorporating visual, haptic, or acoustic
+cues can further improve performance, they introduce addi-
+tional sensing, synchronization, and computational overhead
+that complicate deployment on resource-constrained plat-
+forms [20], [21], [22]. Establishing the upper bound of
+lightweight visual-only performance is an important prereq-
+uisite before introducing multimodal fusion.
+The contributions of this research are as follows: (1) A sys-
+tematic accuracy-efficiency evaluation of lightweight CNN
+architectures for surface material classification on the LMT-
+108 dataset is presented, where all models are fine-tuned
+under an identical training, augmentation, and regularization
+pipeline for controlled comparison; (2) an augmentation and
+regularization strategy tailored for low-sample, texture-rich
+visual data is developed to improve generalization with-
+out increasing computational cost; and (3) a lightweight
+visuo-tactile fusion case study is presented demonstrating
+efficient multimodal extension.
+By emphasizing both performance and efficiency, this
+study aims to guide the selection of CNN backbones for
+texture-aware perception in contexts where compute and
+memory budgets are limited.
+II. RELATED WORK
+A. VISUAL TEXTURE AND MATERIAL CLASSIFICATION
+CNN-based representations have largely replaced hand-
+crafted texture descriptors such as LBP and co-occurrence
+matrices, offering hierarchical feature extraction that general-
+izes across lighting and scale variations [19], [23], [24], [25].
+Early CNNs such as AlexNet and VGG were later surpassed
+by residual architectures like ResNet, which improved train-
+ing stability and accuracy on fine-grained material datasets.
+Mandal et al. [26] demonstrated that ImageNet-pretrained
+CNNs achieve high texture recognition accuracy even with-
+out dataset-specific architectures, though their computational
+demands remain significant. Despite these successes, system-
+atic analyses of compact CNNs on material-specific datasets
+such as LMT-108 remain limited [20], [24].
+B. HAPTIC AND MULTIMODAL SURFACE PERCEPTION
+In parallel with visual approaches, multimodal percep-
+tion frameworks have leveraged tactile, acoustic, and other
+sensing modalities to improve surface understanding [21],
+[22], [24], [27], [28]. Substantial accuracy gains have been
+demonstrated by model architectures that utilize multimodal
+inputs for material classification. For example, Zheng et al.
+[24] introduced FusionNet, a fully convolutional fusion
+model that integrates two sub-networks: HapticNet for tactile
+data, and VisualNet for image data, achieving substantially
+better accuracy than single-modality performance.
+Building on this, subsequent studies have explored
+cross-modal feature learning [29], [30], domain adaptation,
+and ensemble fusion. Liu et al. [20] proposed an optimized
+ensemble approach integrating CNN, recurrent, and acous-
+tic models with a feature-selection strategy, achieving good
+accuracy on LMT-108. Other researchers extended multi-
+modal learning with graph neural networks [31], [32], 3D
+tactile point clouds [33], [34], or attention-based fusion [3],
+[35]. Despite these advances, multimodal frameworks incur
+higher inference latency, sensor synchronization challenges,
+and hardware costs, factors that hinder deployment on small
+robotic platforms [21], [22], [24]. Naturally, there is a moti-
+vation to examine the upper bound of purely visual systems
+before adding tactile complexity.
+C. LIGHTWEIGHT EDGE-EFFICIENT CNNs
+Recent lightweight architectures achieve strong accuracy–
+efficiency trade-offs through structural optimizations such
+as depthwise-separable convolutions and channel shuf-
+fling. MobileNetV2 introduced inverted residuals [16],
+ShuffleNetV2 balanced computation and memory through
+channel-split design [17], and EfficientNet applied com-
+pound scaling to optimize performance under fixed compute
+budgets [18].
+Although these networks have demonstrated competitive
+performance on large-scale vision benchmarks, their com-
+parative accuracy and efficiency metrics on fine-grained,
+texture-centric datasets remain underexplored. Mandal et al.
+[26] conducted a related comparative study on rock tex-
+tures using ImageNet-pretrained CNNs and reported high
+recognition accuracy, but their work did not evaluate compu-
+tational metrics such as parameter count, FLOPs, or inference
+latency. In contrast, the present study extends this compar-
+ative perspective to lightweight CNN architectures, jointly
+evaluating predictive accuracy and computational efficiency
+on the LMT-108 dataset to identify optimal trade-offs for
+embedded robotic perception.
+III. METHODOLOGY
+This work conducts a unified evaluation of lightweight con-
+volutional neural network architectures for visual surface
+material classification using the LMT-108 dataset [36]. The
+goal is to identify compact models capable of high accuracy
+while remaining suitable for resource-constrained platforms.
+The study benchmarks AlexNet, ResNet-18, ShuffleNetV2
+(x1.0, x1.5), MobileNetV2, MobileNetV3 (Small and Large),
+and EfficientNet-B0–B2. All models are trained under iden-
+tical preprocessing, optimization, and regularization settings
+66180
+VOLUME 14, 2026
+
+
+--- PAGE 3 ---
+
+J. S. Tan et al.: Comparative Study of Lightweight Convolutional Models
+to ensure controlled comparison. The evaluation incorporates
+both predictive performance and computational efficiency,
+including parameter count, FLOPs, model size, and inference
+latency.
+A supplementary multimodal fusion experiment further
+demonstrates the extensibility of the strongest lightweight
+visual backbone toward efficient visuo-tactile perception.
+A. DATASET
+All experiments utilized the LMT-108 dataset [36], a com-
+prehensive benchmark for surface material classification
+developed by the Technical University of Munich. The dataset
+contains 108 surface classes, each representing a distinct
+material type. Each material was recorded under six sensing
+modalities: visual, haptic, acoustic, friction, metal detection,
+and reflectance.
+In this study, only the visual modality was used, consisting
+of RGB images captured under two illumination conditions:
+with flash and without flash. Each class contains 40 images
+in total: 20 for training (10 with flash, 10 without) and
+20 for testing (10 with flash, 10 without), resulting in 4,320
+RGB images across all 108 classes. The haptic modality was
+incorporated only in the supplementary multimodal exper-
+iment (Section IV-B), where accelerometer-based features
+were fused with the visual embeddings to evaluate cross-
+sensory generalization.
+The official dataset split was used directly, with no addi-
+tional resampling or repartitioning performed.
+B. PREPROCESSING AND AUGMENTATION
+Images were resized to 224 × 224 and normalized using
+standard ImageNet preprocessing conventions. The normal-
+ization for each pixel channel is defined as:
+x′ = x −µ
+σ
+(1)
+where
+x
+represents
+the
+original
+pixel
+intensity,
+and
+x′
+represents
+the
+normalized
+value.
+The
+normaliza-
+tion
+parameters
+were
+defined
+as
+channel-wise
+mean
+µ = [0.485, 0.456, 0.406] and standard deviation σ
+=
+[0.229, 0.224, 0.225]. A balanced 50:50 split was used, yield-
+ing 2160 images for the train and test sets, with uniform class
+representations preserved in both subsets.
+To mitigate overfitting, on-the-fly augmentation (random
+crops, flips, rotations ±20◦, perspective distortion, grayscale
+p = 0.1, random erasing) were applied independently to each
+image during data loading, ensuring that each epoch pre-
+sented the network with a stochastically varied version of the
+dataset. The augmentation strategy was selected via prelim-
+inary ablation experiments and fixed across all architectures
+to ensure fair comparison under limited-sample conditions.
+C. TRAINING CONFIGURATION
+All networks were trained using cross-entropy loss with label
+smoothing (ε = 0.1), a regularization technique commonly
+used in deep image classification [37]. The loss function is
+defined as:
+LCE = −1
+N
+N
+X
+i=1
+C
+X
+c=1
+yLS
+i,c log
+ pi,c
+
+(2)
+where N denotes the number of samples, C the number of
+classes, yLS
+i,c the smoothed target label, and pi,c the predicted
+softmax probability for class c. Label smoothing is applied
+according to:
+yLS
+i,c = (1 −ε) yi,c + ε
+C
+(3)
+where yi,c denotes the one-hot ground-truth label and ε =
+0.1 controls the degree of smoothing. Label smoothing redis-
+tributes a small fraction of probability mass away from
+the ground-truth class, reducing model overconfidence and
+improving generalization [37].
+Optimization employed the AdamW optimizer with a
+learning rate of 3 × 10−4 and weight decay of 1 × 10−4.
+To prevent overfitting, an early-stopping mechanism with
+patience equaling 50 epochs halted training once validation
+performance ceased to improve [38]. A ReduceLROnPlateau
+scheduler dynamically adjusted the learning rate (factor =
+0.5, patience = 12) to maintain stable convergence.
+D. EVALUATION METRICS AND BASELINES
+Performance
+was
+assessed
+using
+both
+accuracy
+and
+efficiency-based metrics.
+1) CLASSIFICATION METRICS
+Top-1 accuracy served as the primary evaluation metric. All
+reported results correspond to the mean ± standard devi-
+ation over three independent training runs, accounting for
+stochastic variability arising from random initialization, data
+augmentation, and mini-batch shuffling. The official LMT-
+108 dataset was used for all experiments, with separate
+training and testing directories, and no resampling or reparti-
+tioning was performed across runs.
+In addition to overall accuracy, class-wise performance and
+confusion matrices were also analyzed to assess robustness
+across visually distinct (e.g., textiles, wood) and visually
+similar (e.g., glass, metal) categories. The Top-1 accuracy is
+defined as:
+Accuracy = 1
+N
+N
+X
+i=1
+1
+ argmaxcpi,c = yi
+
+(4)
+where N is the total number of test samples, pi,c denotes the
+predicted probability for class C, and yi is the true label of the
+i-th sample.
+2) EFFICIENCY METRICS
+Computational efficiency was evaluated through parame-
+ter count, FLOPs, model size, and inference latency—each
+reflecting deployability in constrained environments. For a
+convolutional layer l with kernel size kl, input channels cin(l),
+VOLUME 14, 2026
+66181
+
+
+--- PAGE 4 ---
+
+J. S. Tan et al.: Comparative Study of Lightweight Convolutional Models
+and output channels cout(l) the total parameters were calcu-
+lated as:
+Ptotal =
+L
+X
+l=1
+k2
+l cin,lcout,l + cout,l
+(5)
+where L denotes the total number of convolutional layers.
+The total number of floating-point operations (FLOPs) was
+computed as:
+FLOPstotal =
+L
+X
+l=1
+2hlwlk2
+l cin,lcout,l
+(6)
+where L denotes the total number of convolutional layers,
+hl and wl represent the spatial height and width of the out-
+put feature map at layer l, respectively, and the factor of
+2 accounts for the multiply-add operations performed during
+convolution. Average inference latency is measured as:
+Latencyavg = 1
+K
+K
+X
+i=1
+ti
+(7)
+where ti is the elapsed inference time (ms/image) for the i-th
+forward pass and K represents the total number of repeated
+forward passes performed under identical hardware and run-
+time conditions. FLOPs and parameter counts were computed
+using PyTorch profiling utilities, and model size (MB) was
+determined from the serialized state dictionary.
+3) COMPARATIVE BASELINES
+The study benchmarked a range of lightweight convolutional
+architectures spanning multiple design generations:
+• AlexNet (2012) [39]: a canonical deep CNN baseline.
+• ResNet-18 (2016) [40]: residual mid-scale model bal-
+ancing accuracy and simplicity.
+• ShuffleNetV2 (x0.5, x1.0, x1.5) (2018) [17]: channel-
+shuffling architectures optimized for mobile inference
+efficiency.
+• MobileNetV2 (2018) [41]: inverted residual design
+offering strong accuracy-latency trade-offs for embed-
+ded systems.
+• MobileNetV3
+(Small
+and
+Large)
+(2019)
+[42]:
+architecture-searched successors incorporating squeeze-
+and-excitation and h-swiss activations for further effi-
+ciency.
+• EfficientNet B0–B2 (2019) [18]: compound-scaled
+models emphasizing optimal accuracy-to-compute scal-
+ing across multiple depths and widths.
+All models were trained under identical optimization, aug-
+mentation, and evaluation settings to ensure a fair comparison
+across architectures. Quantitative results are presented in
+Section IV-A.
+E. COMPUTATIONAL ENVIRONMENT
+All experiments were conducted in PyTorch 2.3 on an
+RTX 4050 GPU. Training and evaluation were performed in
+Jupyter Notebook and VS Code.
+Inference latency values reported in this paper correspond
+to desktop-side measurements on this workstation. Latency
+was measured using single-image inference (batch size =
+1) with input tensors of size 3 × 224 × 224. For each
+model, 100 consecutive forward passes were executed under
+inference mode, and the average elapsed time per image
+was computed. Input preprocessing was not included in the
+timing as inputs were provided directly in tensor form. All
+measurements were performed using FP32 precision.
+Because no embedded devices (e.g., Jetson, Raspberry
+Pi) were benchmarked, the latency results should be inter-
+preted only as relative comparisons between models, not as
+direct indicators of real-time performance on edge hardware.
+Although GPU synchronization was not explicitly enforced
+during timing, all models were evaluated under identical con-
+ditions. Therefore, the reported latency values remain valid
+for relative comparison across architectures.
+Unless otherwise specified, all architectures were trained
+under the same preprocessing, augmentation, and optimiza-
+tion settings, ensuring a controlled and fair comparison across
+models.
+IV. EXPERIMENTAL RESULTS AND ANALYSIS
+A. PRIMARY RESULTS
+The results demonstrate that modern lightweight convolu-
+tional architectures can achieve high performance in surface
+material classification while substantially reducing compu-
+tational cost. Among the tested models, ShuffleNetV2 ×
+1.0 and MobileNetV3-Small attained accuracies of 97.0%
+and 96.3%, respectively, closely matching the 97.0–97.8%
+range of the more complex EfficientNet variants (B0–B2)
+despite using an order of magnitude fewer parameters.
+Specifically, ShuffleNetV2 × 1.0 achieved an average
+inference latency of 4.08 ms per image with only 1.36 M
+parameters, representing an 82% reduction in parameter
+count and a 45% lower latency compared to EfficientNet-
+B2 (7.85 M, 7.37 ms), while maintaining accuracy within
+0.8 percentage points of the best-performing model. Table 1
+summarizes accuracy and efficiency metrics for all evaluated
+architectures. EfficientNet-B2 achieved the highest mean
+accuracy (97.81%) but at the cost of 7.85 M parameters and
+0.69 B FLOPs. In contrast, ShuffleNetV2 × 1.0 reached a
+comparable 97.04% accuracy while requiring over 80% fewer
+parameters and nearly half the inference latency, making it
+the optimal baseline for subsequent experiments. Smaller
+MobileNetV3 and ShuffleNetV2 variants further reduced
+FLOPs and storage with minor accuracy loss, an important
+trade-off for memory or power-constrained platforms [19].
+Figure 1 summarizes model parameters and computa-
+tional cost (FLOPs) for the lightweight CNN architectures
+(AlexNet and ResNet-18 are omitted for clarity due to
+their significantly larger scale). AlexNet and ResNet-18
+remain the heaviest models, with 57.45 M and 11.23 M
+parameters and 0.71 B and 1.82 B FLOPs, respectively. Effi-
+cientNet variants show greater parameter efficiency but still
+incur relatively high computational cost as depth increases
+66182
+VOLUME 14, 2026
+
+
+--- PAGE 5 ---
+
+J. S. Tan et al.: Comparative Study of Lightweight Convolutional Models
+TABLE 1. Performance comparison of CNN architectures.
+(e.g., EfficientNet-B2: 7.85 M params, 0.69 B FLOPs).
+In contrast, the ShuffleNetV2 and MobileNet families
+demonstrate substantially lower complexity. ShuffleNetV2
+× 0.5 and x1.0 require only 0.45 M / 1.36 M parameters
+and 0.04 B / 0.15 B FLOPs, respectively, over an order of
+magnitude lighter than AlexNet and ResNet-18. A generally
+positive correlation between model size (parameters) and
+computational complexity (FLOPs) can be observed, with
+architectural design influencing the scaling efficiency.
+FIGURE 1. Comparison of model parameters (millions) and computational
+complexity(FLOPs, billions) for mobilenet, ShuffleNet, and efficientnet
+variants, highlighting the scaling of computational cost with network size.
+Figure 2 reports the corresponding accuracy and infer-
+ence latency measurements for the lightweight architectures
+(AlexNet and ResNet-18 are omitted for visual clarity).
+EfficientNet-B2 attains the highest classification accuracy at
+97.81%, but this improvement is accompanied by increased
+latency (7.37 ms). ShuffleNetV2 has a latency of 4.08 ms,
+indicating a more favorable balance for real-time infer-
+ence. The MobileNet models provide the lowest latency
+overall (3.46–3.98 ms) but show slightly reduced accuracy
+relative to the ShuffleNetV2 and EfficientNet models.
+Although ResNet-18 incurs a large FLOP count, it exhibits
+fast inference (1.32 ms), likely due to efficient kernel imple-
+mentations and the regular structure of its convolutional
+blocks. These observations show that gains in accuracy do
+not necessarily correspond to improved runtime behavior.
+FIGURE 2. Accuracy classification accuracy versus inference time
+(ms/image) for MobileNet, ShuffleNet, and efficientnet architectures,
+illustrating the trade-off between predictive performance and
+computational efficiency.
+Finally, Figure 3 presents a combined accuracy-efficiency
+map summarizing the overall trade-offs across the best-
+performing subset of evaluated models. Resource efficiency
+is defined as the ratio of average classification accuracy
+to inference time (ms/image), representing the accuracy
+achieved per unit latency. The visualization shows that
+ShuffleNetV2 × 1.0 occupies the upper-right region of
+the trade-off space, achieving both high predictive accu-
+racy and strong computational efficiency. Other competitive
+architectures include MobileNetV3 and the remaining Shuf-
+flenetV2 models evaluated. Overall, the results suggest that
+ShuffleNetV2 provides the most balanced configuration for
+texture classification on LMT-108, combining competitive
+performance with real-time inference capability.
+To evaluate the impact of data augmentation on model
+generalization, a mini ablation study was conducted using
+ShuffleNetV2 × 1.0 as the reference architecture. Training
+the model without augmentations yielded a mean accuracy of
+87.13%, while the augmented variant achieved 97.04% on the
+LMT-108 dataset. This substantial performance gap indicates
+that, in small-sample texture classification settings, augmen-
+tation is critical for mitigating overfitting and enabling the
+learning of invariant surface representations. While part of
+this gain can be attributed to the limited number of training
+samples per class, the result highlights the strong depen-
+dence of texture-based recognition performance on effective
+data diversity. Accordingly, augmentation is treated as a
+fixed component of the training pipeline in all subsequent
+experiments to ensure that architectural comparisons reflect
+VOLUME 14, 2026
+66183
+
+
+--- PAGE 6 ---
+
+J. S. Tan et al.: Comparative Study of Lightweight Convolutional Models
+FIGURE 3. Accuracy versus resource efficiency trade-off. The optimal
+zone(green hatched, upper-right) identifies models achieving both high
+accuracy and efficiency.
+representational efficiency rather than sensitivity to data
+scarcity.
+Compared to conventional deep CNNs such as AlexNet
+(93.5%) and ResNet-18 (96.8%), these lightweight designs
+deliver 1–3 percentage points higher accuracy, while requir-
+ing substantially fewer parameters and being better suited
+for resource-constrained deployment scenarios. This suggests
+that architectural strategies such as depthwise-separable con-
+volutions and channel shuffling can preserve representational
+capacity even at substantially reduced parameter and FLOP
+budget.
+Viewed from an accuracy–efficiency perspective, Shuf-
+fleNetV2 ×1.0 occupies a Pareto-efficient operating point
+on LMT-108 among the evaluated architectures, as no other
+model simultaneously achieves higher accuracy with lower
+parameter count or inference latency. In contrast, larger mod-
+els such as AlexNet and ResNet-18 are Pareto-dominated
+under the evaluated metrics, offering neither improved accu-
+racy nor reduced computational cost.
+To further analyze model behavior, the most frequent mis-
+classification pairs for EfficientNet-B2 (the highest-accuracy
+model) are examined in Table 2. The majority of errors occur
+between visually similar materials within the same material
+group, such as foam variants, wood species, and reflective
+metals. The most frequent pair, G3StainlessSteel misclassi-
+fied as G3Copper, accounts for 6 out of 20 test samples for
+that class. A subset of errors also spans material groups (e.g.,
+G4LaminatedWood predicted as G3Glass, G4Beech_0 as
+G2RoofTile), suggesting that surface reflectance and lighting
+conditions may contribute to confusion beyond categorical
+similarity. Overall, the remaining classification errors are
+largely attributable to inter-class visual similarity rather than
+systematic model failure.
+B. ARCHITECTURAL DISCUSSION
+The
+results
+in
+Table
+1
+and
+Figures
+1-3
+highlight
+how architectural design choices strongly influence the
+accuracy-efficiency
+trade-off
+in
+surface
+material
+TABLE 2. Top confused material pairs for efficientnet-b2.
+classification. Unlike object-centric recognition tasks that
+benefit from deep hierarchical abstraction, texture recog-
+nition primarily relies on the discrimination of localized,
+repetitive patterns and subtle differences across spatial neigh-
+borhoods [43]. Architectures that efficiently preserve and mix
+local features therefore exhibit a structural advantage on the
+LMT-108 dataset.
+Classical CNNs such as AlexNet and ResNet-18 rely on
+dense convolutional blocks and progressive depth to increase
+representational power. While effective for general-purpose
+vision tasks, this design can lead to redundant parameteriza-
+tion for texture-centric problems, where increasing network
+depth does not necessarily increase model discriminative
+capacity [44]. Consequently, these architectures incur sub-
+stantial computational overhead without proportional gains
+in classification accuracy.
+EfficientNet demonstrates strong representational capacity
+through compound scaling of depth, width, and resolution
+[18]. However, this compound scaling strategy implicitly
+favors deeper feature hierarchies, which results in dimin-
+ishing returns for small-scale texture datasets. The small
+performance gains observed with increasing EfficientNet
+depth also suggest that beyond a certain capacity, adding
+additional layers mostly amplifies redundancy rather than
+improving texture classification accuracy, while increasing
+inference latency and memory access cost.
+In contrast, ShuffleNetV2 is explicitly optimized for
+efficient feature reuse and low memory access overhead.
+ShuffleNetV2 employs channel splitting and shuffling to
+reduce memory access cost while maintaining cross-channel
+information interaction [17], resulting in strong texture clas-
+sification performance despite its fewer parameters. This
+design enables ShuffleNetV2 ×1.0 to achieve accuracy com-
+parable to EfficientNet-B2 while requiring over 80% fewer
+parameters and significantly lower inference latency, indicat-
+ing that effective channel mixing can compensate for reduced
+model depth in texture classification settings.
+MobileNet architectures further emphasize efficiency
+through depthwise-separable convolutions and inverted resid-
+ual blocks, which separate spatial filtering from channel-wise
+feature mixing [41], [42]. MobileNetV3 also incorporates
+lightweight attention mechanisms and optimized nonlinear-
+ities, resulting in low latency across all evaluated variants.
+66184
+VOLUME 14, 2026
+
+
+--- PAGE 7 ---
+
+J. S. Tan et al.: Comparative Study of Lightweight Convolutional Models
+However, a notable reduction in accuracy relative to Shuf-
+fleNetV2 suggests that aggressive parameter compression
+may slightly limit classification accuracy when class bound-
+aries are visually subtle.
+Interestingly, ResNet-18 exhibits a relatively fast inference
+time despite its high FLOP count, likely due to its regular
+convolutional structure and optimized kernel implementa-
+tions on modern hardware. This reveals that FLOPs alone are
+not a determining factor for a model’s runtime performance,
+as memory access patterns and operator regularity can also
+influence inference latency [17]. Nevertheless, its parame-
+ter inefficiency and lack of mobile-oriented design prevents
+it from achieving the same accuracy-efficiency balance as
+newer, lightweight models.
+Overall, these results indicate that architectural strategies
+explicitly designed for efficient feature reuse, such as channel
+shuffling, inverted residuals, and depthwise-separable convo-
+lutions, are particularly well suited for surface texture clas-
+sification under constrained computational budgets. Among
+the evaluated architectures, ShuffleNetV2 ×1.0 achieves a
+favorable balance between accuracy, efficiency, and real-time
+performance on LMT-108 texture scans, supporting its poten-
+tial use in real-time and embedded applications.
+C. SUPPLEMENTARY MULTIMODAL EXPERIMENT
+To illustrate the adaptability of the optimized visual encoder,
+a
+supplementary
+experiment
+integrated
+ShuffleNetV2
+×1.0 with a lightweight 2-D CNN-based accelerometer clas-
+sifier via feature-level fusion. The resulting MultiModalNet
+concatenated a 1024-dimensional visual embedding and a
+256-dimensional haptic embedding to form a joint represen-
+tation, which was processed by a compact fully connected
+fusion head. To preserve computational efficiency while
+enabling limited domain adaptation, only the final convo-
+lutional layers of the visual backbone and the top classifier
+blocks of the haptic encoder were unfrozen and fine-tuned.
+The overall fusion mapping can be expressed as:
+y = ffusion (z) = Softmax(W3σ
+(W2σ (W1z + b1) + b2) b3)
+(8)
+where Wi, bi denote the trainable weights and biases of the
+fusion head’s linear layers and σ(·) represents the ReLU
+activation.
+Empirical evaluation on the LMT-108 dataset yielded a
+99.35% test accuracy, outperforming the unimodal Shuf-
+fleNetV2 ×1.0 baseline (97.04%). While not intended as
+an exhaustive optimization, this result demonstrates that
+lightweight visual CNN backbones can naturally extend to
+efficient visuo-tactile perception with minimal additional
+computational overhead.
+V. CONCLUSION
+This study presented a systematic evaluation of lightweight
+convolutional architectures for surface material classification
+and showed that compact models can achieve strong per-
+formance while substantially reducing computational cost.
+Although EfficientNet-B2 achieved the highest accuracy,
+the analysis demonstrated that ShuffleNetV2 and MobileNet
+variants provide the most favorable accuracy–efficiency
+trade-off, with ShuffleNetV2 ×1.0 offering competitive per-
+formance at a fraction of the parameters and latency. The
+scenario-based evaluation further highlighted that no sin-
+gle architecture is universally optimal, emphasizing that
+backbone selection must align with specific deployment con-
+straints rather than accuracy alone. These findings reduce
+the effective architecture search space to a small set of con-
+sistently strong candidates for each deployment scenario,
+enabling practitioners to select suitable backbones without
+exhaustive experimentation. The supplementary visuo-tactile
+experiment also showed that the strongest lightweight visual
+backbone generalizes effectively to multimodal fusion with
+minimal additional computational overhead. Future work will
+explore improved augmentation strategies, dynamic feature
+integration mechanisms for lightweight architectures, and
+hardware-level benchmarking on embedded platforms.
+REFERENCES
+[1] A. Demirtas, G. Erdemir, and H. Bayram, ‘‘Indoor surface classification
+for mobile robots,’’ PeerJ Comput. Sci., vol. 10, p. e1730, Jan. 2024, doi:
+10.7717/peerj-cs.1730.
+[2] Q. Li, O. Kroemer, Z. Su, F. F. Veiga, M. Kaboli, and H. J. Ritter,
+‘‘A review of tactile information: Perception and action through touch,’’
+IEEE Trans. Robot., vol. 36, no. 6, pp. 1619–1634, Dec. 2020, doi:
+10.1109/TRO.2020.3003230.
+[3] S. Cui, R. Wang, J. Wei, J. Hu, and S. Wang, ‘‘Self-attention based
+visual-tactile fusion learning for predicting grasp outcomes,’’ IEEE
+Robot. Autom. Lett., vol. 5, no. 4, pp. 5827–5834, Oct. 2020, doi:
+10.1109/LRA.2020.3010720.
+[4] N.
+Navarro-Guerrero,
+S.
+Toprak,
+J.
+Josifovski,
+and
+L.
+Jamone,
+‘‘Visuo-haptic object perception for robots: An overview,’’ 2022,
+arXiv:2203.11544.
+[5] S. Chitta, E. Jones, M. Ciocarlie, and K. Hsiao, ‘‘Mobile manipula-
+tion in unstructured environments: Perception, planning, and execution,’’
+IEEE Robot. Autom. Mag., vol. 19, no. 2, pp. 58–71, Jun. 2012, doi:
+10.1109/MRA.2012.2191995.
+[6] A. Belyaev and O. Kushnarev, ‘‘Energy-based surface classification for
+mobile robots in known and unexplored terrains,’’ Robotics, vol. 14, no. 9,
+p. 130, Sep. 2025, doi: 10.3390/robotics14090130.
+[7] M. Nouredanesh, A. Godfrey, D. Powell, and J. Tung, ‘‘Egocentric vision-
+based detection of surfaces: Towards context-aware free-living digital
+biomarkers for gait and fall risk assessment,’’ J. NeuroEngineering Reha-
+bil., vol. 19, no. 1, p. 79, Dec. 2022, doi: 10.1186/s12984-022-01022-6.
+[8] L. Liu and P. Fieguth, ‘‘Texture classification from random features,’’ IEEE
+Trans. Pattern Anal. Mach. Intell., vol. 34, no. 3, pp. 574–586, Mar. 2012,
+doi: 10.1109/TPAMI.2011.145.
+[9] Y. Wang, Y. Zhao, Q. Cai, H. Li, and H. Yan, ‘‘A varied local
+edge pattern descriptor and its application to texture classification,’’ J.
+Vis. Commun. Image Represent., vol. 34, pp. 108–117, Jan. 2016, doi:
+10.1016/j.jvcir.2015.11.001.
+[10] V. Arvis, C. Debain, M. Berducat, and A. Benassi, ‘‘Generalization of
+the cooccurrence matrix for colour images: Application to colour texture
+classification,’’ Image Anal. Stereol., vol. 23, no. 1, p. 63, May 2011, doi:
+10.5566/ias.v23.p63-72.
+[11] N. Liu, M. Rogers, H. Cui, W. Liu, X. Li, and P. Delmas, ‘‘Deep convo-
+lutional neural networks for regular texture recognition,’’ PeerJ Comput.
+Sci., vol. 8, p. e869, Feb. 2022, doi: 10.7717/peerj-cs.869.
+[12] L. Liu, J. Chen, P. Fieguth, G. Zhao, R. Chellappa, and M. Pietikainen,
+‘‘From BoW to CNN: Two decades of texture representation for texture
+classification,’’ 2018, arXiv:1801.10324.
+[13] S. Bell, P. Upchurch, N. Snavely, and K. Bala, ‘‘Material recognition in
+the wild with the materials in context database,’’ in Proc. IEEE Conf.
+Comput. Vis. Pattern Recognit. (CVPR), Jun. 2015, pp. 3479–3487, doi:
+10.1109/CVPR.2015.7298970.
+VOLUME 14, 2026
+66185
+
+
+--- PAGE 8 ---
+
+J. S. Tan et al.: Comparative Study of Lightweight Convolutional Models
+[14] H. Li, Z. Wang, X. Yue, W. Wang, H. Tomiyama, and L. Meng, ‘‘An
+architecture-level analysis on deep learning models for low-impact com-
+putations,’’ Artif. Intell. Rev., vol. 56, no. 3, pp. 1971–2010, Mar. 2023,
+doi: 10.1007/s10462-022-10221-5.
+[15] M. L. Richter, J. Schöning, A. Wiedenroth, and U. Krumnack, ‘‘Should you
+go deeper? Optimizing convolutional neural network architectures without
+training,’’ in Proc. 20th IEEE Int. Conf. Mach. Learn. Appl. (ICMLA),
+Dec. 2021, pp. 964–971, doi: 10.1109/ICMLA52953.2021.00159.
+[16] A. G. Howard, M. Zhu, B. Chen, D. Kalenichenko, W. Wang, T. Weyand,
+M. Andreetto, and H. Adam, ‘‘MobileNets: Efficient convolutional neural
+networks for mobile vision applications,’’ 2017, arXiv:1704.04861.
+[17] N. Ma, X. Zhang, H.-T. Zheng, and J. Sun, ‘‘ShuffleNet v2: Practical guide-
+lines for efficient CNN architecture design,’’ 2018, arXiv:1807.11164.
+[18] M. Tan and Q. V. Le, ‘‘EfficientNet: Rethinking model scaling for convo-
+lutional neural networks,’’ 2019, arXiv:1905.11946.
+[19] C.-H. Wang, K.-Y. Huang, Y. Yao, J.-C. Chen, H.-H. Shuai, and
+W.-H. Cheng, ‘‘Lightweight deep learning: An overview,’’ IEEE Con-
+sum. Electron. Mag., vol. 13, no. 4, pp. 51–64, Jul. 2024, doi:
+10.1109/MCE.2022.3181759.
+[20] X. Liu, H. Wu, S. Fang, Z. Yi, and X. Wu, ‘‘Multimodal surface material
+classification based on ensemble learning with optimized features,’’ in
+Proc. IEEE Int. Conf. E-Health Netw., Appl. Services (HEALTHCOM),
+Mar. 2021, pp. 1–6, doi: 10.1109/HEALTHCOM49281.2021.9398999.
+[21] M. Strese, C. Schuwerk, A. Iepure, and E. Steinbach, ‘‘Multimodal feature-
+based surface material classification,’’ IEEE Trans. Haptics, vol. 10, no. 2,
+pp. 226–239, Apr. 2017, doi: 10.1109/TOH.2016.2625787.
+[22] X. Han, S. Chen, Z. Fu, Z. Feng, L. Fan, D. An, C. Wang, L. Guo, W. Meng,
+X. Zhang, R. Xu, and S. Xu, ‘‘Multimodal fusion and vision–language
+models: A survey for robot vision,’’ Inf. Fusion, vol. 126, Feb. 2026,
+Art. no. 103652, doi: 10.1016/j.inffus.2025.103652.
+[23] J. Chen, Z. Shao, C. Cen, and J. Li, ‘‘HyNet: A novel hybrid deep learning
+approach for efficient interior design texture retrieval,’’ Multimedia Tools
+Appl., vol. 83, no. 9, pp. 28125–28145, Aug. 2023, doi: 10.1007/s11042-
+023-16579-0.
+[24] H. Zheng, L. Fang, M. Ji, M. Strese, Y. Özer, and E. Steinbach, ‘‘Deep
+learning for surface material classification using haptic and visual informa-
+tion,’’ IEEE Trans. Multimedia, vol. 18, no. 12, pp. 2407–2416, Dec. 2016,
+doi: 10.1109/TMM.2016.2598140.
+[25] H. Liu, S.-I. Kamata, and Y. Li, ‘‘Hybrid featured based pyramid structured
+CNN for texture classification,’’ in Proc. IEEE Int. Conf. Signal Image
+Process. Appl. (ICSIPA). Malaysia: IEEE, Sep. 2019, pp. 170–175, doi:
+10.1109/ICSIPA45851.2019.8977773.
+[26] D. J. Mandal, H. Deborah, T. L. Tobing, M. Janiszewski, J. W. Tanaka,
+and A. Lawrance, ‘‘Comprehensive evaluation of ImageNet-trained
+CNNs for texture-based rock classification,’’ IEEE Access, vol. 12,
+pp. 94765–94783, 2024, doi: 10.1109/ACCESS.2024.3424931.
+[27] G. Tatiya and J. Sinapov, ‘‘Deep multi-sensory object category recogni-
+tion using interactive behavioral exploration,’’ in Proc. Int. Conf. Robot.
+Autom. (ICRA). QC, Canada: IEEE, May 2019, pp. 7872–7878, doi:
+10.1109/ICRA.2019.8794095.
+[28] M. Maleki, G. Rouhafzay, and A.-M. Cretu, ‘‘Multimodal material classifi-
+cation using visual attention,’’ Sensors, vol. 24, no. 23, p. 7664, Nov. 2024,
+doi: 10.3390/s24237664.
+[29] G. Rouhafzay, A.-M. Cretu, and P. Payeur, ‘‘Transfer of learning from
+vision to touch: A hybrid deep convolutional neural network for visuo-
+tactile 3D object recognition,’’ Sensors, vol. 21, no. 1, p. 113, Dec. 2020,
+doi: 10.3390/s21010113.
+[30] W. Zheng, H. Liu, and F. Sun, ‘‘Lifelong visual-tactile cross-modal
+learning
+for
+robotic
+material
+perception,’’
+IEEE
+Trans.
+Neural
+Netw. Learn. Syst., vol. 32, no. 3, pp. 1192–1203, Mar. 2021, doi:
+10.1109/TNNLS.2020.2980892.
+[31] W. Fan, H. Bo, Y. Lin, Y. Xing, W. Liu, N. Lepora, and D. Zhang,
+‘‘Graph neural networks for interpretable tactile sensing,’’ in Proc.
+27th Int. Conf. Autom. Comput. (ICAC), Sep. 2022, pp. 1–6, doi:
+10.1109/ICAC55051.2022.9911130.
+[32] L. Chen, Y. Zhu, and M. Li, ‘‘Tactile-GAT: Tactile graph attention net-
+works for robot tactile perception classification,’’ Sci. Rep., vol. 14, no. 1,
+p. 27543, Nov. 2024, doi: 10.1038/s41598-024-78764-x.
+[33] H. Zhang, C. Wang, S. Tian, B. Lu, L. Zhang, X. Ning, and X. Bai,
+‘‘Deep learning-based 3D point cloud classification: A systematic survey
+and outlook,’’ 2023, arXiv:2311.02608.
+[34] G. Caroleo, A. Albini, and P. Maiolino, ‘‘A cross-task visuo-tactile rep-
+resentation using point clouds,’’ Intell. Service Robot., vol. 18, no. 6,
+pp. 1119–1131, Aug. 2025, doi: 10.1007/s11370-025-00628-8.
+[35] P. Zhang, L. Bai, D. Shan, X. Wang, S. Li, W. Zou, and Z. Chen,
+‘‘Visual–tactile fusion object classification method based on adaptive
+feature weighting,’’ Int. J. Adv. Robotic Syst., vol. 20, no. 4, Jul. 2023,
+Art. no. 17298806231191947, doi: 10.1177/17298806231191947.
+[36] M. Strese, Y. Boeck, and E. Steinbach, ‘‘Content-based surface mate-
+rial retrieval,’’ in Proc. IEEE World Haptics Conf. (WHC), Jun. 2017,
+pp. 352–357, doi: 10.1109/WHC.2017.7989927.
+[37] C. Szegedy, V. Vanhoucke, S. Ioffe, J. Shlens, and Z. Wojna, ‘‘Rethinking
+the inception architecture for computer vision,’’ 2015, arXiv:1512.00567.
+[38] I. Loshchilov and F. Hutter, ‘‘Decoupled weight decay regularization,’’
+2017, arXiv:1711.05101.
+[39] A. Krizhevsky, I. Sutskever, and G. E. Hinton, ‘‘ImageNet classification
+with deep convolutional neural networks,’’ Commun. ACM, vol. 60, no. 6,
+pp. 84–90, May 2017, doi: 10.1145/3065386.
+[40] K. He, X. Zhang, S. Ren, and J. Sun, ‘‘Deep residual learning for image
+recognition,’’ 2015, arXiv:1512.03385.
+[41] M. Sandler, A. Howard, M. Zhu, A. Zhmoginov, and L.-C. Chen,
+‘‘MobileNetV2:
+Inverted
+residuals
+and
+linear
+bottlenecks,’’
+2018,
+arXiv:1801.04381.
+[42] A. Howard, M. Sandler, G. Chu, L.-C. Chen, B. Chen, M. Tan, W. Wang,
+Y. Zhu, R. Pang, V. Vasudevan, Q. V. Le, and H. Adam, ‘‘Searching for
+MobileNetV3,’’ 2019, arXiv:1905.02244.
+[43] R. Geirhos, P. Rubisch, C. Michaelis, M. Bethge, F. A. Wichmann,
+and W. Brendel, ‘‘ImageNet-trained CNNs are biased towards tex-
+ture; increasing shape bias improves accuracy and robustness,’’ 2018,
+arXiv:1811.12231.
+[44] M. Cimpoi, S. Maji, and A. Vedaldi, ‘‘Deep filter banks for texture
+recognition
+and
+segmentation,’’
+in
+Proc.
+IEEE
+Conf.
+Comput.
+Vis.
+Pattern
+Recognit.
+(CVPR),
+Jun.
+2015,
+pp. 3828–3836,
+doi:
+10.1109/CVPR.2015.7299007.
+JEREMY SEAN TAN is currently pursuing the
+B.S. degree in computer science with Oregon
+State University, USA. He has been a Research
+Intern with the National Chin-Yi University of
+Technology, Taichung, Taiwan, under the Taiwan
+Experience Education Program (TEEP), from
+October to November 2025, and has continued in
+this role, since January 2026, where he works on
+applied artificial intelligence and computer vision
+systems. His research interests include artificial
+intelligence, machine learning, and computer vision.
+AARON RAYMOND SEE (Member, IEEE) was
+born in Manila, Philippines. He received the B.S.
+degree in electronics and communications engi-
+neering from De La Salle University, Manila,
+in 2006, and the master’s and Ph.D. degrees in
+electrical engineering with a major in biomedical
+engineering from the Southern Taiwan University
+of Science and Technology, in 2010 and 2014,
+respectively. Subsequently, he did his postdoctoral
+research in neuroscience at the Brain Research
+Center, National Tsing Hua University, Hsinchu, Taiwan. He is currently an
+Associate Professor with the Department of Electronic Engineering, National
+Chin-Yi University of Technology. His research interests include assistive
+device development, haptics, and visuotactile sensors.
+AARON
+BENJMIN
+ALCUITAS
+received the
+Bachelor of Science (B.Sc.) degree in computer
+science from the University of San Jose-Recoletos,
+Cebu, Philippines, in 2024. He is currently pursu-
+ing the master’s degree in electronics engineering.
+He was a Research Assistant with the Southern
+Taiwan University of Science and Technology,
+Tainan, Taiwan, from January 2024 to July 2024.
+Since September 2024, he has been a Research
+Assistant with the National Chin-Yi University
+of Technology, Taichung, Taiwan. His research interests include artificial
+intelligence, haptics, and signal processing.
+66186
+VOLUME 14, 2026

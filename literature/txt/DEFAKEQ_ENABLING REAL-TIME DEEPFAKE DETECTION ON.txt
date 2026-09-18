@@ -1,0 +1,1690 @@
+
+
+--- PAGE 1 ---
+
+DEFAKEQ: ENABLING REAL-TIME DEEPFAKE DETECTION ON
+EDGE DEVICES VIA ADAPTIVE BIDIRECTIONAL QUANTIZATION
+Xiangyu Li*
+Digital Trust Centre
+Nanyang Technological University
+xinagyu.li@ntu.edu.sg
+Yujing Sun∗†
+Digital Trust Centre
+Nanyang Technological University
+yujing.sun@ntu.edu.sg
+Yuhang Zheng
+Digital Trust Centre
+Nanyang Technological University
+yuhang.zheng@ntu.edu.sg
+Yuexin Ma
+School of Information Science and Technology
+ShanghaiTech University
+mayuexin@shanghaitech.edu.cn
+Kwok-Yan Lam
+Digital Trust Centre
+Nanyang Technological University
+kwokyan.lam@ntu.edu.sg
+ABSTRACT
+Deepfake detection has become a fundamental component of modern media forensics. Despite
+significant progress in detection accuracy, most existing methods remain computationally intensive
+and parameter-heavy, limiting their deployment on resource-constrained edge devices that require
+real-time, on-site inference. This limitation is particularly critical in an era where mobile devices are
+extensively used for media-centric applications, including online payments, virtual meetings, and
+social networking. Meanwhile, due to the unique requirement of capturing extremely subtle forgery
+artifacts for deepfake detection, state-of-the-art quantization techniques usually underperform for
+such a challenging task. These fine-grained cues are highly sensitive to model compression and can
+be easily degraded during quantization, leading to noticeable performance drops. This challenge
+highlights the need for quantization strategies specifically designed to preserve the discriminative
+features essential for reliable deepfake detection. To address this gap, we propose DefakeQ, the
+first quantization framework tailored for deepfake detectors, enabling real-time deployment on
+edge devices. Our approach introduces a novel adaptive bidirectional compression strategy that
+simultaneously leverages feature correlations and eliminates redundancy, achieving an effective
+balance between model compactness and detection performance. Extensive experiments across
+five benchmark datasets and eleven state-of-the-art backbone detectors demonstrate that DeFakeQ
+consistently surpasses existing quantization and model compression baselines. Notably, it reduces
+model size to 10–20% of the original while retaining up to 90% of baseline accuracy, substantially
+outperforming prior state-of-the-art methods. Furthermore, we deploy DefakeQ on mobile devices in
+real-world scenarios, demonstrating its capability for real-time deepfake detection and its practical
+applicability in edge environments.
+Keywords Deepfake Detection · Edge Devices · Post-Training Quantization · Real-time and Real-world Deployment
+1
+Introduction
+Deepfake detection has become increasingly important with the rapid evolution of generative artificial intelligence,
+forming a crucial foundation for media forensics Chu et al. [2015]. We notice that current mainstream approaches Huang
+et al. [2025], Fu et al. [2025], Tan et al. [2025], Wang et al. [2026a], Yang et al. [2023] mainly focus on improving
+detection accuracy but often rely on relatively high computational resources Wang et al. [2025], Xia et al. [2024], Zhao
+et al. [2023]. However, such resources are not readily available in everyday settings, where most users rely on edge
+∗Equal contribution
+†Corresponding author
+arXiv:2604.08847v1  [cs.CV]  10 Apr 2026
+
+
+--- PAGE 2 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+Our
+DeFakeQ
+Edge Devices
+Resource-extensive
+Servers
+Original 
+Model
+Light Weighted
+Model
+Conventional
+Quantization
+HIGH performance
+on edge devices
+NO work on 
+edge devices.
+NO work on 
+edge devices.
+LOW Performance
+on edge devices.
+Bridge the Gap of Deepfake Detection to Edge Devices
+Detection Accuracy：
+-
+Model Size& Precision: 
+~100-1000 MB 
+32 bit FP 32
+Detection Accuracy: 
+~60% of the original 
+Model Accuracy
+Model Size& Precision: 
+~100-500 MB
+32 bit FP 32
+Detection Accuracy: 
+~55% of the original 
+Model Accuracy
+Model Size& Precision: 
+~50-150 MB
+INT 3/4/8 bit
+Detection Accuracy: 
+~90% of the original 
+Model Accuracy
+Model Size & Precision: 
+~10-100 MB
+INT 3/4/8 bit
+Figure 1: We present the first quantization framework tailored for deepfake detection, DeFakeQ, enabling real-time
+deployment on edge devices. Compared to existing lightweight model designs and conventional quantization approaches,
+our framework significantly reduces computational cost while maintaining high detection accuracy.
+devices such as mobile phones for payment, work, and entertainment, contexts that may involve AI-generated content
+posing potential risks or fraud, requiring real-time, on-site Deepfake identification.
+Nevertheless, edge devices operate under strict constraints, including limited memory, restricted computational power,
+and stringent latency requirements. For instance, a state-of-the-art Xception-based deepfake detector Tan and Le
+[2019] requires 28M parameters and 1.2G FLOPs per inference, resulting in a 350ms latency even on a high-end
+mobile System-on-Chip, well above the threshold for real-time applications. Therefore, it is crucial to develop efficient
+adaptation strategies that enable existing deepfake detectors to run effectively on edge devices.
+Realizing the importance of bridging the edge deployment gap for state-of-the-art deepfake detectors, researchers have
+explored model pruning Vidya et al. [2023], Kim et al. [2021], Li et al. [2023a] and lightweight architecture design Wang
+and Lu [2023], Dutta et al. [2024]. However, both approaches share a key limitation. Whether reducing redundant
+parameters or designing compact networks, they still depend on full-precision weight representations. This reliance
+results in substantial memory overhead, as even pruned or lightweight models retain large numbers of full-precision
+weights to maintain feature extraction capacity, making them unsuitable for memory-constrained edge devices.
+To address this limitation, Post-Training Quantization (PTQ) appears to be an effective backbone for enabling efficient
+deepfake detection on edge devices. By compressing model weights and activations from full-precision to low-bit
+representations, PTQ substantially reduces memory consumption and computational demand.
+However, directly applying existing general-purpose or task-specific quantization methods Nagel et al. [2021] to
+deepfake detection remains ineffective, largely due to the task’s unique nature. Deepfake detection fundamentally
+relies on capturing ultra-subtle, fine-grained facial forgery cues, such as imperceptible micro-expression inconsistencies
+and faint texture anomalies across critical facial regions. These cues are easily disrupted when model weights and
+activations are compressed from floating-point to low-precision integer formats, as quantization inevitably introduces
+noise and information loss. Consequently, even minor distortions can obscure the delicate features essential for reliable
+detection, underscoring the urgent need for quantization strategies tailored specifically to the sensitivity and complexity
+of deepfake detection.
+To enable deepfake detection on edge devices, for the first time, we propose DeFakeQ, an adaptive bidirectional
+quantization framework designed to balance model efficiency and accuracy. DeFakeQ tackles the core challenge of
+edge deployment: achieving lightweight, real-time inference while preserving the fine-grained facial forgery cues
+essential for reliable detection. DeFakeQ incorporates two key innovations to overcome the limitations of existing
+quantization methods. First, Horizontal Adaptive Block Quantization (HAQ) adaptively adjusts the quantization
+bit-width across each layer within the block by calculating the importance of weights and activations for each layer.
+It assigns higher bit-widths to layers with high information density to preserve their feature representation capability,
+thereby minimizing information loss while maximizing computational and storage efficiency. Subsequently, Vertical
+2
+
+
+--- PAGE 3 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+Efficient Feature Fine-Tuning (VEFT) randomly selects a small subset of feature channels and restores them to their
+original full-precision format. By constructing a progressive contrastive metric learning loss function, VEFT further
+preserves discriminative features within quantization blocks. This complements HAQ’s layer-level optimization and
+further enhances the model’s accuracy in resource-constrained scenarios.
+Extensive experiments on 5 Deepfake datasets across 7 mainstream SOTA Deepfake detectors demonstrate that
+DeFakeQ reduces pre-trained models’ parameter size to merely 10% of their full-precision counterparts while retaining
+over 90% of the original full-precision performance. Moreover, we have successfully deployed DeFakeQ on mobile
+devices for real-time and real-world applications, directly validating its practical real-world application value for
+resource-constrained edge deployment scenarios.
+In summary, our contributions are as follows:
+• We are the first to introduce DeFakeQ, an Adaptive Bidirectional Quantization framework tailored for
+deployment of real-time deepfake detection on edge devices.
+• In DeFakeQ, we novelly propose Horizontal Adaptive Block Quantization (HAQ) to dynamically allocate
+bit-width based on the information saliency of each block and Vertical Efficient Feature Fine-Tuning (VEFT)
+to maximize the preservation of discriminative features within quantized blocks, achieving a better trade-off
+between detection accuracy and compression efficiency.
+• Extensive experiments on benchmark Deepfake datasets across 11 mainstream SOTA / Backbone Deepfake
+detectors demonstrate that DeFakeQ reduces pre-trained models’ parameter size to merely 10% of their
+full-precision counterparts while retaining over 90% of the original full-precision performance. Moreover, we
+have successfully deployed and worked DeFakeQ on actual mobile devices, directly validating its practical
+real-world application value for resource-constrained edge deployment scenarios.
+2
+Related Works
+2.1
+Deepfake Detection Models
+The most recent deepfake detection focuses on improving generalization across different domains and forgery types. For
+image forgery detection, key approaches include data augmentation Chen et al. [2022a], Li et al. [2020a], Li and Lyu
+[2018], Shiohara and Yamasaki [2022], Zhao et al. [2021a], Yang et al. [2021a], frequency-domain clue extraction Gu
+et al. [2022], Liu et al. [2021a], Luo et al. [2021], Qian et al. [2020], Wang et al. [2023], Identity Information (ID)
+utilization Dong et al. [2023], Huang et al. [2023], disentanglement learning Liang et al. [2022], Yan et al. [2023],
+Yang et al. [2021b], custom network design Zhao et al. [2021b], Dang et al. [2020], reconstruction learning Cao
+et al. [2022], Wang and Deng [2021], Wang et al. [2026b], and 3D decomposition Zhu et al. [2021a]. Recently,
+studies Jia et al. [2024], Tan et al. [2024a], Zheng et al. [2026] have focused on enhancing generalization through
+specific training-free pipelines. However, these models typically involve large parameter sizes and high computational
+costs, making them incompatible with resource-constrained edge devices. This incompatibility significantly hinders
+their practical deployment in real-world scenarios, thereby limiting their actual application value. Although researchers
+have explored model pruning Vidya et al. [2023], Kim et al. [2021] and lightweight architecture design Wang and Lu
+[2023], Dutta et al. [2024] to tackle the deployment of deepfake detectors, their full-precision representation still incurs
+substantial storage overhead. Meanwhile, model compression induced by pruning inevitably adversely affects detection
+performance.
+2.2
+Model Quantization
+Model quantization Nagel et al. [2021] tackles deployment on resource-constrained devices via converting high-
+precision floats to low-bit integers. While Quantization-Aware Training (QAT) Lee et al. [2021], Li et al. [2022a], Zhu
+et al. [2023] delivers high accuracy, full-dataset retraining makes it prohibitively expensive. Post-Training Quantization
+(PTQ) Frantar et al. [2022], Li et al. [2023b], Dettmers et al. [2023], Huang et al. [2024] is more practical, relying on
+a small unlabeled calibration set and no retraining. For instance, AdaRound Nagel et al. [2020], which introduces a
+learnable task-aware rounding mechanism; BRECQ Li et al. [2022b], which employs blockwise reconstruction and
+leverages Fisher information to protect critical weights; QDrop Wei et al. [2022], which adopts Dropout-inspired
+regularization to enhance resilience against quantization noise; and PD-Quant Liu et al. [2023], which utilizes global
+information (e.g., discrepancies in final model predictions). However, these methods are not adapted to deepfake
+detection, which rely on capturing subtle facial variations. Existing quantization methods inevitably lose fine-grained
+cues during the quantization, failing to preserve the discriminative details essential for edge deepfake detection.
+3
+
+
+--- PAGE 4 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+ç√
+(a) DeFakeQ:   Adaptive Bidirectional Quantization for Deepfake Detection
+��: Layer � Importance Score
+��: Weight-Level Importance
+  ��: Channel-Level Importance
+(b) Layer Criticality
+Importance Score ��
+��
+S�=
+�
+�������   �� ∙��
+Adaptive bit-width 
+Quantization
+INT �� bit
+FP 32 bit
+��= �(��)
+Full Precision 
+Feature
+Mix Precision 
+Feature
+Int Precision 
+Feature
+FP32 Feature 
+Channels
+INT3/4/8 Feature 
+Channels
+�
+�
+Fine-tuning Precision
+Weight: FP32
+Adaptive Quantized 
+Weights: INT 3/4/8
+(c) Mix-precision Feature Fine-Tuning
+Adaptive Channel 
+Precision Restoration
+�−�
+�
+Full Precision
+Feature
+Low Precision
+ Feature
+Mix-precision
+Feature
+Contrastive Learning with ����
+Feature Block
+(Mix-precision)
+Feature Block
+(Mix-precision)
+Mix-precison 
+Feature 
+Fine-Tuning
+Quantized 
+Classifier
+Training 
+Samples
+Full Presicion 
+Weights: FP32
+Full 
+Quantized 
+Weights: 
+INT 3/4/8
+Feature Block
+(Full INT 3/4/8)
+Feature Block
+(Full FP 32)
+����
+����
+×N
+×N
+Original Deepfake 
+Detection Block
+Horizontal Adaptive Quantized Block
+Reconstruction
+Quantization
+Embed
+Embed
+INT �� bit
+INT �� bit
+INT �� bit
+Embed
+Embed
+FP 32 bit
+FP 32 bit
+FP 32 bit
+����
+���
+(a1) Horizontal Adaptive Quantization (HAQ)
+(a2) Vertical Efficient Feature 
+Fine-Tuning  (VEFT)
+Layer 
+Criticality
+√
+Adaptive ��
+Selection with
+Figure 2: The overview of DeFakeQ. It comprises two core components: Horizontal Adaptive Quantization (HAQ)
+and Vertical Efficient Feature Fine-Tuning (VEFT). HAQ first calculates the importance scores of weights within each
+network block. Guided by a specially designed horizontal loss function Lhor, it adaptively identifies blocks rich in
+discriminative information and assigns them higher bit-widths, ensuring critical forgery-related features are preserved
+during quantization. Complementing HAQ, VEFT operates at the channel level: it adaptively identifies and prioritizes
+sensitive feature channels within each quantized block. This mechanism maximizes the retention of discriminative
+features in quantized blocks while maintaining efficient compression of redundant channels.
+3
+Background and Preliminaries of Quantization
+Model quantization Nagel et al. [2021] has emerged as a pivotal technique for accelerating inference and compressing
+deep learning models, as it enables the reduction of parameter bit-width representations while preserving the integrity
+of model accuracy. For mainstream quantization paradigms, the operations of quantization and de-quantization are
+formally defined as follows:
+int =clamp
+fp
+s
+
++ z, 0, 2k −1
+
+,
+ˆ
+fp = s · (int −z) ≈fp,
+(1)
+where s and z denote the scaling factor and zero point, respectively. ⌊·⌉represents the Round-to-Nearest (RTN) rounding
+operator. fp corresponds to the original floating-point value, while ˆfp stands for the resulting de-quantized value. int
+denotes the integer value mapped from the floating-point input via quantization, and the clamp function is used to clip
+any values that lie outside the range of a k-bit integer.
+Why Conventional Quantization ineffective in Deepfake Detection ?
+Traditional quantization methods exhibit
+limited effectiveness when directly applied to deepfake detection. This task fundamentally depends on capturing
+fine-grained forgery artifacts, such as micro-expression inconsistencies, boundary artifacts, and subtle texture anomalies.
+However, the aggressive precision reduction inherent in conventional quantization often leads to the degradation or loss
+of these discriminative signals, thereby compromising the detector’s reliability and overall performance. Moreover,
+such clues are typically sparse, fragile, and unevenly distributed across network blocks Dong et al. [2022], Li et al.
+[2025], with certain layers encoding disproportionately more forensic information than others. Traditional uniform
+bit-width quantization fails to account for this heterogeneity: applying low-bit quantization (e.g., 4-bit) universally
+risks severe loss of fragile cues, while high-bit quantization (e.g., 8-bit) across all layers undermines efficiency by
+over-preserving redundant, non-forensic information.
+4
+
+
+--- PAGE 5 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+4
+Method
+The large model size and high computational demands of mainstream deepfake detectors make them impractical for
+deployment on resource-constrained edge devices. Although lightweight network design Chen et al. [2022b] and
+pruning Han et al. [2015] have been explored to reduce complexity, their practical usability on edge platforms remains
+limited, as they still rely on full-precision (FP16/FP32) parameters, leading to substantial storage overhead. Meanwhile,
+conventional quantization approaches Wei et al. [2022] also underperform in deepfake detection tasks, failing to preserve
+the subtle forensic cues essential for reliable classification.
+To bridge the gap, we propose the first deepfake detection quantization approach to enable real-time edge device deploy-
+ment, DeFakeQ. We significantly reduce both model size and storage requirements through an adaptive bidirectional
+precision compression scheme while maintaining high detection accuracy.
+The pipeline of DeFakeQ is demonstrated in Fig. 2(a). In general, we propose an adpative bidirectional strategy to
+resolve the contradiction between reducing model size and maintaining important forensics clues. Our DeFakeQ
+comprises two key components. To address the limitation of uniform bit-width in conventional quantization where
+fragile cues are at risk of severe loss, Horizontal Adaptive Quantization (HAQ) is proposed. The goal of HAQ is to
+adaptively select bit-widths while maximizing the approximation to the original floating-point (FP) model. This ensures
+that blocks rich in discriminative features retain higher precision, enabling efficient compression while preserving
+critical forgery-related information. In addition, to excavate the feature representation ability within each block,
+we propose Vertical Efficient Feature Fine-Tuning (VEFT) to adaptively select sensitive feature channels within
+each quantized block, maximizing the retention of discriminative features in quantized blocks while maintaining the
+compression efficiency of redundant features.
+4.1
+Horizontal Adaptive Quantization
+To overcome the limitation of uniform Bit-Width in conventional quantizations, Horizontal Adaptive Quantization
+(HAQ) is thus designed to dynamically allocate bit-width based on the information saliency of each block (as shown in
+Figure 2(a1)). Generally, blocks rich in forgery-relevant discriminative features are assigned higher bit-widths (e.g.,
+8-bit) to preserve their forensic integrity. While blocks with redundant or non-critical information are quantized to lower
+bit-widths (e.g., 4-bit) to reduce computational overhead. This targeted strategy ensures the most valuable forensic cues
+remain intact while achieving substantial compression.
+We quantifies the “Criticality” of each linear layer l via a Weight-Activation Importance Score Sl (as shown in
+Figure 2(b)), which integrates both weight magnitude and channel importance energy to capture the layer’s true impact
+on model output. Specifically, let the input activation tensor of layer l be X(l) ∈RN×Cin, where N denotes the
+number of tokens in the activation tensor (corresponding to the spatial dimensions of feature maps or sequence length
+in transformers); Cin represents the number of input channels (i.e., the feature dimension); X(l)
+n,j is the activation value
+of the nth token in the jth input channel.
+Channel-Level Importance.
+Input activation tensors exhibit inherent variability in information density across
+channels. To quantify this disparity, we adopt the L2 norm (Energy norm) as a metric for channel-level importance due
+to its ability to effectively characterize the Energy Intensity of activations: higher L2 norm indicates greater information
+density, reflecting the cumulative contribution of a channel’s activations to the layer’s output Devoto et al. [2024], Liu
+[2025]. Thus, for each input channel j, we compute its average L2 norm to ensure generalization beyond individual
+samples. This yields the input channel importance vector A(l) ∈RCin, where each element A(l)
+j
+is defined as:
+A(l)
+j
+=
+ 
+1
+M
+M
+X
+m=1
+N
+X
+n=1
+
+X(l,m)
+n,j
+2
+! 1
+2
+∀j ∈{1, 2, ..., Cin},
+(2)
+where M denotes the number of samples in the calibration dataset, and X(l,m)
+n,j
+denotes the activation value of the nth
+token in the jth channel of layer l for the m th calibration sample. The normalization by M ensures that A(l) is robust
+to variations in the scale of the dataset, while the L2 norm directly maps to the channel’s informational contribution.
+Weight-Level Importance.
+Each layer output is determined by the linear transformation of input activations via its
+weight matrix, which means that the impact of an individual weight element W (l)
+i,j (connecting the jth input channel
+to the ith output channel) depends not only on its own magnitude but also on the information density of the input
+channel it acts upon. A large weight connected to a low-information input channel (low A(l)
+j ) will have minimal
+influence on the output, whereas a moderate weight linked to a high-information channel can significantly shape the
+layer’s representational output. To capture this synergistic effect, we define an element-wise importance metric with the
+5
+
+
+--- PAGE 6 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+same dimensions as the weight matrix (where Cout is the number of output channels). Each element of this metric is
+formulated as the product of the absolute weight magnitude (avoid cancelation of positive and negative contributions)
+and the corresponding input channel importance, which can be formulated as:
+|W (l)
+i,j | · A(l)
+j
+∀i ∈{1, ..., Cout}, j ∈{1, ..., Cin}.
+(3)
+The formulation ensures that directly quantifies the Effective Contribution of each weight-element to the layer’s output,
+effectively filtering out weights that are either small in magnitude or connected to low-information input channels.
+Weight-Activation Importance Score Sl for layer l is finalized as the mean of all elements:
+Sl =
+1
+Cout · Cin
+Cout
+X
+i=1
+Cin
+X
+j=1
+|W (l)
+i,j | · A(l)
+j .
+(4)
+Thus, the score Sl determines the weight bit-width of the l-th layer, where θl = f(Sl) denotes the number of bits
+assigned to the l-th layer and is learned through an optimization process. A higher Sl indicates that the layer plays a
+more critical role in sustaining the model’s representational capacity, thereby necessitating higher bit-widths to mitigate
+substantial accuracy degradation during the quantization process.
+Learnable Optimization Process.
+The goal of HAQ is to assign a bit-width bl ∈B (a predefined set of candidate
+bit-widths) to each layer l ∈L (the set of quantizable layers) such that two objectives are balanced: maximizing the
+accuracy while minimizing the bit-width for each block. Formally, the HAQ problem is cast as a learnable constrained
+combinatorial optimization problem:
+min
+bl∈B
+X
+l∈L
+Sl · E(bl),
+s.t.
+P
+l∈L bl · pl
+P
+l∈L pl
+≤Bavg,
+(5)
+where pl denotes the number of parameters in layer l, and Bavg denotes the target average bit-width. E(bl) denotes a
+monotonic error function that maps bit-width bl to the theoretical quantization error of layer l. We adopt E(bl) ∝2−bl,
+a well-validated approximation in quantization Nagel et al. [2020], to reflect quantization error roughly increases as
+bit-width decreases. In Equation 5, high-Sl layers are allocated more bits to minimize their E(bl), while low-Sl layers
+are assigned fewer bits to save resources, which balances accuracy preservation and efficiency.
+As for the HAQ problem, the loss function must be differentiable to enable gradient-based optimization even though
+bit-widths are inherently discrete. Therefore, the trainable loss function Lhor is defined as:
+Lhor =
+X
+l∈L
+Sl · E(ˆbl) + λ · max
+ 
+0,
+P
+l∈L ˆbl · pl
+P
+l∈L pl
+−Bavg
+!2
+,
+(6)
+where ˆbl denotes the continuous relaxation of the discrete bit-width bl and λ is penalty coefficient to balance the two
+terms.
+Reconstruction Loss Function.
+During reconstruction quantization process, Lrec is employed to minimize the
+discrepancy between the outputs of the quantized and original models. Similar to AdaRound Nagel et al. [2020], Lrec
+is defined as:
+Lrec = ∥Wx −˜Wx∥2
+F + αR(V),
+(7)
+where the first term corresponds to the MSE loss; W denotes the weights of the reconstruction layer for original block,
+x represents its input, α is a trade-off hyperparameter, and ˜W denotes the quantized weights of the quantized block,
+which can be formulated as:
+˜W = clamp
+W
+s
+
++ h(V) + z, 0, 2k −1
+
+.
+(8)
+The other term R(V), is a differentiable regularizer that encourages the optimization variables h(Vi,j) to converge to
+either 0 or 1.
+4.2
+Vertical Efficient Feature Fine-Tuning
+The Horizontal Adaptive Quantization (HAQ) has achieved dynamic bit-width allocation at the block level to effectively
+reduce the computational efficiency. However, HAQ treats each block as a uniform unit, but low-bit blocks still contain a
+6
+
+
+--- PAGE 7 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+Algorithm 1 DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantiza-
+tion
+Input: Pre-trained Full-precision Deepfake Detection Model Mf, Calibration Set Dcalib
+Output: Low-presicion quantized model Mq, Mix-precision model M v
+q
+Variables: The Quantized Layers Lq, Scaling Factor s, Zero Point z
+1: Initialize quantized model MQ by copying parameters from MF and inserting pseudo-quantization modules
+2: Activate observers associated with pseudo-quantization modules to track activation statistics
+3: Perform calibration: forward samples from Dcalib into Mq through Mq, observers record layer-wise activation
+distributions
+4: Enable quantization logic of pseudo-quantization modules to simulate low-bit operations
+5: for each layer l ∈Lq in Mq do
+6:
+Compute scaling factor s and zero point z for layer l using Lrec, Lhor and Lver
+7: end for
+8: return Quantized Detection Model Mq, Mix-precision model M v
+q
+mix of discriminative and redundant features. For example, even a 4-bit block may include discriminative informations
+sensitive to deepfake detetcion. Uniform 4-bit quantization compresses both discriminative and irrelevant features,
+leading to the dilution of key forgery artifacts. In addition, even high-bit quantization can cause subtle distortion of
+these fragile discriminative cues, which are pivotal for distinguishing fakes from reals.
+To bridge this gap, we propose Vertical Efficient Feature Fine-Tuning (VEFT), which maximizes the retention of
+discriminative features in quantization blocks while maintaining the compression efficiency of redundant features,
+complementing HAQ’s block-level optimization (as shown in Figure 2(a2)). For each quantized block, VEFT randomly
+selects a small subset of feature channels to restore to the original full-precision format, consistent with the precision
+of the pre-trained full-precision Deepfake detector Mf. The remaining channels in each quantized block retain their
+HAQ-allocated int bit-width, ensuring that redundant information continues to be compressed effectively. The resulting
+mix-precision model, denoted as M v
+q , is distinguished from HAQ’s low-presicion quantized model Mq (where all
+quantized blocks retain only int precision).
+Feature Alignment with contrastive learning. To align the distribution of M v
+q and Mq with that of Mf, VEFT
+introduces a progressive contrastive learning workflow (as shown in Figure 2(c)). The anchor sample xa is defined as
+the output feature of Mf for a given input sample x, leveraging Mf’s ability to preserve all subtle forgery artifacts as
+the ground truth for feature distribution. Two positive samples are integrated to guide optimization across all quantized
+blocks: the first positive sample xpos1 is the output feature of Mq (HAQ’s low-presicion model) for the same input,
+representing the baseline block-level quantization result that requires refinement to reduce discriminative loss; the
+second positive sample xpos2 is the output feature of M v
+q , whose partial FP channels make it inherently closer to xa
+and thus the primary target for alignment. Then, a progressive weight w(t) (where t is the current training epoch
+and T is the total number of epochs) is introduced to fuse the two positive samples into a combined positive sample
+xcomb = w(t) · xpos2 + (1 −w(t)) · xpos1, with w(t) = t
+T , ensuring early training prioritizes xpos1 to quickly align
+low-presicion presicion features with Mf and late training emphasizes xpos1 to optimize the mix-precision model’s
+accuracy.
+Loss Function.
+To materialize the progressive contrastive learning workflow above, we propose the loss function
+Lver to enforce alignment between the feature distributions of M v
+q , Mq, and the full-precision ground truth Mf, while
+robustly distinguishing authentic from forged feature patterns. The loss function Lver is formalized as:
+Lver = −log
+
+esim(xa,xcomb)/τ
+esim(xa,xcomb)/τ + PK
+k=1 esim(xa,xk)/τ
+
+,
+(9)
+where τ denotes Temperature coefficient to control the sharpness of the similarity distribution. K denotes Number of
+negative samples, ensuring diverse negative distributions and robust class discrimination.
+The loss function Lver ensures that the mix-precision model M v
+q not only retains the efficiency of quantized channels
+but also refines the discriminative power of restored full-precision channels.
+4.3
+Total Loss Function of DeFakeQ
+Eventually, the total loss of our proposed DeFakeQ can be formulated as:
+L = Lrec + γ1Lhor + γ2Lver,
+(10)
+where γ1 and γ2 are trade-off parameters.
+7
+
+
+--- PAGE 8 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+Table 1: Cross-dataset evaluations of Detection Accuracy, Storage Cost and Compression Rate on testing Dataset
+DFD Zi et al. [2020]. All quantized detectors are trained on FF++ Rossler et al. [2019]. Our method achieves
+significantly improved detection accuracy (%) comparable to existing quantization approaches, while remains
+comparable in Compression Rate (%) and Storage Cost (MB).
+Detectors
+Type
+Storage Cost (MB) ↓
+Compression Rate (%) ↑
+Detection Accuracy (%) ↑
+BRECQ
+ICLR’22
+Adalog
+ECCV’24
+FIMA-Q
+CVPR’25 Ours GT
+BRECQ
+ICLR’22
+Adalog
+ECCV’24
+FIMA-Q
+CVPR’25 Ours
+BRECQ
+ICLR’22
+Adalog
+ECCV’24
+FIMA-Q
+CVPR’25
+Ours GT
+DeiT-Tiny
+Backbones
+5.9
+2.8
+2.4
+2.2
+23.7
+75.0
+88.2
+90.0
+90.7 52.1 (-17.2%) 54.5 (-14.8%) 53.2 (-16.1%) 69.3 77.8
+DeiT-Small
+20.2
+9.3
+7.6
+7.5
+84.1
+76.0
+88.9
+91.0
+91.1 50.3 (-21.8%) 52.8 (-19.3%) 54.1 (-18.0%) 72.1 79.4
+DeiT-Base
+75.9
+33.0
+26.4
+31.7 330.2
+77.0
+90.0
+92.0
+90.4 58.6 (-15.9%) 56.9 (-17.6%) 60.3 (-14.2%) 74.5 82.3
+ViT-Small
+21.0
+10.1
+8.4
+8.2
+84.1
+75.0
+88.0
+90.0
+90.2 56.4 (-20.9%) 58.2 (-19.1%) 61.7 (-15.6%) 77.3 84.5
+ViT-Base
+79.2
+29.7
+26.4
+31.2 330.2
+76.0
+91.0
+92.0
+90.6 57.2 (-20.9%) 58.8 (-19.3%) 61.1 (-17.0%) 78.1 86.7
+Swin-Small
+43.5
+20.8
+17.0
+18.1 189.2
+77.0
+88.9
+91.0
+90.4 55.9 (-21.0%) 53.7 (-23.2%) 63.4 (-13.5%) 76.9 85.0
+Swin-Base
+73.7
+33.5
+26.8
+31.8 334.8
+78.0
+90.0
+92.0
+90.5 51.5 (-25.6%) 55.8 (-21.3%) 60.9 (-16.2%) 77.1 86.5
+LSDA
+CVPR’24
+58.2
+27.9
+22.8
+26.6 253.2
+77.0
+88.9
+91.0
+89.5 52.8 (-25.6%) 56.3 (-22.1%) 58.1 (-20.3%) 78.4 88.0
+NPR
+CVPR’24
+42.7
+21.4
+17.8
+19.7 177.9
+76.0
+88.0
+90.0
+88.9 50.4 (-27.2%) 55.2 (-22.4%) 56.7 (-20.9%) 77.6 85.5
+UCF
+ICCV’23
+22.9
+11.9
+10.1
+9.1
+91.6
+75.0
+87.0
+89.0
+90.0 43.7 (-33.6%) 48.2 (-29.1%) 50.1 (-27.2%) 77.3 84.9
+Wavelet
+WACV’25
+135.3
+61.5
+49.2
+84.8 615.0
+78.0
+90.0
+92.0
+86.2 43.9 (-35.0%) 47.8 (-31.1%) 51.2 (-27.7%) 78.9 85.7
+4.4
+Calibrations
+Quantization requires calibration as a critical step to determine optimal quantization parameters (e.g., scaling factors
+and min/max ranges) for both model weights and activations. Different from the large scale of training data, calibration
+in quantization requires small, representative datasets to capture the core distribution of model activations needed to
+determine optimal quantization parameters, while avoid the excessive computational cost and slower calibration speed
+of large datasets.
+Calibration Dataset Dcalib.
+Considering the cross data evaluation setting where test data is inaccessible during
+non-test phases, our calibration dataset is constructed entirely from the training dataset (FF+ Rossler et al. [2019]).
+Specifically, we randomly select 256 images to form the calibration dataset, with the selected images deliberately
+avoiding being sourced from the same video as much as possible.
+Calibration Process.
+Our DeFakeQ incorporates pseudo-quantization factors into the full-precision Deepfake
+detection model (denoted as Mf) to derive the quantized model (denoted as Mq). We then activate the observer
+for these pseudo-quantization factors, where a small calibration dataset Dcalib serves to assess and document the
+activation distributions across each layer under simulated quantization conditions. Guided by Dcalib, the quantized
+model undergoes layer-by-layer adaptive bit-width reconstruction (via the loss function Lhor), with the goal of closely
+aligning quantized outputs with those of the original floating-point model. After adaptive bit-width reconstruction, we
+randomly select a small subset of feature channels to restore to the original full-precision format for each quantized
+block, consistent with the precision of the pre-trained full-precision Deepfake detector Mf. The remaining channels in
+each quantized block retain their HAQ-allocated int bit-width, ensuring that redundant information continues to be
+compressed effectively. Then we propose the Lver to enforce alignment between the outputs of original and quantized
+models. This calibration phase is critical, as it facilitates precise capture of each layer’s output statistics—including
+activation ranges and distributions—which are employed to initialize quantization scaling factors. The overall process
+is shown in Algorithm 1.
+5
+Experiments
+5.1
+Setups
+Dataset. To validate the generalization ability of the proposed framework, we validate on 5 widely used Deepfake
+datasets: FaceForensics++ (FF++) Rossler et al. [2019], DeepfakeDetection (DFD) Zi et al. [2020], Deepfake Detection
+Challenge (DFDC) Dolhansky et al. [2020], the preview version of DFDC (DFDCP) Dolhansky et al. [2019], and
+CelebDF (CDF) Li et al. [2020b]. FF++ dataset is a widely used dataset in deepfake detection tasks, which consists of
+over 1.8 million forged images from 1,000 pristine videos. We use a subset of the training split of FF++ as the calibration
+dataset to calibrate and fine-tune the quantized model. The detailed procedure is elaborated in the Algorithm 1.
+Deepfake Detector. We test DeFakeQ’s performance on 4 State-of-Art (SoTA) Detection methods, LSDA Yan et al.
+[2024a], NPR Tan et al. [2024b], UCF Yan et al. [2023], and Wavelet Baru et al. [2025], and 7 mainstream backbones
+8
+
+
+--- PAGE 9 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+Table 2: Additional Cross-datasets evaluation of Detection Accuracy on testing datasets CDF-v1 Li et al. [2020b],
+CDF-v2 Li et al. [2020b], and DFDC Dolhansky et al. [2019]. All quantized detectors are trained on the FF++
+dataset Rossler et al. [2019], with the best results highlighted in bold.
+Detectors
+Type
+CDF-v1 (Accuracy%)
+CDF-v2 (Accuracy%)
+DFDC (Accuracy%)
+BRECQ
+ICLR’22
+Adalog
+ECCV’24
+FIMA-Q
+CVPR’25
+Ours GT
+BRECQ
+ICLR’22
+Adalog
+ECCV’24
+FIMA-Q
+CVPR’25
+Ours GT
+BRECQ
+ICLR’22
+Adalog
+ECCV’24
+FIMA-Q
+CVPR’25
+Ours GT
+DeiT-Tiny
+Backbones
+50.2 (-18.3%) 55.8 (-12.7%) 54.3 (-14.2%) 68.5 76.7 45.3 (-19.2%) 47.6 (-16.9%) 49.9 (-14.6%) 64.5 73.3 37.2 (-20.5%) 39.4 (-18.3%) 40.3 (-17.4%) 57.7 65.1
+DeiT-Small
+48.9 (-22.2%) 51.9 (-19.2%) 55.0 (-16.1%) 71.1 78.2 42.1 (-25.9%) 50.1 (-17.9%) 50.5 (-17.5%) 68.0 74.8 36.1 (-23.9%) 40.0 (-20.0%) 42.5 (-17.5%) 60.0 66.4
+DeiT-Base
+60.8 (-12.7%) 58.5 (-15.0%) 61.2 (-12.3%) 73.5 81.2 46.6 (-22.7%) 48.2 (-21.1%) 49.8 (-19.5%) 69.3 77.8 42.7 (-21.4%) 41.6 (-22.5%) 47.5 (-16.6%) 64.1 71.4
+ViT-Small
+58.1 (-17.9%) 59.7 (-16.3%) 62.8 (-13.2%) 76.0 82.0 44.7 (-29.3%) 46.6 (-27.4%) 52.2 (-21.8%) 74.0 79.8 43.1 (-23.7%) 42.8 (-24.0%) 47.1 (-19.7%) 66.8 72.1
+ViT-Base
+58.9 (-17.5%) 60.0 (-16.4%) 62.2 (-14.2%) 76.4 83.7 48.2 (-26.5%) 47.2 (-27.5%) 56.3 (-18.4%) 74.7 81.9 45.2 (-22.0%) 45.1 (-22.1%) 52.4 (-14.8%) 67.2 73.6
+Swin-Small
+57.7 (-18.4%) 55.3 (-20.8%) 64.9 (-11.2%) 76.1 83.8 45.5 (-26.7%) 43.9 (-28.3%) 54.5 (-17.7%) 72.2 80.2 45.9 (-18.7%) 43.3 (-21.3%) 53.4 (-11.2%) 64.6 71.1
+Swin-Base
+53.2 (-23.1%) 57.5 (-18.8%) 62.0 (-14.3%) 76.3 85.8 48.0 (-25.7%) 45.0 (-28.7%) 50.1 (-23.6%) 73.7 82.9 41.5 (-14.5%) 43.5 (-12.5%) 50.9 (-5.1%)
+56.0 73.2
+LSDA
+CVPR’24 54.0 (-24.9%) 58.0 (-20.9%) 59.8 (-19.1%) 78.9 86.7 46.6 (-28.7%) 49.2 (-26.1%) 52.0 (-23.3%) 75.3 83.0 42.8 (-23.1%) 46.9 (-19.0%) 49.8 (-16.1%) 65.9 73.6
+NPR
+CVPR’24 52.1 (-26.2%) 56.9 (-21.4%) 57.4 (-20.9%) 78.3 85.8 46.3 (-27.9%) 48.7 (-25.5%) 49.7 (-24.5%) 74.2 81.2 40.4 (-25.7%) 42.5 (-23.6%) 51.6 (-14.5%) 66.1 75.8
+UCF
+ICCV’23 45.3 (-25.4%) 49.8 (-20.9%) 51.7 (-19.0%) 70.7 77.9 46.1 (-23.2%) 42.1 (-27.2%) 47.9 (-21.4%) 69.3 75.3 39.7 (-27.6%) 42.8 (-24.5%) 55.5 (-11.8%) 67.3 74.0
+Wavelet
+WACV’25 45.1 (-24.5%) 50.0 (-19.6%) 52.5 (-17.1%) 69.6 75.6 48.5 (-22.4%) 43.6 (-27.3%) 50.6 (-20.3%) 70.9 75.9 46.6 (-22.3%) 43.9 (-25.0%) 53.1 (-15.8%) 68.9 75.3
+Table 3: Additional Cross-datasets evaluation of Detection Accuracy on testing dataset DFDCP Dolhansky et al.
+[2019] where all quantized detectors are trained on FF++ Rossler et al. [2019].
+Dateset DFDCP Dolhansky et al. [2019] (Accuracy%)
+Quantization Methods
+Detectors
+Type
+BRECQ Li et al. [2022b]
+ICLR’22
+Adalog Wu et al. [2024]
+ECCV’24
+FIMA-Q Wu et al. [2025]
+CVPR’25
+Ours
+GT
+DeiT-Tiny
+Backbones
+43.3(-20.4%)
+44.7(-18.8%)
+54.1(-15.1%)
+63.7
+72.1
+DeiT-Small
+44.1(-33.6%)
+52.9(-20.3%)
+55.1(-17.0%)
+66.4
+73.5
+DeiT-Base
+46.1(-33.4%)
+55.3(-20.1%)
+57.6(-16.8%)
+69.2
+76.8
+ViT-Small
+46.2(-35.5%)
+55.4(-22.6%)
+57.8(-19.3%)
+71.6
+77.0
+ViT-Base
+48.1(-33.5%)
+57.7(-20.2%)
+60.2(-16.7%)
+72.3
+80.2
+Swin-Small
+47.2(-33.0%)
+56.7(-19.6%)
+59.0(-16.3%)
+70.5
+78.7
+Swin-Base
+48.5(-32.5%)
+58.2(-19.1%)
+60.7(-15.6%)
+71.9
+80.9
+LSDA Yan et al. [2024a]
+CVPR’24
+48.8(-31.8%)
+58.5(-18.2%)
+61.0(-14.7%)
+71.5
+81.3
+NPR Tan et al. [2024b]
+CVPR’24
+49.2(-31.8%)
+59.0(-18.2%)
+61.5(-14.7%)
+72.1
+82.0
+UCF Yan et al. [2023]
+ICCV’23
+47.1(-32.9%)
+56.5(-19.5%)
+58.9(-16.1%)
+70.2
+78.5
+Wavelet Baru et al. [2025]
+WACV’25
+42.1(-41.6%)
+50.5(-30.0%)
+52.6(-27.0%)
+72.1
+70.1
+for model quantization, DeiT (Tiny, Small, Base) Touvron et al. [2021], ViT (Small, Base) Dosovitskiy [2020], and
+Swin (Small, Base) Liu et al. [2021b].
+Baselines. To demonstrate that existing quantization methods has limited performance when directly applied to deepfake
+detection tasks, we compare with 3 State-of-Art general quantization baselines, BRECQ Li et al. [2022b], Adalog Wu
+et al. [2024], and FIMA-Q Wu et al. [2025]. Despite of different techniques adopted, they are all general quantization
+methods. In addition, we have also compared with 5 SoTA compression methods in different technical categories,
+including ADD Woo et al. [2022], GAC-FAS Le and Woo [2024], X-Pruner Yu and Xiang [2023], One-bit Xu et al.
+[2024], HOLa Lei et al. [2025].
+Evaluation Metrics. We evaluate performance by detection accuracy (Area Under the Curve AUC) , storage cost (MB,
+deployment feasibility), and compression ratio (%, size reduction relative to the full-precision model).
+Cross-dataset Evaluation Protocol. Quantized models for each deepfake detector are trained on the FF++ dataset
+Rossler et al. [2019] and evaluated on the CDF (v1, v2), DFD, DFDC, and DFDCP datasets. Notice that the full-precision
+(FP) deepfake detection model, labeled “GT”, serves as the upper bound for reference.
+Implementation Details. We employ 7 mainstream detectors as the original backbones for model quantization,
+encompassing DeiT (Tiny, Small, Base) Touvron et al. [2021], ViT (Small, Base) Dosovitskiy [2020], and Swin (Small,
+Base) Liu et al. [2021b]. All pre-trained detector parameters are initialized with pre-trained weights from the timm
+library. Following reconstruction-based PTQ approaches, 256 images are randomly sampled from the FF++ dataset to
+serve as the calibration set for quantizing deepfake detectors. Consistent with established practices, our implemented
+quantization strategy utilizes per-channel asymmetric quantization for weights and per-tensor asymmetric quantization
+for activations. Regarding hyperparameter settings, α, λ, γ1, and γ2 are configured as 1, 1, 0.5, and 0.5, respectively.
+9
+
+
+--- PAGE 10 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+Table 4: Comparison with compression methods across other technical categories on detection accuracy(%).
+Methods
+Venue
+Technology Category
+DFD Zi et al. [2020]
+CDF-v1 Li et al. [2020b]
+DFDC Dolhansky et al. [2020]
+DeiT-Base ViT-Base Swin-Base DeiT-Base ViT-Base Swin-Base DeiT-Base ViT-Base Swin-Base
+ADD Woo et al. [2022]
+AAAI’22
+Knowledge Distillation
+49.5
+46.6
+49.0
+47.7
+48.2
+49.0
+37.1
+36.8
+35.2
+GAC-FAS Le and Woo [2024] CVPR’24 Neural Architecture Search
+52.1
+51.3
+50.6
+45.1
+48.9
+47.6
+45.1
+45.0
+41.3
+X-Pruner Yu and Xiang [2023] CVPR’23
+Model Pruning
+52.1
+55.5
+59.1
+53.9
+51.0
+51.5
+48.6
+47.2
+50.1
+One-bit Xu et al. [2024]
+NIPS’24
+Low-Rank Factorization
+56.6
+53.2
+52.5
+50.0
+48.1
+47.1
+40.5
+43.2
+42.7
+HOLa Lei et al. [2025]
+ICCV’25
+Low-Rank Factorization
+59.2
+57.0
+55.4
+48.8
+51.9
+49.9
+46.5
+50.2
+52.7
+DeFakeQ (Ours)
+-
+Quantization
+74.5
+78.1
+77.1
+73.5
+76.4
+76.3
+64.1
+67.2
+65.0
+Ground Truth (GT)
+-
+-
+82.3
+86.7
+86.5
+81.2
+83.7
+85.8
+71.4
+73.6
+73.2
+Table 5: Comparison with compression methods across other technical categories on Storage Cost (MB) and Compres-
+sion Rate (%). ↓means the lower the better and ↑means the higher the better.
+Methods
+Storage Cost (MB) ↓
+Compression Rate (%) ↑
+ADD Woo et al. [2022]
+230.2
+31.2
+GAC-FAS Le and Woo [2024]
+150.7
+55.0
+X-Pruner Yu and Xiang [2023]
+133.9
+60.0
+One-bit Xu et al. [2024]
+72.7
+78.3
+HOLa Lei et al. [2025]
+86.6
+74.1
+DeFakeQ (Ours)
+31.8
+90.5
+Ground Truth (GT)
+334.8
+-
+5.2
+Cross-Dataset Evaluation of Quantization Performance
+We validate our quantization performance through cross-dataset evaluations against SoTA quantization baselines,
+considering detection accuracy, compression rate, and storage cost. We further provide a visual analysis of attention
+maps to illustrate the underlying reasons for our superiority over existing SotA approaches.
+5.2.1
+Accuracy.
+In summary, across all detection methods and across all datasets, our DeFakeQ substantially outperforms all
+quantization baselines on maintaining detection accuracy. Table 1, Table 2 and Table 3 present a comprehensive
+cross-data evaluation of quantization methods on Sota deepfake detections. Specifically, as shown in Table 1 , when
+evaluated on the DFD dataset, our method consistently outperforms BRECQ Li et al. [2022b], Adalog Wu et al.
+[2024], and FIMA-Q Wu et al. [2025] on both state-of-the-art and backbone detectors by 17.2%–25.6%, 14.8%–
+23.2%, and 13.5%–25.7%, respectively. Furthermore, as summarized in Table 2 and Table 3, our approach maintains
+superior accuracy across multiple benchmarks. Compared with BRECQ, Adalog, and FIMA-Q, DeFakeQ achieves
+improvements of 11.2%–35.5%, 17.5%–22.6%, and 11.2%–23.7% on datasets CDF-v1, CDF-v2, DFDC and
+DFDCP, respectively, for both SOTA and backbone detectors, further demonstrating its robustness and generalization
+capability. Notably, while achieving such state-of-the-art detection accuracy, our method remains comparable to existing
+quantization approaches in terms of compression rate and storage cost, showcasing its excellent balance between
+efficiency and performance for practical deepfake detection applications (refer to Table 1).
+5.2.2
+Compression Rate and Storage Cost
+Table 1 reports the storage cost of quantized models and their compression rates relative to the original full-precision
+detectors (GT). As shown in the table, DeFakeQ demonstrates competitive or superior efficiency in both storage
+cost and compression ratio, while, more importantly, achieving significantly improved detection accuracy. This
+performance gain can be attributed to our novel adaptive bidirectional quantization strategy, which effectively preserves
+critical forensic cues during the quantization process.
+5.2.3
+Visual Analysis of Attention Maps
+To analyze the performance of different quantization methods, we also visualize attention heatmaps. As shown in
+Figure 3, BRECQ Li et al. [2022b] and Adalog Wu et al. [2024] exhibit significant discrepancies in the output of each
+attention block compared to the full-precision attention block (GT), which verifies that common quantization cannot be
+directly applied to deepfake detection tasks. Meanwhile, FIMA-Q Wu et al. [2025] alleviates this issue to a certain
+extent by employing the diagonal plus low-rank principle to preserve salient features, but it still has limitations for
+fine-grained deepfake detection tasks. In contrast, our DeFakeQ can closely approximate the output of each layer
+in the GT attention block and accurately extract targeted feature regions (e.g., eyes, nose, mouth, etc.), thus greatly
+maintaining accuracy in deepfake detection during quantization process.
+10
+
+
+--- PAGE 11 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+Table 6: Ablation studies on model design (HAQ and VEFT). All detection models are trained on the FF++
+dataset Rossler et al. [2019] and evaluated across various other datasets on metric detection accuracy(%).
+Method
+CDF-v1 Li et al. [2020b]
+CDF-v2 Li et al. [2020b]
+DFD Zi et al. [2020]
+DFDC Dolhansky et al. [2020] DFDCP Dolhansky et al. [2019]
+DeiT-Base ViT-Base Swin-Base DeiT-Base ViT-Base Swin-Base DeiT-Base ViT-Base Swin-Base DeiT-Base ViT-Base Swin-Base DeiT-Base ViT-Base Swin-Base
+✗HAQ, ✗VEFT
+57.8
+58.9
+53.2
+46.6
+48.2
+48.0
+52.2
+54.9
+51.9
+42.3
+45.8
+43.4
+52.5
+57.1
+55.8
+✓HAQ, ✗VEFT
+61.5
+63.3
+60.7
+58.4
+59.1
+58.2
+59.7
+62.4
+60.0
+50.1
+53.5
+56.0
+60.4
+62.5
+61.7
+✗HAQ, ✓VEFT
+65.2
+61.9
+66.6
+64.5
+60.8
+68.2
+63.6
+64.4
+62.4
+55.9
+57.8
+60.1
+57.2
+59.8
+60.2
+✓HAQ, ✓VEFT (Ours)
+73.5
+76.4
+76.3
+69.3
+74.7
+73.7
+74.5
+78.1
+77.1
+64.1
+67.2
+65.0
+69.2
+72.3
+71.9
+5.3
+Comparisons with Other Compression Methods
+Table 4 presents a comprehensive comparison of quantization results between our proposed method and other state-of-
+the-art model compression techniques across three benchmark datasets and three mainstream backbone models. Among
+the compared compression methods, ADD Woo et al. [2022] (Knowledge Distillation), GAC-FAS Le and Woo [2024]
+(Neural architecture search), X-Pruner Yu and Xiang [2023] (Model Pruning), One-bit Xu et al. [2024] and HOLa Lei
+et al. [2025] (Low-rank Factorization) all exhibit varying degrees of performance degradation compared to GT, which is
+a common trade-off between model compression and performance preservation. In contrast, our proposed DeFakeQ
+method (based on quantization) maintains its superior performance advantage across all datasets and backbone
+models, consistently achieving the highest scores among all compressed methods. Specifically, our DeFakeQ
+achieves 74.5% (DeiT-Base), 78.1% (ViT-Base), and 77.1% (Swin-Base) on the DFD dataset; 73.5% (DeiT-Base),
+76.4% (ViT-Base), and 76.3% (Swin-Base) on the CDF-v1 dataset; and 64.1% (DeiT-Base), 67.2% (ViT-Base), and
+65.0% (Swin-Base) on the DFDC dataset, respectively. These results fully validate the effectiveness of the quantization
+strategy adopted in DeFakeQ, which can effectively mitigate performance loss while realizing model compression,
+outperforming other mainstream compression techniques.
+Table 5 compares our DeFakeQ with other compression approaches in terms of storage cost and compression rate. The
+whole results are evaluated on the Swin-Base model and trained with the FF++ dataset Rossler et al. [2019]. We observe
+that traditional compression strategies such as ADD Woo et al. [2022], GAC-FAS Le and Woo [2024], and X-Pruner Yu
+and Xiang [2023] achieve relatively high memory consumption and limited compression ratios, which restricts their
+deployment on resource-constrained edge platforms. Although low-rank and binarization-based methods (One-bit Xu
+et al. [2024], HOLa Lei et al. [2025]) reduce memory usage to some extent, their accuracies still lag behind ours (refer
+to Table 4), which are unsuitable for edge devices for the real-world scenario. In contrast, our DeFakeQ achieves the
+lowest storage cost and the highest compression rate, demonstrating the superior efficiency in model compression.
+These results validate that our quantization-aware design effectively minimizes memory overhead while maintaining
+strong compression performance, making it highly suitable for edge-oriented deepfake detection applications.
+5.4
+Ablation Studies
+5.4.1
+Ablations on model design
+To validate the necessity and complementary effects of the proposed Horizontal Adaptive Quantization (HAQ) and
+Vertical Efficient Feature Fine-Tuning (VEFT), ablation experiments were conducted on five datasets.
+As shown in Table 6, removing either the HAQ or VEFT module leads to a significant drop in detection performance,
+thereby validating the contribution and effectiveness of each component. The evaluated variants include the basic
+quantization, the baseline with the proposed Horizontal Adaptive Quantization (HAQ), the Vertical Efficienct Feature
+Fine-Tuning (VEFT), and our overall framework (HAQ + VEFT). When only HAQ is enabled (✓HAQ, ✗VEFT),
+the AUC scores improve significantly by 3.7–9.2% compared to the baseline, demonstrating that HAQ’s adaptive
+quantization strategy effectively preserves critical feature information during model compression. Similarly, activating
+only VEFT (✗HAQ, ✓VEFT) yields moderate improvements (5.0–11.4% higher than the baseline), highlighting its
+ability to refine feature representations for better detection robustness. Furthermore, the full combination of HAQ and
+VEFT (Ours) attains the optimal performance across all datasets and backbones, outperforming the single-module
+implementations by 4.3-15.8% and boosting the baseline by a large margin of 14.5-23.2%.
+These results clearly illustrate that HAQ and VEFT play indispensable and synergistic roles: HAQ ensures efficient
+quantization with minimal information loss, while VEFT compensates for residual performance gaps by enhancing
+feature discriminability. Together, they enable the proposed method to achieve superior detection performance,
+underscoring the necessity of integrating both components for high-efficiency and high-accuracy deepfake detection.
+11
+
+
+--- PAGE 12 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+Table 7: Ablations Studies on Calibration Set Size. All detection models are trained on the FF++ dataset Rossler et al.
+[2019] and evaluated across various other datasets on metric detection accuracy(%).
+Calibration Set Size
+DFD Zi et al. [2020]
+CDF-v1 Li et al. [2020b]
+DFDC Dolhansky et al. [2020]
+DeiT-Base
+ViT-Base
+Swin-Base
+DeiT-Base
+ViT-Base
+Swin-Base
+DeiT-Base
+ViT-Base
+Swin-Base
+64
+69.8
+72.6
+71.3
+71.5
+74.8
+72.9
+61.3
+61.2
+62.7
+128
+72.1
+75.8
+74.7
+72.2
+75.0
+75.5
+63.1
+64.5
+63.3
+256
+74.5
+78.1
+77.1
+73.5
+76.4
+76.3
+64.1
+67.2
+65.0
+512
+73.4
+77.0
+75.8
+72.9
+75.8
+75.8
+63.8
+65.7
+64.2
+1024
+73.1
+76.8
+75.5
+72.6
+75.5
+75.6
+63.5
+65.3
+64.0
+Table 8: Ablations Studies on Random Selection Strategy. All detection models are trained on the FF++ dataset Rossler
+et al. [2019] and evaluated across various other datasets on metric detection accuracy(%).
+Method
+CDF-v1 Li et al. [2020b]
+CDF-v2 Li et al. [2020b]
+DFD Zi et al. [2020]
+DFDC Dolhansky et al. [2020] DFDCP Dolhansky et al. [2019]
+DeiT-BaseViT-BaseSwin-BaseDeiT-BaseViT-BaseSwin-BaseDeiT-BaseViT-BaseSwin-BaseDeiT-BaseViT-BaseSwin-BaseDeiT-BaseViT-Base Swin-Base
+✗VEFT
+61.5
+63.3
+60.7
+58.4
+59.1
+58.2
+59.7
+62.4
+60.0
+50.1
+53.5
+56.0
+60.4
+62.5
+61.7
+✓VEFT (✗Random Selection)
+70.2
+69.1
+72.3
+65.9
+70.8
+69.2
+67.6
+71.5
+72.3
+61.5
+62.6
+61.8
+64.4
+68.9
+67.2
+✓VEFT (✓Random Selection)
+73.5
+76.4
+76.3
+69.3
+74.7
+73.7
+74.5
+78.1
+77.1
+64.1
+67.2
+65.0
+69.2
+72.3
+71.9
+5.4.2
+Ablations Studies on Calibration Set Size
+We perform an experiment to demonstrate the effect of the calibration set size. Table 7 presents the detection performance
+of DeFakeQ with varying calibration set sizes on three representative deepfake detection benchmarks, evaluated using
+three mainstream transformer backbones. From the empirical results, we observe that the detection accuracy rises
+steadily when the calibration set size is increased from 64 to 256, achieving the peak performance at 256 samples.
+Further expanding the calibration size to 512 and 1024 results in a mild degradation in accuracy across all datasets and
+backbone architectures, without yielding any observable performance improvement. This observation clearly indicates
+that DeFakeQ imposes only a low demand on the calibration set size. The underlying reason lies in that DeFakeQ is a
+quantization method that aligns a quantized detector with a full-precision pre-trained model. Benefiting from this
+design principle, merely a small number of calibration samples are adequate to refine the calibration procedure, which
+effectively manifests the low-cost merit of our quantization framework in real-world deepfake detection applications.
+5.4.3
+Ablation Studies on Random Selection Strategy in VEFT
+For each quantized block, VEFT randomly selects a small subset of feature channels to restore to the original full-
+precision format, consistent with the precision of the pre-trained full-precision Deepfake detector Mf. It is noted
+that the Random Selection is a data augmentation strategy, rather than a model design strategy, which is inspired
+by Dropout-style sample augmentation, and aims to focus the model on quantized channels by generating diverse
+mixed-precision samples in a self-supervised manner. With the design of progressive contrastive learning, VEFT
+adaptively optimizes the quantized channels. To explore the influence of the random selection strategy on the detection
+performance, ablation experiments were conducted on five datasets, which is shown in Table 8. The three compared
+methods are designed to clarify the effect of the channel selection strategy when adopting VEFT. Specifically, the first
+method corresponds to the scenario without adopting VEFT, which is marked as "✗VEFT" in the table. It can be
+observed that this method achieves the lowest detection accuracy across all datasets and backbones, indicating that the
+absence of VEFT significantly limits the model performance.
+The second method adopts VEFT but adopts a fixed selection strategy, i.e., adopting VEFT while fixedly selecting
+a small subset of feature channels to restore to the original full-precision format, denoted as "✓VEFT (✗Random
+Selection)". Compared with the first method without VEFT, this method achieves a noticeable performance improvement
+on all datasets and backbones. This improvement demonstrates that restoring a small subset of feature channels to full
+precision under VEFT can effectively enhance the detection capability of the model.
+The third method is the proposed strategy, which involves adopting VEFT and randomly selecting feature channels to
+restore to full precision, labeled as "✓VEFT (✓Random Selection)". As shown in the table, this method achieves the
+highest detection accuracy across all datasets and backbones, outperforming the other two methods consistently. This
+result fully verifies that the random channel selection strategy under VEFT can better exploit the feature information,
+thereby further improving the deepfake detection performance.
+12
+
+
+--- PAGE 13 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+GT
+BRECQ
+Adalog
+Original Image
+FIMA-Q
+Ours
+Figure 3: Visual Comparisons of detected salient forgeries during the quantization process.
+5.5
+Real-Time, Real-World Deployment on Edge Devices
+To validate the practical applicability of DeFakeQ, we deploy it on Android mobile phones and conducted edge-device
+testing on five prominent face forgery methods, including Face Swap Zhu et al. [2021b], Face Shifter Li et al. [2020c],
+Face2Face Thies et al. [2016], DeepFake Yan et al. [2024b], and NeuralTextures Thies et al. [2019], as shown in
+Figure 4.
+In addition, we have recorded a video to showcase the practical deployment and performance of our DeFakeQ on edge
+mobile devices. Please refer to the demo video for our real time and real work depoyment on the android phone.
+The demo validates that DeFakeQ has been successfully installed and runs seamlessly on mobile hardware, enabling
+reliable differentiation between real and fake images. Notably, the fake images in the demo cover multiple common
+deepfake categories, e.g., face swapping, face2face, and neuraltexture, and our method consistently achieves accurate
+detection results across all these scenarios. Equally impressive is the real-time inference capability of DeFakeQ: the
+inference latency per image is no more than 50ms, which fully meets the requirements for real-time applications.
+This demonstration not only confirms the compatibility and feasibility of DeFakeQ on edge mobile devices but also
+highlights its superior balance between detection accuracy and efficiency, making it a promising solution for real-world
+deepfake detection tasks.
+During real-time inference, DeFakeQ achieves an average latency of 25 ms per frame and consumes 87 mW of power
+while maintaining high detection accuracy. Our DeFakeQ performance balances efficiency and reliability, enabling
+seamless integration into mobile deepfake detection apps for end-users to verify media authenticity.
+Discussions for broader real-world adoptions
+DeFakeQ can be further adapted to custom circuit boards (e.g., ASICs
+and FPGAs) for edge deployment scenarios. The proposed HAQ module can be aligned with the low-bit arithmetic
+capabilities of modern circuit designs. Besides, our DeFakeQ is hardware agnostic and adheres to standard integer
+arithmetic specifications. HAQ and VEFT are compatible with iOS via Core ML, embedded systems, e.g., Raspberry
+Pi, ESP32, and custom circuit boards like ASICs/FPGAs. In addition, DeFakeQ’s output can be directly exported to
+ONNX for cross-platform deployment or PyTorch Mobile for Python-based edge applications. Leveraging the ultra-low
+storage cost (as verified in Table 1) and optimized computational graph, DeFakeQ occupies far below the threshold for
+lightweight mobile applications.
+13
+
+
+--- PAGE 14 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+Real Instance
+Fake Instance
+Face Swap
+DeepFake
+Face2Face
+NeuralTextures
+FaceShifter
+Figure 4: Real-world detection instances of DeFakeQ deployed on an Android device. The quantized model processes
+in around 35 ms, and outputs the prediction result and the corresponding confidence score. Please refer to the demo
+video for our real time and real work depoyment on the android phone.
+5.6
+Limitations and Future Works
+Current real-world deployment is limited to mobile devices; we have not extended the validation to more resource-
+constrained edge scenarios, e.g., low-power IoT devices, edge gateways, or evaluated performance under extreme
+environmental conditions, e.g., low-light imaging, partial facial occlusion. We plan to extend deployment to a broader
+range of edge platforms and optimize a resource-aware dynamic quantization module that adjusts precision in real time
+based on device residual computing power and network bandwidth.
+6
+Conclusion
+To conclude, we propose DeFakeQ, the first specialized quantization framework tailored for deepfake detection,
+addressing the challenge of deploying high-performing detectors on resource-constrained edge devices. Unlike
+traditional quantization methods that tend to disrupt the subtle facial forgery cues critical to reliable detection, DeFakeQ
+introduces a novel adaptive bidirectional quantization, which achieves substantial model compression while preserving
+the discriminative capacity to capture fine-grained facial forgery cues. Extensive evaluations demonstrate its superiority
+over conventional quantization methods in maintaining post-quantization accuracy, while real-world deployment on
+edge platforms further substantiates its practicality and robustness. Furthermore, real-world deployment on mobile
+devices further confirms DeFakeQ’s practicality, these results underscore the potential of DeFakeQ as a viable solution
+for real-time, on-device deepfake detection in practical applications.
+14
+
+
+--- PAGE 15 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+References
+Xiaoyu Chu, Yan Chen, Matthew C Stamm, and KJ Ray Liu. Information theoretical limit of media forensics: The
+forensicability. IEEE Transactions on Information Forensics and Security, 11(4):774–788, 2015.
+Zhenglin Huang, Jinwei Hu, Xiangtai Li, Yiwei He, Xingyu Zhao, Bei Peng, Baoyuan Wu, Xiaowei Huang, and
+Guangliang Cheng. Sida: Social media image deepfake detection, localization and explanation with large multimodal
+model. In Proceedings of the Computer Vision and Pattern Recognition Conference, pages 28831–28841, 2025.
+Xinghe Fu, Zhiyuan Yan, Taiping Yao, Shen Chen, and Xi Li. Exploring unbiased deepfake detection via token-level
+shuffling and mixing. In Proceedings of the AAAI Conference on Artificial Intelligence, volume 39, pages 3040–3048,
+2025.
+Chuangchuang Tan, Renshuai Tao, Huan Liu, Guanghua Gu, Baoyuan Wu, Yao Zhao, and Yunchao Wei. C2p-clip:
+Injecting category common prompt in clip to enhance generalization in deepfake detection. In Proceedings of the
+AAAI Conference on Artificial Intelligence, volume 39, pages 7184–7192, 2025.
+Chi Wang, Ziwen He, Xinjue Hu, Weinan Guan, Wei Wang, and Zhangjie Fu. Map-mamba: Multi-artifacts perception
+mamba for generalizable face forgery detection. IEEE Transactions on Information Forensics and Security, 2026a.
+Ziming Yang, Jian Liang, Yuting Xu, Xiao-Yu Zhang, and Ran He. Masked relation learning for deepfake detection.
+IEEE Transactions on Information Forensics and Security, 18:1696–1708, 2023.
+Zhiyuan Wang, Yanxiang Chen, Yuanzhi Yao, Meng Han, Wenpeng Xing, and Meng Li. Idcnet: Image decomposition
+and cross-view distillation for generalizable deepfake detection. IEEE Transactions on Information Forensics and
+Security, 2025.
+Ruiyang Xia, Decheng Liu, Jie Li, Lin Yuan, Nannan Wang, and Xinbo Gao. Mmnet: multi-collaboration and multi-
+supervision network for sequential deepfake detection. IEEE Transactions on Information Forensics and Security,
+19:3409–3422, 2024.
+Cairong Zhao, Chutian Wang, Guosheng Hu, Haonan Chen, Chun Liu, and Jinhui Tang. Istvt: interpretable spatial-
+temporal video transformer for deepfake detection. IEEE Transactions on Information Forensics and Security, 18:
+1335–1348, 2023.
+Mingxing Tan and Quoc Le. Efficientnet: Rethinking model scaling for convolutional neural networks. In International
+conference on machine learning, pages 6105–6114. PMLR, 2019.
+K Vidya, Praveen Ramesh, Hrithik Viknesh, and Sanjay Devanand. Compressed deepfake detection using spatio-
+temporal approach with model pruning. Procedia Computer Science, 230:436–444, 2023.
+Minha Kim, Shahroz Tariq, and Simon S Woo. Fretal: Generalizing deepfake detection using knowledge distillation
+and representation learning. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition,
+pages 1001–1012, 2021.
+Haohao Li, Jianguo Zhang, Zhihu Li, Juan Liu, and Yuncai Wang. Improvement of min-entropy evaluation based
+on pruning and quantized deep neural network. IEEE Transactions on Information Forensics and Security, 18:
+1410–1420, 2023a.
+Tiantian Wang and Xiaoqi Lu. Face forgery detection algorithm based on improved mobilevit network. In 2023 8th
+International Conference on Intelligent Computing and Signal Processing (ICSP), pages 1396–1400. IEEE, 2023.
+Maitreyee Dutta, Jagriti Saini, et al. Enhancing passive digital image splicing forensics using data-efficient image
+transformer and lightweight pretrained shufflenet-v2 models-a comparative analysis. In 2024 1st International
+Conference on Trends in Engineering Systems and Technologies (ICTEST), pages 1–8. IEEE, 2024.
+Markus Nagel, Marios Fournarakis, Rana Ali Amjad, Yelysei Bondarenko, Mart van Baalen, and Tijmen Blankevoort.
+A white paper on neural network quantization. arxiv 2021. arXiv preprint arXiv:2106.08295, 4, 2021.
+Liang Chen, Yong Zhang, Yibing Song, Lingqiao Liu, and Jue Wang. Self-supervised learning of adversarial example:
+Towards good generalizations for deepfake detection. In Proceedings of the IEEE/CVF conference on computer
+vision and pattern recognition, pages 18710–18719, 2022a.
+Lingzhi Li, Jianmin Bao, Ting Zhang, Hao Yang, Dong Chen, Fang Wen, and Baining Guo. Face x-ray for more general
+face forgery detection. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition,
+pages 5001–5010, 2020a.
+Yuezun Li and Siwei Lyu.
+Exposing deepfake videos by detecting face warping artifacts.
+arXiv preprint
+arXiv:1811.00656, 2018.
+Kaede Shiohara and Toshihiko Yamasaki. Detecting deepfakes with self-blended images. In Proceedings of the
+IEEE/CVF conference on computer vision and pattern recognition, pages 18720–18729, 2022.
+15
+
+
+--- PAGE 16 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+Tianchen Zhao, Xiang Xu, Mingze Xu, Hui Ding, Yuanjun Xiong, and Wei Xia. Learning self-consistency for deepfake
+detection. In Proceedings of the IEEE/CVF international conference on computer vision, pages 15023–15033, 2021a.
+Jiachen Yang, Aiyun Li, Shuai Xiao, Wen Lu, and Xinbo Gao. Mtd-net: Learning to detect deepfakes images by
+multi-scale texture difference. IEEE Transactions on Information Forensics and Security, 16:4234–4245, 2021a.
+Qiqi Gu, Shen Chen, Taiping Yao, Yang Chen, Shouhong Ding, and Ran Yi. Exploiting fine-grained face forgery clues
+via progressive enhancement learning. In Proceedings of the AAAI conference on artificial intelligence, volume 36,
+pages 735–743, 2022.
+Honggu Liu, Xiaodan Li, Wenbo Zhou, Yuefeng Chen, Yuan He, Hui Xue, Weiming Zhang, and Nenghai Yu. Spatial-
+phase shallow learning: rethinking face forgery detection in frequency domain. In Proceedings of the IEEE/CVF
+conference on computer vision and pattern recognition, pages 772–781, 2021a.
+Yuchen Luo, Yong Zhang, Junchi Yan, and Wei Liu. Generalizing face forgery detection with high-frequency features.
+In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pages 16317–16326, 2021.
+Yuyang Qian, Guojun Yin, Lu Sheng, Zixuan Chen, and Jing Shao. Thinking in frequency: Face forgery detection by
+mining frequency-aware clues. In European conference on computer vision, pages 86–103. Springer, 2020.
+Yuan Wang, Kun Yu, Chen Chen, Xiyuan Hu, and Silong Peng. Dynamic graph learning with content-guided spatial-
+frequency relation reasoning for deepfake detection. In Proceedings of the IEEE/CVF conference on computer vision
+and pattern recognition, pages 7278–7287, 2023.
+Shichao Dong, Jin Wang, Renhe Ji, Jiajun Liang, Haoqiang Fan, and Zheng Ge. Implicit identity leakage: The stumbling
+block to improving deepfake detection generalization. In Proceedings of the IEEE/CVF conference on computer
+vision and pattern recognition, pages 3994–4004, 2023.
+Baojin Huang, Zhongyuan Wang, Jifan Yang, Jiaxin Ai, Qin Zou, Qian Wang, and Dengpan Ye. Implicit identity driven
+deepfake face swapping detection. In Proceedings of the IEEE/CVF conference on computer vision and pattern
+recognition, pages 4490–4499, 2023.
+Jiahao Liang, Huafeng Shi, and Weihong Deng. Exploring disentangled content information for face forgery detection.
+In European conference on computer vision, pages 128–145. Springer, 2022.
+Zhiyuan Yan, Yong Zhang, Yanbo Fan, and Baoyuan Wu. Ucf: Uncovering common features for generalizable deepfake
+detection. In Proceedings of the IEEE/CVF international conference on computer vision, pages 22412–22423, 2023.
+Tianyun Yang, Juan Cao, Qiang Sheng, Lei Li, Jiaqi Ji, Xirong Li, and Sheng Tang. Learning to disentangle gan
+fingerprint for fake image attribution. arXiv preprint arXiv:2106.08749, 2021b.
+Hanqing Zhao, Wenbo Zhou, Dongdong Chen, Tianyi Wei, Weiming Zhang, and Nenghai Yu. Multi-attentional
+deepfake detection. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pages
+2185–2194, 2021b.
+Hao Dang, Feng Liu, Joel Stehouwer, Xiaoming Liu, and Anil K Jain. On the detection of digital face manipulation. In
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern recognition, pages 5781–5790, 2020.
+Junyi Cao, Chao Ma, Taiping Yao, Shen Chen, Shouhong Ding, and Xiaokang Yang. End-to-end reconstruction-
+classification learning for face forgery detection. In Proceedings of the IEEE/CVF conference on computer vision
+and pattern recognition, pages 4113–4122, 2022.
+Chengrui Wang and Weihong Deng. Representative forgery mining for fake face detection. In Proceedings of the
+IEEE/CVF conference on computer vision and pattern recognition, pages 14923–14932, 2021.
+Jian Wang, Baoyuan Wu, Li Liu, and Qingshan Liu. Fauforensics: Boosting audio-visual deepfake detection with facial
+action units. IEEE Transactions on Information Forensics and Security, 2026b.
+Xiangyu Zhu, Hao Wang, Hongyan Fei, Zhen Lei, and Stan Z Li. Face forgery detection by 3d decomposition. In
+Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pages 2929–2939, 2021a.
+Shan Jia, Reilin Lyu, Kangran Zhao, Yize Chen, Zhiyuan Yan, Yan Ju, Chuanbo Hu, Xin Li, Baoyuan Wu, and Siwei
+Lyu. Can chatgpt detect deepfakes? a study of using multimodal large language models for media forensics. In
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pages 4324–4333, 2024.
+Chuangchuang Tan, Ping Liu, RenShuai Tao, Huan Liu, Yao Zhao, Baoyuan Wu, and Yunchao Wei. Data-independent
+operator: A training-free artifact representation extractor for generalizable deepfake detection. arXiv preprint
+arXiv:2403.06803, 2024a.
+Hongrui Zheng, Yuezun Li, Liejun Wang, Yunfeng Diao, and Zhiqing Guo. Boosting active defense persistence:
+A two-stage defense framework combining interruption and poisoning against deepfake. IEEE Transactions on
+Information Forensics and Security, 2026.
+16
+
+
+--- PAGE 17 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+Junghyup Lee, Dohyung Kim, and Bumsub Ham. Network quantization with element-wise gradient scaling. In
+Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pages 6448–6457, 2021.
+Yanjing Li, Sheng Xu, Baochang Zhang, Xianbin Cao, Peng Gao, and Guodong Guo. Q-vit: Accurate and fully
+quantized low-bit vision transformer. Advances in neural information processing systems, 35:34451–34463, 2022a.
+Ke Zhu, Yin-Yin He, and Jianxin Wu. Quantized feature distillation for network quantization. In Proceedings of the
+AAAI Conference on Artificial Intelligence, volume 37, pages 11452–11460, 2023.
+Elias Frantar, Saleh Ashkboos, Torsten Hoefler, and Dan Alistarh. Gptq: Accurate post-training quantization for
+generative pre-trained transformers. arXiv preprint arXiv:2210.17323, 2022.
+Zhikai Li, Junrui Xiao, Lianwei Yang, and Qingyi Gu. Repq-vit: Scale reparameterization for post-training quantization
+of vision transformers. In Proceedings of the IEEE/CVF International Conference on Computer Vision, pages
+17227–17236, 2023b.
+Tim Dettmers, Artidoro Pagnoni, Ari Holtzman, and Luke Zettlemoyer. Qlora: Efficient finetuning of quantized llms.
+Advances in neural information processing systems, 36:10088–10115, 2023.
+Wei Huang, Yangdong Liu, Haotong Qin, Ying Li, Shiming Zhang, Xianglong Liu, Michele Magno, and Xiaojuan Qi.
+Billm: Pushing the limit of post-training quantization for llms. arXiv preprint arXiv:2402.04291, 2024.
+Markus Nagel, Rana Ali Amjad, Mart Van Baalen, Christos Louizos, and Tijmen Blankevoort. Up or down? adaptive
+rounding for post-training quantization. In International conference on machine learning, pages 7197–7206. PMLR,
+2020.
+Yuhang Li, Ruihao Gong, Xu Tan, Yang Yang, Peng Hu, Qi Zhang, Fengwei Yu, Wei Wang, and Shi Gu. Brecq:
+Pushing the limit of post-training quantization by block reconstruction. In International Conference on Learning
+Representations, 2022b.
+Xiuying Wei, Ruihao Gong, Yuhang Li, Xianglong Liu, and Fengwei Yu. Qdrop: Randomly dropping quantization for
+extremely low-bit post-training quantization. In International Conference on Learning Representations, 2022.
+Jiawei Liu, Lin Niu, Zhihang Yuan, Dawei Yang, Xinggang Wang, and Wenyu Liu. Pd-quant: Post-training quantization
+based on prediction difference metric. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern
+Recognition, pages 24427–24437, 2023.
+Shichao Dong, Jin Wang, Jiajun Liang, Haoqiang Fan, and Renhe Ji. Explaining deepfake detection by analysing image
+matching. In European conference on computer vision, pages 18–35. Springer, 2022.
+Dong Li, Jiaying Zhu, Yidi Liu, Xin Lu, Xueyang Fu, Jiawei Liu, Aiping Liu, and Zheng-Jun Zha. Learnable frequency
+decomposition for image forgery detection and localization. In Proceedings of the Thirty-Fourth International Joint
+Conference on Artificial Intelligence, pages 1359–1367, 2025.
+Hong-Shuo Chen, Shuowen Hu, Suya You, C-C Jay Kuo, et al. Defakehop++: An enhanced lightweight deepfake
+detector. APSIPA Transactions on Signal and Information Processing, 11(2), 2022b.
+Song Han, Huizi Mao, and William J Dally. Deep compression: Compressing deep neural networks with pruning,
+trained quantization and huffman coding. arXiv preprint arXiv:1510.00149, 2015.
+Alessio Devoto, Yu Zhao, Simone Scardapane, and Pasquale Minervini. A simple and effective l_2 norm-based strategy
+for kv cache compression. In Proceedings of the 2024 Conference on Empirical Methods in Natural Language
+Processing, pages 18476–18499, 2024.
+Changyan Liu. Patchprune: Reducing hallucinations in vision language models by pruning redundant image patches.
+In International Conference on Machine Learning and Intelligent Computing, pages 298–304. PMLR, 2025.
+Andreas Rossler, Davide Cozzolino, Luisa Verdoliva, Christian Riess, Justus Thies, and Matthias Nießner. Faceforen-
+sics++: Learning to detect manipulated facial images. In Proceedings of the IEEE/CVF international conference on
+computer vision, pages 1–11, 2019.
+Bojia Zi, Minghao Chang, Jingjing Chen, Xingjun Ma, and Yu-Gang Jiang. Wilddeepfake: A challenging real-world
+dataset for deepfake detection. In Proceedings of the 28th ACM international conference on multimedia, pages
+2382–2390, 2020.
+Yuezun Li, Xin Yang, Pu Sun, Honggang Qi, and Siwei Lyu. Celeb-df: A large-scale challenging dataset for deepfake
+forensics. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pages 3207–3216,
+2020b.
+Brian Dolhansky, Russ Howes, Ben Pflaum, Nicole Baram, and Cristian Canton Ferrer. The deepfake detection
+challenge (dfdc) preview dataset. arXiv preprint arXiv:1910.08854, 2019.
+17
+
+
+--- PAGE 18 ---
+
+DeFakeQ: Enabling Real-Time Deepfake Detection on Edge Devices via Adaptive Bidirectional Quantization
+Zhuguanyu Wu, Jiaxin Chen, Hanwen Zhong, Di Huang, and Yunhong Wang. Adalog: Post-training quantization for
+vision transformers with adaptive logarithm quantizer. In European Conference on Computer Vision, pages 411–427.
+Springer, 2024.
+Zhuguanyu Wu, Shihe Wang, Jiayi Zhang, Jiaxin Chen, and Yunhong Wang. Fima-q: Post-training quantization for
+vision transformers by fisher information matrix approximation. In Proceedings of the Computer Vision and Pattern
+Recognition Conference, pages 14891–14900, 2025.
+Zhiyuan Yan, Yuhao Luo, Siwei Lyu, Qingshan Liu, and Baoyuan Wu. Transcending forgery specificity with latent
+space augmentation for generalizable deepfake detection. In Proceedings of the IEEE/CVF Conference on Computer
+Vision and Pattern Recognition, pages 8984–8994, 2024a.
+Chuangchuang Tan, Yao Zhao, Shikui Wei, Guanghua Gu, Ping Liu, and Yunchao Wei. Rethinking the up-sampling
+operations in cnn-based generative network for generalizable deepfake detection. In Proceedings of the IEEE/CVF
+Conference on Computer Vision and Pattern Recognition, pages 28130–28139, 2024b.
+Lalith Bharadwaj Baru, Rohit Boddeda, Shilhora Akshay Patel, and Sai Mohan Gajapaka. Wavelet-driven generalizable
+framework for deepfake face forgery detection. In Proceedings of the winter conference on applications of computer
+vision, pages 1661–1669, 2025.
+Brian Dolhansky, Joanna Bitton, Ben Pflaum, Jikuo Lu, Russ Howes, Menglin Wang, and Cristian Canton Ferrer. The
+deepfake detection challenge (dfdc) dataset. arXiv preprint arXiv:2006.07397, 2020.
+Simon Woo et al. Add: Frequency attention and multi-view based knowledge distillation to detect low-quality
+compressed deepfake images. In Proceedings of the AAAI conference on artificial intelligence, volume 36, pages
+122–130, 2022.
+Binh M Le and Simon S Woo. Gradient alignment for cross-domain face anti-spoofing. In Proceedings of the IEEE/CVF
+Conference on Computer Vision and Pattern Recognition, pages 188–199, 2024.
+Lu Yu and Wei Xiang. X-pruner: explainable pruning for vision transformers. In Proceedings of the IEEE/CVF
+conference on computer vision and pattern recognition, pages 24355–24363, 2023.
+Yuzhuang Xu, Xu Han, Zonghan Yang, Shuo Wang, Qingfu Zhu, Zhiyuan Liu, Weidong Liu, and Wanxiang Che.
+Onebit: Towards extremely low-bit large language models. Advances in Neural Information Processing Systems, 37:
+66357–66382, 2024.
+Qinqian Lei, Bo Wang, and Robby T Tan. Hola: Zero-shot hoi detection with low-rank decomposed vlm feature
+adaptation. In Proceedings of the IEEE/CVF International Conference on Computer Vision, pages 1825–1835, 2025.
+Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre Sablayrolles, and Hervé Jégou. Training
+data-efficient image transformers & distillation through attention. In International conference on machine learning,
+pages 10347–10357. PMLR, 2021.
+Alexey Dosovitskiy. An image is worth 16x16 words: Transformers for image recognition at scale. arXiv preprint
+arXiv:2010.11929, 2020.
+Ze Liu, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin, and Baining Guo. Swin transformer:
+Hierarchical vision transformer using shifted windows. In Proceedings of the IEEE/CVF international conference on
+computer vision, pages 10012–10022, 2021b.
+Yuhao Zhu, Qi Li, Jian Wang, Cheng-Zhong Xu, and Zhenan Sun. One shot face swapping on megapixels. In
+Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pages 4834–4844, 2021b.
+Lingzhi Li, Jianmin Bao, Hao Yang, Dong Chen, and Fang Wen. Advancing high fidelity identity swapping for forgery
+detection. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pages 5074–5083,
+2020c.
+Justus Thies, Michael Zollhofer, Marc Stamminger, Christian Theobalt, and Matthias Nießner. Face2face: Real-time
+face capture and reenactment of rgb videos. In Proceedings of the IEEE conference on computer vision and pattern
+recognition, pages 2387–2395, 2016.
+Zhiyuan Yan, Taiping Yao, Shen Chen, Yandan Zhao, Xinghe Fu, Junwei Zhu, Donghao Luo, Chengjie Wang, Shouhong
+Ding, Yunsheng Wu, et al. Df40: Toward next-generation deepfake detection. Advances in Neural Information
+Processing Systems, 37:29387–29434, 2024b.
+Justus Thies, Michael Zollhöfer, and Matthias Nießner. Deferred neural rendering: Image synthesis using neural
+textures. Acm Transactions on Graphics (TOG), 38(4):1–12, 2019.
+18

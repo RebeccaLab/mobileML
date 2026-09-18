@@ -1,0 +1,1608 @@
+
+
+--- PAGE 1 ---
+
+ech
+T
+Press
+Science
+Doi:10.32604/cmc.2025.070010
+REVIEW
+Toward Robust Deepfake Defense: A Review of Deepfake Detection and
+Prevention Techniques in Images
+Ahmed Abdel-Wahab1 and Mohammad Alkhatib2,*
+1Faculty of Computer Studies, Arab Open University, P.O. Box 8490, Riyadh, 11681, Saudi Arabia
+2Department of Computer Science, College of Computer and Information Sciences, Imam Mohammad Ibn Saud Islamic University
+(IMSIU), P.O. Box 5701, Riyadh, 11432, Saudi Arabia
+*Corresponding Author: Mohammad Alkhatib. Email: mhalkhatib@imamu.edu.sa
+Received: 05 July 2025; Accepted: 14 October 2025; Published: 09 December 2025
+ABSTRACT: Deepfake is a sort of fake media made by advanced AI methods like Generative Adversarial Networks
+(GANs). Deepfake technology has many useful uses in education and entertainment, but it also raises a lot of ethical,
+social, and security issues, such as identity theft, the dissemination of false information, and privacy violations. This
+study seeks to provide a comprehensive analysis of several methods for identifying and circumventing Deepfakes, with
+a particular focus on image-based Deepfakes. There are three main types of detection methods: classical, machine
+learning (ML) and deep learning (DL)-based, and hybrid methods. There are three main types of preventative
+methods: technical, legal, and moral. The study investigates the effectiveness of several detection approaches, such
+as convolutional neural networks (CNNs), frequency domain analysis, and hybrid CNN-LSTM models, focusing
+on the respective advantages and disadvantages of each method. We also look at new technologies like Explainable
+Artificial Intelligence (XAI) and blockchain-based frameworks. The essay looks at the use of algorithmic protocols,
+watermarking, and blockchain-based content verification as possible ways to stop certain things from happening.
+Recent advancements, including adversarial training and anti-Deepfake data generation, are essential because of their
+potential to alleviate rising concerns. This review shows that there are major problems, such as the difficulty of improving
+the capabilities of existing systems, the high running expenses, and the risk of being attacked by enemies. It stresses the
+importance of working together across fields, including academia, business, and government, to create robust, scalable,
+and ethical solutions. The main goals of future work should be to create lightweight, real-time detection systems, connect
+them to large language models (LLMs), and put in place worldwide regulatory frameworks. This essay argues for a
+complete and varied plan to keep digital information real and build confidence in a time when media is driven by
+artificial intelligence. It uses both technical and non-technical means.
+KEYWORDS: Deepfake detection; deepfake prevention; generative adversarial networks (GANs); digital media
+integrity; artificial intelligence ethics
+1 Introduction
+1.1 Background
+The emergence of artificial intelligence (AI) technology, particularly deep learning (DL), over the past
+decade has revolutionized numerous sectors by enabling computer systems to autonomously learn and make
+judgments with minimal human intervention. Utilizing extensive computational power and large datasets,
+deep learning employs techniques such as multilayer neural networks to identify patterns, excelling in
+tasks like image recognition and audio generation. Deepfake technology has become feasible due to rapid
+Copyright © 2025 The Authors. Published by Tech Science Press.
+This work is licensed under a Creative Commons Attribution 4.0 International License, which permits
+unrestricted use, distribution, and reproduction in any medium, provided the original work is properly cited.
+
+
+--- PAGE 2 ---
+
+2
+Comput Mater Contin. 2026;86(2)
+advancements in deep learning and the development of novel generative AI models. These models have
+paved the way for creating technologies capable of producing highly convincing counterfeit media, including
+videos, audio, and images [1].
+The term “Deepfake” is derived from “deep learning”, the method used to generate the content, and
+“fake”, indicating that the generated content is not authentic. Deepfake technology primarily uses DL
+techniques, particularly Generative Adversarial Networks (GANs), to create realistic but fake media content.
+This requires substantial computational resources and vast datasets for effective implementation [2]. The
+first notable use of Deepfake technology occurred in 2017 when deep learning algorithms were employed to
+fabricate celebrity media. Since then, the prevalence of Deepfake content has surged due to the availability of
+user-friendly tools that make the technology accessible to the general public. Fig. 1 illustrates the evolution
+and enhancement of Deepfake technology over time, highlighting significant milestones from the inception
+of generative AI models to the widespread application of Deepfake technologies. While Deepfake technology
+offers numerous beneficial applications, such as creating realistic simulations for industries and producing
+effective educational content, it also presents significant risks. These include the potential to infringe on
+individual privacy, cause reputational harm, breach intellectual property rights, and disseminate false or
+misleading information [3].
+Figure 1: The timeline of evolution and advancements in Deepfake technology [4]
+
+
+--- PAGE 3 ---
+
+Comput Mater Contin. 2026;86(2)
+3
+The growing use of Deepfake technology has necessitated robust countermeasures to mitigate its
+risks across various domains, including cybersecurity, journalism, law enforcement, and entertainment. In
+cybersecurity, Deepfakes have been exploited for sophisticated phishing attacks, where adversaries generate
+synthetic audio to mimic an authorized individual’s voice, tricking victims into financial fraud. These attacks
+can disrupt financial transactions and compromise organizational business continuity [5]. In journalism
+and media, Deepfakes threaten the credibility of news outlets by spreading fake or misleading information.
+For example, manipulated videos of public figures spreading false narratives can erode trust in news
+organizations and create obstacles for political processes [6]. Law enforcement agencies also face unique
+challenges with Deepfake technology, as it can be used for identity theft and defamation. Fake media can
+inflict severe psychological harm and reputational damage on victims [7].
+The entertainment industry is similarly vulnerable, as Deepfake technology can be misused to create
+unauthorized videos or audio that mimic actors’ behaviors without their consent, raising ethical and legal
+concerns. Given these hazards, it is imperative to develop methods to mitigate or eliminate the risks
+associated with Deepfake technology in various domains. Deepfake technology continues to evolve, posing
+significant challenges to security, privacy, and trust in digital content. It can be weaponized to harm
+individuals, alter perceptions, and disseminate false information by fabricating compromising or misleading
+scenarios [8]. For instance, Deepfakes have been used in political campaigns to undermine opponents or
+in criminal activities to impersonate victims. Addressing the risks associated with Deepfake technology is
+essential for maintaining the integrity of digital media, protecting individual reputations, and preserving
+trust in visual evidence [9]. As Deepfake techniques become increasingly sophisticated, the need for robust
+detection and prevention methods grows. Countermeasures not only mitigate risks but also promote the
+ethical application of AI in communication and media [10].
+Countermeasures for Deepfake can be categorized into two primary approaches: detection methods
+and preventive strategies. Detection methods aim to identify altered media, such as videos, audio, or
+images, using Deepfake techniques. Conversely, preventive strategies focus on inhibiting the creation
+or dissemination of Deepfake content, thereby preventing its misuse across various domains. Deepfake
+technology poses significant ethical, societal, and security challenges that demand immediate attention.
+Altering photographs to create fraudulent content raises ethical issues related to consent, authenticity, and
+the misuse of technology. This is especially concerning when Deepfake technology is used to create sexual
+or defamatory content without the consent of the individuals involved. Deepfakes can undermine trust in
+visual media, spread misinformation, erode democratic institutions, and exacerbate societal divisions [11].
+They can also facilitate malicious activities such as identity theft, fraud, and espionage, posing severe security
+risks for individuals and organizations alike. These threats underscore the importance of robust detection
+mechanisms and ethical guidelines to mitigate the adverse impacts of Deepfake technology [12].
+1.2 Research Objectives
+This paper examines all research conducted on methods for detecting and preventing deepfake images.
+The review carefully identifies all relevant studies, ensuring comprehensive coverage while minimizing the
+risk of bias or missing important study findings. This review helps researchers understand contemporary
+research on detecting and preventing deepfake images. Furthermore, this analysis and review aim to evaluate
+the effectiveness of current prevention and detection techniques in images and identify their limitations.
+Ultimately, the current review seeks to identify current research trends, gaps, and challenges, paving the way
+for future research in the field of deepfake prevention and detection.
+
+
+--- PAGE 4 ---
+
+4
+Comput Mater Contin. 2026;86(2)
+1.3 Paper Organization
+This paper is structured as follows: Section 1 presents the background of deep fake technologies, their
+inception, and the significance of establishing effective detection and prevention methods. It also underscores
+the ethical, cultural, and security ramifications of Deepfake. Section 2 offers a comprehensive analysis of
+diverse deep fake detection methodologies, classified into traditional techniques, machine learning and deep
+learning approaches, and novel detection strategies. A comparative examination of various methodologies is
+also provided. Section 3 examines techniques for preventing Deepfake, encompassing both technical meth-
+ods, such content authentication, watermarking, and algorithmic protocols, and non-technical strategies,
+such as awareness campaigns, legislation, and regulations. Section 4 analyzes the constraints and difficulties
+of detection and preventive techniques and highlights corresponding research deficiencies. Section 5 delin-
+eates prospective research avenues for enhancing detection and preventive methodologies, underscoring the
+importance of interdisciplinary collaboration and innovation. Section 6 finishes the report by encapsulating
+the principal findings and issuing a call to action for international collaboration and additional research in
+this domain.
+2 Deepfake Detection and Prevention Methods
+This section introduces the main concepts related to deepfake detection and prevention methods,
+allowing the reader to become familiar with those significant concepts. It also highlights the key approaches
+for deepfake detection and prevention as found in literature.
+2.1 Deepfake Detection Methods
+The objective of deepfake detection systems is to identify media that has been fabricated or altered
+utilising deepfake methodologies. They are termed reactive as they occur subsequent to the creation and
+dissemination of Deepfake content. A Deepfake detection method or tool may analyse questionable media
+and identify it as altered due to anomalous patterns or inconsistencies.
+Deepfake detection methods can be categorized into three key categories: (1) detection methods based
+on AI models [13], (2) detection methods that utilize artifact analysis and heuristic rules [14], and eventually
+the hybrid approach that combines both AI models and heuristic rules to achieve more accurate detection
+of Deepfake content [15]. Fig. 2 presents various methods for detecting deepfakes. These can be categorised
+into three fundamental groups: traditional procedures, artificial intelligence (AI) based methods, and hybrid
+approaches that integrate the most effective elements of both AI models and traditional methodologies.
+Figure 2: Classification of deepfake detection methods
+Every technique for detecting Deepfakes possesses distinct advantages and disadvantages. These
+detection methods frequently struggle to keep pace with rapidly advancing Deepfake algorithms and also
+encounter issues with false positives and negatives in their detection systems. This review examines the
+primary detection methods, evaluating their efficacy and limitations. The objective is to identify deficiencies
+and issues within the research in this domain.
+
+
+--- PAGE 5 ---
+
+Comput Mater Contin. 2026;86(2)
+5
+2.2 Deepfake Prevention Methods
+Deepfake prevention is proactive in nature because it happens before or during the creation or spread
+of Deepfake. The prevention methods focus on making Deepfake creation or distribution more difficult or
+infeasible. To achieve this, the Deepfake prevention employs technical, legal, and ethical strategies.
+The technical Deepfake prevention methods can be categorized into technical and non-technical
+methods. Technical prevention methods refer to prevention approaches that use certain technologies or
+algorithms, including: (1) Prevention methods that rely on algorithmic approaches and protocols, and (2)
+Prevention methods that use Blockchain technology to verify the origin and integrity of digital content. On
+the other hand, non-technical methods refer to awareness, policies, and regulations. Fig. 3 illustrates the
+categorization of various methods for countering Deepfake technology.
+Deepfake
+Prevenon
+Technical 
+Methods
+Blockchain and 
+Watermarking
+Algorithmic 
+Approaches and 
+Protocols
+Non-technical 
+Methods
+Awareness
+Policies and 
+Regulaons
+Figure 3: Classification of deepfake prevention methods
+Regulatory and awareness of ethics and best practices, together with technical methodologies, are
+crucial in preventing the misuse of Deepfake technology across several domains.
+Governments worldwide are formulating legislation to prevent the misuse and proliferation of Deepfake
+technology. Additionally, dedicated organizations are formulating guidelines to encourage AI developers to
+adhere to ethical norms aimed at preventing the creation and dissemination of Deepfake technology [16].
+However, there are issues with the methods employed to combat Deepfakes. Certain preventative
+measures, for instance, require restricting access to biometric data for digital media, potentially complicating
+its beneficial utilization. Achieving an optimal equilibrium between privacy and security in these preventive
+strategies is challenging.
+The current review explores the latest advances, and research works related to Deepfake prevention
+methods and evaluates their effectiveness. The goal is to identify existing research gaps and challenges while
+paving the way for future investigations and research in this field.
+2.3 Comparison with Related Works
+This paper distinguishes itself from prior studies and existing reviews by addressing critical gaps in
+the literature on Deepfake detection and prevention techniques, particularly for image-based Deepfakes.
+While previous works provide valuable insights into Deepfake detection, most reviews focus narrowly on
+specific aspects, such as video-based detection methods or technical solutions, without integrating detection
+and prevention strategies into a unified framework. Below, we discuss how our study differs from and
+complements related works:
+
+
+--- PAGE 6 ---
+
+6
+Comput Mater Contin. 2026;86(2)
+2.3.1 Comprehensive Scope
+Sharma et al. [17] provide a systematic literature review on Deepfake detection techniques, focusing
+primarily on various datasets and algorithmic performance metrics in the context of image, video, and
+audio-based Deepfakes. However, their work does not emphasize prevention strategies or propose a cohesive
+framework combining detection and prevention. In contrast, our paper uniquely integrates detection and
+prevention strategies for image-based Deepfakes into a single, holistic framework, offering a balanced
+perspective on both reactive and proactive measures.
+2.3.2 Focus on Image-Based Deepfakes
+Existing reviews, such as those by Alrashoud [18], Tolosana et al. [16] and Mirsky et al. [3], primarily
+focus on Deepfake detection in videos or audio. These studies highlight the technical challenges associated
+with temporal inconsistencies and audio-visual synchronization but do not delve into image-specific
+challenges. Our work fills this void by concentrating on image-based Deepfakes, exploring their unique
+characteristics, and proposing tailored approaches for detection and prevention.
+2.3.3 Integration of Detection and Prevention Strategies
+Unlike previous reviews that either focus solely on detection (e.g., Sharma et al. [17]), this paper
+integrates both into a cohesive framework. By categorizing detection methods into traditional, machine
+learning-based, and hybrid approaches, and prevention strategies into technical, legal, and ethical measures,
+we provide a comprehensive overview that emphasizes their interplay and mutual reinforcement.
+2.3.4 Addressing Emerging Technologies and Challenges
+Recent advancements, such as Explainable AI (XAI), adversarial training, and blockchain-based
+frameworks, are briefly mentioned in related works but are not explored in depth. This paper provides
+a detailed discussion of these emerging technologies, highlighting their potential to enhance detection
+accuracy, improve transparency, and mitigate vulnerabilities to adversarial attacks. Additionally, we critically
+analyze the computational challenges and scalability issues associated with these methods, offering insights
+into future research directions.
+3 Methodology
+This study employs the Preferred Reporting Items for Systematic Reviews and Meta-Analyses (PRISMA)
+methodology to ensure a rigorous and transparent approach to the systematic review of deepfake detection
+and prevention techniques in images. PRISMA was selected due to its ability to enhance the reproducibility
+and comprehensiveness of systematic reviews. The methodology involves four key phases: identification,
+screening, eligibility, and inclusion. Below is a detailed explanation of each phase, complemented by a
+PRISMA flowchart.
+3.1 Identification
+The identification phase involved a comprehensive search of peer-reviewed literature, conference
+proceedings, and technical reports relevant to deepfake detection and prevention in images. Multiple
+academic databases, including IEEE Xplore, SpringerLink, ACM, Scopus, and Google Scholar, were searched
+to ensure broad coverage of the topic. The following search terms and Boolean operators were used:
+•
+“Deepfake Detection”
+•
+“Deepfake Prevention”
+
+
+--- PAGE 7 ---
+
+Comput Mater Contin. 2026;86(2)
+7
+•
+“Generative Adversarial Networks (GANs)”
+•
+“Image Manipulation”
+•
+“AI Ethics in Deepfakes”
+•
+“Deepfake Prevention” AND “Blockchain”
+•
+“Deepfake Prevention” AND “Algorithm” AND “Protocol”
+•
+“Deepfake Prevention” AND “Policies” AND “Regulation” AND “Awareness”
+The search was limited to publications between 2020 and 2025 to capture the most recent advances in
+the field. Additional references were identified through citation tracking and manual searches of relevant
+journals and conference proceedings.
+3.2 Screening
+All identified records were exported to a reference management tool (Mendeley) to remove duplicates.
+The initial screening was conducted based on the title and abstract to exclude irrelevant studies. Articles were
+retained if they met the inclusion criteria, which were defined as follows:
+•
+Focus on deepfake detection or prevention techniques specifically for images.
+•
+Inclusion of experimental results, frameworks, or theoretical approaches.
+•
+Published in peer-reviewed journals, conferences, or technical reports.
+Studies were excluded if they:
+•
+Focused solely on deepfake techniques for audio or video without addressing images.
+•
+Were non-English publications.
+•
+Were editorials, opinion pieces, or lacked sufficient experimental evidence.
+3.3 Eligibility
+The full texts of the remaining studies were retrieved and assessed for eligibility against more detailed
+criteria:
+•
+Relevance to technical methods (e.g., blockchain-based prevention, AI-based detection) or non-
+technical approaches (e.g., ethical guidelines, awareness campaigns).
+•
+Use of datasets such as FaceForensics++, DFDC, or Celeb-DF for evaluation.
+•
+Discussion of limitations, challenges, or future directions in deepfake detection/prevention.
+•
+Two reviewers independently evaluated each study to ensure consistency, and disagreements were
+resolved through discussion or consultation with a third reviewer.
+3.4 Inclusion
+The final set of studies included in the review were those that met all criteria and contributed
+significantly to the understanding of deepfake detection and prevention. A total of 130 studies was included
+in the systematic review. These studies were analyzed and categorized into detection techniques (traditional,
+machine learning-based, and emerging methods) and prevention strategies (technical, legal, and ethical
+approaches).
+3.5 Justification for PRISMA
+The PRISMA methodology ensures that this review is systematic, transparent, and replicable. It
+minimizes the risk of bias and enhances the credibility of the findings, making it particularly valuable for
+
+
+--- PAGE 8 ---
+
+8
+Comput Mater Contin. 2026;86(2)
+an emerging field like deepfake detection and prevention. Fig. 4 shows the PRISMA flowchart summarizing
+this methodology.
+Figure 4: PRISMA flowchart
+To enhance the quality and clarity of this manuscript, artificial intelligence (AI) tools were employed
+during the writing process. Specifically, AI-assisted tools were used for language polishing, structural refine-
+ment, and grammar correction. These tools ensured the manuscript adhered to academic language standards,
+improved sentence coherence, and minimized grammatical errors. However, the conceptualization, research,
+analysis, and conclusions presented in this work remain entirely the intellectual contributions of the authors.
+4 Deepfake Detection Techniques
+This section explores both traditional and advanced deepfake detection methods in detail. It examines
+the primary techniques utilized in past studies and highlights the advantages and limitations of these various
+approaches. This aims to shed light on the current research gaps in this field and to suggest potential
+directions and trends for future research.
+4.1 Traditional Methods
+Typically, conventional techniques for detecting image-based Deepfakes focus on identifying artefacts
+and discrepancies that arise during image manipulation. These approaches are categorised into three primary
+groups: Techniques Based on Image Forensics, Signal Processing, and Handcrafted Features. Each group
+examines distinct sections of pictures to identify indications of modification. Fig. 5 illustrates the primary
+categories of conventional techniques for identifying deepfake images and their respective focal points.
+
+
+--- PAGE 9 ---
+
+Comput Mater Contin. 2026;86(2)
+9
+Figure 5: Traditional methods for image deepfake detection
+4.1.1 Image Forensics-Based Techniques
+Image forensics techniques are crucial for detecting Deepfake images, since they analyse various
+aspects and artefacts that may indicate alterations to the image. These methods often analyse the statistical
+characteristics of images, such as discrepancies in noise patterns, lighting, and shadows, which may indicate
+variations between the original and altered content. For instance, researchers have developed methods
+to detect manipulated images by analysing the distinct noise patterns produced by various cameras [19].
+Additionally, techniques such as analysing variations in illumination and geometric features have been
+employed to detect image splicing and other forms of deception [20]. Recent advancements in deep learning
+have significantly enhanced these traditional methods, enabling more intricate analyses and improving the
+accuracy of Deepfake detection [21,22]. As the technology behind Deepfake advances, the necessity for robust
+visual forensics solutions to safeguard the authenticity of digital content increases.
+4.1.2 Signal Processing-Based Techniques
+Identifying Deepfake images necessitates the utilisation of signal processing techniques. These strategies
+examine signals and patterns indicative of alterations. These methods often employ various algorithms
+to extract information from photos. Examples include frequency domain analysis, wavelet transforms,
+and temporal signal processing. Researchers have employed wavelet transformers to identify issues in
+the frequency components of photos. These issues may reveal inconsistencies introduced throughout the
+Deepfake production process [23]. Additionally, methodologies such as empirical mode decomposition and
+spectral analysis have been employed to facilitate the detection of minor artefacts sometimes overlooked
+by traditional techniques. The integration of machine learning with signal processing techniques has
+significantly enhanced detection capabilities, enabling the identification of intricate patterns in Deepfake
+images [24]. Deepfake technology is continuously improving; therefore, it remains crucial to develop robust
+signal processing methods to ensure the authenticity of visual content.
+
+
+--- PAGE 10 ---
+
+10
+Comput Mater Contin. 2026;86(2)
+4.1.3 Handcrafted Feature-Based Methods
+Handcrafted feature-based approaches are crucial for detecting Deepfake images, as they rely on
+identifying unique, manually designed traits that indicate image alteration. These approaches typically
+identify distinctive features of human faces, such as the blinking of the eyes, facial symmetry, and variations
+in texture. These are elements that Deepfake algorithms struggle to replicate accurately. Local Binary Patterns
+(LBP) and Histogram of Orientated Gradients (HOG) are two prevalent techniques that utilise texture and
+shape information to differentiate between authentic and counterfeit images [25]. Recent studies have shown
+that integrating handcrafted features with machine learning classifiers significantly enhances detection accu-
+racy. These traits provide critical information that automated systems may overlook [26,27]. Furthermore,
+academics have investigated the integration of artisanal techniques with deep learning approaches. They
+discovered that these hybrid models can leverage the optimal aspects of both methodologies to enhance their
+efficacy in detecting Deepfake [28,29]. As Deepfake technology evolves, it is essential to enhance handcrafted
+feature-based approaches to ensure their continued efficacy.
+4.2 Machine and Deep Learning-Based Approaches
+Deep learning algorithms are now indispensable for detecting Deepfakes, as they can autonomously
+analyse intricate patterns and subtle alterations in altered media. These methodologies employ sophisticated
+architectures, encompassing supervised learning models, unsupervised learning techniques, and Convolu-
+tional Neural Networks (CNNs), to enhance detection accuracy and reliability. Fig. 6 illustrates the primary
+components of deep learning-based Deepfake detection and delineates the distinct methodologies employed
+by supervised learning, unsupervised learning, and CNN-based approaches.
+Figure 6: Deep learning methods for image deepfake detection
+4.2.1 Supervised Learning-Based Methods
+Methods based on supervised learning for detecting Deepfakes in images have attracted considerable
+interest because they can utilise labelled datasets to train effective classifiers. These approaches generally
+consist of training models on a varied collection of authentic and altered images, enabling the algorithms
+to acquire distinguishing characteristics that can proficiently differentiate between real and counterfeit
+content. Recent advancements indicate that Convolutional Neural Networks (CNNs) demonstrate notable
+effectiveness in this field, as they possess the capability to automatically extract intricate features from images,
+eliminating the necessity for manual feature engineering [30]. For example, investigations have shown that
+
+
+--- PAGE 11 ---
+
+Comput Mater Contin. 2026;86(2)
+11
+CNN architectures, including ResNet and VGG, can attain elevated accuracy levels in identifying Deepfake
+by recognising subtle artefacts frequently found in altered images [31]. Furthermore, the incorporation
+of hyperparameter optimisation techniques has significantly improved the performance of these models,
+allowing for better generalisation to previously unseen data [32]. With the ongoing evolution of Deepfake
+generation techniques, the advancement of sophisticated supervised learning methods is essential for
+preserving the integrity of digital media.
+4.2.2 Unsupervised Learning-Based Methods
+Methods based on unsupervised learning for detecting Deepfakes in images have surfaced as a
+promising strategy, especially because they can pinpoint anomalies without relying on labelled datasets.
+These approaches typically emphasise understanding the fundamental distribution of authentic images and
+identifying anomalies that could suggest alterations. For example, methods like autoencoders have been
+utilised to reconstruct input images, enabling the model to emphasise differences between the original and
+reconstructed images, which may indicate Deepfake content [33]. Furthermore, recent investigations have
+examined the application of clustering algorithms to categorise similar images and detect outliers that could
+signify Deepfake [34]. An alternative innovative approach utilises generative adversarial networks (GANs)
+in a semi-supervised framework, wherein the discriminator is trained to differentiate between authentic
+and synthetic images based on acquired features, thereby improving the model’s capacity to identify subtle
+alterations [35]. With the ongoing advancements in Deepfake technology, the importance of unsupervised
+learning methods is growing significantly for the creation of resilient detection systems capable of adapting
+to emerging forms of manipulation.
+4.2.3 Convolutional Neural Network (CNN)-Based Methods
+Methods based on Convolutional Neural Networks (CNNs) have emerged as fundamental in identifying
+Deepfake images, owing to their capacity to autonomously learn and extract pertinent features from
+extensive datasets. The techniques utilise the hierarchical organisation of CNNs to effectively capture both
+low-level and high-level features, essential for detecting subtle artefacts that could suggest manipulation.
+Recent studies have shown the effectiveness of various CNN architectures, including ResNet, Inception,
+and DenseNet, in achieving high accuracy rates in Deepfake detection tasks. A study indicated that a
+CNN integrated with a vision transformer reached an accuracy of 97% on the FaceForensics++ dataset,
+highlighting the capabilities of these models in differentiating between authentic and fabricated images [36].
+Furthermore, the exploration of ensemble methods has been undertaken, wherein multiple CNN models
+are integrated to enhance detection performance by capitalising on the strengths of each architecture [37].
+The ability of CNNs to adjust to various forms of input data, combined with their potential for transfer
+learning, significantly boosts their relevance in the fast-changing realm of Deepfake technology [38]. With
+the advancement of Deepfake generation techniques, it is crucial to persist in refining and innovating
+CNN-based methods for effective detection.
+4.3 Hybrid Methods
+Hybrid methods for Deepfake detection in images have gained traction as experts seek to combine the
+strengths of various machine learning architectures to enhance detection accuracy and robustness. These
+methods generally combine Convolutional Neural Networks (CNNs) with alternative models, including
+transformers or recurrent neural networks (RNNs), to utilise both spatial and temporal characteristics. A
+recent study introduced a hybrid transformer network that employs two distinct CNNs, XceptionNet and
+EfficientNet-B4, as feature extractors. These are subsequently integrated with a transformer architecture to
+
+
+--- PAGE 12 ---
+
+12
+Comput Mater Contin. 2026;86(2)
+facilitate the learning of joint feature representations. This model exhibited strong performance on bench-
+mark datasets such as FaceForensics++ and DFDC, while also utilising innovative image augmentations to
+enhance detection abilities and mitigate overfitting. A significant method integrates CNNs with Long Short-
+Term Memory (LSTM) networks, enabling the model to grasp temporal dynamics in video Deepfake, which
+improves its capacity to identify inconsistencies across frames [39]. The implementation of these hybrid
+methods enhances detection accuracy while offering a deeper insight into the intricate characteristics linked
+to Deepfake images, indicating a promising avenue for future exploration in this area [40]. Fig. 7 presents
+a hybrid detection model that integrates Convolutional Neural Networks (CNNs) with Long Short-Term
+Memory (LSTM) networks. This integration utilises the advantages of both spatial and temporal feature
+extraction to improve the identification of Deepfake images and videos.
+Figure 7: A Hybrid CNN-LSTM model for deepfake detection [39]
+4.4 Emerging Detection Techniques
+This section discusses recent advances in deepfake detection methods. It provides critecal review for
+research studies that utilized emerging deepfake detection techniques, such as the frequency domain analysis,
+the explainable AI techniques, and the adverserial detection techniques.
+
+
+--- PAGE 13 ---
+
+Comput Mater Contin. 2026;86(2)
+13
+4.4.1 Frequency Domain Analysis
+Frequency domain analysis methods have garnered considerable interest in the field of Deepfake
+detection because they can reveal subtle artefacts often introduced during the image generation process.
+The methods employed involve techniques like the Fast Fourier Transform (FFT), which facilitates the
+transformation of images from the spatial domain to the frequency domain, thereby enabling the detection
+of discrepancies that might remain hidden in the original image. Recent studies have shown that Deepfake
+images frequently display unique frequency characteristics, including particular spectral peaks and troughs,
+which can be utilised for detection purposes [41]. A comparative study demonstrated the effectiveness of
+analysing high-frequency components to identify subtle anomalies in GAN-generated images, which are
+usually less noticeable in the spatial domain [8]. Furthermore, the implementation of frequency-aware
+models, like FreqNet, has demonstrated potential in improving the generalisability of Deepfake detectors
+by concentrating on high-frequency information and acquiring source-agnostic features [42]. Overall,
+frequency domain analysis offers a strong framework for detecting Deepfake, allowing for the identification
+of manipulations that conventional methods might miss.
+4.4.2 Explainable AI (XAI) Techniques
+Techniques for explainable AI are progressively being incorporated into methods for detecting Deep-
+fakes, aiming to improve the interpretability and transparency of the predictions made by models. The
+techniques focus on delivering a transparent understanding of the decision-making processes inherent
+in deep learning models. This transparency is essential for fostering trust among users and stakeholders,
+particularly in sensitive fields like journalism and law enforcement. Recent studies have utilised various
+XAI methods, including Local Interpretable Model-Agnostic Explanations (LIME) and SHapley Additive
+exPlanations (SHAP), to clarify the features that play a role in classifying images as real or fake [43]. For
+example, LIME has been employed to emphasise particular areas in an image that impacted the model’s
+decision, enabling users to grasp the reasoning behind the classification [44]. Fig. 8 illustrates the use
+of Explainable Artificial Intelligence (XAI) in the detection of Deepfakes. The XAI approach emphasises
+important decision-making characteristics, facilitating interpretability and transparency in the identification
+of manipulated media content. Furthermore, investigations have delved into the application of network
+dissection techniques to examine the internal representations acquired by CNNs, offering valuable insights
+into the responses of different layers of the network to various features linked to Deepfake images [45].
+Incorporating XAI techniques enhances detection accuracy while also promoting a deeper understanding
+of the underlying mechanisms, thus meeting the essential demand for explainability in AI systems [46].
+4.4.3 Adversarial Detection Methods
+Adversarial detection methods have become a vital focus in combating Deepfake images, especially
+as these synthetic media continue to evolve in complexity. The methods concentrate on recognising and
+addressing adversarial attacks intended to mislead Deepfake detection systems through subtle modifications
+of input images. Recent studies have underscored the susceptibility of Deepfake detectors to adversarial
+manipulations, which can greatly undermine their reliability [47]. An innovative approach involves inte-
+grating eXplainable Artificial Intelligence (XAI) techniques, which offer interpretability maps that assist in
+identifying the decision-making factors within AI models. By leveraging these insights, individuals have
+developed adversarial detectors that enhance the robustness of existing Deepfake detection systems without
+altering their performance [48]. Moreover, techniques involving adversarial training, which involve training
+models on both clean and adversarial examples, have demonstrated potential in enhancing the robustness of
+Deepfake detectors against a range of adversarial attacks [49]. This dual emphasis on detection and defence
+
+
+--- PAGE 14 ---
+
+14
+Comput Mater Contin. 2026;86(2)
+highlights the necessity of crafting thorough strategies to protect against the continuously changing realm of
+Deepfake technologies.
+Figure 8: Explainable artificial intelligence (XAI) approach [44]
+4.5 Comparative Analysis
+In this section, the strengths and weaknesses of various Deepfake detection approaches, the per-
+formance metrics used for evaluation, and the datasets commonly utilized are critically analyzed to
+provide a comprehensive understanding of the current state of research. Table 1 summarizes the key
+strengths and weaknesses of the detection methods, highlighting their advantages and limitations in tackling
+Deepfake challenges.
+Table 1: Strengths and weaknesses of various detection approaches
+Technique
+Strengths
+Weaknesses
+Traditional
+methods
+Effective for analyzing specific artifacts
+(e.g., lighting inconsistencies, shadow
+mismatches) and noise patterns. These
+methods are computationally
+lightweight and interpretable.
+Limited scalability to diverse datasets
+and evolving Deepfake techniques.
+Struggle with sophisticated
+manipulations that address traditional
+forensics clues.
+Machine
+learning-based
+approaches
+Capable of automatically learning
+complex features from large datasets.
+Supervised learning methods, such as
+CNNs, achieve high accuracy rates for
+known manipulations.
+Dependence on labeled datasets,
+which may limit generalizability.
+Vulnerable to adversarial attacks and
+overfitting.
+(Continued)
+
+
+--- PAGE 15 ---
+
+Comput Mater Contin. 2026;86(2)
+15
+Table 1 (continued)
+Technique
+Strengths
+Weaknesses
+Unsupervised
+learning-based
+approaches
+Effective for anomaly detection in
+unlabeled datasets. Can adapt to new
+types of manipulations.
+Lower accuracy compared to
+supervised methods. Relies on the
+assumption that anomalies are
+indicative of Deepfake, which may not
+always hold.
+Hybrid approaches
+Combine the strengths of multiple
+methodologies, such as CNNs and
+transformers, to improve robustness
+and accuracy.
+Higher computational costs and
+complexity in training and
+deployment.
+Emerging
+techniques (e.g.,
+Frequency Domain
+Analysis,
+Explainable AI)
+Uncover subtle artifacts and provide
+interpretable results, fostering user
+trust in detection systems.
+May require domain-specific expertise
+and additional computational
+resources.
+Meanwhile, Table 2 provides a comparison of the detection methods with detailed metrics like accuracy,
+computational cost, used dataset, and robustness against adversarial attacks.
+Table 2: Benchmarking detection methods: metrics-based comparison
+Method
+Algorithm
+Dataset
+Accuracy
+(%)
+Computational
+cost
+Adversarial
+robustness
+CNN-Based (ResNet)
+CNN
+FaceForensics++
+97
+High
+Moderate
+Hybrid (CNN + LSTM)
+CNN + LSTM
+DFDC
+95
+Moderate
+High
+Frequency-Aware
+FreqNet
+CelebDF
+92
+Moderate
+High
+5 Deepfake Prevention Techniques
+This section discusses major techniques for preventing Deepfake. These techniques can be categorized
+based on the technology or approach used into content authentication and watermarking, algorithmic
+approaches, and prevention strategies based on awareness, policies, and regulations.
+5.1 Blockchain and Watermarking
+This approach for Deepfake prevention relies on the use of watermarking and content authentication
+technologies such as Blockchain. Several attempts based on these techniques have been documented in
+previous research studies to resist the spread of Deepfake content.
+In [50], authors proposed a system for preventing the distribution of Deepfake video news using
+watermarking and Blockchain. The proposed system utilizes Digimarc audio and image watermarking
+technologies to create watermarks required to verify the integrity of the content. Additionally, the system
+employs Ethereum Blockchain to store the metadata of news videos and hence facilitates the forensic analysis
+of media content when necessary. Due to the storage limitations of the block-chain, the proposed system
+is supported by the InterPlanetary File System (IPFS) technology to store the original video news and its
+
+
+--- PAGE 16 ---
+
+16
+Comput Mater Contin. 2026;86(2)
+metadata. The proposed system demonstrates significant potential to detect and prevent the dissemination
+of Deepfake content, facilitate the forensic analysis, and prevent the copy attacks. However, the system is
+considered costly due to its reliance on Blockchain and IPFS technologies. Moreover, these technologies
+might not be accessible for a large segment of the population in many countries, which reduces the
+effectiveness of the system. Additionally, the performance of the system may suffer from low throughput and
+scalability challenges inherited from Ethereum Blockchain. Authors of [51] highlighted the importance of
+utilizing security features of Blockchain, such as immutability and decentralization, to combat Deepfake.
+The features of Blockchain can facilitate provenance tracking, enhance data integrity, and provide public
+access to verifiable information. However, due the evolving threats of Deepfake and their sever impacts on
+different sectors, the study emphasized on the need to develop a comprehensive framework that utilizes smart
+contracts to automate verification processes and enforce polices in respect to content usage. Researchers
+in [52] presented a hybrid hardware-software approach to combat the growing threat of Deepfake. The
+proposed approach leverages unique physical properties of camera flash memory to generate a distinct ID
+for each image, which is then embedded in a cryptographically sealed manifest and published on a secure
+distributed ledger. By utilizing the security features of Blockchain the images can be authenticated and
+hence proactively mitigate the spread of Deepfake. Moreover, the research study used convolutional neural
+networks to improve Deepfake detection. Another research utilized Blockchain technology to create a trust
+index model aimed at preventing the spread of fake news on social media. The proposed model represents
+another effort to combat the problem of the spread of Deepfake by leveraging block-chain technology [53].
+Another research presented in [54] developed a method to detect face videos via extracting frequency
+domain and spatial domain features. Blockchain technology was employed to enhance the generalization
+ability of the detection model and establish a shared and renewable environment for real data and content
+regulation. In [55], researchers introduced a proposal for combating the spread of misinformation on the
+web by leveraging Blockchain and AI technologies. In [56], authors presented a prototype implementation
+using the Hyperledger Fabric blockchain to prevent fake news. The proposed implementation uses an
+entropy-based incentive mechanism to diminish the negative effect of malicious behaviors on the fake news
+prevention system. The study in [57] introduced a decentralized application using Blockchain and smart
+contracts to check the authenticity and provenance of the vehicle accident footage and prevent the spread of
+Deepfake manipulated content. Another decentralized mechanism to detect Deepfake attacks and prevent
+the spread of Deepfake video recordings was proposed in [58]. The research in [59] presented a survey
+for various techniques that can be adopted to mitigate the risk of Deepfake. Blockchain technology was
+recommended as an effective preventive countermeasure. A research project that integrated Blockchain and
+deep learning algorithms to combat Deepfake was proposed in [60]. The deep learning algorithms are used to
+identify Deepfake content while Blockchain is utilized to provide authenticated and immutable video records.
+It has been found that integrating Blockchain and deep learning can offer more effective solutions to mitigate
+the threats of Deepfake. In [61], authors discussed various techniques to avoid the spread of Deepfake and its
+negative impacts in the healthcare domain using Blockchain technology. Another research leveraging deep
+learning (DL) and Blockchain was proposed by [62]. Researchers concluded that the accuracy of DL model
+can be improved via utilizing the security features of Blockchain. Another research attempt leveraging DL
+models and Blockchain was reported in [63]. Blockchain is used to develop a secure system to trace media
+content, where Convolutional Neural Network, and hash algorithms are employed to preserve the integrity
+of the content and ensure better protection. Researchers in [64] used Algorand Blockchain Consensus
+Mechanism to detect Deepfake in financial transactions. The proposed Blockchain-based solution aims to
+avoid the threats of users’ identity theft and the spread of Deepfake. A blockchain-based application to check
+the authenticity of the Vehicle accident footage and mitigate the threats of Deepfake was proposed in [65].
+
+
+--- PAGE 17 ---
+
+Comput Mater Contin. 2026;86(2)
+17
+Authors explored the potential of Blockchain technology as a solution to mitigate the spread of fake news
+and offer the ability to authenticate and trace the content. They concluded that Blockchain technology holds
+promise in this area due to its powerful security features [66]. A Blockchain-based Deepfake Verification
+Framework was developed to offer real time detection of manipulated data in electoral contexts and hence
+improve the fairness and authenticity [67]. A novel method that leverages Blockchain and collaborative
+learning techniques to limit the proliferation of Deepfake was presented in [68]. The study employed
+Blockchain and federated learning (FL) to preserve the confidentiality of data sources and address challenges
+related to data integrity and authenticity. The pro-posed Blockchain-based FL method with DL technique is
+shown in Fig. 9.
+Figure 9: Blockchain-based FL method with DL technique [68]
+A study in [69] introduced a proactive approach to limit the spread of Deepfake by leveraging
+Blockchain and DL techniques. In particular, the research used the Dense Neural Networks (DNN) to prevent
+identity impersonation attacks and utilized Blockchain and Smart Contracts technologies to tackle the Deep-
+fake challenge by verifying digital media’s history. Researchers explored the potential of Blockchain to secure
+data generated by the Deepfake service providers and hence avoid the abuse of Deepfake technology. In [70],
+authors introduced a Deepfake task management algorithm (DD-TMA) based on Blockchain and edge
+computing technologies. This research employed Blockchain technology to create a decentralized, immutable
+storage platform, which helps maintain the integrity of data and tasks performed by Deepfake models and
+reduce the risks associated with traditional centralized storage solutions. Another study recommended using
+comprehensive cybersecurity architecture to limit the impacts of Deepfake technology. The study suggests
+utilizing cutting-edge detection algorithms, and Blockchain technologies to develop effective proactive
+
+
+--- PAGE 18 ---
+
+18
+Comput Mater Contin. 2026;86(2)
+solution for the Deepfake challenge [71]. Another research suggested to integrate Blockchain with AI models
+mitigate the risk of Deepfake was published in [72]. The research introduced a Blockchain-Augmented AI
+framework that utilizes security features of Blockchain to enhance the reliability of the detection process of
+AI models. Experimental results indicated that the proposed framework significantly enhances the accuracy
+of Deepfake detection. Researchers investigated integrating Blockchain with advanced hashing algorithms
+to enhance authenticity and trust, thereby helping to mitigate threats posed by Deepfake technology [73].
+A model based on Blockchain and Steganalysis technologies to offer real time Deepfake detection and
+prevention was proposed in [74]. Experiments showed that the model can efficiently distinguish genuine
+content from Deepfake. Blockchain was also employed by [75] to trace back media content and original
+from manipulated images and videos. The Blockchain was also suggested by [76] as an effective Deepfake
+detection method after a thorough analysis of relevant studies. Another study published in [77] introduced
+a Blockchain-enabled deep recurrent neural network model. The proposed model leverages Blockchain and
+DL to combat the threats of clickbait scams in social networks. In recent research [78], authors proposed
+a framework that employs Convolutional Neural Networks (CNNs) and Blockchain to combat the threats
+of Deepfake technology. The proposed framework utilizes IPFS to solve the limited storage capacity of
+Blockchain. Smart contracts were also utilized to store social media content and AI verification results. The
+model improved the reliability and transparency of online media. Another Blockchain-based framework
+for enhanced Deepfake detection was proposed in [79]. The framework utilizes Blockchain and multimodal
+analysis techniques to enhance the detection of manipulated media content
+It should be mentioned that Blockchain technology was proposed to preserve integrity and offer better
+authentication and transparency in variety of contexts such as financial transactions [80], education [81],
+healthcare [82], and identity management [83].
+5.2 Algorithmic Approaches and Protocols
+Many research studies investigated leveraging various algorithms and protocols for Deepfake preven-
+tion. A challenge and response protocol to enable proactive real time detection of Deepfake were presented
+in [84]. The proposed protocol involves a simple challenge that can be performed easily by a human, while
+posing significant difficulties for Deepfake models to generate due technical and theoretical limitations of
+Deepfake technologies. As a result, the proposed approach is effective in preventing real-time Deepfake calls
+on smartphones. However, since the proposed approach relies on predefined sets of challenges, it may be
+susceptible to bypassing as Deepfake technologies continue to advance, especially if an attacker has large
+enough datasets. Moreover, although the proposed protocol is effective in preventing real-time video and
+audio calls, its effectiveness in avoiding the spread of fabricated Deepfake content is not investigated. A novel
+approach based on steganography techniques to prevent Deepfake videos was proposed in [85]. The proposed
+approach leverages the Generative Adversarial Networks (GANs) to develop effective solution that can
+combat sophisticated and continuously evolving Deepfake technologies. The proposed solution also involved
+embedding hidden watermarks in video frames to create a layer of security against Deepfake manipulations.
+Another research that utilized GANs to prevent Deepfake was presented in [86]. The study developed
+methods that can effectively confuse the Deepfake generation process. One notable limitation of the proposed
+method is the dependency on specific configurations of adversarial attacks, which may not generalize across
+all potential use cases or image manipulation technologies. Also, the study did not consider dynamic or real
+time manipulation settings which may limit the effectiveness of the presented approach. In [87], authors
+introduced the concept of “scapegoat image” to address privacy concerns associated with Deepfake. The
+proposed method provides a balance between maintaining user recognition and ensuring that the original
+identity is well-protected against Deepfake manipulations, making it a significant advancement in terms of
+
+
+--- PAGE 19 ---
+
+Comput Mater Contin. 2026;86(2)
+19
+user’s privacy protection. Other studies employed digital signature algorithms to prevent the distribution of
+Deepfake content. In [11], authors proposed a framework based on elliptic curve cryptography (ECC) digital
+signature. The framework leverages ECC digital signature to enhance the authenticity and integrity of digital
+content. Moreover, it emphasizes the integration of crypto-graphic algorithms with societal awareness to
+mitigate the proliferation of Deepfake content. Another Deepfake prevention mechanism to mitigate the
+threat of face-swapping was introduced in [88]. The proposed mechanism utilizes targeted perturbations
+of latent vectors within generative algorithms to disrupt visual quality while minimizing reconstruction
+loss. Experimental results showed that this approach can effectively introduces inconsistencies in Deepfake
+videos, making them more detectable, and hence contribute to preventing the spread of images manipulated
+using Deepfake techniques. Authors of [89] explored the implications and user responses to adversarial noise
+designed to counter the generation of Deepfake. In particular, the study focused on examining the satisfaction
+level of users in social media platforms regarding the noise produced by noise-adding technologies to
+enhance their content security. The study’s findings revealed a significant gap in awareness regarding privacy
+risks associated with Deepfake among native users in influencers in social media, emphasizing the need
+for a more effective strategy to enhance awareness about this issue. The study published in [90] described
+how parties from various domains evaluate the detection capabilities. The study concluded that analyzing
+data from multi-stakeholder input can better inform the detection process decisions and policies. In [91],
+researchers presented a method to mitigate threats relevant to Mixed Reality and improve data integrity.
+They also advocated utilizing machine learning algorithms in this field. Another study introduces a Deepfake
+disruption algorithm called “Deepfake Disrupter” [92]. The algorithm trains a perturbation generator and
+adds the generated human imperceptible perturbations to the original images. Experimental results showed
+that the proposed algorithm improves the F1-score and accuracy of various Deepfake detectors. In [93],
+researchers recommended to develop reliable, explainable, and generalizable attribution methods to hold
+malicious users accountable for any actions that led to the spread of manipulated information or violating the
+intellectual property. Researchers introduced a method to avoid the spread of Deepfake content by employing
+motion magnification as a pre-processing step to amplify temporal inconsistencies common in forged videos.
+They also introduced a classification algorithm that utilizes the preprocessing step to enhance accuracy and
+help in classifying forged videos [94]. A method, called D-CAPTCHA, for preventing fake calls was proposed
+in [95]. The method relies on generating content that exceeds the capabilities of Deepfake models and hence
+hinders the creation of Deepfake content and helps real time detection. An overview of the proposed method
+is presented in Fig. 10. Another research employed DL algorithms to improve the efficiency of identifying fake
+audio [96]. The proposed method uses Melted frequency cepstral coefficients (MFCCs) to extract the most
+useful information from the sound. Experimental results showed that the proposed method can enhance the
+accuracy of Deepfake identification. In [97], researchers proposed a computationally efficient DL algorithm
+to detect low-quality fake content. The proposed algorithm enables the fast identification of images and
+videos on social media, helping to mitigate the spread of fake content. Another method, supported by DL
+algorithms, to prevent the distribution of Deepfake content was proposed in [98]. The method employs
+remote Photoplethysmography (rPPG) and Convolutional Neural Network to detect Deepfake content and
+identify its source. By doing so, the proposed method aids in locating the perpetrator, enabling appropriate
+actions to be taken. A custom Deepfake text model based on ML algorithms was proposed in [99]. The model
+enables to determine if a text is associated with a certain author, which contributes in combatting Deepfake
+at the text level.
+
+
+--- PAGE 20 ---
+
+20
+Comput Mater Contin. 2026;86(2)
+Figure 10: An overview of D-CAPTCHA method for detecting fake calls [95]
+5.3 Awareness, Policies, and Regulations
+Enormous research studies emphasized on the necessity of adopting effective awareness, policies,
+and regulations in protecting from Deepfake and their impacts. In [100], authors highlighted the various
+harms related to Deepfake, including the spread of non-consensual pornography, misinformation, violation
+of privacy, and threats to national security. The study proposed policy recommendations that focus on
+establishing accountability and imposing restrictions across the entire supply chain of Deepfake, starting
+from the AI model developer to the service providers. This may contribute in preventing the misuse of
+AI technologies. The ethical considerations surrounding Deepfake technology development were explored
+in [101]. Researchers conducted interviews with professional Deepfake developers to collect data regarding
+awareness and gaps in ethical practices among specialists in AI development. The study revealed that
+there is a limited awareness about the ethical implications of AI technologies, including consent, and the
+societal negative impacts of Deepfake-related crimes. Recent research studies raised the importance of
+developing robust regulations to mitigate risks associated with Deepfake while fostering innovation [102].
+The research results highlighted the need to develop comprehensive and robust legal measures aimed at
+controlling the use of Deepfake technology and avoids its catastrophic consequences on economy, and
+public trust. Moreover, the study emphasizes the pressing need for international collaboration to address
+the challenges posed by Deepfake. Authors of [103] investigated the legal and ethical implications of
+Deepfake pornography content generated using AI models. They analyzed the policies and law enforcement
+for a case study in Indonesia. The results of the study found a significant gap in legal protections for
+victims of Deepfake AI misuse. Another case study of India explored the multifaceted legal implications
+arising from the emergence of Deepfake technology [104]. The research results indicated that while the
+currently applied Acts and policies provide some level of recourse, there is an urgent need for targeted
+legislation that encompasses the unique and severe threats posed by Deepfake technology. Thus, the research
+recommends multi-stakeholder collaborations to improve privacy protection and raise public awareness
+about the implications of Deepfake technology. The study published in [105] investigated the pros and cons
+of Deepfake technology. Researchers highlighted both the potential benefits and the significant risks posed
+by this technology. They recommended to enhance identity verification, public awareness, strengthening
+legal frameworks, and advancing technological innovations aimed at detecting and preventing Deepfake
+contents. Recent research emphasized that current policies and regulations are insufficient to prevent
+the creation of Deepfake [106]. The authors recommended incorporating mandatory safeguards against
+Deepfake into regulatory frameworks and developing AI tools that follow ‘safety by design’ principles. This
+proactive approach has the potential to mitigate the risk of Deepfake technology. In a recent study [107],
+
+
+--- PAGE 21 ---
+
+Comput Mater Contin. 2026;86(2)
+21
+researchers conducted a comprehensive analysis of the multifaced impacts of Deepfake technology across
+various domains. The study presented evidence-based recommendations to stakeholders, and policymakers
+to mitigate the risks associated with Deepfake. In [108], researchers assessed the public attitude regarding
+Deepfake technology. The study concluded that there is a need for more robust penalties and regulations
+to mitigate the harms associated with the spread of Deepfake content. Researchers in [109] provided an
+overview of the global journalistic discussions of Deepfake application. Also, they presented insights about
+AI content regulations and ethics. The research study published in [110] presented analysis of criminal law
+in terms of its ability to keep pace with the evolving risk of Deepfake technology. The study concluded
+that there is a pressing need for more effective multifaceted responses to Deepfake abuse. Another study
+proposed amendments to the electoral regulations in Australia in order to mitigate the threats posed by
+Deepfake to elections [111]. In [112], researchers evaluated the regulatory regimes in terms of their ability
+to address potential harm associated with Deepfake and proposed improvement to the privacy and data
+protection regime. Another research discussed the impact of manipulating personal data using Deepfake
+technology on cyberterrorism, political and legal resilience in Indonesia. The research found that existing
+regulations need to be enhanced to address the negative consequences associated with the misuse of Deepfake
+technology [113]. The article published in [114] provided an overview about the main algorithm models of
+Deepfake technology and highlighted the associated risks and legal regulation. In [115], researchers discussed
+the weaknesses of policies and regulations and advocated for mor effective strategy to combat Deepfake.
+Researchers in [116] suggested to incorporate AI Deepfake education into legal training. This aims to enhance
+the skills of legal professionals and assist them to address challenges posed by Deepfake technology.
+Another study proposed improvement to the AI Act to better address the unique characteristics of
+Deepfake technology. This initiative is part of a broader effort to create more effective laws and regulations
+that can mitigate the negative impacts of Deepfake [117]. In the study presented in [118], researchers examined
+the legal issues surrounding the protection of individuals and society. They also investigated some legitimate
+or useful applications of Deepfake technology. The authors concluded that there is a considerable gap in
+current laws and regulations, and they advocate for increased research efforts to develop a more effective
+approach to mitigate the impact of Deepfake technology. The study published in [119] explored the methods
+used by well-known news organizations to tackle the challenge of Deepfake. It indicated that organizations
+focus on training journalists to detect fake news. Moreover, research projects that aim to improve media
+forensics tools represent another important measure to mitigate the spread of fake news.
+5.4 Integration of Multiple Prevention Strategies
+A number of research studies called for adopting a multifaceted strategy to counter the evolving
+Deepfake techniques and associated threats in different domains [120–127]. In [120], researchers investigated
+the implications of Deepfake on journalism and related parties. The study found that current reactive
+technical solutions are insufficient to combat Deepfake and mitigate their effects, which may lead to
+severe consequences across various sectors. This indicates that there is an urgent need to develop a multi-
+layered and more effective approach that involves both technical and non-technical countermeasures to
+address the risks associated with Deepfake technology. The negative impacts of Deepfake technology and
+the current technical and non-technical countermeasures were discussed in [121]. The major impacts are
+Privacy and Consent Violations, Misinformation, and losing Reputation and Trust. The article advocates for
+a comprehensive multi-faceted approach that combines education, technology, and legal countermeasures
+to effectively limit the negative impacts associated with Deepfake. Another research article highlighted
+the need for a collaborative approach involving the key players, including technology firms, regulatory
+bodies, and academic institutions to enhance the defense against threats caused by unethical use of Deepfake
+
+
+--- PAGE 22 ---
+
+22
+Comput Mater Contin. 2026;86(2)
+technology. The need for a multi-faceted approach involving technical methods and legal frameworks
+to counter Deepfake is further supported by another study [122], which highlighted both the beneficial
+applications of Deepfake technology and the substantial risks it poses to individuals and society. In [123],
+researchers recommended mitigating the threats associated with Deepfake technology by using several
+strategies, including implementing basic security practices, raising awareness about deep fakes, and employ-
+ing robust cybersecurity measures. This approach was also adopted by [124,125], which found that although
+technical solutions can lessen the risks posed by Deepfake technology, a comprehensive strategy involving
+legislation, education, and collaborative innovation is essential for successfully navigating the difficulties
+posed by Deepfake technology. One more study explored the implications and user responses to adversarial
+noise designed to prevent the generation of Deepfake [126]. The study employed concepts from different
+fields, including technology, psychology, and social media to provide better understanding of how users
+interact with Deepfake prevention tools. Moreover, the study found that there is a concerning gap in
+awareness about Deepfake-associated privacy risks among digital natives and influencers. Another research
+explored the multifaceted legal and ethical considerations of Deepfake technology. The study involved a
+comprehensive analysis for the perspective of experts in various fields related to Deepfake technology.
+The findings emphasized the necessity for a collaborative approach that includes both technical and non-
+technical measures to effectively combat the challenges posed by Deepfake content [127]. Researchers in [128]
+explored the efficiency of various methods for Deepfake prevention and detection. They concluded that there
+is a need for a multifaceted approach involving both technical and non-technical methods to develop effective
+solution that can mitigate the threats of Deepfake technology. Furthermore, the approach of integrating
+collaborative and multiple prevention strategies, including technical and non-technical countermeasures,
+to create effective solution for Deepfake challenges was advocated by various recently published research
+articles [129–131].
+6 Limitations and Open Research Questions
+This section discusses the main limitations of Deepfake detection and prevention techniques based on
+the research articles explored in this review.
+6.1 Limitations of Deepfake Detection Techniques
+The main limitations of Deepfake detection can be summarized as follows:
+Generalization Across Datasets: Many detection techniques struggle to generalize across datasets due to
+biases in training data and the diversity of Deepfake generation methods. For example, models trained on
+specific datasets often fail to detect Deepfakes generated using unseen manipulation techniques or datasets.
+As highlighted by Edwards et al. [132], the lack of a standardized benchmark dataset exacerbates this issue,
+leading to inconsistencies in detection performance across real-world scenarios.
+Vulnerability to Adversarial Manipulations: Detection systems are vulnerable to adversarial manipula-
+tions, which can bypass detection algorithms by introducing subtle perturbations that are imperceptible to
+humans but degrade the model’s accuracy. Studies by Dhesi et al. [133] demonstrate that adversarial attacks
+can significantly reduce the reliability of detection systems, posing a critical challenge to their robustness.
+Rapid Advancements in Deepfake Generation Technologies: The rapid advancements in Deepfake gen-
+eration technologies have outpaced the development of detection systems, reducing their effectiveness over
+time. For instance, GAN-based methods (Goodfellow et al. [2]) have evolved to produce highly realistic
+Deepfakes that are increasingly difficult to detect, as discussed in Babaei et al. [134].
+
+
+--- PAGE 23 ---
+
+Comput Mater Contin. 2026;86(2)
+23
+High Rates of False Positives and Negatives: High rates of false positives and negatives impact the
+reliability of detection systems, particularly in high-stakes applications like journalism and law enforcement.
+Cases documented by Kalodanis et al. [135] highlight how unreliable detection outputs can erode trust in
+these systems, especially when used as evidence in legal or journalistic contexts.
+Computational Requirements of Advanced Techniques: Advanced detection methods, such as hybrid
+approaches or those using the frequency domain, require substantial computational resources. This lim-
+itation hinders accessibility for researchers and practitioners with limited computational infrastructure.
+For example, Kaur et al. [4] emphasize that while frequency-based techniques improve accuracy, they also
+demand specialized hardware, which limits their adoption.
+6.2 Limitations of Deepfake Prevention Techniques
+Based on the research databases reviewed in this review, there is generally a lack of research focusing
+on the development of Deepfake prevention solutions. This is concerning given the potentially catastrophic
+effects of the malicious use of this technology on vital sectors. Some proposed solutions to combat the
+spread of fake content produced by Deepfake tools leverage Blockchain technology and watermarking. While
+this approach effectively authenticates media content and helps reduce the dissemination of manipulated
+material, it is often regarded as expensive and inaccessible to a large segment of users. For example,
+Blockchain should be supported by IPFS to enable the storing of original content, which is considered costly.
+This limitation hinders its effectiveness in preventing the spread of Deepfake, particularly among ordinary
+users on social media and other platforms. Additionally, Blockchain-based solutions suffer challenges related
+to scalability and storage capacity. Moreover, they do not provide real-time prevention from Deepfake.
+Furthermore, Deepfake prevention techniques that rely on algorithmic approaches and protocols
+may by unable to provide enough protection against the continuously evolving Deepfake methods. The
+effectiveness of some of these techniques in curbing the distribution of Deepfake has also not been
+thoroughly investigated.
+Eventually, non-technical preventive measures, such as raising awareness, implementing policies, and
+enforcing regulations, are insufficient to address the severe damage caused by the spread of Deepfake. Those
+measures must be complemented by technical solutions to be enforced and effective. Recent studies have
+called for adopting a multi-faceted approach that integrates multiple prevention strategies to provide robust
+and effective protection against the spread of Deepfake and mitigate their catastrophic effects.
+7 Future Directions
+The following discussion provides recommendations for potential future research directions for both
+Deepfake detection and prevention strategies.
+7.1 Future Research Directions for Deepfake Detection
+The dynamic and evolving nature of Deepfake technology necessitates innovative and adaptive detection
+mechanisms. Future research in Deepfake detection should not only address current challenges but also
+anticipate future threats. Below are expanded and strengthened recommendations for future research
+directions:
+(1) Development of Self-Evolving Detection Systems
+Future detection systems should leverage continuous learning frameworks that autonomously adapt to
+emerging Deepfake generation techniques. This can be achieved through the integration of reinforcement
+learning and meta-learning paradigms, enabling systems to anticipate and respond to novel manipulation
+
+
+--- PAGE 24 ---
+
+24
+Comput Mater Contin. 2026;86(2)
+strategies in real-time. For instance, adaptive models could monitor evolving GAN architectures and retrain
+themselves dynamically based on new datasets [43].
+(2) Explainable AI (XAI) for Enhanced Transparency
+The integration of Explainable AI (XAI) into detection systems is vital for fostering trust and usability,
+especially in critical domains like journalism, law enforcement, and legal proceedings. Future research should
+focus on developing XAI methods that offer intuitive visualizations of decision-making processes, helping
+stakeholders understand why specific content is flagged as manipulated. Techniques such as saliency maps,
+attention mechanisms, and interpretable feature extraction should be emphasized [45].
+(3) Adversarial Robustness and Defense Mechanisms
+Strengthening detection mechanisms against adversarial manipulations is a pressing challenge. Future
+studies should explore the application of adversarial training, defensive distillation, and noise injection
+techniques to ensure robustness. Additionally, developing adversarially resilient feature extraction methods
+that can detect subtle perturbations without relying on labeled datasets is a promising direction [50].
+(4) Lightweight and Energy-Efficient Algorithms
+Resource-intensive detection models currently limit their deployment in real-world applications,
+particularly on edge devices and mobile platforms. Future research should prioritize the development of
+lightweight, energy-efficient algorithms capable of operating in constrained environments. Techniques such
+as model pruning, quantization, and knowledge distillation should be explored to optimize detection systems
+for real-time applications [25].
+(5) Integration with Multimodal Detection Frameworks
+Deepfake detection can benefit from multimodal analysis techniques that combine visual, audio, and
+biometric data. Future research should focus on developing cross-modal fusion techniques to improve
+accuracy and reliability, especially in cases where manipulations affect multiple modalities (e.g., lip-syncing
+in videos). Advanced multimodal architectures, such as transformers, should be studied to enhance feature
+integration [80].
+(6) Creation of Comprehensive Benchmark Datasets
+Current datasets often lack diversity in terms of cultural, demographic, and technical contexts, which
+limits the generalizability of detection models. Future research should prioritize the creation of large-scale,
+diverse datasets that include a variety of Deepfake manipulations, geographic regions, and demographic
+groups. Such datasets should also incorporate metadata and environmental variables, enabling models to
+account for contextual factors during detection [17].
+(7) Real-Time Live Stream Detection
+Detecting Deepfakes in live video streams remains a significant challenge due to latency and com-
+putational constraints. Future work should focus on developing real-time detection systems optimized for
+streaming platforms. Techniques such as temporal consistency analysis, real-time frequency domain analysis,
+and parallel processing architectures can enhance performance in live environments [95].
+(8) Integration with Blockchain Technology for Provenance Tracking
+Blockchain-based provenance tracking solutions can complement detection mechanisms by ensuring
+the authenticity of media content. Future research should investigate the integration of detection algorithms
+with blockchain frameworks to provide tamper-proof records of media creation and modification. This
+approach can enhance the accountability and traceability of digital content [79].
+
+
+--- PAGE 25 ---
+
+Comput Mater Contin. 2026;86(2)
+25
+(9) Focus on Ethical and Societal Implications
+Beyond technical advancements, future research should address the ethical and societal implications
+of Deepfake detection. Studies should explore ways to minimize biases in detection systems, ensure fairness
+across demographic groups, and mitigate unintended consequences, such as false accusations or privacy
+violations. Collaboration with ethicists and policymakers is crucial to establish guidelines for responsible AI
+deployment [100].
+(10) Collaborative Detection Frameworks
+A decentralized and collaborative approach to Deepfake detection could improve scalability and
+resilience. Future research should explore federated learning frameworks that enable multiple organizations
+(e.g., social media platforms, law enforcement agencies) to collaboratively train detection models on shared
+data while preserving privacy and security [69].
+(11) Detection of Next-Generation Deepfakes
+As Deepfake generation techniques evolve, new forms of manipulation (e.g., 3D-based Deepfakes,
+holographic Deepfakes, and synthetic avatars) are likely to emerge. Future research should proactively
+investigate detection methods for these next-generation threats, leveraging advancements in 3D imaging,
+spatiotemporal analysis, and neural rendering detection [37].
+(12) Global Standardization and Benchmarking Efforts
+To facilitate consistent advancements in Deepfake detection, future research should contribute to global
+standardization efforts by developing universally accepted benchmarks, metrics, and evaluation protocols.
+Establishing open-source platforms for sharing detection models and results can also accelerate progress and
+foster collaboration [17].
+By pursuing these directions, the research community can develop robust, scalable, and ethical solutions
+to counter the ever-evolving threats posed by Deepfake technologies. These efforts will not only enhance
+detection capabilities but also restore trust in the integrity of digital media.
+7.2 Future Research Directions for Deepfake Prevention
+According to the systematic review conducted in this research, there is a lack of a comprehensive,
+defense-in-depth framework that integrates technical measures, policy initiatives, and human-centered
+strategies. On the technical side, promising avenues for exploration include the following:
+(1)
+Adaptive watermarking and invisible fingerprinting that can endure various transformations types,
+such as compression, cropping, and re-encoding [85].
+(2)
+Cryptographic provenance algorithms and technologies, which include digital signature algorithms
+or content attestation technologies like blockchain to track content lineage and ensure integrity and
+authentication [79].
+(3)
+Adversarial hardening and robustness techniques, which are simple, but could be effective to withstand
+efforts by generators to bypass deepfake detection operations [50].
+Moreover, research studies showed that the field requires standardized benchmarks, data collection
+procedures, and evaluation criteria, particularly to assess generalization across different deepfake generators,
+cross-dataset robustness, timing constraints, and resistance to adversarial attacks [17]. Experimental results
+of recent studies have shown that many deepfake detection techniques perform poorly when facing deepfakes
+produced by novel model architectures. Beyond technical measures, effective deepfake prevention also
+relies on governance, compliance, policies, and regulations [107]. Future research works should examine
+
+
+--- PAGE 26 ---
+
+26
+Comput Mater Contin. 2026;86(2)
+legal requirements for content provenance, regulatory frameworks for platform-level screening, and coor-
+dinated takedown policies. A rigorous collaboration among concerned parties as well as the integration
+of authentication and integrity algorithms with regulatory measures can help close loopholes exploited by
+malicious actors.
+Additionally, user education and awareness should be adopted as a foundational element of mitigation
+strategies—especially for vulnerable populations. Surveys conducted in prior research revealed significant
+knowledge gaps in detecting manipulated media content, which increases risk [129].
+Finally, this study emphasized the need for sustained collaboration among key stakeholders, including
+spanning academia, industry, civil society, platform providers, and regulators. Such collaboration is cru-
+cial for continuously refining defensive strategies and ensuring compliance with professional and ethical
+standards [119]. This research encourages to organize joint initiatives to promote shared data reposito-
+ries, adversarial red-team competitions, global standards for content provenance, and cross-jurisdictional
+enforcement policies. Through these integrative and the integration of both technical and non-technical
+countermeasures, the individuals and community will be better prepared to tackle the evolving threats posed
+by the spread of deepfakes.
+8 Conclusion
+The proliferation of Deepfake technology has presented unprecedented challenges across various
+domains, necessitating a unified and robust approach to detect and prevent manipulated media. This study
+provides a significant contribution by integrating Deepfake detection and prevention into a comprehensive
+framework. Unlike prior studies that focus on either detection or prevention, this research introduces a
+novel classification method that categorizes detection techniques into traditional, machine learning and
+deep learning-based, and hybrid approaches, while organizing prevention strategies into technical, legal, and
+ethical measures. This dual focus offers a holistic perspective on countering Deepfake.
+Detection methods have significantly advanced, with traditional techniques such as image forensics and
+signal processing providing lightweight solutions, though they struggle with the sophistication of modern
+Deepfake generation. Advanced machine learning and deep learning approaches, including supervised,
+unsupervised, and hybrid models, leverage architectures like CNNs, transformers, and autoencoders to
+detect subtle manipulations. Despite their potential, challenges like limited generalizability, adversarial
+vulnerabilities, and high computational costs persist. Emerging techniques, such as Explainable AI (XAI)
+and frequency domain analysis, offer promising avenues to enhance both detection capabilities and inter-
+pretability.
+On the prevention front, technical solutions like Blockchain-based authentication, watermarking, and
+adversarial noise demonstrate the ability to proactively address Deepfake creation and dissemination. How-
+ever, issues related to scalability, cost, and accessibility hinder their widespread adoption. Complementary
+non-technical strategies, including awareness campaigns, ethical norms, and legislative measures, foster
+accountability and responsible use of AI. The study emphasizes that integrating detection and prevention
+strategies is essential to address the evolving and multifaceted threats posed by Deepfake.
+This research highlights critical gaps, such as the need for scalable, real time solutions, and emphasizes
+the importance of interdisciplinary collaboration among academia, industry, and policymakers. By com-
+bining technical and non-technical measures, the study advocates for a balanced, multifaceted approach
+that leverages hybrid solutions to mitigate risks while fostering trust in digital media. Looking forward, the
+development of adaptive, explainable, and resource-efficient detection and prevention systems, coupled with
+
+
+--- PAGE 27 ---
+
+Comput Mater Contin. 2026;86(2)
+27
+international cooperation, will be pivotal to safeguarding digital integrity and addressing the societal risks
+posed by Deepfake technologies.
+Additionally, future studies might look into integrating various technologies that enhance one another’s
+advantages, such as blockchain, smart contracts, digital signatures, and watermarking. This might result
+in more effective solutions for deepfake prevention. Furthermore, the development of a comprehensive
+framework that involves both technological and non-technical countermeasures could result in more holistic
+strategy for reducing the threats posed by deepfake in various domains.
+Acknowledgement: The authors extend their appreciation to the Arab Open University for funding this research work.
+Additionally, the authors acknowledge the use of AI-assisted tools for language polishing and structural adjustments,
+which contributed to improving the overall readability and clarity of this manuscript. The intellectual content, ideas, and
+findings of this research remain the sole contributions of the authors. This manuscript was prepared with the assistance
+of AI tools for improving language quality, grammar, and structure. The use of AI was limited to these aspects, and no
+AI tools were used for data analysis, conceptual development, or interpretation of results.
+Funding Statement: This research was funded by the Arab Open University, Riyadh, Saudi Arabia.
+Author Contributions: Conceptualization, Ahmed Abdel-Wahab and Mohammad Alkhatib; methodology, Ahmed
+Abdel-Wahab; validation, Mohammad Alkhatib and Ahmed Abdel-Wahab; formal analysis, Ahmed Abdel-Wahab and
+Mohammad Alkhatib; investigation, Ahmed Abdel-Wahab; resources, Ahmed Abdel-Wahab and Mohammad Alkhatib;
+data curation, Ahmed Abdel-Wahab; writing—original draft preparation, Ahmed Abdel-Wahab and Mohammad
+Alkhatib; writing—review and editing, Ahmed Abdel-Wahab and Mohammad Alkhatib; visualization, Ahmed Abdel-
+Wahab and Mohammad Alkhatib; supervision, Ahmed Abdel-Wahab; project administration, Ahmed Abdel-Wahab
+and Mohammad Alkhatib; funding acquisition, Ahmed Abdel-Wahab and Mohammad Alkhatib. All authors reviewed
+the results and approved the final version of manuscript.
+Availability of Data and Materials: Not applicable.
+Ethics Approval: Not applicable.
+Conflicts of Interest: The authors declare no conflicts of interest to report regarding the present study.
+References
+1.
+LeCun Y, Bengio Y, Hinton G. Deep learning. Nature. 2015;521(7553):436–44. doi:10.1038/nature14539.
+2.
+Goodfellow IJ, Pouget-Abadie J, Mirza M, Xu B, Warde-Farley D, Ozair S, et al. Generative adversarial nets. Adv
+Neural Inf Process Syst. 2014;27:1–9. doi:10.1145/3422622.
+3.
+Mirsky Y, Lee W. The creation and detection of deepfakes: a survey. ACM Comput Surv. 2021;54(1):1–41. doi:10.
+1145/3425780.
+4.
+Kaur A, Noori Hoshyar A, Saikrishna V, Firmin S, Xia F. Deepfake video detection: challenges and opportunities.
+Artif Intell Rev. 2024;57(6):159. doi:10.1007/s10462-024-10810-6.
+5.
+Kietzmann J, Lee LW, McCarthy IP, Kietzmann TC. Deepfakes: trick or treat? Bus Horiz. 2020;63(2):135–46. doi:10.
+1016/j.bushor.2019.11.006.
+6.
+Chesney R, Citron D. Deepfake and the new disinformation war: the coming age of post-truth geopolitics. Foreign
+Aff. 2019;98:147.
+7.
+Korshunov P, Marcel S. Deepfakes: a new threat to face recognition? Assessment and detection. arXiv:1812.08685.
+2018.
+8.
+Mustak M, Salminen J, Mäntymäki M, Rahman A, Dwivedi YK. Deepfakes: deceptions, mitigations, and
+opportunities. J Bus Res. 2023;154:113368. doi:10.1016/j.jbusres.2022.113368.
+9.
+Shahzad HF, Rustam F, Flores ES, Luís Vidal Mazón J, de la Torre Diez I, Ashraf I. A review of image processing
+techniques for deepfakes. Sensors. 2022;22(12):4556. doi:10.3390/s22124556.
+
+
+--- PAGE 28 ---
+
+28
+Comput Mater Contin. 2026;86(2)
+10.
+Khalil HA, Maged SA. Deepfakes creation and detection using deep learning. In: Proceedings of the 2021
+International Mobile, Intelligent, and Ubiquitous Computing Conference (MIUCC); 2021 May 26–27; Cairo,
+Egypt. Piscataway, NJ, USA: IEEE; 2021. p. 1–4. doi:10.1109/miucc52538.2021.9447642.
+11.
+Wazid M, Mishra AK, Mohd N, Das AK. A secure deepfake mitigation framework: architecture, issues, challenges,
+and societal impact. Cyber Secur Appl. 2024;2:100040. doi:10.1016/j.csa.2024.100040.
+12.
+Ahmad J, Salman W, Amin M, Ali Z, Shokat S. A survey on enhanced approaches for cyber security challenges
+based on deep fake technology in computing networks. Spectr Eng Sci. 2024;2(4):133–49.
+13.
+Sandotra N, Arora B. A comprehensive evaluation of feature-based AI techniques for deepfake detection. Neural
+Comput Appl. 2024;36(8):3859–87. doi:10.1007/s00521-023-09288-0.
+14.
+Gao J, Micheletto M, Orrù G, Concas S, Feng X, Marcialis GL, et al. Texture and artifact decomposition for
+improving generalization in deep-learning-based deepfake detection. Eng Appl Artif Intell. 2024;133:108450.
+doi:10.1016/j.engappai.2024.108450.
+15.
+Ghiur˘au D, Popescu DE. Distinguishing reality from AI: approaches for detecting synthetic content. Computers.
+2025;14(1):1. doi:10.3390/computers14010001.
+16.
+Tolosana R, Vera-Rodriguez R, Fierrez J, Morales A, Ortega-Garcia J. Deepfakes and beyond: a survey of face
+manipulation and fake detection. Inf Fusion. 2020;64:131–48. doi:10.1016/j.inffus.2020.06.014.
+17.
+Sharma VK, Garg R, Caudron Q. A systematic literature review on deepfake detection techniques. Multimed Tools
+Appl. 2025;84(20):22187–229. doi:10.1007/s11042-024-19906-1.
+18.
+Alrashoud M. Deepfake video detection methods, approaches, and challenges. Alex Eng J. 2025;125:265–77. doi:10.
+1016/j.aej.2025.04.007.
+19.
+Zhu X, Qian Y, Zhao X, Sun B, Sun Y. A deep learning approach to patch-based image inpainting forensics. Signal
+Process Image Commun. 2018;67:90–9. doi:10.1016/j.image.2018.05.015.
+20. Lai Z, Li J, Wang C, Wu J, Jiang D. LIDeepDet: deepfake detection via image decomposition and advanced lighting
+information analysis. Electronics. 2024;13(22):4466. doi:10.3390/electronics13224466.
+21.
+Raza A, Munir K, Almutairi M. A novel deep learning approach for deepfake image detection. Appl Sci.
+2022;12(19):9820. doi:10.3390/app12199820.
+22. Hsu CC, Zhuang YX, Lee CY. Deep fake image detection based on pairwise learning. Appl Sci. 2020;10(1):370.
+doi:10.3390/app10010370.
+23. Cao J, Deng J, Yin X, Yan S, Li Z. WPCA: wavelet packets with channel attention for detecting face manipulation.
+In: Proceedings of the 2023 15th International Conference on Machine Learning and Computing; 2023 Feb 17–20;
+Zhuhai, China. New York, NY, USA: ACM; 2023. p. 284–9. doi:10.1145/3587716.3587763.
+24. Ni Y, Zeng W, Xia P, Yang GS, Tan R. A deepfake detection algorithm based on Fourier transform of biological
+signal. Comput Mater Contin. 2024;79(3):5295–312. doi:10.32604/cmc.2024.049911.
+25. Yasir SM, Kim H. Lightweight deepfake detection based on multi-feature fusion. Appl Sci. 2025;15(4):1954. doi:10.
+3390/app15041954.
+26. Tsalera E, Papadakis A, Samarakou M, Voyiatzis I. Feature extraction with handcrafted methods and convolutional
+neural networks for facial emotion recognition. Appl Sci. 2022;12(17):8455. doi:10.3390/app12178455.
+27.
+Cui S, Luo Y, Tseng HH, Ten Haken RK, El Naqa I. Combining handcrafted features with latent variables in machine
+learning for prediction of radiation-induced lung damage. Med Phys. 2019;46(5):2497–511. doi:10.1002/mp.13497.
+28. Lee S, Tariq S, Shin Y, Woo SS. Detecting handcrafted facial image manipulations and GAN-generated facial images
+using Shallow-FakeFaceNet. Appl Soft Comput. 2021;105:107256. doi:10.1016/j.asoc.2021.107256.
+29.
+Megahed A, Han Q, Fadl S. Exposing deepfake using fusion of deep-learned and hand-crafted features. Multimed
+Tools Appl. 2024;83(9):26797–817. doi:10.1007/s11042-023-16329-2.
+30. Rafique R, Gantassi R, Amin R, Frnda J, Mustapha A, Alshehri AH. Deep fake detection and classification using
+error-level analysis and deep learning. Sci Rep. 2023;13(1):7422. doi:10.1038/s41598-023-34629-3.
+31.
+Chang X, Wu J, Yang T, Feng G. Deepfake face image detection based on improved VGG convolutional neural
+network. In: Proceedings of the 2020 39th Chinese Control Conference (CCC); 2020 Jul 27–29; Shenyang, China.
+Piscataway, NJ, USA: IEEE; 2020. p. 7252–6.
+
+
+--- PAGE 29 ---
+
+Comput Mater Contin. 2026;86(2)
+29
+32.
+Badale A, Castelino L, Darekar C, Gomes J. Deep fake detection using neural networks. In: Proceedings of the
+15th IEEE International Conference on Advanced Video and Signal Based Surveillance (AVSS); 2018 Nov 27–30;
+Auckland, New Zealand.
+33.
+Zhang L, Qiao T, Xu M, Zheng N, Xie S. Unsupervised learning-based framework for deepfake video detection.
+IEEE Trans Multimed. 2023;25:4785–99. doi:10.1109/TMM.2022.3182509.
+34. Gupta G, Raja K, Gupta M, Jan T, Whiteside ST, Prasad M. A comprehensive review of deepfake detection using
+advanced machine learning and fusion methods. Electronics. 2024;13(1):95. doi:10.3390/electronics13010095.
+35.
+John J, Sherif BV. Comparative analysis on different deepfake detection methods and semi supervised GAN
+architecture for deepfake detection. In: 2022 Sixth International Conference on I-SMAC (IoT in Social, Mobile,
+Analytics and Cloud) (I-SMAC); 2022 Nov 10–12; Dharan, Nepal. Piscataway, NJ, USA: IEEE; 2022. p. 516–21.
+doi:10.1109/I-SMAC55078.2022.9987265.
+36. Soudy AH, Sayed O, Tag-Elser H, Ragab R, Mohsen S, Mostafa T, et al. Deepfake detection using convolutional
+vision transformers and convolutional neural networks. Neural Comput Appl. 2024;36(31):19759–75. doi:10.1007/
+s00521-024-10181-7.
+37.
+Croitoru FA, Hiji AI, Hondru V, Ristea NC, Irofti P, Popescu M, et al. Deepfake media generation and detection in
+the generative AI era: a survey and outlook. arXiv:2411.19537. 2024.
+38. Abir WH, Khanam FR, Alam KN, Hadjouni M, Elmannai H, Bourouis S, et al. Detecting deepfake images using
+deep learning techniques and explainable AI methods. Intell Autom Soft Comput. 2023;35(2):2151–69. doi:10.
+32604/iasc.2023.029653.
+39.
+Al-Dulaimi OAHH, Kurnaz S. A hybrid CNN-LSTM approach for precision deepfake image detection based on
+transfer learning. Electronics. 2024;13(9):1662. doi:10.3390/electronics13091662.
+40. Anan K, Bhattacharjee A, Intesher A, Islam K, Assaeem Fuad A, Saha U, et al. Hybrid deepfake image detection:
+a comprehensive dataset-driven approach integrating convolutional and attention mechanisms with frequency
+domain features. arXiv:2502.10682. 2025.
+41.
+Kosarkar U, Sarkarkar G, Gedam S. Revealing and classification of deepfakes video’s images using a customize
+convolution neural network model. Procedia Comput Sci. 2023;218:2636–52. doi:10.1016/j.procs.2023.01.237.
+42. Tan C, Zhao Y, Wei S, Gu G, Liu P, Wei Y. Frequency-aware deepfake detection: improving generalizability through
+frequency space domain learning. Proc AAAI Conf Artif Intell. 2024;38(5):5052–60. doi:10.1609/aaai.v38i5.28310.
+43. Yan J, Li Z, He Z, Fu Z. Generalizable deepfake detection via effective local-global feature extraction.
+arXiv:2501.15253. 2025.
+44. Shi C, Chen L, Wang C, Zhou X, Qin Z. Review of image forensic techniques based on deep learning. Mathematics.
+2023;11(14):3134.
+45. Mansoor N, Iliev AI. Explainable AI for deepfake detection. Appl Sci. 2025;15(2):725. doi:10.3390/app15020725.
+46. Khalifa AH, Zaher NA, Abdallah AS, Fakhr MW. Convolutional neural network based on diverse Gabor filters for
+deepfake recognition. IEEE Access. 2022;10:22678–86. doi:10.1109/ACCESS.2022.3152029.
+47.
+Venkateswarulu S, Srinagesh A. DeepExplain: enhancing deepfake detection through transparent and explainable
+AI model. Informatica. 2024;48(8):103–10. doi:10.31449/inf.v48i8.5792.
+48. Pinhasov B, Lapid R, Ohayon R, Sipper M, Aperstein Y. XAI-based detection of adversarial attacks on deepfake
+detectors. arXiv:2403.02955. 2024.
+49. Abdullah SM, Cheruvu A, Kanchi S, Chung T, Gao P, Jadliwala M, et al. An analysis of recent advances in deepfake
+image detection in an evolving threat landscape. In: Proceedings of the 2024 IEEE Symposium on Security and
+Privacy (SP); 2024 May 19–23; San Francisco, CA, USA. p. 91–109. doi:10.1109/SP54263.2024.00194.
+50. Stanciu DC, Ionescu B. Improving generalization in deepfake detection via augmentation with recurrent adver-
+sarial attacks. In: Proceedings of the 3rd ACM International Workshop on Multimedia AI against Disinformation;
+2024 Jun 10–14; Phuket, Thailand. New York, NY, USA: ACM; 2024. p. 46–54. doi:10.1145/3643491.3660291.
+51.
+Alattar A, Sharma R, Scriven J. A system for mitigating the problem of deepfake news videos using watermarking.
+Electron Imaging. 2020;32(4):1–10. doi:10.2352/issn.2470-1173.2020.4.mwsf-117.
+52.
+Rashid MM, Lee SH, Kwon KR. Blockchain technology for combating deepfake and protect video/image integrity.
+J Korea Multimed Soc. 2021;24(8):1044–58.
+
+
+--- PAGE 30 ---
+
+30
+Comput Mater Contin. 2026;86(2)
+53.
+Hasan K, Karimian N, Tehranipoor S. Combating deepfakes: a novel hybrid hardware-software approach. In:
+Proceedings of the 2024 Silicon Valley Cybersecurity Conference (SVCC); 2024 Jun 17–19; Seoul, Republic of Korea.
+Piscataway, NJ, USA: IEEE; 2024. p. 1–2. doi:10.1109/svcc61185.2024.10637357.
+54. Jing TW, Murugesan RK. Protecting data privacy and prevent fake news and deepfakes in social media via
+blockchain technology. In: Advances in cyber security. Singapore: Springer Singapore; 2021. p. 674–84. doi:10.1007/
+978-981-33-6835-4_44.
+55.
+Mao D, Zhao S, Hao Z. A shared updatable method of content regulation for deepfake videos based on blockchain.
+Appl Intell. 2022;52(13):15557–74. doi:10.1007/s10489-021-03156-x.
+56. Seneviratne O. Blockchain for social good: combating misinformation on the web with AI and blockchain. In:
+Proceedings of the 14th ACM Web Science Conference 2022; 2022 Jun 26–29; Barcelona, Spain. New York, NY,
+USA: ACM; 2022. p. 435–42. doi:10.1145/3501247.3539016.
+57.
+Chen CC, Du Y, Peter R, Golab W. An implementation of fake news prevention by blockchain and entropy-based
+incentive mechanism. Soc Netw Anal Min. 2022;12(1):114. doi:10.1007/s13278-022-00941-5.
+58. Parlak M, Altunel NF, Akka¸s UA, Arici ET. Tamper-proof evidence via blockchain for autonomous vehicle accident
+monitoring. In: Proceedings of the 2022 IEEE 1st Global Emerging Technology Blockchain Forum: Blockchain &
+Beyond (iGETblockchain); 2022 Nov 7–11; Irvine, CA, USA. Piscataway, NJ, USA: IEEE; 2022. p. 1–6. doi:10.1109/
+iGETblockchain56591.2022.10087067.
+59.
+Nagothu D, Xu R, Chen Y, Blasch E, Aved A. DeFakePro: decentralized deepfake attacks detection using ENF
+authentication. IT Prof. 2022;24(5):46–52. doi:10.1109/MITP.2022.3172653.
+60. Ali A, Jadoon YK, Farid Z, Ahmad M, Abidi N, Alzoubi HM, et al. The threat of deep fake technology to trusted
+identity management. In: Proceedings of the 2022 International Conference on Cyber Resilience (ICCR); 2022 Oct
+6–7; Dubai, United Arab Emirates. Piscataway, NJ, USA: IEEE; 2022. p. 1–5. doi:10.1109/ICCR56254.2022.9995978.
+61.
+Koli RY. Deepfake detection system by integrating deep learning and blockchain technology [master’s thesis].
+Dublin, Ireland: National College of Ireland; 2023.
+62. Chandrappa K, Shankar KK. Combating deep fakes by the power of artificial intelligence and block chain in
+healthcare applications. In: Unleashing the potentials of blockchain technology for healthcare industries. San
+Diego, CA, USA: Academic Press; 2023. p. 253–71.
+63. Choi N, Kim H. DDS: deepfake detection system through collective intelligence and deep-learning model in
+blockchain environment. Appl Sci. 2023;13(4):2122. doi:10.3390/app13042122.
+64. Costales JA, Shiromani S, Devaraj M. The impact of blockchain technology to protect image and video integrity
+from identity theft using deepfake analyzer. In: Proceedings of the 2023 International Conference on Innovative
+Data Communication Technologies and Application (ICIDCA); 2023 Mar 14–16; Uttarakhand, India. Piscataway,
+NJ, USA: IEEE; 2023. p. 730–3. doi:10.1109/ICIDCA56705.2023.10099668.
+65. Anitha S, Anitha N, Ashok N, Daranya T, Nandhini B, Chandrasekaran V. Detection of deepfakes in financial
+transactions using algorand blockchain consensus mechanism. In: Proceedings of International Conference on
+Network Security and Blockchain Technology; 2023 Mar 24–26; Midnapore, India. Singapore: Springer Nature
+Singapore; 2023. p. 173–83. doi:10.1007/978-981-99-4433-0_15.
+66. Parlak M. Blockchain-based immutable evidence and decentralized loss adjustment for autonomous vehicle
+accidents in insurance. arXiv:2303.18130. 2023.
+67.
+Mohammadi M. Exploring the potential of the Blockchain technology in reducing the effect of fake news [master’s
+thesis]. Helsinki, Finland: Arcada University of Applied Sciences; 2023.
+68. Islam MBE, Haseeb M, Batool H, Ahtasham N, Muhammad Z. AI threats to politics, elections, and democracy:
+a blockchain-based deepfake authenticity verification framework. Blockchains. 2024;2(4):458–81. doi:10.3390/
+blockchains2040020.
+69. Heidari A, Navimipour NJ, Dag H, Talebi S, Unal M. A novel blockchain-based deepfake detection method using
+federated and deep learning models. Cogn Comput. 2024;16(3):1073–91. doi:10.1007/s12559-024-10255-7.
+70. Lokhande M, Raut P, Gawali K, Ahirrao M, Bhande A. Artificial intelligence for detecting cyber attacks in deepfake
+& identity theft. In: Proceedings of the 2024 8th International Conference on Computing, Communication,
+
+
+--- PAGE 31 ---
+
+Comput Mater Contin. 2026;86(2)
+31
+Control and Automation (ICCUBEA); 2024 Aug 23–24; Pune, India. Piscataway, NJ, USA: IEEE; 2024. p. 1–6.
+doi:10.1109/ICCUBEA61740.2024.10774771.
+71.
+Yang Y, Idris NB, Yu D, Liu C, Wu H. Decentralized deepfake task management algorithm based on blockchain
+and edge computing. IEEE Access. 2024;12:86456–69. doi:10.1109/ACCESS.2024.3416458.
+72.
+Kumar R, Khan SA, Alharbe N, Khan RA. Code of silence: cyber security strategies for combating deepfake
+disinformation. Comput Fraud Secur. 2024;2024(4). doi:10.12968/s1361-3723(24)70013-x.
+73.
+Priya M, Murugesan J, Bhuvaneswari P, Rubigha M, Lalithambikai S, Mohanraj B. Preserving visual authenticity:
+block chain-augmented AI frameworks for advanced digital deception recognition and mitigation. In: Proceedings
+of the 2024 5th International Conference on Smart Electronics and Communication (ICOSEC); 2024 Sep 18–20;
+Trichy, India. Piscataway, NJ, USA: IEEE; 2024. p. 707–13. doi:10.1109/ICOSEC61587.2024.10722740.
+74.
+Gopalakrishnan T, Ghanimi HMA, Alam T, Sreekanth K, Purushothaman KE, Sengan S, et al. Leveraging
+blockchain technology to combat deception, deepfake, and counterfeit system. J Discrete Math Sci Cryptogr.
+2024;27(7):2143–54. doi:10.47974/jdmsc-2087.
+75.
+Rana MS, Solaiman M, Gudla C, Sohan MF. Deepfakes—reality under threat?. In: Proceedings of the 2024 IEEE
+14th Annual Computing and Communication Workshop and Conference (CCWC); 2024 Jan 8–10; Las Vegas, NV,
+USA. Piscataway, NJ, USA: IEEE; 2024. p. 0721–7. doi:10.1109/ccwc60891.2024.10427659.
+76. Patil U, Chouragade PM. Blockchain based approach for tackling deepfake videos. Int J Sci Res Comput Sci Eng
+Inf Technol. 2021;7(5):342–7. doi:10.32628/cseit217372.
+77.
+Patil U, Chouragade PM. Deepfake video authentication based on blockchain. In: Proceedings of the 2021
+Second International Conference on Electronics and Sustainable Communication Systems (ICESC); 2021 Aug 4–6;
+Coimbatore, India. Piscataway, NJ, USA: IEEE; 2021. p. 1110–3. doi:10.1109/icesc51422.2021.9532725.
+78. Razaque A, Alotaibi B, Alotaibi M, Amsaad F, Manasov A, Hariri S, et al. Blockchain-enabled deep recurrent neural
+network model for clickbait detection. IEEE Access. 2021;10:3144–63. doi:10.1109/ACCESS.2021.3137078.
+79.
+Jain A, Gaur A, Gupta G, Mishra S, Johari R, Vidyarthi DP. Securing digital integrity: proposed comprehensive
+framework for deepfake detection and blockchain validation. In: Proceedings of International Conference on
+Cognitive Computing and Cyber Physical Systems; 2024 Apr 4–6; Bhimavaram, India. Singapore: Springer Nature
+Singapore; 2024. p. 579–89. doi:10.1007/978-981-97-7371-8_45.
+80. Patil S, Bhat A, Jain N, Javalkar V. Navigating deepfakes with data science: a multi-modal analysis and blockchain-
+based detection framework. In: Proceedings of the 2025 International Conference on Pervasive Computational
+Technologies (ICPCT); 2025 Feb 8–9; Greater Noida, India. Piscataway, NJ USA: IEEE; 2025. p. 772–7. doi:10.1109/
+ICPCT64145.2025.10940229.
+81.
+Balogun ED, Ogunsola KO, Samuel A. A risk intelligence framework for detecting and preventing financial fraud
+in digital marketplaces. Iconic Res Eng J. 2021;4(8):134–49.
+82. Alkhatib M, Albalawi T, Saeed F. Blockchain-based quality assurance system for academic programs. Appl Sci.
+2024;14(11):4868. doi:10.3390/app14114868.
+83. Haleem A, Javaid M, Singh RP, Suman R, Rab S. Blockchain technology applications in healthcare: an overview.
+Int J Intell Netw. 2021;2:130–9. doi:10.1016/j.ijin.2021.09.005.
+84. Alanzi H, Alkhatib M. Towards improving privacy and security of identity management systems using blockchain
+technology: a systematic review. Appl Sci. 2022;12(23):12415. doi:10.3390/app122312415.
+85. Wang R, Juefei-Xu F, Luo M, Liu Y, Wang L. FakeTagger: robust safeguards against deepfake dissemination via
+provenance tracking. In: Proceedings of the 29th ACM International Conference on Multimedia; 2021 Oct 20–24;
+Virtual. New York, NY, USA: ACM; 2021. p. 3546–55. doi:10.1145/3474085.3475518.
+86. Noreen I, Muneer MS, Gillani S. Deepfake attack prevention using steganography GANs. PeerJ Comput Sci.
+2022;8:e1125. doi:10.7717/peerj-cs.1125.
+87.
+Ruiz N, Bargal SA, Sclaroff S. Disrupting deepfakes: adversarial attacks against conditional image translation
+networks and facial manipulation systems. In: Proceedings of the Computer Vision—ECCV, 2020 Workshops;
+2020 Aug 23–28; Glasgow, UK. Berlin/Heidelberg, Germany: Springer International Publishing; 2020. p. 236–51.
+doi:10.1007/978-3-030-66823-5_14.
+
+
+--- PAGE 32 ---
+
+32
+Comput Mater Contin. 2026;86(2)
+88. Kato G, Fukuhara Y, Isogawa M, Tsunashima H, Kataoka H, Morishima S. Scapegoat generation for privacy
+protection from deepfake. In: Proceedings of the 2023 IEEE International Conference on Image Processing (ICIP);
+2023 Oct 8–11; Kuala Lumpur, Malaysia. Piscataway, NJ, USA: IEEE; 2023. p. 3364–8. doi:10.1109/icip49359.2023.
+10221904.
+89.
+Awodiji TO, Owoyemi J. Advanced detection and mitigation techniques for deepfake video: leveraging AI to
+safeguard visual media integrity in cybersecurity. Int Adv Res J Sci Eng Technol. 2024;11(9):76–95.
+90. Leibowicz CR, McGregor S, Ovadya A. The deepfake detection dilemma: a multistakeholder exploration of
+adversarial dynamics in synthetic media. In: Proceedings of the 2021 AAAI/ACM Conference on AI, Ethics, and
+Society; 2021 May 19–21; Virtual. New York, NY, USA: ACM; 2021. p. 736–44. doi:10.1145/3461702.3462584.
+91.
+Kilger F, Kabil A, Tippmann V, Klinker G, Pahl MO. Detecting and preventing faked mixed reality. In: Proceedings
+of the 2021 IEEE 4th International Conference on Multimedia Information Processing and Retrieval (MIPR); 2021
+Sep 8–10; Tokyo, Japan. Piscataway, NJ, USA: IEEE; 2021. p. 399–405. doi:10.1109/mipr51284.2021.00074.
+92. Wang X, Huang J, Ma S, Nepal S, Xu C. Deepfake disrupter: the detector of deepfake is my friend. In: 2022
+IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR); 2022 Jun 18–24; New Orleans, LA,
+USA. Piscataway, NJ, USA: IEEE; 2022. p. 14920–9. doi:10.1109/CVPR52688.2022.01450.
+93. Khoo B, Phan RC, Lim CH. Deepfake attribution: on the source identification of artificially generated images.
+Wiley Interdiscip Rev Data Min Knowl Discov. 2022;12(3):e1438. doi:10.1002/widm.1438.
+94. Mehra A, Agarwal A, Vatsa M, Singh R. Motion magnified 3-d residual-in-dense network for deepfake detection.
+IEEE Trans Biom Behav Identity Sci. 2022;5(1):39–52. doi:10.1109/TBIOM.2022.3201887.
+95. Yasur L, Frankovits G, Grabovski FM, Mirsky Y. Deepfake captcha: a method for preventing fake calls. In:
+Proceedings of the 2023 ACM Asia Conference on Computer and Communications Security; 2023 Jul 10–14;
+Melbourne, VIC, Australia. New York, NY, USA: ACM; 2023. p. 608–22. doi:10.1145/3579856.3595801.
+96. Altalahin I, AlZu’bi S, Alqudah A, Mughaid A. Unmasking the truth: a deep learning approach to detecting
+deepfake audio through MFCC features. In: Proceedings of the 2023 International Conference on Information
+Technology (ICIT); 2023 Aug 9–10; Amman, Jordan. Piscataway, NJ, USA: IEEE; 2023. p. 511–8. doi:10.1109/
+ICIT58056.2023.10226172.
+97.
+Chhabra S, Thakral K, Mittal S, Vatsa M, Singh R. Low-quality deepfake detection via unseen artifacts. IEEE Trans
+Artif Intell. 2024;5(4):1573–85. doi:10.1109/TAI.2023.3299894.
+98. Hooda A, Kumar M. Combatting disinformation and deepfake: interdisciplinary insights and global strategies.
+In: Proceedings of the TENCON 2024—2024 IEEE Region 10 Conference (TENCON); 2024 Dec 1–4; Singapore.
+Piscataway, NJ, USA: IEEE; 2025. p. 1729–32. doi:10.1109/TENCON61640.2024.10902954.
+99. Rosca CM, Stancu A, Iovanovici EM. The new paradigm of deepfake detection at the text level. Appl Sci.
+2025;15(5):2560. doi:10.3390/app15052560.
+100. Miotti A, Wasil A. Combatting deepfakes: policies to address national security threats and rights violations.
+arXiv:2402.09581. 2024.
+101. Pawelec M. Decent deepfakes? Professional deepfake developers’ ethical considerations and their governance
+potential. AI Ethics. 2025;5(3):2641–66. doi:10.1007/s43681-024-00542-2.
+102. Fabuyi J, Olaniyi OO, Olateju O, Aideyan NT, Selesi-Aina O, Olaniyi FG. Deepfake regulations and their impact
+on content creation in the entertainment industry. Arch Curr Res Int. 2024;24(12):52–74. doi:10.9734/acri/2024/
+v24i12997.
+103. Putra GP, Multazam MT. Law enforcement against deepfake porn AI: penegakan hukum terhadap deepfake porn
+AI. 2024. doi:10.21070/ups.4378.
+104. Mahashreshty Vishweshwar S. Implications of deepfake technology on individual privacy and security [master’s
+thesis]. St. Cloud, MN, USA: St. Cloud State University; 2023.
+105. Lingyun Y. Regulations on detecting, punishing, preventing deepfake technologies based forgery. Cent Asian J
+Acad Res. 2024;2(5):62–6.
+106. Kira B. When non-consensual intimate deepfakes go viral: the insufficiency of the UK online safety act. Comput
+Law Secur Rev. 2024;54:106024. doi:10.1016/j.clsr.2024.106024.
+
+
+--- PAGE 33 ---
+
+Comput Mater Contin. 2026;86(2)
+33
+107. Alanazi S, Asif S, Caird-daley A, Moulitsas I. Unmasking deepfakes: a multidisciplinary examination of social
+impacts and regulatory responses. Hum Intell Syst Integr. 2025;20:1–23. doi:10.1007/s42454-025-00060-4.
+108. Whyte C. Deepfake news: aI-enabled disinformation as a multi-level public policy challenge. J Cyber Policy.
+2020;5(2):199–217. doi:10.1080/23738871.2020.1797135.
+109. Yadlin-Segal A, Oppenheim Y. Whose dystopia is it anyway? Deepfakes and social media regulation. Convergence.
+2021;27(1):36–51. doi:10.1177/1354856520923963.
+110. Flynn A, Clough J, Cooke T. Disrupting and preventing deepfake abuse: exploring criminal law responses to AI-
+facilitated abuse. In: The palgrave handbook of gendered violence and technology. Berlin/Heidelberg, Germany:
+Springer International Publishing; 2021. p. 583–603. doi:10.1007/978-3-030-83734-1_29.
+111. Ray A. Disinformation, deepfakes and democracies: the need for legislative reform. Univ New South Wales Law J.
+2021;44(3):983–1013. doi:10.53637/dels2700.
+112. van der Sloot B, Wagensveld Y. Deepfakes: regulatory challenges for the synthetic society. Comput Law Secur Rev.
+2022;46:105716. doi:10.1016/j.clsr.2022.105716.
+113. Purwadi A, Serfiyani CY, Serfiyani CR. Legal landscape on national cybersecurity capacity in combating cybert-
+errorism using deep fake technology in Indonesia. Int J Cyber Criminol. 2022;16(1):123–40.
+114. Liu M, Zhang X. Deepfake technology and current legal status of it. In: Proceedings of the 2022 3rd Interna-
+tional Conference on Artificial Intelligence and Education (IC-ICAIE 2022); 2022 Jun 24–26; Chengdu, China.
+Dordrecht, The Netherlands: Atlantis Press. p. 1308–14.
+115. Staab LC. Making sense of deepfake: epistemic harms and the EU policy response [master’s thesis]. Enschede, The
+Netherlands: University of Twente; 2023.
+116. Esezoobo SO, Braimoh JJ. Integrating legal, ethical, and technological strategies to mitigate AI deepfake risks
+through strategic communication. Int J Sci Res Manag. 2023;11(8):914–24. doi:10.18535/ijsrm/v11i08.ec02.
+117. Łabuz M. Regulating deep fakes in the artificial intelligence act. Appl Cybersecur Internet Gov. 2023;2(1):1–42.
+doi:10.60097/acig/162856.
+118. Busacca A, Monaca MA. Deepfake: creation, purpose, risks. In: Innovations and economic and social changes due
+to artificial intelligence: the state of the art. Cham, Switzerland: Springer Nature Switzerland; 2023. p. 55–68. doi:10.
+1007/978-3-031-33461-0_6.
+119. Vizoso Á, Vaz-Álvarez M, López-García X. Fighting deepfakes: media and Internet giants’ converging and
+diverging strategies against hi-tech misinformation. Media Commun. 2021;9(1):291–300. doi:10.17645/mac.v9i1.
+3494.
+120. Temir E. Deepfake: new era in the age of disinformation & end of reliable journalism. Selçuk ˙Ileti¸sim.
+2020;13(2):1009–24.
+121. Gonzales NH, Lobian AL, Hengky FM, Andhika MR, Achmad S, Sutoyo R. Deepfake technology: negative impacts,
+mitigation methods, and preventive algorithms. In: Proceedings of the 2023 IEEE 8th International Conference on
+Recent Advances and Innovations in Engineering (ICRAIE); 2023 Dec 2–3; Kuala Lumpur, Malaysia. Piscataway,
+NJ, USA: IEEE; 2024. p. 1–5. doi:10.1109/ICRAIE59459.2023.10468370.
+122. Seng LK, Mamat N, Abas H, Wan Ali WNH. AI integrity solutions for deepfake identification and prevention.
+Open Int J Inform. 2024;12(1):35–46. doi:10.11113/oiji2024.12n1.297.
+123. Ghediri K. Countering the negative impacts of deepfake technology: approaches for effective combat. Int J Econ
+Perspect. 2024;18(12):2871–90.
+124. Taha MA, Khudhair WM, Khudhur AM, Mahmood OA, Hammadi YI, Al-husseinawi RSA, et al. Emerging
+threat of deep fake: how to identify and prevent it. In: Proceedings of the 6th International Conference on Future
+Networks & Distributed Systems; 2022 Dec 15; Tashkent, Uzbekistan. New York, NY, USA: ACM; 2022. p. 645–51.
+doi:10.1145/3584202.3584300.
+125. Buo SA. The emerging threats of deepfake attacks and countermeasures. arXiv:2012.07989. 2020.
+126. Wang S. How will users respond to the adversarial noise that prevents the generation of deepfake? In: Proceed-
+ings of the 23rd Biennial Conference of the International Telecommunications Society (ITS); 2021 Jun 21–23;
+Gothenburg, Sweden.
+
+
+--- PAGE 34 ---
+
+34
+Comput Mater Contin. 2026;86(2)
+127. Tuysuz MK, Kılıç A. Analyzing the legal and ethical considerations of deepfake technology. Interdiscip Stud Soc
+Law Polit. 2023;2(2):4–10. doi:10.61838/kman.isslp.2.2.2.
+128. Romero-Moreno F. Deepfake fraud detection: safeguarding trust in generative AI 2025. [cited 2025 Jan 1]. Available
+from: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5031627.
+129. Alexander S. Deepfake cyberbullying: the psychological toll on students and institutional challenges of AI-driven
+harassment. Clear House A J Educ Strateg Issues Ideas. 2025;98(2):36–50. doi:10.1080/00098655.2025.2488777.
+130. Pedersen KT, Pepke L, Stærmose T, Papaioannou M, Choudhary G, Dragoni N. Deepfake-driven social engi-
+neering: threats, detection techniques, and defensive strategies in corporate environments. J Cybersecur Priv.
+2025;5(2):18. doi:10.3390/jcp5020018.
+131. Mi X, Zhang B. Digital communication strategies for coping with deepfake content distribution. In: Proceedings of
+the 2025 Communication Strategies in Digital Society Seminar (ComSDS); 2025 Apr 9; Saint Petersburg, Russian
+Federation. Piscataway, NJ, USA: IEEE; 2025. p. 82–6. doi:10.1109/ComSDS65569.2025.10971333.
+132. Edwards P, Nebel JC, Greenhill D, Liang X. A review of deepfake techniques: architecture, detection and datasets.
+IEEE Access. 2024;12(1):154718–42. doi:10.1109/ACCESS.2024.3477257.
+133. Dhesi S, Fontes L, Machado P, Ihianle IK, Tash FF, Adama DA. Mitigating adversarial attacks in deepfake detection:
+an exploration of perturbation and AI techniques. arXiv:2302.11704. 2023.
+134. Babaei R, Cheng S, Duan R, Zhao S. Generative artificial intelligence and the evolving challenge of deepfake
+detection: a systematic analysis. J Sens Actuator Netw. 2025;14(1):17. doi:10.3390/jsan14010017.
+135. Kalodanis K, Rizomiliotis P, Feretzakis G, Papapavlou C, Anagnostopoulos D. High-risk AI systems—lie detection
+application. Future Internet. 2025;17(1):26. doi:10.3390/fi17010026.

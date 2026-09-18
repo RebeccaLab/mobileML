@@ -1,0 +1,693 @@
+
+
+--- PAGE 1 ---
+
+DeepDetect: Full-Stack Multimodal Deepfake Analysis Platform
+Dr.B. Kalaiselvi, 
+Department Of Computer Science     
+And Engineering, 
+Mahendra Engineering College, 
+Namakkal ,India                              
+kalairs2003@gmail.com 
+ 
+Sri Harish K 
+Department Of  Cyber Security, 
+Mahendra Engineering College, 
+Namakkal,India 
+sriharishkiruba@gmail.com 
+Parameshwaran S 
+Department Of  Cyber Security, 
+Mahendra Engineering College, 
+Namakkal,India 
+parameshwarans001@gmail.com 
+ 
+Vishnu Chakravarthi p 
+Department Of Cyber Security, 
+Mahendra Engineering College, 
+Namakkal ,India 
+vishnupattanam2004@gmail.com
+Ranjith V 
+Department of Cyber Security, 
+Mahendra Engineering College, 
+Namakkal,India 
+ranjithvranjithv325@gmail.com
+ABSTRACT 
+Recent advancements in deep learning have given rise 
+to new forms of media that are extremely realistic yet 
+also create major threats to the integrity and trust of the 
+digital world—synthetic media, commonly referred to 
+as deepfakes. Deepfake audio and video have quickly 
+become an easy medium to commit identity fraud, 
+produce misinformation campaigns, and conduct 
+advanced social engineering attacks.This article 
+describes an AI-based multimodal detection system for 
+detecting deepfake content in both video and audio 
+formats via the use of state-of-the-art deep neural 
+network architectures. For video-based detection, 
+CNN-based spatial feature extractors (EfficientNet and 
+ResNet50) are combined with temporal modeling via 
+BiLSTM and an attention mechanism to isolate subtle 
+facial artifacts present in deepfake content. For the 
+detection of deepfake audio, the proposed framework 
+incorporates several state-of-the-art anti-spoofing 
+models (RawNet for raw waveform learning, LCNN 
+for artifact-based spectral detection, AASIST for 
+graph-attention fusion, and CNNs trained on MFCC 
+and spectrogram features) to identify manipulation 
+artifacts of various types within the synthesized 
+speech.The proposed solution executes on a secure 
+full-stack web application with visual analytics, 
+confidence scores, and automated forensic PDF writing 
+functionality. Evaluation on standard benchmark 
+datasets shows that the proposed architecture achieves 
+high accuracy levels and near real-time inference, 
+demonstrating 
+the 
+systems’ 
+value 
+for 
+digital 
+forensics/cybersecurity. 
+ 
+ 
+I. INTRODUCTION 
+The rapid rise of generative AI has made the creation 
+of 
+synthetic 
+media—both 
+video 
+and 
+audio—
+astonishingly simple and highly convincing. Modern 
+deepfake systems can replicate facial movements, 
+vocal tones, speech patterns, and subtle human 
+behaviours 
+with 
+near-human 
+accuracy. 
+While 
+deepfakes have beneficial applications in film 
+production, assistive technologies, and education, their 
+misuse has grown far more rapidly. Attackers now 
+exploit deepfakes for identity theft, impersonation 
+scams, misinformation campaigns, and manipulation 
+of digital trust. 
+Traditional authenticity-verification methods, such as 
+digital watermarks or metadata tracing, are no longer 
+reliable because these indicators can be stripped, 
+modified, or completely bypassed. As deepfake 
+generation advances—particularly with diffusion 
+models and high-capacity GAN architectures—the 
+visual cues like unnatural blinking, head tilts, or 
+mismatched lighting are far less detectable. This shift 
+has pushed researchers toward deep learning–based 
+detection, especially CNNs and hybrid CNN–RNN 
+systems that can learn fine-grained spatial and temporal 
+inconsistencies. 
+In parallel, audio deepfakes have evolved dramatically. 
+With just a few seconds of audio, modern voice-
+cloning systems can imitate a person’s voice well 
+enough to deceive humans and automated verification 
+systems. This has led to real-world attacks, including 
+fraudulent CEO-voice scams, bypassing voice-based 
+authentication, and manipulating customer-support 
+channels. To counter this, researchers now rely on 
+advanced audio-processing architectures such as 
+RawNet for raw-waveform learning, LCNN for 
+2026 International Conference on Innovations in Emerging Technologies for Sustainable Development (ICIETSD) | 979-8-3315-4823-0/26/$31.00 ©2026 IEEE | DOI: 10.1109/ICIETSD68684.2026.11584786
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:43:39 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 2 ---
+
+compact feature extraction, AASIST for anti-spoofing, 
+and CNN-based models leveraging MFCCs and 
+spectrograms for analysing frequency-time patterns. 
+Despite these advancements, most existing studies treat 
+audio and video detection separately. There is an urgent 
+need for a unified, multimodal detection system 
+capable of jointly analysing spatial, temporal, and 
+acoustic features. Our work addresses these gaps by 
+combining CNN–BiLSTM networks for video and 
+integrating multiple audio-focused models—RawNet, 
+LCNN, 
+AASIST, 
+CNN+MFCC, 
+and 
+CNN+Spectrogram—within a cohesive deepfake-
+detection framework that moves closer to a robust, real-
+world cybersecurity solution. 
+                            II. Literature Review 
+Deepfake detection has become a multidisciplinary 
+subject that brings together people from many different 
+disciplines such as computer vision, audio and speech 
+research, cybersecurity, and digital forensics. All of 
+these people are responding to an evolving threat and 
+the need to detect deepfakes. 
+ 
+In this section, we will review the main categories of 
+detection approaches that have been developed in 
+recent years. We will also discuss how detection 
+techniques are currently failing. What we can say is 
+that there is no silver bullet solution to this problem yet. 
+Additionally, with the recent improvements in the 
+quality of deepfake generator software, many of the 
+tools that have been developed over the last several 
+years to detect deepfakes are not as effective. 
+ 
+A.Traditional Forensic Approaches 
+ 
+In the early days of multimedia forensics, the majority 
+of evidence used to determine if an image or video was 
+faked relied on identifying the unusual features caused 
+by various aspects of the recording process. For 
+example, researchers would analyze the color filter 
+arrays on the cameras that took the picture, look for 
+compression artifacts that didn't match other nearby 
+frames, and find physical features that were either 
+misaligned or inconsistent (such as lighting that didn't 
+match across a subject's face). 
+ 
+Many researchers wrote papers on things such as how 
+long a person takes to blink at least one time (regularity 
+of blinks), unnatural head pose transitions, and odd 
+ratios in body parts/geometry, etc. as being examples 
+of potential signs of manipulation. 
+ 
+These methods had the advantage of being quick to run, 
+having relatively small datasets, and providing a 
+reasonable explanation for their findings. However, 
+these methods are now outdated. Today's ML-based 
+generators (especially diffusion-based ones that have 
+become popular recently) were developed specifically 
+to minimize many of the types of anomalies 
+characterized by these older methods. As a result, many 
+of the signs that would have once been reliable 
+indicators of alteration are now unlikely to be valid 
+indicators, as many high-quality deepfakes pass 
+through current validation methods with little or no 
+signs left behind. 
+ 
+B. CNN-Based Visual Detection 
+ 
+The development of deep CNNs has dramatically 
+improved detection. Examples of organizations using 
+deep CNNs to detect forgeries include XceptionNet, 
+ResNet, EfficientNet, and a variety of their derivatives. 
+These models can learn to detect spatial patterns from 
+images of the face, including blends of edges, odd 
+frequencies, and anomalies in texture, that humans 
+cannot easily detect. There are large public databases, 
+such as FaceForensics++ (as well as extensions), that 
+provide researchers and developers with many labelled 
+forgeries that were created with many different 
+methods , which helps to improve the quality of model 
+training. 
+ 
+One significant problem with deep CNNs is that they 
+are still primarily based on analysing images frame-by 
+frame, and attempt to treat each frame with almost no 
+relation to other frames. As a result, many types of 
+motion and temporal variations that are present in 
+video do not display their full effects when using deep 
+CNNs. E.g. A forgeries that is absolutely photorealistic 
+with any temporal inconsistency in the flow of facial 
+expression and/or movement of the mouth will be 
+indistinguishable from a real one when viewed in 
+isolation, however, when viewed in motion the 
+inconsistencies in flow will become significant enough 
+to be detected by a human observer. The performance 
+of many models that detect newer (or are created more 
+like older) forgeries when tested in real-world 
+conditions 
+will 
+significantly 
+differ 
+from 
+the 
+performance levels that they achieve when tested in 
+controlled lab conditions.. 
+ 
+C. Temporal and Hybrid CNN–RNN Models 
+ 
+In order to work around the absence of a time 
+dimension, users began combining recurrent layers 
+(LSTMs, GRUs, sometimes BiLSTMs) with CNN 
+feature extractors. The logic behind this technique is 
+sound: to allow models to learn dependencies across 
+frames in order to catch unnatural rates of blinking, 
+sudden jerky expressions, mismatches between lips 
+and sounds, and motions that don’t appear to flow 
+correctly. Based on research conducted by us and by 
+others, these combinations appear to perform better on 
+video-based fakes (in particular, more subtle fakes) 
+than models using only static images. 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:43:39 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 3 ---
+
+However, many of these approaches come with their 
+own difficulties. Many of these methods consider all 
+frames equal; there is no way to weight parts of the 
+sequence based on relative importance, so the model 
+wastes time processing less relevant pieces of each 
+sequence. Also, without any type of attention or focus 
+mechanism, the model might have trouble identifying 
+the key spatial locations or temporal intervals to 
+enhance. Lastly, these types of models tend to overfit 
+to the training dataset; therefore, when new 
+compression algorithms, random noise or a completely 
+different generation technique are used against the 
+model, accuracy can drop up to 40–50% (or more) 
+when tested across datasets or "real-world" scenarios. 
+Recent studies and evaluations of these "in-the-wild" 
+models continue to reinforce this idea: there is still a 
+significant arms race in the fight against fakes that 
+cannot be won simply through the use of temporal 
+modeling; we need smarter methods for checking 
+variations and long-range con
+III. Problem Formulation and Threat Model 
+ 
+A.Problem Definition 
+ 
+take a sample of multimedia like x that could be in the 
+form of a vide together with some type of audio the 
+premise of our approach is to determine through 
+rudimentary methods whether this particular input has 
+been changed or not. We present this in the form of a 
+binary classification problem. 
+ 
+ŷ = f(x) 
+ 
+Where f is the model we create to learn how to detect 
+and our expected output,ŷ = 0 means that the content is 
+authentic and if the output is equal to 1 then it 
+represents a deepfake or otherwise forged content. 
+ 
+In terms of video, the process looks at groups of 
+individual frames to find areas of inconsistency in the 
+overall images (i.e. the way that each object appears on 
+screen) based upon spatial inconsistencies (for 
+example, an object showing up with an unusual surface 
+texture) and temporal inconsistencies (i.e. the objects 
+movement between frames is jerky, i.e. that the 
+character’s facial expression in one frame does not 
+coincide with them in a later frame). 
+ 
+In terms of audio, we look at factors related to speech 
+characteristics such as prosodic characteristics (the 
+rhythm of speech), the characteristics of vowel sounds 
+as they occur relative to other sounds that occur in same 
+time period (called formants), and variations in 
+breathing sounds or other distinctive characteristics 
+that can be detected with respect to synthetic vs non-
+synthetic. 
+ 
+The same overall detection pipeline is used for both 
+video and audio, making it easier to implement and 
+manage. 
+ 
+B. Threat Model 
+We work under the attack model of an adversary that 
+has access to the best generative tools available today, 
+such as advanced GANs, diffusion models, and neural 
+voice cloning pipelines, and is capable of producing 
+highly-realistic forgeries. 
+The types of manipulations that we are considering 
+(and not limited to) include: 
+ 
+➢ face swapping and facial reenactment techniques 
+➢ voice cloning combined with neural text-to-speech 
+synthesis 
+➢ artificial lip-sync adjustments to match dubbed or 
+fabricated audio 
+➢ cross-modal impersonations, where visual and 
+auditory elements are swapped or blended to 
+impersonate a target person 
+ 
+The primary goal of the attacker will be to produce 
+content so convincing that it will fool both casual 
+consumers and automated systems such as biometric 
+verifiers, content moderation platforms, and forensic 
+authentication systems. As we are making worst-case 
+assumptions with this work, our detector must be able 
+to detect forgeries that achieve very high perceptual 
+fidelity with respect to both sight and sound. 
+ 
+C. Design Objectives 
+ 
+Our deepfake detection framework is based on 
+identifying four top priorities: that the framework is 
+highly temporally aware, that it provides effective 
+discriminative feature extraction, that it identifies 
+realistic deployment constraints, and that it has real 
+utility in a Cybersecurity context. 
+ 
+In terms of temporal sensitivity, we have put the 
+highest 
+emphasis 
+on 
+detecting 
+motion-based 
+manipulation. Many signs of tampering are only 
+evident with the movement of objects over time. For 
+example, a person's abnormal blink rate (or unusual 
+rate of blinking during the recording), their inconsistent 
+micro-expression movements or odd head tilt 
+movements over time, and an audio-visual de-
+synchronisation will be extremely difficult for a user to 
+spot through static or single frame basis assessments of 
+a video. Temporal motion sensitivity will enable the 
+model to identify the sequential relationships within a 
+video, which ultimately will give the model a better 
+chance of identifying the covert and overt indicators of 
+tampering. 
+ 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:43:39 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 4 ---
+
+With regard to highly discriminative features, we focus 
+on constructing highly discriminative representations 
+to represent the features of an object by employing 
+deep neural networks. Modern deep networks 
+automatically identify spatial features of an object 
+(e.g., faces, backgrounds, illumination) and acoustic 
+features (e.g., spectral patterns, pitch contours) that 
+have demonstrated to provide specific and sensitive 
+indicators of tampering on an Object. In addition to 
+these features, attention layer features will assist in the 
+identification and evaluation of the most suspicious or 
+malign parts of the object and will be very robust in 
+defining the object when inputs are under distortion 
+caused by compression, noise, or low resolution, as 
+would occur in most real-life situations. 
+ 
+With regard to practicality, it is extremely important to 
+us that we use modular components that are efficient in 
+use of CPU resources and that operate on a commodity-
+standard graphics processing unit (GPU), and that 
+provide real-time or nearly real-time processing 
+capabilities. By utilising these modular and efficient 
+CPU resource economies, we can readily integrate a 
+deepfake detection capable framework into live 
+monitoring setups, as well as into mobile applications 
+and forensic workstations without requiring overly 
+burdensome hardware. 
+ 
+IV. Deep Learning Methodology 
+ 
+ 
+ 
+ 
+A.Video Preprocessing 
+ 
+Individual video clips are decomposed into single 
+frames; this is done via extraction at a rate consistent 
+across all videos (e.g., 1-4 frames per second), which 
+will vary based on the specifics of each dataset and the 
+overall length of the video. To facilitate computational 
+efficiency, we use MTCNN, a widely-used multi-task 
+cascaded convolutional neural network, to jointly 
+detect faces, localize facial landmarks, and align faces. 
+The alignment process will crop out the majority of the 
+background noise, as well as normalizing the spatial 
+locations of the facial parts so they can all be aligned 
+consistently to the same orientation and scale, across 
+all video frames. 
+ 
+Finally, we resize and normalize all of the previously 
+extracted facial patches to a predetermined size (e.g., 
+224 x 224 pixels or 256 x 256 pixels) using the 
+mean/standard deviation statistics from a pre-trained 
+model of a backbone network, or if no such model can 
+be found, the appropriate mean/standard deviation 
+statistics from the overall dataset. 
+ 
+In order to capture temporal information while staying 
+within the limits of memory/compute capability, we 
+uniformly sample a small number of frames (e.g., 16-
+64, depending on the length of the video) across the 
+entire video, providing an effective compromise 
+between short and long term dynamics while 
+eliminating redundancy associated with dense frame 
+extraction. 
+ 
+ 
+B. Spatial Feature Extraction via CNN Backbone 
+ 
+For frame-based visual analysis, we commonly utilize 
+EfficientNet-B0 or statistically, ResNet-50, due to their 
+lightweight design while maintaining a high level of 
+performance. Both networks are initialized with 
+ImageNet-pretrained weights; therefore, both networks 
+effectively extract semantically rich features that reveal 
+visual manipulation artifacts including, but not limited 
+to: visible blending seams, texture mismatches, 
+lighting mismatches, unnatural edges where two items 
+meet, and subtle facial irregularities/ distortions that 
+are frequently missed by the casual observer. 
+ 
+Once the final convolutional layer has been completed, 
+we apply global average pooling followed by a small 
+flatten to yield a small compact fixed dimensional 
+embedding vector per frame (typically 1280-d for 
+EfficientNet-B0). These embedding vectors are then 
+used as the basis for the temporal aggregation stage that 
+follows. 
+ 
+C. 
+Audio 
+Preprocessing 
+and 
+Feature 
+Representation 
+ 
+The audio deepfake detection system combines various 
+deep learning models to analyze vocal characteristics 
+in order to identify synthetic speech. The audio 
+processing starts by normalizing, cleaning, and 
+dividing the audio into fixed-size segments. RawNet 
+processes raw waveforms and allows the model to 
+discover discriminating speaker and artifact structures 
+without utilizing handcrafted features. The LCNN 
+extracts subtle artifacts based on Max-Feature-Map 
+(MFM) activation, allowing for more accurate 
+detection of the less obvious vocoder artifacts that 
+produce generated audio. The AASIST architecture 
+combines spectral and temporal features using a graph 
+attention mechanism to identify inconsistencies 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:43:39 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 5 ---
+
+between multiple band resolutions. Additionally, there 
+are the traditional (feature-based) methods using CNNs 
+and training on features based on MFCC and 
+spectrograms, which allow the model to learn about 
+frequency anomalies associated with voice cloning. By 
+using a combination of raw waveforms and spectral-
+feature-based CNNs, the entire detection system is 
+robust to many different deepfake generation types and 
+provides high confidence that speech is real or 
+manipulated. 
+ 
+E. Training and Optimization 
+ 
+Across the data sets in question (see Table 1), we use 
+both the video and audio branches with standard Binary 
+Cross-Entropy Loss and optimized with the Adam 
+optimizer (β1=0.9, β2=0.999). The learning rate 
+typically falls within the range of 1e-4 to 3e-4. 
+ 
+To prevent overfitting (especially when using smaller 
+or unbalanced datasets for Deepfake video), we 
+implement Dropout (0.3-0.5) after all Dense Layers 
+and after all GRU hidden states. We monitor validation 
+loss using early stopping (with a patience between 8-
+12 epochs) and implement a Cosine Annealing 
+Learning Rate Scheduler (with warm-up), which helps 
+smooth 
+out 
+convergence 
+and 
+improve 
+final 
+performance. 
+ 
+Our training process has produced multiple stable and 
+generalizable models across a diversity of benchmark 
+datasets (see Table 1) during our experimentation. 
+ 
+V. Implementation and work process for video and      
+audio models 
+A. Working of video and audio model analysis  
+The following steps describe how a user uploads a 
+video, audio, or image file into the system: 
+1) The user uploads a video/audio/image file using 
+the 
+upload 
+interface 
+of 
+the 
+system.
+ 
+ 
+2) The system checks whether or not the uploaded 
+file meets these criteria (i.e., it verifies both the 
+extension and MIME type of the file; assesses size 
+limits). 
+ 
+3) The preprocessing module extracts either frames 
+(from images or videos) or MFCC features (from 
+audio files) and prepares the input data for analysis. 
+ 
+4) The CNN/GRU model performs spatial and 
+temporal feature extractions on the preprocessed 
+input data. 
+ 
+5) The attention mechanism identifies areas of 
+concern within the uploaded data, thus improving 
+the decision-making process of the model. 
+ 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:43:39 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 6 ---
+
+6) The classifier will provide either a prediction as 
+to whether or not the input data is real (true) or 
+fabricated (false), along with an associated 
+confidence score. 
+ 
+7) Finally, the system will either return a result or 
+generate a downloadable PDF report. 
+ 
+ 
+ 
+VI. Conclusion and Future Work 
+In our paper, we have shared our journey of secretly 
+developing a new deepfake detector. More importantly, 
+we have demonstrated a couple of cool features such as 
+the unified audio, video component and the real, world, 
+friendliness without making deepfake detectors the 
+only focus. We implemented a combination of 
+Convolutional Neural Networks (CNNs) to extract 
+spatial cues, recurrent layers (BiLSTM) to capture 
+temporal dependencies, and attention mechanisms to 
+concentrate on the most telling frames, which greatly 
+improves the performance of the model compared to 
+the methods only using facial frames. Moreover, the 
+full, stack implementation with secure handling, 
+detailed logging, and automatic forensic reports 
+converts a mere laboratory prototype into a feasible 
+solution that can be integrated into cybersecurity 
+pipelines, forensic laboratories, or media verification 
+workflows. 
+The experiments pretty much confirmed this. On well, 
+known datasets such as FaceForensics++, Celeb, DF 
+and DFDC, our method consistently improved 
+detection performance and, most importantly, yielded 
+greater resilience to various degradations that are 
+typical of the real, world conditions: severe 
+compression, noise, and low resolution. Such 
+sturdiness plus the multimodality feature altogether 
+evoke the notion of a significant breakthrough in the 
+arsenal of combating the attacks where the adversaries 
+are hard to spot because of their trickery in the visuals 
+as well as in the auditory fakes. 
+However, it really isn't the story's end. In fact, several 
+avenues of the project are worth exploring. 
+Replacing the current transformer blocks with lighter 
+versions (or even hybrid recurrent, transformer blocks) 
+might be a way to increase the length of dependencies 
+without drastically increasing the inference time. 
+Ensuring that the audio and video tell compatible 
+stories thus cross, modal consistency seems like a ripe 
+avenue for detecting even more sophisticated attacks. 
+ 
+Perhaps, adversarial training would almost certainly be 
+a weapon against evasion attempts, and adding better 
+explainability (beyond just attention maps) would 
+make outputs easier for non, experts to trust and audit. 
+ 
+More generally, we want to delve into federated 
+learning configurations to train on decentralized, 
+privacy, preserving data sources, to continue to 
+overcoming dataset biases through more diverse 
+collection and augmentation, and to figure out the 
+whole pipeline to work for an edge device or large, 
+scale cloud deployment. 
+The big picture here is the creation of non, static 
+defenses, systems that are able to adjust when new 
+generative models (diffusion, based, multimodal large 
+models, etc.) keep being released. It is definitely a race 
+for superiority, but with smart engineering and 
+maintaining the collaboration across the different 
+fields, we can be the ones leading instead of always 
+being one step behind. 
+ 
+ 
+ 
+ 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:43:39 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 7 ---
+
+REFERENCE: 
+[1] Goodfellow, I. J., Pouget-Abadie, J., Mirza, M., Xu, 
+B., Warde-Farley, D., Ozair, S., Courville, A., & 
+Bengio, Y. (2014). Generative adversarial nets. In 
+Advances in Neural Information Processing Systems 
+(NeurIPS) (pp. 2672–2680). Montreal, QC, Canada. 
+[2] Rössler, A., Cozzolino, D., Verdoliva, L., Riess, C., 
+Thies, J., & Nießner, M. (2019). FaceForensics++: 
+Learning to detect manipulated facial images. In 
+Proceedings of the IEEE International Conference on 
+Computer Vision (ICCV) (pp. 1–11). Seoul, South 
+Korea. 
+[3] Li, Y., Yang, X., Sun, P., Qi, H., & Lyu, S. (2020). 
+Celeb-DF: A large-scale challenging dataset for 
+deepfake forensics. In Proceedings of the IEEE 
+Conference on Computer Vision and Pattern 
+Recognition (CVPR) (pp. 3207–3216). Seattle, WA, 
+USA. 
+[4] Dolhansky, B., Howes, R., Pflaum, B., Baram, N., 
+& Ferrer, C. (2020). The Deepfake Detection 
+Challenge (DFDC) dataset. In Proceedings of the IEEE 
+Conference on Computer Vision and Pattern 
+Recognition (CVPR) (pp. 1–6). Seattle, WA, USA. 
+[5] Güera, D., & Delp, E. J. (2018). Deepfake video 
+detection using recurrent neural networks. In 
+Proceedings of the IEEE International Conference on 
+Advanced Video and Signal Based Surveillance (AVSS) 
+(pp. 1–6). Auckland, New Zealand. 
+[6] Li, Y., Chang, M.-C., & Lyu, S. (2018). In Ictu 
+Oculi: Exposing AI generated fake face videos by 
+detecting eye blinking. In Proceedings of the IEEE 
+International Workshop on Information Forensics and 
+Security (WIFS) (pp. 1–7). Hong Kong. 
+[7] He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep 
+residual learning for image recognition. In Proceedings 
+of the IEEE Conference on Computer Vision and 
+Pattern Recognition (CVPR) (pp. 770–778). Las 
+Vegas, NV, USA. 
+[8] Tan, M., & Le, Q. (2019). EfficientNet: Rethinking 
+model scaling for convolutional neural networks. In 
+Proceedings of the International Conference on 
+Machine Learning (ICML) (pp. 6105–6114). Long 
+Beach, CA, USA. 
+[9] Chollet, F. (2017). Xception: Deep learning with 
+depthwise separable convolutions. In Proceedings of 
+the IEEE Conference on Computer Vision and Pattern 
+Recognition (CVPR) (pp. 1251–1258). Honolulu, HI, 
+USA. 
+[10] Hochreiter, S., & Schmidhuber, J. (1997). Long 
+short-term memory. Neural Computation, 9(8), 1735–
+1780. 
+ 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:43:39 UTC from IEEE Xplore.  Restrictions apply. 

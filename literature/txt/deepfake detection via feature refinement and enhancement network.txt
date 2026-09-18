@@ -1,0 +1,1289 @@
+
+
+--- PAGE 1 ---
+
+ 
+Contents lists available at ScienceDirect
+Image and Vision Computing
+journal homepage: www.elsevier.com/locate/imavis
+ 
+Deepfake detection via Feature Refinement and Enhancement Network
+Weicheng Song a,1, Siyou Guo a,1, Mingliang Gao a
+,∗, Qilei Li b,c, Xianxun Zhu d,∗, Imad Rida e
+a School of Electrical and Electronic Engineering, Shandong University of Technology, Zibo, 255000, Shandong, China
+b Faculty of Artificial Intelligence in Education, Central China Normal University, Wuhan, 430079, Hubei, China
+c National Engineering Laboratory for Educational Big Data, Central China Normal University, Wuhan, 430079, Hubei, China
+d School of Communication and Information Engineering, Shanghai University, Shanghai, China
+e Laboratoire Biomécanique et Bioingénierie UMR 7338, Centre de Recherches de Royallieu, Université de Technologie de Compiègne, Compiègne, France
+A R T I C L E  I N F O
+Keywords:
+Privacy preservation
+Deepfake detection
+Model generalization
+Feature enhancement
+ 
+A B S T R A C T
+The rapid advancement of deepfake technology poses significant threats to the integrity and privacy of 
+biometric systems, such as facial recognition and voice authentication. To address this issue, there is an urgent 
+need for advanced forensic detection methods that can reliably safeguard biometric data from manipulation and 
+unauthorized access. However, current methods mainly focus on shallow feature extraction and neglect feature 
+refinement and enhancement, which leads to low detection accuracy and poor generalization performance. 
+To address this problem, we propose Feature Refinement and Enhancement Network (FRENet) for deepfake 
+detection by leveraging progressive refinement and enhanced mixed feature learning. Specifically, a Low 
+Rank Projected Self-Attention (LPSA) module is introduced for the refinement and enhancement of features. 
+Also, a Patch-based Focused (PatchFocus) module is proposed to highlight local texture inconsistencies in 
+key regions. In addition, we propose a Refine Fusion (RefFus) module that integrates the refined features 
+and associated noise information to enhance feature separability. Experimental results across five benchmark 
+datasets demonstrate that the proposed FRENet outperforms state-of-the-art methods in terms of both accuracy 
+and generalization. The code is available at https://github.com/weichengsong-code/FRENet.
+1. Introduction
+Biometric authentication, such as facial, fingerprint, and voice 
+recognition, has become widely used in everyday smart devices. These 
+technologies provide users with efficient and secure access to digital 
+services. However, the growing reliance on biometric systems has 
+also increased their exposure to sophisticated security threats [1,2]. 
+In particular, recent advances in generative adversarial networks and 
+diffusion models [3,4] have greatly improved the realism and diver-
+sity of facial forgeries. As a result, distinguishing between authentic 
+and manipulated biometric data has become increasingly challeng-
+ing. This raises serious concerns about the security and reliability of 
+biometric authentication systems in the face of emerging deepfake 
+technologies [5].
+Recent studies have shown that deepfake attacks can successfully 
+bypass state-of-the-art facial recognition systems, which pose serious 
+threats such as unauthorized access, identity theft, and privacy inva-
+sion [6,7]. In addition, multiple reports have documented incidents of 
+financial fraud and misinformation campaigns driven by deepfake tech-
+nology, which have caused significant economic and societal harm [8]. 
+∗Corresponding authors.
+E-mail addresses: 24404020559@stumail.sdut.edu.cn (W. Song), 23504030565@stumail.sdut.edu.cn (S. Guo), mlgao@sdut.edu.cn (M. Gao), 
+qilei.li@ccnu.edu.cn (Q. Li), zhuxianxun@shu.edu.cn (X. Zhu), imad.rida@utc.fr (I. Rida).
+1 Authors contributed equally.
+To ensure the security and reliability of identity authentication systems, 
+various detection techniques [9,10] have been developed. For example, 
+Rahim et al. [11] proposed a privacy-preserving image retrieval method 
+for mobile devices using deep features on the cloud.
+Current deepfake detection methods primarily focus on either the 
+spatial or frequency domains. In the spatial domain, Zhang et al. [12] 
+proposed a union-saliency adversarial attack method to disrupt the 
+functioning of deepfake generation models. This method targets the 
+saliency regions of the generated content. It applies subtle adversarial 
+perturbations that confuse the ability of the deepfake model to generate 
+realistic forgeries. Xu et al. [13] introduced a reconstruction learning 
+method that fuses gradient and content features for enhanced deepfake 
+detection. Chen et al. [14] proposed a deepfake detection method that 
+focuses on subtle spatial manipulation features. The model uses spatial 
+attention to identify key forged areas and temporal consistency to rec-
+ognize forgeries across frames. In the frequency domain, Luo et al. [15] 
+proposed a multi-scale high-frequency feature extraction method to im-
+prove the generalization ability of face forgery detection across diverse 
+datasets. Tian et al. [16] introduced a frequency-aware attentional 
+https://doi.org/10.1016/j.imavis.2025.105663
+Received 19 May 2025; Received in revised form 29 June 2025; Accepted 6 July 2025
+Image and Vision Computing 162 (2025) 105663 
+Available online 24 July 2025 
+0262-8856/© 2025 Published by Elsevier B.V. 
+
+
+--- PAGE 2 ---
+
+W. Song et al.
+feature fusion method, which captures frequency anomalies induced by 
+image manipulations. Tan et al. [17] proposed a frequency-aware deep-
+fake detection method to enhance generalization capabilities. However, 
+frequency domain methods encounter challenges when processing sub-
+tle forged images, as the weakened frequency information in these 
+images reduces their accuracy.
+To further improve the accuracy rate of deepfake detection, numer-
+ous studies have adopted a combination of spatial and frequency do-
+mains. Liu et al. [18] proposed a Spatial-Phase Shallow Learning (SPSL) 
+method to capture subtle frequency anomalies by fusing spatial and 
+frequency domain features. This method identifies forgery traces that 
+are often overlooked by amplitude spectrum methods [19,20]. How-
+ever, SPSL directly conducts detection by fusing spatial features and 
+frequency features, which lacks further analysis of complex features. 
+Consequently, there is still considerable room for improvement in 
+generalization and accuracy.
+In this work, we propose a deepfake detection model termed Fea-
+ture Refinement and Enhancement Network (FRENet) to improve the 
+generalization ability by refining and enhancing the feature. FRENet 
+integrates three key modules to support progressive feature enhance-
+ment. The Low Rank Projected Self-Attention (LPSA) module refines 
+and enhances global features through a self-attention mechanism. The 
+Patch-based Focused (PatchFocus) module applies localized attention 
+to capture fine-grained texture features and subtle inconsistencies. This 
+allows the proposed model to focus on key regions that are most 
+susceptible to forgery. To further boost discriminative capability, the 
+Refine Fusion (RefFus) module aggregates the refined features and asso-
+ciated noise information. This fusion enhances feature separability and 
+facilitates more accurate discrimination between real and fake content. 
+The main contributions of this paper are summarized as follows:
+• We propose the FRENet model to enhance generalization by 
+refining features and improving the model for detecting subtle 
+forgery traces.
+• We propose an LPSA module to enhance feature representation 
+by emphasizing distinctions between real and forged content. 
+This module guides the model to focus on subtle yet informative 
+discrepancies. Additionally, a PatchFocus module is built to con-
+centrate attention on key regions prone to manipulation, and it 
+can improve the accuracy of the forgery artifact detection.
+• We introduce a RefFus module that fuses the refined features and 
+associated noise information to enhance feature separability and 
+improve discriminative performance.
+The remainder of this paper is structured as follows. Section 2 
+provides an overview of related work in deepfake detection. Section 3 
+describes the FRENet framework. Section 4 presents the experimental 
+setup and results. Section 5 concludes the paper.
+2. Related work
+In recent years, deepfake detection has received increasing atten-
+tion due to the rapid advancement of generative techniques. Various 
+methods have been proposed, which can be categorized as spatial-
+frequency domain fusion-based methods, feature Enhancement and 
+refinement-based methods, and local attention-based methods.
+2.1. Deepfake detection based on spatial-frequency domain fusion
+Early detection methods primarily focused on inconsistencies within 
+the spatial domain and abrupt transitions in the frequency domain. 
+For example, Rössler et al. [21] introduced a forgery detection net-
+work based on the Xception architecture. It uses depthwise separable 
+convolutions to capture local and global patterns, which helps detect 
+subtle deepfake artifacts. Li et al. [22] incorporated frequency-domain 
+analysis and identified fusion boundaries in images to detect subtle 
+artifacts.
+To combine the advantages of both spatial and frequency domains, 
+Zhai et al. [23] proposed a dual-stream frequency-spatial fusion net-
+work that combines spatial and frequency-domain information to im-
+prove deepfake detection. However, the method may incur significant 
+computational costs due to the simultaneous processing of two distinct 
+streams. Meanwhile, Zheng et al. [24] introduced a spatial-frequency 
+cross-fusion model. However, the model may experience performance 
+degradation when processing noisy or low-quality data. Yi et al. [25] 
+proposed a deepfake detection method, termed Spatial-Frequency Fea-
+ture Integration (SFIAD), to fuse spatial and frequency domain features 
+and uses dynamic boundary optimization. While it improves detection 
+accuracy on multiple datasets, it still faces challenges in handling 
+highly compressed or low-quality images. Liu et al. [18] introduced 
+the Spatial-Phase Shallow Learning (SPSL) method. The method demon-
+strates computational efficiency, requiring less processing power than 
+more complex models. However, its performance remains suboptimal in 
+complex environments. This issue is mainly attributed to limited feature 
+extraction capabilities and a lack of comprehensive understanding of 
+fine-grained details. Consequently, the design of a feature enhancement 
+module is essential for refining and strengthening the generalization of 
+the detector.
+2.2. Deepfake detection based on feature enhancement and refinement
+With the continuous advancement of deepfake technology, tradi-
+tional detection methods face growing challenges in accurately iden-
+tifying high-quality forged images. These forgeries often exhibit fewer 
+visual artifacts and maintain strong semantic consistency. To address 
+these limitations, recent research has increasingly focused on feature 
+enhancement and refinement techniques. These methods aim to im-
+prove the ability of the model to capture subtle and complex differ-
+ences between real and fake content. Strategies such as multi-scale 
+feature extraction and frequency-domain representations enhance the 
+quality and discriminability of learned features. These improvements 
+lead to greater robustness and accuracy in deepfake detection across 
+diverse scenarios. For example, Zhao et al. [26] proposed a multi-
+attentional deepfake detection network with feature enhancement to 
+improve discriminative representation. Their method integrates multi-
+scale attention with enhanced feature fusion to effectively boost de-
+tection performance in complex forgery scenarios. Zhou et al. [27] 
+proposed a frequency-aware method to improve forgery detection by 
+fusing spatial and frequency components. Lai et al. [28] introduced 
+a multi-feature fusion method for deepfake video detection, which 
+extracts features from the spatial, frequency, local gravity pattern, 
+and time domains. Qiu et al. [29] proposed the d2fusion model that 
+enhances deepfake detection by fusing spatial and frequency domain 
+features with attention mechanisms. The method uses feature superpo-
+sition and phase updating to improve the differentiation between real 
+and forged content. Additionally, Lin et al. [30] developed a detection 
+method that uses convolutional neural networks to improve detection 
+accuracy by using multiscale feature extraction. This method captures 
+subtle inconsistencies across various levels of image detail, thereby 
+improving the sensitivity of the model to complex forgeries.
+2.3. Deepfake detection based on local attention
+Attention mechanisms play a crucial role in deepfake detection. 
+They can guide models to focus on the most informative regions of an 
+image, thereby improving the identification of manipulated content. By 
+assigning greater importance to salient features, attention mechanisms 
+enhance the capacity of the model to capture subtle inconsistencies 
+introduced during the forgery process. This targeted representation 
+improves the accuracy and robustness of detecting both local and global 
+artifacts.
+Several studies have explored different attention-based strategies 
+to enhance deepfake detection performance. Luong et al. [31] pro-
+posed cross-modal attention to focus on the most relevant information 
+Image and Vision Computing 162 (2025) 105663 
+2 
+
+
+--- PAGE 3 ---
+
+W. Song et al.
+across different modalities and improve the performance of deepfake 
+detection. Han et al. [32] proposed a facial feature-guided adaptation 
+method to promote the model to pay attention to areas most susceptible 
+to manipulation. Waseem et al. [33] proposed a multi-attention-based 
+approach that focuses on detecting and localizing fake faces and ex-
+pression manipulations. By employing multiple attention mechanisms, 
+the method effectively captures diverse features across different facial 
+regions. This improves the detection accuracy of both subtle manip-
+ulations and large-scale forgeries. Lu et al. [34] proposed the Hybrid 
+Attention Module with Attention Elimination for fine-grained image 
+classification. This method enhances important regions and eliminates 
+irrelevant areas to improve accuracy. Qiu et al. [35] proposed the 
+boundary-enhanced local–global collaborative network, which com-
+bines local and global feature extraction with a boundary-focused 
+decoder.
+Overall, these approaches have achieved promising results on spe-
+cific benchmarks. However, many existing methods struggle to gen-
+eralize across different datasets and forgery types. Their performance 
+often degrades in cross-domain scenarios due to overfitting or limited 
+feature representation. This highlights the need for more robust and 
+transferable detection models. In this context, our study introduces 
+FRENet, a modular framework designed to enhance feature quality and 
+improve generalization in deepfake detection.
+3. Proposed method
+3.1. Overall framework
+The overall architecture of the FRENet method is illustrated in Fig. 
+1(a). The process begins with the input image being processed by 
+PhaseNet, which reconstructs the image based on phase information 
+extracted via Fast Fourier Transform (FFT). This phase information 
+helps capture the underlying structure and frequency characteristics 
+of the image. After reconstructing the image, the Inverse Fast Fourier 
+Transform (IFFT) is applied to fuse the reconstructed image with the 
+original input. This fusion enhances both structural and frequency-
+based features and improves the robustness and quality of the final 
+image representation. The fused output is passed to the Xception net-
+work [21]. Xception employs depthwise separable convolutions and 
+residual connections to efficiently extract high-level features. Subse-
+quently, the features undergo refinement via the LPSA module. The 
+primary role of LPSA is to reduce the correlation between real and fake 
+features, which enables the model to better distinguish genuine content 
+from manipulations.
+Additionally, a PatchFocus module is incorporated to guide FRENet 
+in focusing on local details within the image, especially those areas 
+likely to contain manipulation artifacts. This ensures that the model 
+focuses on regions where forgery traces are most prominent, thereby 
+enhancing its detection capabilities. The local attention mechanism 
+is further refined through SoftPooling operations and convolutional 
+layers, which ensure that the focus on critical regions is accurate and 
+efficient. The RefFus module is then used to fuse the refined features 
+with injected noise information. This noise injection enhances the 
+separability of features, which enables the model to more effectively 
+distinguish between real and fake content. It functions as a regular-
+ization technique that improves the generalization of the model across 
+diverse forgery types and varying conditions. Finally, a Multi-Layer 
+Perceptron (MLP) classifier is employed to make the final distinction 
+between real and fake images.
+3.2. Low rank projected self-attention module
+To improve generalization across diverse scenarios, we propose a 
+Low Rank Projected Self-Attention (LPSA) module. It is illustrated in 
+Fig. 1(c). This mechanism captures fine-grained interactions within the 
+mixed features extracted from the input image. The input features, 
+denoted as 𝐹∈R𝐵×𝐶×𝐻×𝑊, consist of a mixture of identity and forgery 
+features.
+These mixed features are projected into a lower-dimensional em-
+bedding space using low-rank linear transformations. These transfor-
+mations generate compact yet expressive query 𝑄, key 𝐾, and value 𝑉
+representations: 
+𝑄= 𝑊𝑄𝐹, 𝐾= 𝑊𝐾𝐹, 𝑉= 𝑊𝑉𝐹,
+(1)
+where 𝑊𝑄∈R𝑑𝑞×𝐶, 𝑊𝐾∈R𝑑𝑘×𝐶, 𝑊𝑉∈R𝑑𝑣×𝐶, are learnable projection 
+matrices. 𝑑𝑞, 𝑑𝑘, and 𝑑𝑣 represent the dimensions of the query, key, and 
+value embeddings, respectively.
+Subsequently, the self-attention is computed to capture the corre-
+lations across different semantic aspects of the features. Specifically, 
+the attention scores quantify how significantly each region in artifact 
+features influences the corresponding region in identity features. The 
+self-attention operation is formulated as: 
+𝐹𝑆= softmax(𝑄𝐾𝑇
+√
+𝑑𝑘
+)𝑉,
+(2)
+where the scaling factor 
+√
+𝑑𝑘 stabilizes gradients during training. This 
+operation aggregates relevant artifact information to enrich the iden-
+tity representations. It strengthens the discriminative capability of the 
+features by capturing subtle manipulation traces. These include texture 
+inconsistencies, boundary artifacts, and frequency abnormalities. As a 
+result, the model gains an improved ability to distinguish real content 
+from forgeries. The enriched features also enhance the robustness of 
+the model under varied forgery conditions and unseen data.
+3.3. Patch-based focused module
+To effectively highlight informative local features, we introduce a 
+local attention mechanism specifically tailored for deepfake detection 
+tasks. The architecture of this mechanism is illustrated in Fig. 2. Distinct 
+from traditional pooling methods, the local attention module adopts a 
+Patch strategy that adaptively assigns local weights. This mechanism 
+enables the model to concentrate on spatially important regions with 
+greater precision.
+The input features are projected through a 1 × 1 convolution into 
+a compact representation. This projection reduces both the dimen-
+sionality and the computational complexity. Subsequently, the Patch 
+operation aggregates local information using exponential weighting. 
+This approach ensures smooth feature transitions and facilitates the 
+capture of discriminative spatial patterns.
+The local attention module is represented as: 
+𝑊= 𝜎(𝐶𝑜𝑛𝑣3×3(𝑃(𝐶𝑜𝑛𝑣1×1(𝐹𝑆))),
+(3)
+where 𝐹𝑆 denotes the input feature maps, 𝜎(⋅) indicates the sigmoid 
+activation, and 𝑃(⋅) is defined explicitly as: 
+𝑃(𝐹𝑆) = SoftPool(𝐹𝑆⋅𝑒𝐹𝑆)
+SoftPool(𝑒𝐹𝑆)
+,
+(4)
+where SoftPool(⋅) refers to a soft pooling operation based on average 
+pooling in a local window. The term 𝑒𝐹𝑆 acts as an exponential atten-
+tion weight. This design increases the influence of features with larger 
+values. As a result, 𝑃(𝐹𝑆) highlights distinctive local characteristics and 
+promotes the selection of informative features. The network can thus 
+focus more on important regions in the feature maps.
+In addition, we incorporate an auxiliary gating mechanism to fur-
+ther refine the attention. The gating mechanism adaptively recali-
+brates the importance of the features by selectively emphasizing critical 
+spatial locations while attenuating redundant or noisy information. 
+Specifically, the gating function utilizes the first feature channel to 
+generate a refined importance map. This approach leverages the inher-
+ent representative strength of the channel as a simplified yet powerful 
+gating reference. The gating operation is formulated as follows: 
+𝑔= 𝑆𝑁(𝐶𝑜𝑛𝑣1×1(𝐹𝑆[∶, 1, ∶, ∶])),
+(5)
+Image and Vision Computing 162 (2025) 105663 
+3 
+
+
+--- PAGE 4 ---
+
+W. Song et al.
+Fig. 1. Overview of the FRENet model for deepfake detection.
+Fig. 2. Framework of the PatchFocus module.
+where 𝐶𝑜𝑛𝑣1×1(⋅) performs a convolution to refine the feature map, and 
+𝑆𝑁(⋅) provides a smooth nonlinear mapping to constrain the gating 
+values between 0 and 1. This adaptive gating not only suppresses ir-
+relevant details but also dynamically emphasizes pertinent information 
+critical for distinguishing genuine and forged patterns. Consequently, 
+the refined attention feature maps are obtained by integrating the 
+attention weight and gating factor 𝑔 with the original input 𝐹𝑠. The 
+output formula of the PatchFocus module is expressed as: 
+𝐹𝑒= 𝐹𝑆⋅𝑊⋅𝑔,
+(6)
+The proposed local attention module incorporates a combined
+patch-based mechanism and an enhanced gating strategy. This design 
+enables the model to emphasize subtle yet critical local differences 
+that are highly relevant to deepfake detection. By focusing on these 
+fine-grained local variations, the module captures manipulation cues 
+that may be overlooked by global feature extractors. As a result, 
+the discriminative power of the learned features is significantly im-
+proved. Additionally, the enhanced attention to local inconsistencies 
+contributes to greater model robustness across various forgery types 
+and manipulation scenarios.
+3.4. Refine fusion module
+The RefFus module employs residual connections to integrate re-
+fined features, followed by the injection of noise information to im-
+prove generalization across diverse forgery scenarios. The overall
+framework is illustrated in Fig. 1(d). It enhances the ability of the 
+model to capture the complex relationships between identity and 
+forged artifact features. Residual connections help alleviate the problem 
+of vanishing gradients and facilitate better information flow during 
+training.
+In the RefFus module, convolutional residual connections are ap-
+plied to the refined features after the self-attention operation. The 
+residual convolution operation is formulated as follows: 
+𝐹′
+𝑒= 𝐹+ 𝐶𝑜𝑛𝑣1×1(𝐹𝑒),
+(7)
+where 𝐶𝑜𝑛𝑣1×1(⋅) represents a convolutional operation. The 1 × 1 con-
+volution operation on an input feature map 𝐹𝑒∈R𝐶×𝐻×𝑊 is formulated 
+as: 
+𝐶𝑜𝑛𝑣1×1(𝐹𝑒) = 𝑊𝑐⋅𝐹𝑒+ 𝑏𝑐,
+(8)
+where 𝑊𝑐∈R𝐶′×𝐶×1×1 denotes the convolution kernel, 𝑏𝑐∈R𝐶′ is the 
+bias term. Specifically, the 1 × 1 convolution serves two main purposes. 
+First, it adaptively recalibrates channel-wise feature representations, 
+thereby enhancing the ability of the model to capture salient infor-
+mation. Second, it provides dimensionality preservation and feature 
+transformation without changing spatial dimensions, thereby facilitat-
+ing effective fusion of residual information. The final residual-enhanced 
+features 𝐹′
+𝑒 is formulated as: 
+𝐹′
+𝑒(𝑐, ℎ, 𝑤) = 𝐹𝑒+
+𝐶
+∑
+𝑐′=1
+𝑊𝑐(𝑐, 𝑐′, 1, 1) ⋅𝐹(𝑐′, ℎ, 𝑤) + 𝑏𝑐(𝑐),
+(9)
+where 𝑐 indicates the channel index, and (ℎ, 𝑤) are spatial coordinates 
+within the feature map.
+To enhance the robustness and generalization of the proposed 
+method, Gaussian noise is injected into the refined features to obtain 
+mixed noise characteristics 𝐹𝑁. This enables the model to prevent 
+overfitting and increases its resilience to subtle feature variations 
+typically encountered in facial authentication scenarios. Specifically, 
+the noise-equipped identity features are computed as follows: 
+𝐹𝑁= (1 −𝐹′
+𝑒) ⊙𝐹+ 𝐹′
+𝑒⊙𝜖𝐹,
+(10)
+where 𝜖𝐹∼𝑁(𝜇𝑋𝐹, 𝜎2
+𝑋𝐹) represents Gaussian noise. Here, ⊙ denotes 
+the element-wise product. The introduced noise effectively perturbs 
+the feature maps, which prevents the model from focusing excessively 
+on dataset-specific characteristics or irrelevant details and promotes 
+robustness while improving generalization across unseen datasets.
+The enhanced features undergo an additional convolutional step to 
+consolidate their representations into more discriminative embeddings 
+Image and Vision Computing 162 (2025) 105663 
+4 
+
+
+--- PAGE 5 ---
+
+W. Song et al.
+suitable for the final classification stage. The corresponding expression 
+is formulated as follows: 
+𝐹′
+𝑁= 𝐶𝑜𝑛𝑣1×1(𝐹𝑁).
+(11)
+The proposed method includes a structured feature fusion and noise 
+injection module. This design strengthens its ability to distinguish 
+between real and fake features. The module integrates refined feature 
+representations with controlled noise signals. This process enhances the 
+separability between authentic and manipulated content. The injected 
+noise acts as a regularization factor and helps reduce overfitting to 
+specific patterns. It also improves the generalization of the model to 
+various types of forgery.
+4. Experimental results and analysis
+4.1. Implementation details
+In this work, we use the Adam [36] optimizer and configure the 
+optimizer with 𝛽1 = 0.9, 𝛽2 = 0.999, 𝜖= 1 × 10−8, and a weight decay of 
+0.0005. The learning rate is set to 2×10−4 and the batch size is 32. We 
+resize all input images to 256 × 256 pixels and normalize the images 
+using a mean and standard deviation of [0.5, 0.5, 0.5]. The backbone is 
+the official Xception model. We initialize the model weights with pa-
+rameters pre-trained on the ImageNet dataset and adopt cross-entropy 
+loss as the objective function. Several data augmentation strategies are 
+adopted, for example, random horizontal flip with a probability of 0.5, 
+random rotation in the angle range of [−10◦, 10◦], and random Gaussian 
+blur with a probability of 0.5. The JPEG compression quality is uni-
+formly sampled between 40 and 100. All experiments are carried out 
+using the PyTorch library [37]. We conduct the training and evaluation 
+on two NVIDIA 3090 Ti GPUs. The training runs for 10 epochs. We set 
+the random seed to 1024 to ensure reproducibility.
+4.2. Datasets
+The experiments were trained in the FaceForensics ++ (FF ++) [21] 
+dataset and evaluated on five benchmark datasets, which include 
+FF++[21], Celeb-DF-v1 [38], Celeb-DF-v2 [38], DFDCP [39], and 
+FaceShifter [40].
+The FF++ dataset is a comprehensive resource for training and eval-
+uating deep learning models in facial manipulation detection. It con-
+tains 1000 original videos which includes 4000 forged videos generated 
+using four representative facial forgery techniques, namely DeepFakes 
+(DF), Face2Face (F2F), FaceSwap (FS), and NeuralTextures (NT). In 
+total, the dataset contains over 1.8 million manipulated images, which 
+are extracted video frames.
+The Celeb-DF-v1 dataset contains 795 real videos featuring 59 
+celebrity subjects, along with 5639 high-quality deepfake videos. This 
+dataset incorporates early deepfake generation methods, such as neural 
+network-based facial synthesis and blending.
+The Celeb-DF-v2 provides high-resolution videos with an equal dis-
+tribution of real and fake content, generated using advanced deepfake 
+techniques. This makes the dataset a valuable benchmark for testing 
+and improving deepfake detection methods.
+The DFDCP dataset comprises high-quality real and manipulated 
+videos generated using diverse facial forgery techniques. It emphasizes 
+realism by including variations in lighting conditions, camera angles, 
+and video resolutions. These characteristics render the dataset suitable 
+for training and benchmarking robust deepfake detection models under 
+practical conditions.
+The FaceShifter dataset provides highly realistic face-swapping ex-
+amples with minimal visual artifacts. It ensures consistency in lighting 
+conditions, background alignment, and facial identity preservation.
+4.3. Evaluation metrics
+The proposed model is evaluated using four standard binary classi-
+fication metrics, namely Area Under the Curve (AUC), Accuracy (ACC), 
+Average Precision (AP), and Equal Error Rate (EER). These metrics 
+provide a comprehensive assessment of the detection performance of 
+the model from different perspectives. The AUC measures the ability of 
+the model to distinguish between real and fake samples. It reflects the 
+probability that the model correctly ranks a randomly chosen positive 
+sample higher than a negative one. A higher AUC value indicates better 
+separability between classes. The ACC quantifies the proportion of 
+correctly classified samples over the total number of samples. It pro-
+vides an overall measure of the effectiveness of the model in detecting 
+deepfakes. The AP evaluates the trade-off between precision and recall 
+across various decision thresholds. It is particularly useful for assessing 
+the performance of the model in imbalanced classification scenarios. 
+The EER represents the point at which the false acceptance rate equals 
+the false rejection rate. A lower EER indicates better balance and 
+reliability in classification, especially in biometric and security-related 
+tasks.
+4.4. Experiments and discussion
+4.4.1. Cross-testing
+To evaluate the generalization and robustness of the proposed 
+FRENet approach, we conducted cross-dataset testing. The model was 
+trained on the FF++ dataset and tested on four additional datasets, 
+namely Celeb-DF-v1, Celeb-DF-v2, DFDCP, and FaceShifter. These
+datasets provide a diverse range of deepfake content, which ensures 
+that the evaluation covers a variety of forgery types, generation meth-
+ods, and image qualities. The detailed results and comparisons are 
+presented in Table 1. It proves that the FRENet outperforms other 
+competitors in the four datasets. Specifically, compared to the baseline 
+model, SPSL, the FRENet improves the AUC by 8.56%, 5.1%, 3.62%, 
+10.5% in the Celeb-DF-v1, Celeb-DF-v2, DFDCP, and FaceShifter, re-
+spectively. Meanwhile, it achieves an average increase of 5. 13% 
+compared to SPSL.  Additionally, some competing methods show signif-
+icant decreases in certain datasets. In contrast, FRENet maintains more 
+stable AUC scores on all benchmarks. This stability indicates a strong 
+robustness against domain shift and various forgery techniques.
+To further validate the superiority of the proposed method, the 
+FRENet model was trained on the FF++ dataset and evaluated on four 
+widely recognized benchmark datasets, namely Celeb-DF-v1, Celeb-
+DF-v2, DFDCP, and FaceShifter. Three key evaluation metrics, ACC, 
+AP, and EER, were employed. These metrics provide a comprehensive 
+assessment of the performance of the model in terms of both classi-
+fication accuracy and its ability to distinguish between authentic and 
+manipulated content. The results are presented in Table 2. It shows 
+that FRENet consistently outperforms the baseline model across all 
+evaluation metrics on the four datasets. In particular, the improvements 
+in ACC, AP, and EER further emphasize the effectiveness of FRENet 
+in detecting facial forgeries, regardless of the dataset or the specific 
+manipulation techniques employed. This reinforces the robustness and 
+generalization of the model, which confirms that FRENet is a highly 
+effective solution for deepfake detection across a wide range of datasets 
+and conditions.
+4.4.2. Intra-testing
+The intra-dataset evaluation demonstrates the overall effectiveness 
+and stability of FRENet across multiple types of deepfake generation 
+techniques. Table 3 provides a detailed comparison of FRENet with 
+several state-of-the-art deepfake detection methods under intra-dataset 
+settings. All models are trained and tested on the FF++ dataset and 
+its subsets, including DF, F2F, FS, and NT. FRENet achieves the high-
+est AUC scores in the FS and F2F subsets, exceeding the next-best 
+method by 0.09% and 0.16%, respectively. These results highlight 
+Image and Vision Computing 162 (2025) 105663 
+5 
+
+
+--- PAGE 6 ---
+
+W. Song et al.
+Table 1
+Comparative results on the cross-testing experiment. The training dataset is the FF++ dataset, and the metric is AUC. The best results are highlighted in bold.
+ Methods
+Venue/Year
+Celeb-DF-v1
+Celeb-DF-v2
+DFDCP
+FaceShifter
+Avg. 
+ MesoIncep [41]
+IEEE WIFS 2018
+0.7366
+0.6966
+0.7561
+0.6438
+0.7083 
+ EfficientB4 [42]
+PMLR 2019
+0.7909
+0.7487
+0.7283
+0.6162
+0.7210 
+ Capsule [43]
+IEEE 2019
+0.7909
+0.7472
+0.6568
+0.6465
+0.7104 
+ FWA [44]
+CVPRW 2019
+0.7897
+0.6680
+0.6375
+0.5551
+0.6626 
+ CNN-Aug [45]
+CVPR 2020
+0.7420
+0.7027
+0.6170
+0.5985
+0.6651 
+ FFD [46]
+CVPR 2020
+0.7840
+0.7435
+0.7426
+0.6056
+0.7189 
+ F3Net [47]
+ECCV 2020
+0.7769
+0.7352
+0.7354
+0.5914
+0.7097 
+ SPSL [18]
+CVPR 2021
+0.8150
+0.7650
+0.7408
+0.6437
+0.7411 
+ SRM [15]
+CVPR 2021
+0.7986
+0.7552
+0.7408
+0.6014
+0.7225 
+ CORE [48]
+CVPR 2022
+0.7798
+0.7428
+0.7341
+0.6032
+0.7150 
+ Recce [49]
+CVPR 2022
+0.7677
+0.7319
+0.7419
+0.6095
+0.7128 
+ VGG19 [50]
+IEEE BigData 2024
+0.7931
+0.7667
+0.7076
+–
+–
+ 
+ ADA-FInfer [51]
+IEEE TDSC 2024
+–
+0.7610
+–
+–
+–
+ 
+ SFIAD [25]
+Artif. Intell. Rev. 2025
+0.8840
+0.7900
+0.7588
+–
+–
+ 
+ SFE-Net [52]
+IEEE ICASSP 2025
+0.8660
+0.7980
+0.7600
+–
+–
+ 
+ CAFMF [53]
+IEEE ICCRD 2025
+0.8090
+0.7758
+–
+0.6575
+–
+ 
+ FRENet (Ours)
+–
+0.8848
+0.8040
+0.7696
+0.7114
+0.7924 
+Table 2
+Comparative results between the FRENet and baseline (SPSL). The training dataset is the FF++ dataset, and the metrics are ACC, AP, and EER. The best results are highlighted 
+in bold.
+ 
+Celeb-DF-v1
+Celeb-DF-v2
+DFDCP
+FaceShifter
+ 
+ACC↑
+AP↑
+EER↓
+ACC↑
+AP↑
+EER↓
+ACC↑
+AP↑
+EER↓
+ACC↑
+AP↑
+EER↓ 
+ Baseline
+0.7091
+0.8910
+0.2543
+0.6686
+0.8555
+0.2998
+0.6876
+0.8214
+0.3341
+0.6392
+0.6822
+0.3549 
+ FRENet (Ours)
+0.7630
+0.9214
+0.1862
+0.7465
+0.8776
+0.2802
+0.7106
+0.8492
+0.3053
+0.6412
+0.6868
+0.3471 
+Table 3
+Comparative results on the intra-testing experiment. The training dataset is the FF++ dataset, and the metric is AUC. The best and second-best results are highlighted in bold and 
+underlined, respectively.
+ Methods
+Venue/Year
+FF++
+DF
+F2F
+FS
+NT
+Avg. 
+ MesoIncep [41]
+IEEE WIFS 2018
+0.7583
+0.8542
+0.8087
+0.7421
+0.6517
+0.7630 
+ EfficientB4 [42]
+PMLR 2019
+0.9567
+0.9757
+0.9758
+0.9797
+0.9308
+0.9637 
+ Capsule [43]
+IEEE 2019
+0.8421
+0.8669
+0.8634
+0.8734
+0.7804
+0.8452 
+ FWA [44]
+CVPRW 2019
+0.8765
+0.9210
+0.9000
+0.8843
+0.8120
+0.8788 
+ CNN-Aug [45]
+CVPR 2020
+0.8493
+0.9048
+0.8788
+0.9026
+0.7313
+0.8534 
+ F3Net [47]
+ECCV 2020
+0.9635
+0.9793
+0.9796
+0.9844
+0.9354
+0.9684 
+ FFD [46]
+CVPR 2020
+0.9624
+0.9803
+0.9784
+0.9853
+0.9306
+0.9674 
+ SPSL [18]
+CVPR 2021
+0.9610
+0.9781
+0.9754
+0.9829
+0.9299
+0.9655 
+ SRM [15]
+CVPR 2021
+0.9576
+0.9733
+0.9696
+0.9740
+0.9295
+0.9609 
+ CORE [48]
+CVPR 2022
+0.9638
+0.9787
+0.9803
+0.9823
+0.9339
+0.9678 
+ Recce [49]
+CVPR 2022
+0.9621
+0.9797
+0.9779
+0.9785
+0.9357
+0.9668 
+ VGG19 [50]
+IEEE BigData 2024
+–
+0.9700
+0.9641
+0.9769
+0.9135
+–
+ 
+ ADA-FInfer [51]
+IEEE TDSC 2024
+–
+0.8310
+0.7840
+0.7440
+0.7230
+–
+ 
+ SDIF [54]
+ICASSP 2024
+0.9993
+0.8354
+0.8369
+0.7514
+–
+–
+ 
+ DDL [55]
+IEEE TIFS 2025
+0.7090
+0.8310
+0.7750
+0.7810
+0.7930
+0.7778 
+ CAFMF [53]
+IEEE ICCRD 2025
+–
+0.9881
+0.9817
+0.9894
+0.9439
+–
+ 
+ FRENet (Ours)
+–
+0.9688
+0.9856
+0.9833
+0.9903
+0.9376
+0.9731 
+the strong ability of FRENet to detect face-swapping and face-to-face 
+manipulations. In the DF and NT subsets, the AUC scores of FRENet 
+are slightly lower than the best-performing methods. For the complete 
+FF++ dataset, FRENet achieves an AUC that is also slightly lower than 
+the top-performing method.
+Compared to the SPSL baseline, FRENet improves the average AUC 
+by 0.76%. While some competing methods, such as SDIF and CAFMF, 
+achieve high results in individual subsets, they do not consistently 
+maintain strong performance across all datasets. In contrast, FRENet 
+consistently provides high and stable performance, regardless of the 
+type of manipulation. Certain methods, such as DDL and Mesonecp, 
+experience notable performance drops in challenging subsets, which 
+limits their adaptability. FRENet avoids such declines and provides re-
+liable detection under all evaluated conditions. These findings indicate 
+that FRENet not only achieves state-of-the-art accuracy but also delivers 
+practical and stable performance for deepfake detection across a wide 
+range of manipulation techniques.
+4.4.3. Visualized analysis
+To provide further visual evidence of the effectiveness of the
+FRENet, the subjective visualization results are shown in Fig. 3. As 
+illustrated in the figure, the proposed method demonstrates a strong 
+capability to distinguish between real and fake images across multiple 
+datasets. The visualizations highlight the regions where FRENet detects 
+discrepancies, which showcase its ability to accurately identify manip-
+ulated content. This confirms the robustness and effectiveness of the 
+method in handling various deep-fake generation techniques.
+In addition, the attention map visualizations are presented in Fig. 
+4. These visualizations provide insight into the regions that the model 
+prioritizes during the detection process. Compared to the baseline SPSL 
+model, FRENet focuses more on facial regions that are commonly 
+vulnerable to forgeries. Specifically, the model highlights areas such as 
+the eyes, mouth, and facial contours. This targeted attention improves 
+the detection of subtle manipulations across different datasets.
+Overall, the attention maps demonstrate that FRENet can detect 
+more potential forgery traces than the baseline model. By concentrating 
+Image and Vision Computing 162 (2025) 105663 
+6 
+
+
+--- PAGE 7 ---
+
+W. Song et al.
+Fig. 3. Visualization of qualitative results. Ground truth (GT) and prediction (Pred) are highlighted in red and blue, respectively. (For interpretation of the references to color in 
+this figure legend, the reader is referred to the web version of this article.)
+Fig. 4. Visualizations of the attention map between the proposed FRENet and the baseline (SPSL).
+Table 4
+The ablation studies of the core modules. The best performance for each metric is 
+indicated in bold.
+ Methods
+AUC↑
+ACC↑
+AP↑
+EER↓ 
+ Baseline
+0.8192
+0.7097
+0.8910
+0.2543 
+ Baseline + LPSA
+0.8573
+0.6875
+0.9029
+0.2236 
+ Baseline + RefFus
+0.8505
+0.7413
+0.9029
+0.2186 
+ Baseline + LPSA + RefFus
+0.8559
+0.7302
+0.9071
+0.2161 
+ Baseline + RefFus + PatchFocus
+0.8417
+0.7248
+0.8974
+0.2360 
+ Baseline + LPSA + RefFus + PatchFocus
+0.8848
+0.7630
+0.9214
+0.1862 
+on critical facial areas, FRENet identifies forgery signs that might be 
+overlooked by other methods. This improvement in detection capability 
+further emphasizes the superiority of FRENet in the domain of deepfake 
+detection.
+4.4.4. Ablation study
+To evaluate the effectiveness of each key component of the proposed 
+model, we conducted ablation experiments on the Celeb-DF-v1 dataset. 
+In these experiments, the baseline model for comparison is SPSL [18]. 
+The main components analyzed include LPSA, PatchFocus, and RefFus. 
+LPSA serves as the feature refinement module, which reduces the 
+correlation between real and fake features and thus enhances discrim-
+inability. PatchFocus acts as a local attention module that guides the 
+model to focus on regions prone to forgery. RefFus is the feature 
+enhancement module, designed to fuse refined features with auxiliary 
+information to improve feature separability and robustness. The results 
+of the ablation experiment are presented in Table 4.
+It shows that the introduction of the single LPSA module improves 
+the performance of AUC, AP and EER, but the ACC decreases slightly. 
+This outcome indicates that the LPSA module improves the ability 
+to distinguish between real and fake images, while the classification 
+accuracy shows minor fluctuation. When the RefFus module is inde-
+pendently equipped, the four indicators are all improved to certain 
+extent. It demonstrates that RefFus enhances both detection and clas-
+sification performance. When LPSA and RefFus are both equipped, the 
+improvements are more evident. The indicators of AUC, ACC, and AP 
+are enhanced by 3.67%, 2.05%, and 1.61%, respectively. Meanwhile, 
+the EER is decreased by 3.82% compared to baseline. The combination 
+of PatchFocus and RefFus yields moderate improvements. The AUC, 
+ACC, and AP are increased 2.25%, 1.51%, and 0.64%, respectively, and 
+EER is decreased by 1.83%. These improvements are less significant 
+than those obtained with the combination of LPSA and RefFus. Overall, 
+the integration of LPSA, RefFus, and PatchFocus achieves the best 
+performance. The AUC, ACC, and AP are increased by 6.56%, 5.33%, 
+and 3.04%, respectively, and EER is decreased by 6.81% relative to 
+baseline. These ablation results demonstrate that each proposed module 
+contributes significantly to the overall performance of the model. The 
+modular design leads to consistent and substantial improvements in 
+deepfake detection, enhancing both robustness and accuracy under 
+varied forgery conditions.
+4.4.5. Hyperparameter study
+This section investigates the influence of the learning rate and the 
+weight decay on the performance of the model. Table 5 presents the re-
+sults of varying these hyperparameters. The learning rate values include 
+0.0001, 0.0002, and 0.0003. The weight decay values include 0.0004, 
+0.0005, and 0.0006. The experimental results show that hyperparame-
+ter selection directly affects the model AUC. FRENet achieves the best 
+performance with a learning rate of 0.0002 and a weight decay of 
+0.0005, where the AUC reaches 88.48%. In comparison, both lower and 
+higher values of these hyperparameters result in reduced performance. 
+Based on the experimental findings, subsequent experiments adopt the 
+best-performing learning rate and weight decay values.
+5. Conclusion
+This work proposes a deepfake detection model termed FRENet. 
+The model uses a modular architecture to improve the generalization 
+Image and Vision Computing 162 (2025) 105663 
+7 
+
+
+--- PAGE 8 ---
+
+W. Song et al.
+Table 5
+Comparative results for different learning rates and weight decay values using FRENet. 
+The best results are highlighted in bold.
+ 
+Learning Rate
+Weight Decay
+ 
+0.0001
+0.0002
+0.0003
+0.0004
+0.0005
+0.0006 
+ AUC
+0.8260
+0.8848
+0.8526
+0.8347
+0.8848
+0.8267 
+of the network. FRENet refines and enhances features in multiple 
+stages. The model captures subtle and complex traces of forgery. This 
+process strengthens the ability to distinguish real content from ma-
+nipulated content. Experimental results show that FRENet surpasses 
+several state-of-the-art methods on multiple benchmark datasets. The 
+model demonstrates improved generalization across different forgery 
+types and datasets. These results confirm its potential for real-world ap-
+plications. The approach also contributes to more reliable and scalable 
+solutions for digital media authentication.
+Despite these strengths, some limitations exist. FRENet mainly ad-
+dresses image-based deepfake detection. This focus may reduce its 
+performance with multi-modal forgeries. The model also shows con-
+siderable computational complexity. This feature limits deployment in 
+real-time systems and on resource-limited devices. FRENet performs 
+well on standard benchmarks, but further tests are needed for unseen 
+or advanced forgery techniques. Future work will optimize FRENet 
+for efficiency in real-time settings. The researchers plan to develop 
+lightweight versions for edge deployment. The extension of the method 
+to video and multi-modal deepfake detection represents another re-
+search direction. The use of self-supervised or unsupervised learning 
+methods may further improve adaptability. These strategies can help 
+the model handle new forgery techniques without large amounts of 
+labeled data.
+CRediT authorship contribution statement
+Weicheng Song: Methodology. Siyou Guo: Writing – original draft. 
+Mingliang Gao: Supervision. Qilei Li: Software, Resources. Xianxun 
+Zhu: Supervision. Imad Rida: Resources, Project administration.
+Declaration of competing interest
+The authors declare that they have no known competing finan-
+cial interests or personal relationships that could have appeared to 
+influence the work reported in this paper.
+Acknowledgments
+This work has been funded by the Natural Science Foundation of 
+Shandong, China Province (No. ZR2022ME156), Shandong Province 
+Undergraduate Teaching Reform, China Project (No. Z2024184) and 
+Research Project on Artificial Intelligence Education in Shandong, 
+China Province (SDDJ202501097).
+Data availability
+Data will be made available on request.
+References
+[1] D. Awasthi, P. Khare, V.K. Srivastava, A.K. Singh, B.B. Gupta, DeepNet: Protec-
+tion of deepfake images with aid of deep learning networks, Image Vis. Comput. 
+158 (2025) 105540.
+[2] J. Zheng, X. Hu, C. Chen, Y. Zhou, D. Gao, Z. Tang, A new deepfake detection 
+model for responding to perception attacks in embodied artificial intelligence, 
+Image Vis. Comput. 151 (2024) 105279.
+[3] N. Xu, W. Feng, T. Zhang, Y. Zhang, FD-GAN: Generalizable and robust forgery 
+detection via generative adversarial networks, Int. J. Comput. Vis. 132 (12) 
+(2024) 5801–5819.
+[4] L. Guarnera, O. Giudice, S. Battiato, Mastering deepfake detection: A cutting-edge 
+approach to distinguish GAN and diffusion-model images, ACM Trans. Multimed. 
+Comput. Commun. Appl. 20 (11) (2024) 1–24.
+[5] G. Zhang, M. Gao, Q. Li, S. Guo, G. Jeon, Detecting sequential deepfake 
+manipulation via spectral transformer with pyramid attention in consumer IoT, 
+IEEE Trans. Consum. Electron. (2024).
+[6] Y. Mirsky, W. Lee, The creation and detection of deepfakes: A survey, ACM 
+Comput. Surv. 54 (1) (2021) 1–41.
+[7] M. Masood, M. Nawaz, K.M. Malik, A. Javed, A. Irtaza, H. Malik, Deepfakes 
+generation and detection: State-of-the-art, open challenges, countermeasures, and 
+way forward, Appl. Intell. 53 (4) (2023) 3974–4026.
+[8] J. Kietzmann, L.W. Lee, I.P. McCarthy, T.C. Kietzmann, Deepfakes: Trick or 
+treat? Bus. Horiz. 63 (2) (2020) 135–146.
+[9] A.L. Pellicer, Y. Li, P. Angelov, PUDD: towards robust multi-modal prototype-
+based deepfake detection, in: Proceedings of the IEEE/CVF Conference on 
+Computer Vision and Pattern Recognition, 2024, pp. 3809–3817.
+[10] Y. Li, J. Ye, L. Zeng, R. Liang, X. Zheng, W. Sun, N. Wang, Learning hierarchical 
+fingerprints via multi-level fusion for video integrity and source analysis, IEEE 
+Trans. Consum. Electron. 70 (1) (2024) 3414–3424.
+[11] N. Rahim, J. Ahmad, K. Muhammad, A.K. Sangaiah, S.W. Baik, Privacy-
+preserving image retrieval for mobile devices with deep features on the cloud, 
+Comput. Commun. 127 (2018) 75–85.
+[12] G. Zhang, M. Gao, Q. Li, W. Zhai, G. Zou, G. Jeon, Disrupting deepfakes via 
+union-saliency adversarial attack, IEEE Trans. Consum. Electron. 70 (1) (2023) 
+2018–2026.
+[13] K. Xu, X. Hu, X. Zhou, X. Xu, L. Qi, C. Chen, RLGC: Reconstruction learning 
+fusing gradient and content features for efficient deepfake detection, IEEE Trans. 
+Consum. Electron. 70 (3) (2024) 6084–6094.
+[14] Y. Chen, N. Akhtar, N.A.H. Haldar, A. Mian, Deepfake detection with spatio-
+temporal consistency and attention, in: 2022 International Conference on Digital 
+Image Computing: Techniques and Applications, DICTA, IEEE, 2022, pp. 1–8.
+[15] Y. Luo, Y. Zhang, J. Yan, W. Liu, Generalizing face forgery detection with high-
+frequency features, in: Proceedings of the IEEE/CVF Conference on Computer 
+Vision and Pattern Recognition, 2021, pp. 16317–16326.
+[16] C. Tian, Z. Luo, G. Shi, S. Li, Frequency-aware attentional feature fusion for 
+deepfake detection, in: ICASSP 2023-2023 IEEE International Conference on 
+Acoustics, Speech and Signal Processing, ICASSP, IEEE, 2023, pp. 1–5.
+[17] C. Tan, Y. Zhao, S. Wei, G. Gu, P. Liu, Y. Wei, Frequency-aware deepfake 
+detection: Improving generalizability through frequency space domain learning, 
+in: Proceedings of the AAAI Conference on Artificial Intelligence, vol. 38, 2024, 
+pp. 5052–5060.
+[18] H. Liu, X. Li, W. Zhou, Y. Chen, Y. He, H. Xue, W. Zhang, N. Yu, Spatial-
+phase shallow learning: rethinking face forgery detection in frequency domain, 
+in: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern 
+Recognition, 2021, pp. 772–781.
+[19] Z. Yan, Y. Luo, S. Lyu, Q. Liu, B. Wu, Transcending forgery specificity with latent 
+space augmentation for generalizable deepfake detection, in: Proceedings of the 
+IEEE/CVF Conference on Computer Vision and Pattern Recognition, 2024, pp. 
+8984–8994.
+[20] R. Liu, J. Zhang, G. Gao, Multi-space channel representation learning for mono-
+to-binaural conversion based audio deepfake detection, Inf. Fusion 105 (2024) 
+102257.
+[21] A. Rossler, D. Cozzolino, L. Verdoliva, C. Riess, J. Thies, M. Nießner, Faceforen-
+sics++: Learning to detect manipulated facial images, in: Proceedings of the 
+IEEE/CVF International Conference on Computer Vision, 2019, pp. 1–11.
+[22] L. Li, J. Bao, T. Zhang, H. Yang, D. Chen, F. Wen, B. Guo, Face x-ray for more 
+general face forgery detection, in: Proceedings of the IEEE/CVF Conference on 
+Computer Vision and Pattern Recognition, 2020, pp. 5001–5010.
+[23] T. Zhai, K. Lu, J. Li, Y. Wang, W. Zhang, P. Yu, Z. Xia, Learning spatial-frequency 
+interaction for generalizable deepfake detection, IET Image Process. 18 (14) 
+(2024) 4666–4679.
+[24] J. Zheng, Y. Zhou, N. Zhang, X. Hu, K. Xu, D. Gao, Z. Tang, A spatio-frequency 
+cross fusion model for deepfake detection and segmentation, Neurocomputing 
+628 (2025) 129683.
+[25] Y. Kou, P. Li, H. Ma, J. Zhou, X. Li, et al., SFIAD: Deepfake detection through 
+spatial-frequency feature integration and dynamic margin optimization, Artif. 
+Intell. Rev. 58 (7) (2025) 1–22.
+[26] H. Zhao, W. Zhou, D. Chen, T. Wei, W. Zhang, N. Yu, Multi-attentional deepfake 
+detection, in: Proceedings of the IEEE/CVF Conference on Computer Vision and 
+Pattern Recognition, 2021, pp. 2185–2194.
+[27] J. Zhou, Y. Li, B. Wu, B. Li, J. Dong, et al., FreqBlender: Enhancing DeepFake 
+detection by blending frequency knowledge, Adv. Neural Inf. Process. Syst. 37 
+(2024) 44965–44988.
+[28] Z. Lai, Y. Wang, R. Feng, X. Hu, H. Xu, Multi-feature fusion based deepfake face 
+forgery video detection, Systems 10 (2) (2022) 31.
+[29] X. Qiu, X. Miao, F. Wan, H. Duan, T. Shah, V. Ojha, Y. Long, R. Ranjan, D2fusion: 
+Dual-domain fusion with feature superposition for deepfake detection, Inf. Fusion 
+(2025) 103087.
+[30] H. Lin, W. Huang, W. Luo, W. Lu, DeepFake detection with multi-scale 
+convolution and vision transformer, Digit. Signal Process. 134 (2023) 103895.
+Image and Vision Computing 162 (2025) 105663 
+8 
+
+
+--- PAGE 9 ---
+
+W. Song et al.
+[31] T. Luong, H. Pham, C.D. Manning, Effective approaches to attention-based 
+neural machine translation, in: L. Màrquez, C. Callison-Burch, J. Su (Eds.), 
+Proceedings of the 2015 Conference on Empirical Methods in Natural Language 
+Processing, Association for Computational Linguistics, Lisbon, Portugal, 2015, pp. 
+1412–1421.
+[32] Y.-H. Han, T.-M. Huang, K.-L. Hua, J.-C. Chen, Towards more general video-based 
+deepfake detection through facial component guided adaptation for foundation 
+model, in: Proceedings of the Conference on Computer Vision and Pattern 
+Recognition, CVPR, 2025.
+[33] S. Waseem, S.A.R.S. Abu-Bakar, Z. Omar, B.A. Ahmed, S. Baloch, A. Hafeezallah, 
+Multi-attention-based approach for deepfake face and expression swap detection 
+and localization, EURASIP J. Image Video Process. 2023 (1) (2023) 14.
+[34] W. Lu, Y. Yang, L. Yang, Fine-grained image classification method based on 
+hybrid attention module, Front. Neurorobotics 18 (2024) 1391791.
+[35] H. Qiu, C. Zhong, C. Gao, C. Huang, Boundary-enhanced local-global col-
+laborative network for medical image segmentation, Sci. Rep. 15 (1) (2025) 
+9081.
+[36] D.P. Kingma, J. Ba, Adam: A method for stochastic optimization, 2014, arXiv 
+preprint arXiv:1412.6980.
+[37] A. Paszke, S. Gross, F. Massa, A. Lerer, J. Bradbury, G. Chanan, T. Killeen, Z. Lin, 
+N. Gimelshein, L. Antiga, A. Desmaison, A. Kopf, E. Yang, Z. DeVito, M. Raison, 
+A. Tejani, S. Chilamkurthy, B. Steiner, L. Fang, J. Bai, S. Chintala, PyTorch: 
+An imperative style, high-performance deep learning library, in: H. Wallach, 
+H. Larochelle, A. Beygelzimer, F. d’ Alché-Buc, E. Fox, R. Garnett (Eds.), in: 
+Advances in Neural Information Processing Systems, vol. 32, Curran Associates, 
+Inc., 2019.
+[38] Y. Li, X. Yang, P. Sun, H. Qi, S. Lyu, Celeb-df: A large-scale challenging dataset 
+for deepfake forensics, in: Proceedings of the IEEE/CVF Conference on Computer 
+Vision and Pattern Recognition, 2020, pp. 3207–3216.
+[39] B. Dolhansky, J. Bitton, B. Pflaum, J. Lu, R. Howes, M. Wang, C.C. Ferrer, 
+The deepfake detection challenge (dfdc) dataset, 2020, arXiv preprint arXiv:
+2006.07397.
+[40] L. Li, J. Bao, H. Yang, D. Chen, F. Wen, Faceshifter: Towards high fidelity and 
+occlusion aware face swapping, 2019, arXiv preprint arXiv:1912.13457.
+[41] D. Afchar, V. Nozick, J. Yamagishi, I. Echizen, MesoNet: a compact facial video 
+forgery detection network, in: 2018 IEEE International Workshop on Information 
+Forensics and Security, WIFS, IEEE, 2018, pp. 1–7.
+[42] M. Tan, Q. Le, Efficientnet: Rethinking model scaling for convolutional neural 
+networks, in: International Conference on Machine Learning, PMLR, 2019, pp. 
+6105–6114.
+[43] H.H. Nguyen, J. Yamagishi, I. Echizen, Capsule-forensics: Using capsule networks 
+to detect forged images and videos, in: ICASSP 2019-2019 IEEE International 
+Conference on Acoustics, Speech and Signal Processing, ICASSP, IEEE, 2019, pp. 
+2307–2311.
+[44] Y. Li, S. Lyu, Exposing DeepFake videos by detecting face warping artifacts, 
+in: IEEE Conference on Computer Vision and Pattern Recognition Workshops, 
+CVPRW, 2019.
+[45] S.-Y. Wang, O. Wang, R. Zhang, A. Owens, A.A. Efros, CNN-generated images are 
+surprisingly easy to spot... for now, in: Proceedings of the IEEE/CVF Conference 
+on Computer Vision and Pattern Recognition, 2020, pp. 8695–8704.
+[46] H. Dang, F. Liu, J. Stehouwer, X. Liu, A.K. Jain, On the detection of digital face 
+manipulation, in: Proceedings of the IEEE/CVF Conference on Computer Vision 
+and Pattern Recognition, 2020, pp. 5781–5790.
+[47] Y. Qian, G. Yin, L. Sheng, Z. Chen, J. Shao, Thinking in frequency: Face 
+forgery detection by mining frequency-aware clues, in: European Conference on 
+Computer Vision, Springer, 2020, pp. 86–103.
+[48] Y. Ni, D. Meng, C. Yu, C. Quan, D. Ren, Y. Zhao, Core: Consistent representation 
+learning for face forgery detection, in: Proceedings of the IEEE/CVF Conference 
+on Computer Vision and Pattern Recognition, 2022, pp. 12–21.
+[49] J. Cao, C. Ma, T. Yao, S. Chen, S. Ding, X. Yang, End-to-end reconstruction-
+classification learning for face forgery detection, in: Proceedings of the IEEE/CVF 
+Conference on Computer Vision and Pattern Recognition, CVPR, 2022, pp. 
+4113–4122.
+[50] S. Sadhya, X. Qi, Deepfake detection with wavelet-integrated convolutional 
+networks, in: 2024 IEEE International Conference on Big Data, BigData, IEEE, 
+2024, pp. 4540–4547.
+[51] J. Hu, J. Liang, Z. Qin, X. Liao, W. Zhou, X. Lin, ADA-FInfer: Inferring face 
+representations from adaptive select frames for high-visual-quality deepfake 
+detection, IEEE Trans. Dependable Secur. Comput. 22 (3) (2025) 3011–3027.
+[52] Y. Li, Y. Zheng, Y. Wang, J. Yin, H. Fei, SFE-net: Harnessing biological principles 
+of differential gene expression for improved feature selection in deep learning 
+networks, in: ICASSP 2025-2025 IEEE International Conference on Acoustics, 
+Speech and Signal Processing, ICASSP, IEEE, 2025, pp. 1–5.
+[53] J. Meng, J. Dong, Y. Liu, C. Liang, The application of cross-modal consistency 
+enhancement and feature fusion in high-frequency feature-driven face forgery 
+detection, in: 2025 IEEE 17th International Conference on Computer Research 
+and Development, ICCRD, IEEE, 2025, pp. 111–116.
+[54] Y. Lai, G. Yang, Y. He, Z. Luo, S. Li, Selective domain-invariant feature 
+for generalizable deepfake detection, in: ICASSP 2024-2024 IEEE International 
+Conference on Acoustics, Speech and Signal Processing, ICASSP, IEEE, 2024, pp. 
+2335–2339.
+[55] Z. Sun, N. Ruan, J. Li, DDL: Effective and comprehensible interpretation 
+framework for diverse deepfake detectors, IEEE Trans. Inf. Forensics Secur. 20 
+(2025) 3601–3615.
+Image and Vision Computing 162 (2025) 105663 
+9 

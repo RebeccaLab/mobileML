@@ -1,0 +1,738 @@
+
+
+--- PAGE 1 ---
+
+https://doi.org/10.1007/s11042-022-12778-3
+Light-weight 3DCNN for DeepFakes, FaceSwap
+and Face2Face facial forgery detection
+Aditi Kohli1 · Abhinav Gupta2
+Received: 27 July 2021 / Revised: 11 November 2021 / Accepted: 21 February 2022
+© The Author(s), under exclusive licence to Springer Science+Business Media, LLC, part of Springer Nature 2022
+Abstract
+Detecting facial forgery in real time application such as video conferencing, netbanking,
+verification of identity etc. is a major concern. Highly accurate facial forgery detectors
+will be incompatible with limited computation and storage space devices like smartphones,
+tablets, PCs due to their deep complex architectures. Therefore, we propose a light weight
+3D convolutional neural networks (3DCNN) to detect popular facial forgeries namely,
+DeepFakes, Face2Face and FaceSwap. The proposed 3DCNN is a five layered architec-
+ture with only 2.69M trainable parameters. The proposed network learns spatio-temporal
+features to detect forged videos. Further, to understand the detection process of 3DCNN,
+activation maps are studied in detail. The popular FaceForensic++ dataset is employed to
+train and test the proposed method. In addition, the effectiveness of the proposed method is
+evaluated and compared with state-of-the art methods in terms of both, number of trainable
+parameters and binary detection accuracy.
+Keywords 3DCNN · Face forensics
+1 Introduction
+With the evolving deep learning techniques and current work from home scenarios, video
+conferencing for business purpose, facial verification, virtual social connects have become
+common. These deep learning techniques have made life easier, however, increasing mali-
+cious use of it has led to an increase in facial forgeries. Thus, designing efficient and real
+time compatible facial forgery detectors is of prime importance.
+The most popular facial forgeries are namely, DeepFakes, Face2Face and FaceSwap.
+DeepFakes and FaceSwap are identity based forgery while Face2Face is an expression
+based forgery. The facial manipulations are even employed using feature rejuvenation, aging
+and anthropometric simulations [4] and [5]. In literature, the researchers have employed
+ Abhinav Gupta
+abhinav.gupta1@natwest.com
+1
+Department of Electronics and Communication Engineering, Jaypee Institute of Information
+Technology, A-10, Sector-62, Noida, Uttar Pradesh, 201309, India
+2
+RBS Services India Private Limited, NatWest Group, Candor Techspace, Sector-21, Dundahera,
+Gurugram, Haryana, 122016, India
+Published online: 9 April 2022
+Multimedia Tools and Applications (2022) 81:31391–31403
+/
+
+
+--- PAGE 2 ---
+
+various tools to detect these facial manipulations. In [11], the authors have rigorously
+exploited steganalysis techniques to detect forgery. In [17], patch classification is employed,
+while in [7], image processing algorithms are used to design facial forgery detectors. Even,
+complex 2D and 3D CNNs are employed and trained on huge facial forgery dataset to detect
+DeepFakes, FaceSwap and Face2Face. The Xception Net [6] is a 36 layered architecture,
+which comprises of depthwise separable convolutional layers with residual connections.
+The Xception Net works efficiently in classifying large classes dataset. It is trained on Face-
+Forensic++ dataset [18] to detect facial forgeries. Similarly, Wang et al. in [26], trained and
+fine tuned 3D ResNet [12], the excellent action recognition network, on the famous Face-
+Forensic++ dataset [18]. Moreover, generative adversarial networks(GAEL-Net [3]) are also
+used in designing robust facial manipulation detectors. Therefore, in order to achieve high
+detection accuracy, researchers have begun to design more and more complex architectures.
+These highly accurate facial forgery detectors are designed at the cost of network size
+and complexity. A highly efficient Xception network [6], when benchmark on FaceForen-
+sics++ dataset, achieves high DeepFake binary detection accuracy. However, it consists of
+almost 22M trainable parameters. Similarly, network based on pre-trained VGG-16 [21],
+ResNet [13], 3D ResNets [12], optical flow based method [1] are computationally expen-
+sive networks. Due to their large size and high computation, these efficient networks are not
+compatible with limited computation and space devices, such as smartphones, personal lap-
+tops and tablets. Whereas, lightweight deep learning models are easier to train and require
+less overheads to update when deployed on smartphones, personal laptops and tablets.
+Consider a video conferencing application, which is popularly and widely used on PCs,
+laptops and smartphones. Many important business and personal discussions are done
+through video conferencing. Let’s consider two types of video conferencing applications,
+the first application consists of a small and lightweight facial manipulation detector while, the
+second does not have any facial forgery detector. Therefore, if during the video conference,
+someone with a forged face attends the conference, then only in the first type of application
+fraud will be checked/detected. Thus, real world applications, highly demand lightweight
+models. Therefore, this paper proposes a light weight 3D convolutional neural networks
+(3DCNN) for facial manipulation detection. The proposed method does not employ complex
+and computational expensive networks like FlowNets [9] or PWCNet [22] to extract tempo-
+ral features of the test video. Rather exploit 3DCNN in a novel manner to extract both spatial
+and temporal features. Furthermore, the proposed 3DCNN is designed with less number of
+trainable parameters, which again results in a simple and light weight architecture.
+The main contributions of this work are as follows:
+1.
+To design a light weight facial forgery detector using a novel, 3D convolutional neural
+network (3DCNN).
+2.
+The 3D convolutional neural network (3DCNN) is employed in such a manner that it
+initially learns spatial features and later learns the combined spatio-temporal features
+of a face.
+3.
+Finally, the proposed method is compared with MobileNetV2 [19], XceptionNet [6] 3D
+ResNet [26] and fCNN [16].
+The paper is organized as follows: Section 1 describes the introduction of facial manip-
+ulation and related detection methods, Section 2 elaborates the motivation behind the
+proposed method, Section 3 describes the working of the proposed method, Section 4 con-
+tains a description of the dataset used in the experiment and the metrics for analyzing the
+proposed method, Section 5 contains activation maps, results and discussions, and Section 6
+concludes the paper.
+31392
+Multimedia Tools and Applications (2022) 81:31391–31403
+
+
+--- PAGE 3 ---
+
+2 Motivation
+Nowadays, the research emphasis is on designing small and efficient networks so that
+computer vision applications can be brought to limited computation platforms, such as
+smartphones, tablets, personal laptops, etc. In MobileNetV1 [14] and MobileNetV2 [19]
+author reduced computation in initial layers by using depth wise separable convolution.
+The lightweight MobileNet is applied for object detection, face recognition and other com-
+puter vision applications. Further, it is compared with exiting models like VGG-16 [21],
+GoogleNet [23] etc. for COCO object detection dataset. It is observed that MobileNet
+achieves equivalent accuracy with reduced computation cost. Similarly, when compared
+with popular FaceNet [20], the number of trainable parameters are reduced by half while
+multiple-adds are reduced by eight times. However, the accuracy also drops by almost
+4%. The same has been observed for deep fired covnets [27] and SqueezeNet [15], where
+the authors designed the network to achieve equivalent or 2%-3% lower accuracy at
+significantly lower computational cost.
+Therefore, it can be inferred from the above that compromising with a slight decrease in
+accuracy can significantly reduce the number of trained parameters. The resulting reduced
+parameter model can be applied to real world applications. This prompted us to design a
+computationally efficient and light weight 3DCNN network.
+The proposed 3DCNN is extracting both spatial and temporal features without using
+complex and computationally expensive optical flow methods. Rather employed simple
+image processing tool, i.e x and y direction gradients. Rather simple image processing tools,
+i.e. x and y direction gradients are employed. These x and y direction gradients present
+strong candidates in the facial manipulation detection process. The Fig. 1 describes in detail
+how the gradients in DeepFakes, FaceSwap and Face2Face faces are changing as compared
+to the pristine face. The faces in Fig. 1 are extracted from pristine video number “216.mp4”
+and their corresponding DeepFakes [8], Face2Face [24] and FaceSwap [10] videos of Face-
+Forensic++ dataset [18]. The Fig. 1a-d represents faces from DeepFakes, ‘DF’, Face2Face,
+‘F2F’ , FaceSwap, ‘FS’ and Pristine, ‘Pris’ videos. The two gradients Gx and Gy are
+computed for the above four faces. The gradient Gx and Gy represent vertical edges and
+horizontal edges in a face, respectively. The Fig. 1e-h represents Gx face gradients while
+the Fig. 1i-l represents Gy face gradients of DF, F2F, FS and Pris, respectively.
+On comparing gradients of DeepFakes with gradients of pristine, i.e comparing Fig. 1e
+with h and i with l, it is visualized that there are more vertical and horizontal edges around
+the cheeks and eyebrows. Similarly, in case of Face2Face, observe Fig. 1f and j with respect
+to (h) and (l), abrupt edges can be seen around lips and forehead regions as this is a face
+reenactment forgery. Likewise, in the case of FaceSwap, Fig. 1g and k, region around the
+chin and mouth are exhibiting artifacts. Thus, high gradient values are observed in forged
+facial regions as compared to pristine. This unique feature inspired us to employ gradients
+in 3DCNN.
+3 Proposed method
+The proposed method is divided into two stages as shown in Fig. 2. The first is pre-
+processing stage, where the video is converted into 4 depth matrix. This 4D matrix
+comprises of two consecutive frames and its x and y direction gradients. The computed 4D
+matrix is given as an input to 3DCNN in second stage. The second stage is employed to
+detect the forged face using the proposed 3DCNN.
+31393
+Multimedia Tools and Applications (2022) 81:31391–31403
+
+
+--- PAGE 4 ---
+
+Fig. 1 (a)-(d) represents DeepFakes, Face2Face, FaceSwap and Pristine faces respectively. (e)-(h) represents
+their corresponding x-direction gradient. (i)-(l) represents their corresponding y-direction gradient
+3.1 Pre-processing stage
+In this stage, the test video is processed through different operations. First, the test video
+is split into RGB frames using ffmpeg toolbox. Then the target faces are extracted from
+the RGB frames using Viola-Jones method [25]. The extracted RGB faces are converted
+into gray scale faces. Further, the Sobel method is employed to computed x and y direction
+gradients of the test face. In this method gradients are computed such that the edges in the
+Fig. 2 Block Diagram of the proposed method
+31394
+Multimedia Tools and Applications (2022) 81:31391–31403
+
+
+--- PAGE 5 ---
+
+face are highlighted. The forged face gradient will either consist of abrupt edges or smooth
+regions. Let t be the current frame, and f (t) represents the test face, then x direction, Gt
+x
+and y direction, Gt
+y gradients are calculated by convolving 3x3 filters with f (t) as follows,
+Gt
+x =
+⎡
+⎣
+1 0 −1
+2 0 −2
+1 0 −1
+⎤
+⎦∗f (t)
+(1)
+Gt
+y =
+⎡
+⎣
+1
+2
+1
+0
+0
+0
+−1 −2 −1
+⎤
+⎦∗f (t)
+(2)
+where, ∗denotes 2D convolution operation. The calculated Gt
+x and Gt
+y are fed as an input
+to 3DCNN. Further, to extract temporal information between the frames, the two consec-
+utive frames, f (t) and f (t + 1) are also fed to network. Thus, forming a 4D input matrix
+corresponding to each test face, f (t).
+3.2 Detection stage
+The 4D face matrix computed in pre-processing stage of proposed method is fed as an input
+to 3DCNN in detection stage. The 4D face matrix comprises of two consecutive frames,
+horizontal gradient and vertical gradient, i.e. [f (t), f (t +1), Gt
+x, Gt
+y]. The 3DCNN process
+the input and learn the key features to classify the test face into pristine or forged.
+The conventional CNN is a 2 dimensional convolutional neural network, where features
+are extracted from xy plane or spatial domain of input. However, to include features from
+other domains as well, a 3 dimensional convolutional neural network is required. In 2D
+CNN, the 2D kernels are convolved with input, thus output is a 2D. While in 3DCNN
+the 3D kernels are convolved with an input cube formed by stacking three input layers.
+Therefore, taking into account the combined effect of the xy plane and depth of input and
+then generating a 2D output.
+Let us consider that there are d number of channels (depth) in the input of size M x
+N, i.e. input size is (M x N x d). The kernel height, weight and length are (P x Q x R),
+respectively. Then, the output feature map at position (s, t, u) after convolution of input
+cube with 3D kernel is given as,
+outputstu =
+P−1
+
+p=0
+Q−1
+
+q=0
+R−1
+
+r=0
+wpqri(s+p)(t+q)(u+r)
+(3)
+where, wpqr is the weight of 3D kernel at (p, q, r) position and for p, q, r equal to zero,
+istu is the uth input at position (s, t).
+The proposed 3DCNN is designed with five 3D convolutional layers, as shown in Fig. 3.
+The green squares in Fig. 3 represent 2D kernels and the red cubes represent 3D kernels. All
+convolutional layers are followed by an activation layer of ReLu function. The batch nor-
+malization is employed in the proposed network, to accelerate the training process as well
+as to mitigate the effect of unstable gradients in the model. Initially, in proposed 3DCNN,
+the (3x3x1) size kernel is selected to learn the individual effect of gray scale frames and
+gradients. Later, as we proceed towards third layer combined effect of consecutive frames
+and gradients is taken into consideration. Thus, the kernel size of (3x3x2) is selected for
+third, fourth and fifth convolutional layers. The detailed description of 3DCNN is discussed
+in Table 1 of model summary.
+31395
+Multimedia Tools and Applications (2022) 81:31391–31403
+
+
+--- PAGE 6 ---
+
+Fig. 3 The proposed 3DCNN architecture
+4 Dataset
+The proposed method is trained and tested on FaceForensics++ dataset [18]. The FaceForen-
+sics++ dataset consists of different types of facial forgeries, namely DeepFakes, Face2Face,
+FaceSwap, and Neural textures. It contains 1000 pristine videos and their corresponding
+4000 forged videos, 1000 each from four different facial forgery techniques. The dataset
+Table 1 The model summary of proposed 3DCNN
+Layer (type)
+Output shape
+Trainable parameters
+Input Layer
+128 x 128 x 4
+0
+conv3d 1 (Conv3D)
+126 x 126 x 4 x 8
+80
+activation 1 (Activation)
+126 x 126 x 4 x 8
+0
+batch normalization 1(batch)
+126 x 126 x 4 x 8
+32
+max pooling 3d 1
+63 x 63 x 4 x 8
+0
+conv3d 2 (Conv3D)
+59 x 59 x 4 x 16
+3216
+activation 2 (Activation)
+59 x 59 x 4 x 16
+0
+batch normalization 2(batch)
+59 x 59 x 4 x 16
+64
+max pooling 3d 2
+29 x 29 x 4 x 16
+0
+conv3d 3 (Conv3D)
+27 x 27 x 3 x 16
+4624
+activation 3 (Activation)
+27 x 27 x 3 x 16
+0
+batch normalization 3(batch)
+27 x 27 x 3 x 16
+64
+max pooling 3d 3
+13 x 13 x 3 x 16
+0
+conv3d 4 (Conv3D)
+11 x 11 x 2 x 32
+9248
+activation 4 (Activation)
+11 x 11 x 2 x 32
+0
+batch normalization 4(batch)
+11 x 11 x 2 x 32
+128
+conv3d 5 (Conv3D)
+9 x 9 x 1 x 32
+18464
+activation 5 (Activation)
+9 x 9 x 1 x 32
+0
+batch normalization 5(batch)
+9 x 9 x 1 x 32
+128
+flatten 1
+2592
+0
+dense 1
+1024
+2655232
+dropout 2
+1024
+0
+dense 2
+2
+2050
+Total trainable parameters
+2,693,122
+31396
+Multimedia Tools and Applications (2022) 81:31391–31403
+
+
+--- PAGE 7 ---
+
+is generated from random collection of youtube videos, comprises of both the genders, i.e.
+male and female. The dataset covered VGA (480p), HD (720p) and FHD (1080p) resolu-
+tion videos. The dataset also consists of different compression quality videos, i.e. c0, c23
+and c40. The c0 videos are uncompressed videos while c23 and c40 are compressed videos
+with H.264 codec. The high quality videos are generated with constant quantization rate of
+23, and low quality videos are generated with constant quantization rate of 40. Thus, the
+FaceForensics++ dataset is the most generic dataset of its kind.
+All the experiments in the proposed method are mainly conducted on three facial forg-
+eries, namely DeepFakes, Face2Face and FaceSwap. DeepFakes are deep learning based
+forgery while Face2Face and FaceSwap are computer generated graphics based forgery. The
+experiments are performed on all the compression qualities available in the dataset, i.e. c0,
+c23, c40. In order to efficiently train the 3DCNN to differentiate between forged and pris-
+tine face, the dataset is divided into three groups, namely training, validation and testing
+with 700, 150 and 150 videos, respectively. The 3DCNN model is even cross validate to
+generate a robust model. The videos are split into frames using ffmpeg. These frames are
+used for further processing. Detailed statics about the number of frames used in each class
+are discussed in Table 2.
+The performance of the proposed method is evaluated using binary detection accuracy,
+Ac and number of trainable parameters used in the model. Ac, measures the number of cor-
+rect test faces detected from total number of test faces. The number of trainable parameters
+measures the complexity of the model. The lesser the number of trainable parameters, the
+simpler the model.
+Ac = Correctf aces
+totalf aces
+∗100
+(4)
+5 Experimental discussion
+In this section, the robustness of the proposed 3DCNN is studied. Experiments conducted
+for different facial forgery scenarios considering all possible combinations of facial forgery
+techniques and their compression ratios. Further, the activation maps for c40 DF, FS and F2F
+is studied. The comparison of proposed 3DCNN with Amerini et al. method [1] and Wang
+et al. [26] 3D ResNet method is studied in detail. The proposed method is also evaluated in
+terms of training parameters to understand its computation complexity. All the experiments
+are performed on Xeon E5 CPU, 3.50Hz, RAM 64GB and Xeon E5 CPU, 3.60 Hz RAM
+16GB. The MATLAB is used to prep-process the FaceForensic++ dataset. The training and
+testing of the proposed method is done on keras and tensorflow frameworks(Ubuntu 18.04
+3LTS).
+Table 2 The cardinality of all classes in the three datasets, namely DeepFake, FaceSwap and
+Face2Face.(training set,‘Tr’, validation set, ‘val’ and testing set, ‘Test’)
+DeepFake
+Face2Face
+FaceSwap
+Pristine
+Dataset
+Tr+val
+Test
+Tr+val
+Test
+Tr+val
+Test
+Tr+val
+Test
+c0
+29609
+4966
+29804
+4949
+23586
+4046
+29738
+5056
+c23
+30452
+5098
+31020
+5135
+24516
+4133
+30787
+5207
+c40
+30407
+5108
+31058
+5114
+24516
+4192
+30804
+5152
+31397
+Multimedia Tools and Applications (2022) 81:31391–31403
+
+
+--- PAGE 8 ---
+
+The proposed 3DCNN is designed to classify between forged and pristine face. The
+model is trained end-to-end for different forgery techniques. The model is cross validated to
+avoid over-fitting. The model hyper-parameters are selected through intensive experimen-
+tation and best model is selected to conduct the experiments. The model is trained for the
+three different forgeries namely, DeepFakes, ‘DF’, Face2Face,‘F2F’, FaceSwap,‘FS’ for all
+the compression ratios (c0, c23, c40). This results in nine trained models. These nine trained
+models are further tested on the unseen 150 test videos. The validation and testing accu-
+racy of these nine models are discussed in detail in Table 3. On analyzing the table, it is
+observed that uncompressed forged video detection is better than compressed detection in
+all the facial forgery techniques( DF, F2F, FS). The forged video detection accuracy falls
+for c40 compression while for c0 and c23 compressions the detection accuracy is almost
+same. On visualizing the table, from facial forgery technique prospective, it is seen that the
+DeepFakes detection is almost 7% better than F2F and 3% better than FS for c40 compres-
+sion. Therefore, it can be inferred from the Table 3, the proposed method is best in detecting
+DeepFake facial forgeries.
+5.1 Activation map visualization and interpretation
+The activations maps are helpful in visualizing the discriminative regions used by a CNN to
+classify the test image [28]. Therefore, to understand the classification process of proposed
+3DCNN, a detailed investigation is conducted for all the three facial forgeries. To this end,
+randomly fifty faces are selected from the unseen c40 test FaceForensics++ dataset [18] for
+all the three forgeries, i.e. DeepFakes, FaceSwap and Face2Face and their pristine counter-
+parts. Further, their activation maps are calculated at the last convolutional layer of 3DCNN
+of size 9x9x32. Among 32 filters randomly four are chosen. And for these four filters, mean
+of all fifty activation maps are calculated and presented using colormaps in Figs. 4, 5 and
+6. In colormaps, the dark red color represents strongly activated facial region and dark blue
+represents the weakly activated facial region.
+The Fig. 4a-d present DeepFakes mean activation maps and Fig. 4e-h present pristine
+mean activation maps. As discussed in motivation Section 2 in DeepFake faces, artifacts are
+observed around face boundaries, forehead and cheeks region. Similar observations can be
+visualized in activation maps of Fig. 4. The Fig. 4a and b show strong activation around face
+boundary and cheeks region while its counterpart pristine activation maps Fig. 4e and f show
+weak activation for these areas. Similarly, Fig. 4c and d present strongly activated forehead
+region while in the case of pristine Fig. 4g and h, weakly activated region is observed.
+The Fig. 5a-d present FaceSwap mean activation maps and Fig. 5e-h present pristine
+mean activation maps. The FaceSwap forged faces are either blurred or extremely smooth.
+Thus details of face are missing in a forged face, especially in nose, chin, lips and cheeks
+Table 3 The validation and testing accuracy of the proposed method for DeepFakes (DF), Face2Face(F2F)
+and FaceSwap(FS) of FaceForensics++ dataset [18]
+c0
+c23
+c40
+Validation
+Testing
+Validation
+Testing
+Validation
+Testing
+DF
+0.9906
+0.9200
+0.9908
+0.9163
+0.9853
+0.9099
+F2F
+0.9713
+0.8673
+0.9507
+0.8785
+0.9363
+0.8348
+FS
+0.9648
+0.9053
+0.9601
+0.8695
+0.9526
+0.8759
+31398
+Multimedia Tools and Applications (2022) 81:31391–31403
+
+
+--- PAGE 9 ---
+
+Fig. 4 The mean activation maps of four randomly selected filters of last convolutional layer of proposed
+3DCNN of size 9x9 for c40 DeepFakes and their corresponding pristine faces of test FaceForensics++ dataset
+[18]
+region. In Fig. 5e, g and h, the strong activations are observed in cheeks, lips and chin region,
+while weak activation is observed in its forged counterpart, i.e. Fig. 5a, c and d. This shows
+that, these particular filters are learning details of the pristine face, which are otherwise
+absent in FaceSwap faces due to forgery. Similarly, the Fig. 5b presents strong activa-
+tion in nose region while Fig. 5f presents weak activation. In the same manner, Face2Face
+activation maps are observed in Fig. 6. The Face2Face forgery is an expression based
+forgery, therefore the details of expressions are either missed or deliberately impainted in
+forged faces. The face2Face mean activation maps are presenting strong activation in forged
+regions as seen in Fig. 6c and d. While weak activation in the details of a facial expressions,
+especially in regions near lips and mouth as seen in Fig. 6a and b.
+Fig. 5 The mean activation maps of four randomly selected filters of last convolutional layer of proposed
+3DCNN of size 9x9 for c40 FaceSwap and their corresponding pristine faces of test FaceForensics++ dataset
+[18]
+31399
+Multimedia Tools and Applications (2022) 81:31391–31403
+
+
+--- PAGE 10 ---
+
+Fig. 6 The mean activation maps of four randomly selected filters of last convolutional layer of proposed
+3DCNN of size 9x9 for c40 Face2Face and their corresponding pristine faces of test FaceForensics++ dataset
+[18]
+Thus, it is inferred from the activation map analysis, that different filters of proposed
+3DCNN are learning discriminative features of face and forgery artifacts to classify the test
+face.
+5.2 Comparative analysis
+The proposed method is compared with Amerini et al. [1] method. The Amerini et al. [1]
+method is a optical flow based forgery detection method. In this method the optical flow is
+calculated using PWC-Net [22]. The computed optical flow is fed into the pre trained CNN.
+The author tested their proposed method for VGG-16 [21] and ResNet50 [13] pre-trained
+models. The author conducted experiments only on c23 Face2Face FaceForensics++ dataset
+[18]. In order to compare the proposed method with Amerini et al. [1] method, the new test
+video dataset of 120 unseen of F2F c23 videos is generated as per the details provided by
+the author. The Table 4 lists the testing accuracy of the proposed method and Amerini et al.
+[1] method for both the pre-trained models, i.e. VGG16 and ResNet50. It is observed that,
+the proposed method outperforms the Amerini et al. [1] method. The detection accuracy
+of the proposed method is almost 4% and 10% better than Amerini et al. [1] method for
+VGG16 and ResNet50, respectively. The proposed method is also compared in terms of
+computation complexity with Amerini et al. [1] method. As discussed in previous section
+the computational complexity is measured in terms of trainable parameters. The Table 5
+discusses the number of trainable parameters in the different detection methods. VGG16
+Table 4 The testing accuracy of
+proposed method and Amerini
+et al. [1] method for c23
+Face2Face FaceForensics++
+dataset [18]
+c23 F2F
+Amerini et al. method(VGG16)
+81.61
+Amerini et al. method (ResNet 50)
+75.46
+proposed method
+85.96
+31400
+Multimedia Tools and Applications (2022) 81:31391–31403
+
+
+--- PAGE 11 ---
+
+Table 5 The trainable parameters of proposed method and Amerini et al. [1] method for c23 Face2Face
+FaceForensics++ dataset [18]
+Trainable parameters (in Millions)
+Amerini et al. method(VGG16)
+138.35M
+Amerini et al. method (ResNet 50)
+25.56M
+proposed method
+2.69M
+[21] and ResNet50 [13] method are very complex as compared to the proposed method. The
+proposed method uses about 10 times less number of trainable parameters, i.e. only 2.69M.
+The FaceForensic++ dataset [18] is the most famous and challenging facial manipula-
+tion dataset. The robustness of the FaceForensic++ dataset can be evaluated using objective
+inpainting metrics(OIM) [2], forgery detection accuracy of detector etc. In [18], the authors
+conducted an experiment to understand how humans perform in detecting facially manip-
+ulated videos (facial forgery). And they observed that, humans struggle to differentiate
+between forged and pristine faces for low quality videos (c40). Therefore, facial forgery
+detection under c40 manipulation scenario is highly challenging. Thus, the robustness of
+proposed method is evaluated and compared with other facial manipulation detectors for
+c40 quality videos.
+The Table 6 lists the comparison of proposed method with Wang et al. [26] 3D ResNet
+method, Xception Net [6], MobileNet V2 [19] and fCNN [16]. The comparison is done in
+terms of binary detection accuracy and number of trainable parameters required for each
+method. To this end, a new test dataset of 140 videos each from three manipulations, i.e.
+DF, F2F, FS of c40 compression ratio is generated as per the details provided by the author
+of [26]. The binary detection accuracy of proposed 3DCNN and 3D ResNet [26] method is
+almost the same for DeepFakes and FaceSwap, but lower in the case of Face2Face. While the
+trainable parameters of proposed 3DCNN method are about 12 times less than 3D ResNet
+[26]. Moreover, the Face2Face detection accuracy of proposed 3DCNN method and Xcep-
+tionNet [6] are similar, but again the trainable parameters of proposed method are about 10
+times less than XceptionNet [6]. However, the proposed 3DCNN has 0.47 Millions more
+trainable parameters than MobileNetV2 [19], but the detection accuracy of the proposed
+method is higher than MobileNetV2 [19] for all the three cases (DF, F2F and FS). Therefore,
+it can inferred from the Table 6 that, detection accuracy of 3D ResNet [26] and Xception-
+Net [6] can be achieved with lower network complexity (number of trainable parameters).
+Hence, the results in Tables 4, 5 and 6 prove the efficacy of the proposed method in terms
+of its detection accuracy and network complexity.
+Table 6 The binary detection accuracy (in%) and number of trainable parameters evaluated for c40 (DF, F2F
+and FS) test videos of FaceForensics++ dataset [18], for different facial forgery detection methods
+DF
+F2F
+FS
+Trainable Parameters(in Millions)
+fCNN [16]
+78.75
+66.68
+67.76
+44.25 M
+3D ResNet [26]
+91.81
+89.60
+88.75
+33.23 M
+Xception [6]
+89.93
+83.04
+88.82
+20.81 M
+MobileNet V2 [19]
+87.25
+81.53
+85.33
+2.22 M
+proposed method
+91.03
+83.72
+87.33
+2.69 M
+31401
+Multimedia Tools and Applications (2022) 81:31391–31403
+
+
+--- PAGE 12 ---
+
+6 Conclusion
+In the event of detecting forged facial videos, authors have begun to design complex archi-
+tectures that are incompatible with real time applications. Therefore, a light weight network
+is proposed to work with real time applications, such as laptops, smartphones etc. The
+proposed method employs simple image processing tools such as gradients to pre-process
+the face and further fed them to a novel five layered 3D covolutional neural network
+(3DCNN) to classify between forged and pristine faces. The activation maps of proposed
+3DCNN are visualized and studied in detail. The activation maps make inferences about
+the discriminative features of face and forgery artifacts learned during training of proposed
+3DCNN.
+The proposed method is compared with Amerini et al. [1], Wang et al. [26], XceptionNet
+[6], MobileNetV2 [19] and fCNN [16] methods in terms of binary detection accuracy and
+trainable parameters. Comparative analysis shows that the proposed method achieves better
+accuracy with only 2.69M of trainable parameters, which is about 10 times less than Wang
+et al. [26] and XceptionNet [6].
+Acknowledgements The authors would thank Council of Scientific and Industrial Research, India (CSIR)
+for providing financial support to conduct research work, file No. 09/1132(0010)/2019 EMR-I.
+Declarations
+Conflict of Interests Aditi Kohli and Abhinav Gupta declare that they have no conflict of interest. Aditi
+Kohli receives research grant, file No. 09/1132(0010)/2019 EMR-I, from Council of Scientific and Industrial
+Research, India (CSIR).
+References
+1. Amerini I, Galteri L, Caldelli R, Del Bimbo A (2019) Deepfake video detection through optical flow
+based cnn. In: 2019 IEEE/CVF International conference on computer vision workshop (ICCVW),
+pp 1205–1207. https://doi.org/10.1109/ICCVW.2019.00152
+2. Amirkhani D, Bastanfard A (2021) An objective method to evaluate exemplar-based inpainted images
+quality using jaccard index. Multimedia Tools and Applications 80. https://doi.org/10.1007/s11042-
+021-10883-3
+3. Baek J, Yoo Y, Bae S (2020) Generative adversarial ensemble learning for face forensics. IEEE Access
+8:45421–45431
+4. Bastanfard A, Bastanfard O, Takahashi H, Nakajima M (2004) Toward anthropometrics simulation of
+face rejuvenation and skin cosmetic: research articles. Comput Animat Virtual Worlds 15(3–4):347–352
+5. Bastanfard A, Takahashi H, Nakajima M (2004) Toward e-appearance of human face and hair by
+age, expression and rejuvenation. In: 2004 International conference on cyberworlds, pp 306–311.
+https://doi.org/10.1109/CW.2004.65
+6. Chollet F (2017) Xception: Deep learning with depthwise separable convolutions. In: 2017 IEEE Con-
+ference on computer vision and pattern recognition (CVPR), pp 1800–1807. https://doi.org/10.1109/
+CVPR.2017.195
+7. Cozzolino D, Poggi G, Verdoliva L (2017) Recasting residual-based local descriptors as convolutional
+neural networks: An application to image forgery detection. In: Proceedings of the 5th ACM workshop
+on information hiding and multimedia security, IHMMSec ’17. Association for Computing Machinery,
+New York, pp 159–164. https://doi.org/10.1145/3082031.3083247
+8. Deepfakes github. https://github.com/deepfakes/faceswap. Accessed: 2020-02-01
+9. Dosovitskiy A, Fischer P, Ilg E, H¨ausser P, Hazirbas C, Golkov V, Smagt PVD, Cremers D, Brox
+T (2015) Flownet: Learning optical flow with convolutional networks. In: 2015 IEEE International
+conference on computer vision (ICCV), pp 2758–2766. https://doi.org/10.1109/ICCV.2015.316
+10. Faceswap github. https://github.com/MarekKowalski/FaceSwap. Accessed: 2020-02-01
+31402
+Multimedia Tools and Applications (2022) 81:31391–31403
+
+
+--- PAGE 13 ---
+
+11. Fridrich J, Kodovsky J (2012) Rich models for steganalysis of digital images. IEEE Transactions on
+Information Forensics and Security 7(3):868–882. https://doi.org/10.1109/TIFS.2012.2190402
+12. Hara K, Kataoka H, Satoh Y (2018) Can spatiotemporal 3d cnns retrace the history of 2d cnns and
+imagenet?. https://doi.org/10.1109/CVPR.2018.00685
+13. He K, Zhang X, Ren S, Sun J (2016) Deep residual learning for image recognition. In: 2016 IEEE confer-
+ence on computer vision and pattern recognition (CVPR), pp 770–778. https://doi.org/10.1109/CVPR.
+2016.90
+14. Howard AG, Zhu M, Chen B, Kalenichenko D, Wang W, Weyand T, Andreetto M, Adam H (2017)
+Mobilenets: Efficient convolutional neural networks for mobile vision applications
+15. Iandola FN, Han S, Moskewicz MW, Ashraf K, Dally WJ, Keutzer K (2016) Squeezenet: Alexnet-level
+accuracy with 50x fewer parameters and ¡0.5mb model size. Cite arXiv:1602.07360. Trans Inf Forensic
+Secur Comment: In ICLR Format
+16. Kohli A, Gupta A (2021) Detecting deepfake, faceswap and face2face facial forgeries using frequency
+cnn. Multimedia Tools and Applications pp 1–20. https://doi.org/10.1007/s11042-020-10420-8
+17. Rahmouni N, Nozick V, Yamagishi J, Echizen I (2017) Distinguishing computer graphics from natu-
+ral images using convolution neural networks. In: 2017 IEEE Workshop on information forensics and
+security (WIFS), pp 1–6. https://doi.org/10.1109/WIFS.2017.8267647
+18. R¨ossler A, Cozzolino D, Verdoliva L, Riess C, Thies J, Nießner M. (2019) FaceForensics++: Learning
+to detect manipulated facial images. In: International conference on computer vision (ICCV)
+19. Sandler M, Howard AG, Zhu M, Zhmoginov A, Chen LC (2018) Mobilenetv2: Inverted residuals and
+linear bottlenecks. In: 2018 IEEE/CVF conference on computer vision and pattern recognition pp 4510–
+4520
+20. Schroff F, Kalenichenko D, Philbin J (2015) Facenet: A unified embedding for face recognition and
+clustering. https://doi.org/10.1109/CVPR.2015.7298682
+21. Simonyan K, Zisserman A (2015) Very deep convolutional networks for large-scale image recognition.
+In: International conference on learning representations
+22. Sun D, Yang X, Liu MY, Kautz J (2018) PWC-Net: CNNs for optical flow using pyramid, warping and
+cost volume
+23. Szegedy C, Liu W, Jia Y, Sermanet P, Reed S, Anguelov D, Erhan D, Vanhoucke V, Rabinovich A
+(2015) Going deeper with convolutions. https://doi.org/10.1109/CVPR.2015.7298594
+24. Thies J, Zollhofer M, Stamminger M, Theobalt C, NieBner M (2016) Face2face: Real-time face capture
+and reenactment of rgb videos. pp 2387–2395. https://doi.org/10.1109/CVPR.2016.262
+25. Viola P, Jones M (2001) Rapid object detection using a boosted cascade of simple features. In: Proceed-
+ings of the 2001 IEEE computer society conference on computer vision and pattern recognition. CVPR
+2001, vol 1, pp I–I. https://doi.org/10.1109/CVPR.2001.990517
+26. Wang Y, Dantcheva A (2020) A video is worth more than 1000 lies. comparing 3dcnn approaches
+for detecting deepfakes. In: 2020 15Th IEEE international conference on automatic face and gesture
+recognition (FG 2020), pp 515–519. https://doi.org/10.1109/FG47880.2020.00089
+27. Yang Z, Moczulski M, Denil M, De Freitas N, Song L, Wang Z (2015) Deep fried convnets. In:
+2015 IEEE International conference on computer vision (ICCV), pp 1476–1483. https://doi.org/10.1109/
+ICCV.2015.173
+28. Zhou B, Khosla A, Lapedriza A, Oliva A, Torralba A (2016) Learning deep features for discriminative
+localization. In: 2016 IEEE Conference on computer vision and pattern recognition (CVPR), pp 2921–
+2929. https://doi.org/10.1109/CVPR.2016.319
+Publisher’s note Springer Nature remains neutral with regard to jurisdictional claims in published maps
+and institutional affiliations.
+31403
+Multimedia Tools and Applications (2022) 81:31391–31403

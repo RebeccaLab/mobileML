@@ -1,0 +1,1466 @@
+
+
+--- PAGE 1 ---
+
+PLOS ONE
+OPEN ACCESS
+Citation: Jabbar N, Bhatti SM, Rashid M,
+Jaffar A, Akram S (2025) Single-layer KAN for
+deepfake classification: Balancing efficiency and
+performance in resource constrained
+environments. PLoS One 20(7): e0326565.
+https://doi.org/10.1371/journal.pone.0326565
+Editor: Jiachen Yang, Tianjin University, CHINA
+Received: September 28, 2024
+Accepted: June 2, 2025
+Published: July 9, 2025
+Copyright: © 2025 Jabbar et al. This is an open
+access article distributed under the terms of the
+Creative Commons Attribution License, which
+permits unrestricted use, distribution, and
+reproduction in any medium, provided the
+original author and source are credited.
+Data availability statement: Dataset 1 Name:
+Celeb-DF: https://github.com/yuezunli/celeb-
+deepfakeforensics. Dataset 2 Name:
+FaceForensics++: https://github.com/ondyari/
+FaceForensics.
+Funding: The author(s) received no specific
+funding for this work.
+Competing interests: The authors have
+declared that no competing interests exist.
+RESEARCH ARTICLE
+Single-layer KAN for deepfake
+classification: Balancing efficiency and
+performance in resource constrained
+environments
+Nadeem Jabbar
+ 
+ 
+1,2∗, Sohail Masood Bhatti1,2, Muhammad Rashid
+ 
+ 
+3,
+Arfan Jaffar1,2, Sheeraz Akram
+ 
+ 
+4
+1 Faculty of Computer Science and Information Technology, The Superior University, Lahore, Pakistan,
+2 Intelligent Data Visual Computing Research (IDVCR), Lahore, Pakistan, 3 Department of Computer
+Science, National University of Technology, Islamabad, Pakistan, 4 Information Systems Department,
+College of Computer and Information Sciences, Imam Mohammad Ibn Saud Islamic University (IMSIU),
+Riyadh, Saudi Arabia
+∗nadeem.ch@superior.edu.pk
+Abstract
+Deepfakes, synthetic media created using artificial intelligence, threaten the authentic-
+ity of digital content. Traditional detection methods, such as Convolutional Neural Net-
+works (CNNs), require substantial computational resources, rendering them impractical
+for resource-constrained devices like smartphones and IoT systems. This study evalu-
+ates a single-layer Kolmogorov-Arnold Network (KAN) with 200 nodes for efficient deep-
+fake classification. Experimental results show that KAN achieves 95.01% accuracy on
+the FaceForensics++ dataset and 88.32% on the Celeb-DF dataset, while requiring only
+52.4 MB of memory, 13.11 million parameters, and 26.21 million FLOPs, significantly less
+than state-of-the-art CNNs. These verified metrics highlight KAN’s potential for real-time
+deepfake detection on edge devices. Untested capabilities, such as robustness against
+adversarial attacks, are proposed for future research. This work aligns with the United
+Nations Sustainable Development Goals, specifically SDG 9: Industry, Innovation, and
+Infrastructure and SDG 16: Peace, Justice, and Strong Institutions.
+Introduction
+Background
+Deepfake technology generates synthetic images and videos that appear almost indistin-
+guishable from real ones as Fig 1, relies heavily on deep learning methods like Generative
+Adversarial Networks (GANs). [1] GANs comprise a generator that creates fake media and
+a discriminator that evaluates its authenticity. Advanced models, such as StyleGAN, have
+enhanced the visual quality of deepfakes and made detection increasingly challenging over the
+time [2].
+Deepfakes offer potential benefits in entertainment, education, and content creation
+[3–7], but their misuse poses significant risks including cyberstalking, non-consensual
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+1/ 26
+
+
+--- PAGE 2 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+Fig 1. Deepfake generated images [11]. (Images used in this figure are sourced from the FaceForensics++ dataset ©
+2018, under the MIT License. https://github.com/ondyari/FaceForensics/tree/master).
+https://doi.org/10.1371/journal.pone.0326565.g001
+pornography, political manipulation, and misinformation [8]. These threats damage pub-
+lic trust in media and institutions, necessitating robust detection methods, particularly
+for resource-constrained devices like smartphones and IoT systems. Traditional detection
+approaches, primarily using Convolutional Neural Networks (CNNs), identify subtle incon-
+sistencies invisible to the human eye [9]. However, CNNs require substantial computational
+resources, limiting their practicality for edge devices [10]. The rapid evolution of deepfake
+techniques further complicates detection, requiring models that are accurate and computa-
+tionally efficient to generalize across diverse datasets and manipulation types.
+This study introduces a single-layer Kolmogorov-Arnold Network (KAN) to address these
+challenges, offering a lightweight, efficient solution for deepfake detection. By achieving high
+accuracy with minimal resources, KAN aligns with United Nations Sustainable Development
+Goals. Specifically SDGs 9: which aims to build resilient infrastructure, promote inclusive sus-
+tainable industrialization, foster innovation, and SDGs 16: which aims to promote peaceful
+and inclusive societies.
+Problem statement
+Existing deepfake detection methods, predominantly relying on computationally intensive
+algorithms, are ill-suited for resource-constrained devices like smartphones, tablets, and IoT
+systems. These devices, ubiquitous in modern society, lack the processing power to support
+complex models like CNNs. Moreover, detection systems face challenges, including the grow-
+ing sophistication of deepfake generation techniques, poor generalization across datasets, and
+susceptibility to adversarial attacks. Continuous research is essential to develop lightweight,
+accurate, and robust methods that ensure the integrity of digital media and protect against
+misuse of deepfake.
+Current challenges and shortcomings
+Deepfake detection has predominantly relied on Convolutional Neural Networks (CNNs),
+which excel at extracting spatial features from images. However, CNN-based methods face
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+2/ 26
+
+
+--- PAGE 3 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+significant limitations that hinder their deployment on resource-constrained devices and their
+effectiveness against evolving threats. These challenges include:
+Computational complexity and resource constraints. CNNs require substantial
+computational resources, with millions of parameters demanding high memory and process-
+ing power [12,13]. For instance, VGGNet uses 548 MB of memory and 138 million parame-
+ters Table 1, rendering it impractical for edge devices. This requires lightweight alternatives
+optimized for low-resource environments [14,15].
+Evolving deepfake techniques. The continuous advancement of deepfake generation,
+driven by improved GANs like StyleGAN, increases the realism of synthetic media [2] .
+Detection methods relying on low-level artifacts become less effective as forgeries become
+more sophisticated [1], challenging existing systems to keep pace.
+Limited generalization across datasets. Many detection algorithms struggle to
+generalize across datasets or manipulation types. Models trained on specific datasets, like
+FaceForensics++, often perform poorly on others, such as Celeb-DF, due to overfitting or
+dataset-specific patterns. This limits their reliability in various real-world scenarios [10].
+Adversarial attacks and robustness. CNN-based detectors are susceptible to adversar-
+ial attacks, in which minor input perturbations lead to misclassifications. This vulnerability
+highlights the necessity for robust models that can withstand such manipulations, marking a
+critical focus for future research [16].
+Objective
+The goal of this study is to determine the practical application of Kolmogorov-Arnold Net-
+works (KANs) to improve the accuracy and resilience of deepfake identification in resource-
+constrained devices. The study will also demonstrate how KANs can be utilized to solve
+the specific challenges that have been encountered with traditional deepfake detection
+approaches.
+1. In terms of computational efficiency and resource useage, KANs beat other CNN-
+based approaches for deep fake detection. The hypothesis suggests that the tiny size and
+efficient architecture of KAN models can provide great approximation potential. Fur-
+thermore, KANS also addresses resource requirements and deployment challenges, par-
+ticularly CNN-based approaches on resource-constrained edge nodes, IoT devices, and
+embedded systems.
+2. Examine how the performance characteristics of KANs, such as accuracy and general-
+ization, compare to traditional deep learning models to identify deepfake content. The
+hypothesis suggests that KANs will outperform existing methods due to their unique
+functional representation and the ability to detect subtle inconsistencies in synthetic
+media [17,18].
+Table 1. Resource usage comparison established CNN models and proposed KAN model [25].
+Model
+Memory Used
+(MB)
+Number of
+Parameters (M)
+Compute Time
+(ms) Tegra K1
+CPU
+Compute Time
+(ms) Jetson
+TX1 GPU
+FLOPs (M)
+GFLOPs
+VGGNet
+548
+138
+7690
+149
+15,503
+1-2
+ResNet
+103
+25.6
+2068
+97
+3,922
+1
+AlexNet
+61
+61
+618
+20
+729
+1-2
+InceptionNet
+53
+6.8
+1064
+35
+1,606
+1.5-2
+Proposed KAN 52.4
+13.11
+262.16
+26.22
+26.21
+0.013
+https://doi.org/10.1371/journal.pone.0326565.t001
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+3/ 26
+
+
+--- PAGE 4 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+3. Analyze whether KANs can effectively adapt rapid advancements in deepfake gener-
+ation technologies while maintaining their detection capabilities as new techniques
+emerge. The hypothesis is that the flexible and adaptive nature of KANs will allow them
+to keep pace with the evolving landscape of deepfake generation [19,20].
+4. Identify the practical implementation and scalability challenges associated with deploy-
+ing KANs for deepfake detection in real-world scenarios. The hypothesis is that KANs
+will strike a balance between detection accuracy and computational efficiency, facilitat-
+ing effective real-time deepfake identification [21,22]
+5. Compare KANs to existing state-of-the-art deepfake detection techniques regarding
+performance, interpretability, and computational requirements. The hypothesis is that
+KANs will demonstrate superior performance while maintaining a high level of inter-
+pretability and computational efficiency [23,24].
+By addressing these, the study will show the efficiency of KAN as a reliable tool for deep-
+fake detection and, therefore, will contribute to the creation of advanced and accurate
+approaches to combating the misuse of deepfake technology.
+Contributions
+In response to the following key contributions, this study will reveal valuable insight about the
+effectiveness of Kolmogorov-Arnold Networks as a solution of deepfake detection in resource
+constrained environments. These findings not only support the development of more effec-
+tive countermeasures against deepfake exploitation but also contribute to ongoing efforts to
+enhance security.
+• Demonstrating KAN’s computational efficiency, the model achieves high accuracy while
+requiring only 52.4 MB of memory and 26.21 million FLOPs, making it well-suited for edge
+devices, Table 1.
+• The study shows KAN’s classification accuracy, achieving 95.01% on the FaceForensics++
+dataset and 88.32% on Celeb-DF while also demonstrating its capacity to generalize across
+diverse deepfake types, Table 2 . Importantly, its potential robustness deserves further
+investigation in future work.
+• Comparing KANs to traditional lightweights models and highlighting KAN’s performance
+gains by spline-based functions, Table 3.
+• Analyzing scalability and real-time performance, confirming KAN’s suitability for practical
+deployment on edge devices, Table 1.
+• Identifying deployment challenges, such as dataset limitations, to guide future optimiza-
+tions.
+• Benchmarking KAN against state-of-the-art methods, showcasing superior efficiency and
+competitive accuracy, Fig 9.
+• Evaluating KAN’s adaptability to evolving deepfake techniques, ensuring relevance against
+new forgeries, Fig 8.
+Related work
+Deepfake detection techniques
+Deepfake detection techniques are categorized into visual, audio, multimodal, and emerging
+techniques. Visual methods analyze inconsistencies in facial movements, blinking patterns,
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+4/ 26
+
+
+--- PAGE 5 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+Table 2. Comparison of CNN models vs KAN accuracy.
+Model Name
+DataSet Name
+Accuracy
+Suitability for Edge Devices
+VGG-16
+Custom DataSet
+86% - 2024 [59]
+Less Suitable [60]
+VGG-16
+FaceForensics++
+88% - 2023 [61]
+Less Suitable [60]
+ResNet-152
+Celeb-DF
+91% - 2023 [61]
+Less Suitable [62]
+AlexNet + Additional Layers FaceForensics++
+87.49% - 2020 [63]
+Suitable [64]
+AlexNet + SVM
+Real & Fake Face Detection
+86.10% - 2021 [65]
+Suitable [64]
+InceptionNet
+Kaggle DataSet
+93% - 2023 [66]
+Less Suitable [67]
+Inception V3
+Custom DataSet
+87% - 2023 [68]
+Less Suitable [69]
+Proposed KAN
+FaceForensics++, Celeb-DF 95.01%, 88.32%
+Highly Suitable
+https://doi.org/10.1371/journal.pone.0326565.t002
+Table 3. Comparison of deepfake lightweight models.
+Model
+Dataset
+Accuracy
+Memory
+Usage
+Drawbacks
+KAN’s Advantage
+Chen et al. [29] Celeb-DF
+90.56%
+42.8K
+parameters
+- Limited to spatial features; lacks temporal
+analysis.
+- Vulnerable to adversarial attacks and
+struggles with generalization.
+- Performance on unseen manipulations is
+unclear.
+- Adapts dynamically to diverse
+manipulations with spline-based
+activations.
+- Improved generalization and adversarial
+robustness while remaining lightweight.
+Pipin et al. [30] Face Foren-
+sics++,
+Celeb-DF
+97.89%
+Not explicitly
+reported
+- High computational cost from PRNU
+preprocessing.
+- Performance drops on noisy inputs.
+- Limited scalability for real-time applications.
+- Lightweight (52.4 MB) for real-time edge
+deployment.
+- Avoids expensive preprocessing,
+enhancing efficiency.
+Liu et al. [31]
+Celeb-DF
+95%
+Not explicitly
+reported
+- Fixed architecture limits adaptability to new
+deepfake techniques.
+- Lacks robustness against adversarial attacks.
+- Requires fewer parameters (13.11M) and
+less memory (52.4 MB) with comparable
+accuracy.
+- Regularization enhances resilience to
+noise.
+MobiDeep [48] DFDC
+93.4%
+2 MB
+- Focuses only on eye regions, missing broader
+manipulations.
+- Performance declines in low-light or low-res
+videos.
+- Not tested on major datasets, limiting
+comparisons.
+- Broader applicability to various deepfake
+types.
+- Tested on established benchmarks,
+providing strong generalization.
+- Efficient on edge devices (52.4 MB, 26.21
+million FLOPs) with good robustness.
+KAN
+(Proposed)
+Face Foren-
+sics++,
+Celeb-DF
+95.01%,
+88.32%
+52.4 MB
+- - -
+- Demonstrates strong efficiency and accu-
+racy for real-time deepfake detection,
+based with validated results on Celeb-DF
+and FaceForensics++ datasets.
+- Optimized for edge deployment with low
+memory usage and computation time.
+https://doi.org/10.1371/journal.pone.0326565.t003
+and texture [26]. Audio methods detect anomalies in voice patterns and spectrograms [27].
+Multimodal approaches combine both visual and audio data for robust detection [28]. Emerg-
+ing techniques such as blockchain tracking and adversarial training help ensure authenticity
+and security of digital content [10].
+Visual detection techniques. Recent advancements in deepfake detection using visual
+techniques have shown promising results across various studies. Chen et al. [29] introduced
+DefakeHop, a lightweight, high-performance deepfake detection method designed specifically
+for resource-constrained devices. Utilizing the Successive Subspace Learning (SSL) principle,
+DefakeHop effectively extracted features from facial images with a significantly small model
+size of 42,845 parameters. The model was evaluated on the UADFV, Celeb-DF v1, and Celeb-
+DF v2 datasets, achieving an AUC of 100%, 94.95%, and 90.56%, respectively. DefakeHop’s
+architecture allowed for efficient training and inference, making it highly suitable for mobile
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+5/ 26
+
+
+--- PAGE 6 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+and small-device applications, with minimal processing time required for accurate detection.
+Pipin et al. [30] presented a deepfake detection method that leveraged Spatiotemporal Convo-
+lutional Networks (SCN) combined with Photo-Response Non-Uniformity (PRNU) analysis.
+The model was evaluated on FaceForensics++ and the Celeb-DF and DFDC datasets, obtain
+up to 97.89% accuracy. The lightweight simplicity and efficient processing makes it suitable
+for integration into small devices. Liu et al. [31] introduced a shallow 3D Convolutional Neu-
+ral Network (3D CNN). Which was proposed for deepfake detection on resource constrained
+devices. The proposed model was tested on Celeb-DF and FaceForensics++. The major advan-
+tage of 3D CNN was the compactness of the architecture, which minimizes storage usage
+while maintaining high detection accuracy at around 95%. The model’s efficient design mak-
+ing it well-suited for mobile and low-resource devices. Furthermore, Jolly et al. [32] develop a
+CNN-based deep learning model for deepfake detection. The methodology involves training a
+CNN on a dataset of deepfake and real videos, focusing on identifying visual inconsistencies.
+The author also combined CNNs with LSTM layers, and Recycle-GAN, achieving over 99%
+detection rate on FaceForensics++, Face2Face, FaceSwap, and neural texture datasets.In the
+meanwhile the model faces challenges in detecting highly sophisticated deepfakes. Beside this
+Ramachandran et al. [33] evaluate deepfake detection using deep face recognition techniques.
+The methodology involves using pre-trained face recognition models to identify inconsis-
+tencies in facial features. The study achieved an AUC of 98% on FaceForensics++ and 99%
+on the Celeb-DF dataset.The study have the limitations include the model’s dependency on
+high-quality video inputs suggest the future work is to enhance performance on lower-quality
+videos. Patel et al. [34] present a deepfake video detection approach using CNNs and RNNs
+for temporal irregularities. The authors utilized the Celeb-DF dataset to train and evaluate
+their deepfake detection model. The results demonstrated the model’s high effectiveness,
+achieving an accuracy of 98%, precision of 97%, recall of 96%, and an F1 score of 96.5%. The
+model achieves competitive accuracy but faces challenges in generalizing to unseen deepfake
+techniques. Jose et al. [35] explores deepfake detection using ImageNet models and tempo-
+ral images of 468 facial landmarks. The methodology involves leveraging pre-trained Ima-
+geNet models to analyze temporal sequences of facial landmarks. The limitations include the
+computational complexity of the used approach.
+Cutting-edge audio detection techniques. Recent research has explored various deep
+learning approaches for detecting audio deepfakes. Bird et al. [36] and Lotfi (2023) introduced
+a novel dataset, DEEP-VOICE, comprising real and AI-generated speech samples. Their real-
+time deepfake detection system, employing Extreme Gradient Boosting (XGBoost), achieved
+an impressive 99.3% accuracy in classifying audio samples. Mateen et al. [37] proposed a
+CNN model to classify Urdu audio as genuine or deepfake. using Mel-Frequency Cepstral
+Coefficients (MFCC) as features and a custom dataset of real and synthetic Urdu audio, they
+achieved a 91% accuracy in distinguishing between the two. Hamza et al. [38] explored the
+use of MFCC features for deepfake detection, and they tested various machine learning mod-
+els such as VGG-16. Although the study demonstrated promising results on the fake-or-real
+dataset, it did not explicitly report accuracy metrics. Chakravarty et al. [39] applied a com-
+bination of data augmentation approaches and feature fusion to enhanced detection results.
+They employed MFCCs and PLP feature as an input to the Long Short Term Memory (LSTM)
+network. The authors attained 99% accuracy with an equivalent error rate of 1.6%. Constant
+Q Transform (CQT) spectrograms was studied by Abdzadeh et al. [40] in the detection of
+deepfake videos. They audio were then converted to the CQT spectrograms and stored into
+the Support Vector Machine (SVM). As for the model’s performance, it was tested on the
+ASVspoof 2019 dataset, and the EER was 3.53%.
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+6/ 26
+
+
+--- PAGE 7 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+Multimodal detection techniques. Multimodal deepfake detection uses multiple types
+of information, such as video, audio, and text, to improve detection results. Its include video,
+audio, and text. The suggested method increases the detectors’ dependability by utilizing the
+complimentary nature of various data to identify fake information. Hyunsoo et al. [41] was
+proposed a method that involved both Vision Transformers (ViT) and CNN through ensem-
+ble method. To evaluate the performance of the proposed model, it was trained on Deep-
+Fake Detection Challenge (DFDC) dataset and obtained an accuracy of 97.66%. Although
+the ensemble model had a larger architecture provided by combining two powerful mod-
+els, it was found to be more generalizable and accurate across different datasets. With paral-
+lel computing, the system can be well optimized while maintaining compatibility with small
+convenient devices. Raza et al. [42] proposed a framework named Multimodaltrace in which
+inputs of audio and visual were processed in the IntrAmodality Mixer Layer (IAML) instruc-
+tion for multi-label classification. The proposed method was demonstrated to achieve the
+optimum accuracy of 92.9% on FakeAVCeleb. The cross-dataset accuracy of this model on
+World Leaders and Presidential Deepfake Detection Datasets yielded accuracies of 83.61%
+and 70%, respectively. The results also offered an understanding of how the model exam-
+ined various aspects of audio and visual properties through integrated gradient evaluation.
+Another deepfake detection method based on multimodal features was proposed by Salvi et
+al. [43] where the authors used both video and audio. The proposed method applies attention-
+based fusion techniques, where data obtained from the two modalities are fused. Although
+the approach illustrates the effectiveness of the proposed methods but the article did not
+describe any datasets, actual figures of performance, and quantitative performance metrics.
+Muppalla et al. [44] explore feature fusion of the audio and the video input to use concatena-
+tion and attention mechanisms. However, it also lacks details about the datasets which have
+been used in this study, and the corresponding performance evaluations have not been elab-
+orated as well. In AV-Lip-Sync+, Shahzad et al. [45] used AV-HuBERT to extract features and
+identify discrepancies in audio and video streams. The method pointed out that lip sync plays
+a key role in detecting deep fakes; however, this technique also needs further validation on
+various datasets and comparisons with other state-of-the-art methods. Yang et al. [46] pro-
+posed AVoiD-DF, a multimodal deepfake detection system that utilizes both audio and visual
+modalities. The results also highlight the need for feature-level fusion to learn complex inter-
+actions between the modalities. The authors employed the DefakeAVMiT, FakeAVCeleb,
+and DFDC datasets to test the model and reported the state-of-the-art results for deepfake
+classification.
+Emerging detection techniques. Perera et al. [47] used super-resolution (SR) techniques
+to improve image resolution and detect low-quality deepfake movies. The authors utilized a
+combination of models on the FaceForensics++ dataset, including XceptionNet, VDSR, and
+RSRGAN. The study confirmed that the combination of RSRGAN with XceptionNet provides
+a substantial advantage. Improved detection accuracy to 96.05%. The model size was opti-
+mized for compact devices, with a focus on SR preprocessing. The model increased its per-
+formance against lowquality deepfakes making it suitable for mobile deployment. Mohzary et
+al. [48] developed MobiDeep, a real-time deepfake detection application for portable devices
+that utilizes corneal-specular backscatter pictures. The model achieved 98.7% accuracy and
+an average detection time of less than 200ms when solely focusing on the white region of the
+face, specifically the eyes. The small model size and efficient processing made MobiDeep ideal
+for mobile deployment, offering robust performance with minimal computational resources.
+The article [10] tackled the challenge of generalizing deepfake detectors by training them for
+attribution, which involves distinguishing different types of deepfake attacks. Using datasets
+such as Google and Jigsaw, FaceForensics++, Celeb-DF, DeepfakeTIMIT, and DF-Mobio,
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+7/ 26
+
+
+--- PAGE 8 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+the authors demonstrate that models trained for attribution with triplet-loss generalize bet-
+ter across different databases and generative approaches compared to binary classification
+models. The results show improved performance on unseen deepfakes, but the method may
+degrade performance on the same database. Beside it the study [49] addresses generalizable
+deepfake detection by using self-supervised learning to enrich the diversity of forgeries and
+improve sensitivity to forgeries. The authors propose adversarial training to dynamically syn-
+thesize challenging forgeries, which enhances the detector’s robustness against unseen forg-
+eries. Experiments on various datasets demonstrate superior performance compared to state-
+of-the-art methods. Limitations include the high computational cost of generating adver-
+sarial examples. The publication [26] presents D-VAEGAN, combining variational autoen-
+coder (VAE) and generative adversarial network (GAN) for deepfake detection. The method
+enhances robustness against adversarial attacks and achieves 96% accuracy on the FaceForen-
+sics++ dataset, outperforming existing defense methods. However, further optimization may
+be required for real-world deployment. Furthermore, The article [50] proposes injecting a
+universal adversarial signature into generative models to enhance detection and traceability.
+The method involves adversarial training to embed a unique watermark in generated images.
+Validated on FFHQ and ImageNet datasets, the method shows promising detection rates.
+Limitations include the potential impact on image quality. The research [27] investigates tech-
+niques for improving the generalization of deepfake detection methods, employing aggres-
+sive data augmentation and few-shot tuning. Using datasets from Google and Jigsaw, Face-
+Forensics++, DeeperForensics, Celeb-DF, and DF-Mobio, the authors demonstrate that these
+techniques improve accuracy in cross-database scenarios. However, the method may require
+fine-tuning for optimal performance on specific datasets.
+Kolmogorov Arnold network
+Liu et al. [17] introduce KAN, which represent a significant advancement in neural network
+architectures, inspired by the Kolmogorov-Arnold representation theorem. KANs replace tra-
+ditional fixed activation functions with learnable univariate functions parametrized as splines,
+allowing for more flexible and interpretable models. This innovative approach enables KANs
+to outperform traditional Multi-Layer Perceptrons (MLPs) in both accuracy and computa-
+tional efficiency, particularly in data fitting and partial differential equation (PDE) tasks. The
+comparative analysis presented in [51] highlights that KANs can achieve superior perfor-
+mance with fewer parameters compared to MLPs, emphasizing their practical advantages in
+high-dimensional data scenarios and complex problem-solving. However, the comparison
+between KAN and MLP reveals several key differences and similarities. While MLP gener-
+ally outperforms KAN across various tasks such as machine learning, computer vision, audio
+processing, and natural language processing, KAN shows a distinct advantage in symbolic for-
+mula representation due to its B-spline activation function. This advantage diminishes when
+B-spline is applied to MLP, enhancing its performance in symbolic formula representation to
+match or surpass that of KAN. In other tasks where MLP already excels, B-spline does not sig-
+nificantly boost MLP’s performance. Additionally, KAN suffers from a more severe forgetting
+issue in class-incremental continual learning settings compared to MLP. Both models were
+compared by controlling the number of parameters and FLOPs, ensuring a fair evaluation.
+These insights highlight the unique strengths and weaknesses of each model, providing valu-
+able guidance for future research [51]. Recent developments of KANs have received impres-
+sive results in the applications to time series prediction and analysis. In [52] the proposed
+model is tailored for temporal data to take the advantage of KANs architecture and discover
+temporal dependencies. Subsequent investigation in [23] demonstrates that KAN generated
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+8/ 26
+
+
+--- PAGE 9 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+solutions can predict time series data effectively. In [24], KANs has been integrated with a
+transformer models to yield better results than either of the two alone in terms of accuracy
+prediction.
+Furthermore, a new deep learning algorithm has also been designed for Kolmogorov-
+Arnold representation. This algorithm presents a step–by–step procedure to decompose mul-
+tivariable functions into basic forms; this accelerates the advancement of KANs in machine
+learning theory and application [53]. In the field of graph neural networks and collaborative
+filtering some new approaches has beed designed by using of KANs. In [54] seeks to enhance
+the method of feature extraction in graph neural networks by consideration the principles of
+KAN to learn the structure of the graph. This integration allows for better and more scalable
+solutions of respective graph-based tasks.
+KANs have also been combined with convolutional layers for enhanced image processing
+capabilities in [55]. Incorporating convolutional operations to these networks, these KANs
+can preserve the spatial hierarchies and can recognize most complicated structures that exist
+in the image. which improved the performance of tasks like image classification, object detec-
+tion and segmentation. CNN–KAN hybrid improves the qualities of the CNN while integrat-
+ing the facilities of KAN to provide a versatile approach toward image processing applications.
+Also, Kolmogorov-Arnold Convolutions [56] introduces about the structure and empirical
+performance of KANs in image associated tasks. Optimised convolutions inside KANs have
+reported enhanced performance on standard image classification and demonstrating their
+versatility in solving difficult image challenges.
+Performance tradeoffs between KANs and MLPs
+In [17], the authors create a new type of neural network called KAN which is inspired by
+Kolmogorov-Arnold theorem. KANs deploy learnable spline based activation functions, offer-
+ing greater flexibility and interpretability compared to traditional multi-layer perceptrons
+(MLPs). The experimental findings reveal that KANs are superior to MLPs in terms of accu-
+racy and time complexity espacilly in the cases of data fitting and partial differential equations
+(PDEs).
+In support of these results, another benchmarking study made in [18] shows that KANs
+also work best on tabular data. The study emphasizes their advantages in scenarios requir-
+ing interpretability and handling high-dimensional datasets. These studies reveal KANs as
+a potentially suitable substitute for MLPs in various applications. Runpeng et al. [51] criti-
+cally evaluates the performance differences between KANs and traditional MLPs. The authors
+argue that previous comparisons may have been biased due to differences in network architec-
+ture and parameterization. By standardizing these factors, the study provides a more accurate
+comparison, highlighting that KANs can outperform MLPs in both accuracy and efficiency,
+particularly in high-dimensional data scenarios. The findings suggest that KANs are not just
+theoretically interesting but practically advantageous for various applications.
+Methodology
+In this study, a comprehensive approach as illustrated in Fig 2 was used to evaluate the per-
+formance of the proposed KAN models on two prominent datasets: Celeb-DF and FF++.
+The results of the study are reflected in Figs 7, 9, 8 and in Tables 2 , 1 to meet the objective as
+defined in Sect.
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+9/ 26
+
+
+--- PAGE 10 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+Fig 2. The Comprehensive Overview of the Study’s Methodology (Images used in this figure are sourced from the
+FaceForensics++ dataset ©2018 , under the MIT License. https://github.com/ondyari/FaceForensics/tree/master)
+https://doi.org/10.1371/journal.pone.0326565.g002
+Dataset
+1. The FaceForensics++ (FF++) dataset is a large-scale dataset for the evaluation of deep-
+fake detection algorithms [11]. It was collected by the Technical University of Munich
+and released in 2018. The dataset contains over 1 million video frames.The dataset
+comprises over 1,000 original videos and four types of manipulation videos: Deep-
+fakes, Face2Face, FaceSwap, and NeuralTextures, with each of 1000. The image of each
+maipulated type is mentioned in Fig 3. For our study, we extracted individual frames
+from these videos, resized them to 224x224 pixels, and converted them to grayscale.
+Data augmentation techniques, such as random cropping, flipping, and rotation, were
+employed to enhance data diversity. The dataset was divided into training, validation,
+and test sets using an 80-10-10 ratio. It maintains a balanced distribution of real and
+fake images, covering a wide range of facial characteristics.
+2. The Celeb-DF (Celeb-Deepfake) dataset [57], released by the University of California,
+Merced in 2019, is a large-scale deepfake video dataset. It is one of the most challeng-
+ing datasets for deepfake detection. The dataset includes 5639 fake videos and 590 real
+videos, featuring celebrities with diverse demographics. The deepfake videos were gen-
+erated using advanced techniques aimed at producing high-quality forgeries. Subjects in
+the dataset include actors, politicians, and public figures, exhibiting varied facial expres-
+sions, head poses, and lighting conditions. To address ethical concerns, the dataset was
+built using publicly available video data without including any personally identifiable
+information. The preprocessing includes frame extraction and face alignment from
+frames, followed by normalization of frames and pixel values and resizing of frames to
+a standard dimension of 150x150. Low-quality frames and the problem of misaligned
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+10/ 26
+
+
+--- PAGE 11 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+Fig 3. Sample frames of original and four types of manipulations videos from FaceForensics++ (FF++) dataset
+[11] (Images used in this figure are sourced from the FaceForensics++ dataset © 2018 , under the MIT License.
+https://github.com/ondyari/FaceForensics/tree/master).
+https://doi.org/10.1371/journal.pone.0326565.g003
+faces, which were derived from data quality factors, were respectively solved by filter-
+ing and manual correction. The dataset variables include frame number, RGB pixel val-
+ues, and binary labels indicating the authenticity of each frame. Data splitting was con-
+ducted using stratified sampling, with 70% for training, 15% for validation, and 15% for
+testing.
+Preprocessing steps
+This study uses a KAN to detect deepfakes by extracting pixel intensity values at the individ-
+ual pixel level from grey-scale facial frames of the videos. The data was preprocessed with
+a high level of preprocessing phases to successfully apply the KAN model provided in this
+study. Specifically, the details are:
+1. The input attributes were standardized to values between -1 and 1. Normalization
+improves training stability and ensures that all features contribute significantly in the
+learning algorithm.
+2. The control point was calculated using the B-spline interpolation grid as described in
+Eq 1 and illustrated in Fig 5. This involved selecting the appropriate grid size, range, and
+additional spaces to accommodate the spline.
+3. To improve model stability, the splines’ weights were first set to nonzero using random
+noise. This method helps to avoid suboptimal solutions.
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+11/ 26
+
+
+--- PAGE 12 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+4. The current base activation function SiLU (Sigmoid Linear Unit), as defined in Eq 2,
+was applied to them before of linear layers. This activation function facilitates learning
+by introducing Non-linearity.
+5. To limit the risk of overfitting the L1 and entropy-based regularization were imple-
+mented.These techniques not only penalize the spline weights but also improve the
+model’s generalization.
+Resolution choices.
+• The FaceForensics++ dataset is comprises on high quality videos of facial features. Resiz-
+ing the images from the video’s frames to a size of 224 x 224. These pixels guarantees that
+enough spatial details are preserved for the purpose of identifying fine details that might
+have been generated by deepfake techniques like FaceSwap as well as NeuralTextures .
+This resolution is also complies with the preprocessing standards that are normally used
+for benchmarking models on this dataset.Furthermore, the said resizing of the data also
+compatible with existing results in the literature.
+• The Celeb-DF videos are more difficult due to quality, lighting and pose may change from
+one frame to another. Reducing the image to 150×150 minimizes the processing need while
+keeping those facial features that are required for classification. This choice also solves the
+problem of the lower-quality frames in the Celeb-DF dataset, where resizing to a higher
+resolution like 224x224 as FaceForensics++ will amplify noise rather than enhance feature
+extraction.
+KAN architecture
+Kolmogorov- Arnold representation theorem provides the basis on which KAN is constituted,
+an evaluated model of neural network Fig 4. In contrast to the conventional MLPs that utilize
+fixed activation functions at their nodes, the KANs employ learnable activation functions on
+their edges.
+The proposed KAN architecture of the study relies on B-spline functions due to its learn-
+able activation functions. Its allow the network to model complex, non-linear relationships in
+the input data. In the B-spline curve, the control points impart local control over the curve-
+shape rather than the global control, Fig 5. This spline-based representation is key to the
+flexibility and efficiency of KAN.
+spline(x) = ∑
+i
+ciBi(x)
+(1)
+The Bi(x) are the B-spline basis functions, and ci are the coefficients learned during train-
+ing. B-splines are piecewise polynomial functions that are defined over a sequence of inter-
+vals, called knots. They allow for smooth, continuous representations of input data [17].
+silu(x) =
+x
+1 + e–x
+(2)
+SiLU is used to add a non-linear transformation to the input features before they are pro-
+cessed by the spline function. It helps stabilize learning and introduces flexibility in feature
+representation.
+The Fig 5 presents two B-spline curves: the first in Fig 5a shows the curve prior to any
+adjustments, while Fig 5b illustrates a new curve resulting from the movement of control
+point 2. Notably this adjustment maintains the overall shape and continuity of the curve,
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+12/ 26
+
+
+--- PAGE 13 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+Fig 4. Example of KAN Architecture - Left: Notations for the activations passing through the network. Right: An activation function parameterized with a
+B-spline [17].
+https://doi.org/10.1371/journal.pone.0326565.g004
+Fig 5. Visual illustration of B-spline curves before and after changing control point 2.
+https://doi.org/10.1371/journal.pone.0326565.g005
+highlighting a fundamental characteristic of B-splines, local control. Modifying a single con-
+trol point does not significantly impact the entire curve, demonstrating the stability and
+robustness of B-splines in shape modeling and KAN’s performance.
+f(x) =
+2n+1
+∑
+q=1
+Φq
+⎛
+⎝
+n
+∑
+p=1
+𝜙q,p(xp)⎞
+⎠
+(3)
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+13/ 26
+
+
+--- PAGE 14 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+This is the core equation of the KAN. Each input feature xp is transformed by the spline
+function 𝜙q,p(xp), then aggregated using higher-level transformations Φq.
+𝜙(x) = w ⋅(b(x) + spline(x))
+(4)
+Here, b(x) is the base activation function (SiLU), and spline(x) is the spline-based transfor-
+mation. The weight w controls the influence of the spline.
+b(x) = silu(x) =
+x
+1 + e–x
+(5)
+This reiterates that the SiLU function serves as the foundational non-linearity.
+The proposed model was defined by using the KAN as illuetrated in Fig 6. It was designed
+by PyTorch. The input size was set to 256 x 256. The output layer had two nodes, indicating
+the model was designed for image classification tasks. The model had a single hidden layer
+with 200 units, followed by an output layer with 2 units, corresponding to a binary classi-
+fication task. The AdamW optimizer was used in the study for optimization. The learning
+rate was set to 1e-3, and the weight decay was 1e-4. In addition, exponential learning rate
+scheduler to reduce the learning rate during training, using a gamma parameter of 0.8. The
+standard cross-entropy loss was chosen as the objective function for the binary classification
+task. The KAN architecture utilized B-spline basis functions and spline-based weights. This
+provided a powerful and flexible framework for learning and classification tasks.
+Fig 6. Proposed KAN for deepfake identification on resource constrained environments.
+https://doi.org/10.1371/journal.pone.0326565.g006
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+14/ 26
+
+
+--- PAGE 15 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+Training process
+We started by experimenting with different grid sizes, such as 3, 5, and 7. We also apply
+different spline orders like 2, 3, and 4. Additionally, we adjusted scaling factors for noise,
+base weights, and spline weights. We tested various activation functions, including ReLU,
+LeakyReLU, and SiLU. Furthermore, we varied the batch size (e.g., 32, 64, 128), the number of
+epochs (e.g., 10, 15, 20), and the image size (e.g., 150x150, 224x224, 256,256, 512x512). Exten-
+sive experimentation revealed that a grid size of 5, spline order of 3, and SiLU are optimal.
+It was also determined that the ideal batch size was 64 after setting the number of epochs to
+15.These hyperparameters were found to improve the model’s effectiveness and generaliza-
+tion capabilities. Further testing is needed to evaluate their impact on resistance to adversarial
+attacks. To keep things simple, the model architecture contained only one hidden layer, Fig 6.
+We tried several values to determine the nodes of hidden layer like: 100, 200, and 300, but 200
+seemed to perform the best. Several optimizers were tested on the network, including SGD,
+Adam, and AdamW. The AdamW optimizer, with a learning rate of 1 × 10–3 and weight decay
+of 1 × 10–4, achieved the best performance. We utilized an exponential learning rate scheduler
+with a decay rate of 0.8 to adaptively control learning rate during training. To prevent over-
+fitting, regularization techniques were utilized to adjust spline weights during training. These
+included L1 regularization, which penalized the absolute values of the weights, and entropy-
+based regularization, which ensured a balanced weight distribution. During training sessions,
+validation was tracked and the results analyzed in order to improve the training process of the
+model. Through careful tuning of the hyperparameters and following the training process, as
+outlined above, the KAN model managed to learn from the input data and reached high accu-
+racy of the predictions while being quite insensitive to the changes in the data and capable of
+generalizing to unseen examples.
+Resource estimation methods for CNN models
+The deploying of CNNs on resource-constrained devices, such as edge devices and embed-
+ded platforms, requires a careful estimation of computational resources. Key metrics include
+memory usage, floating-point operations (FLOPs), power consumption, and energy usage.
+The following section describes the formulas used to estimate these metrics.
+Memory usage
+A significant portion of memory in a CNN is utilized for storing model parameters, such
+as weights and biases, as well as the feature maps, which are the outputs of each layer. The
+memory required for parameters could be calculated [25] as:
+Memory (MB) = Number of Parameters × Precision (bits)
+8 × 106
+(6)
+where the precision was typically 32 bits for floating-point operations.
+FLOPs (Floating Point Operations)
+FLOPs measured the computational cost of CNNs, representing the number of multiply-
+accumulate (MAC) operations required. For a convolutional layer, the FLOPs could be calcu-
+lated as:
+FLOPs = 2 × H × W × Cin × Kh × Kw × Cout
+(7)
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+15/ 26
+
+
+--- PAGE 16 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+where H and W were the dimensions of the output feature map, Cin and Cout were the input
+and output channels, and Kh and Kw were the kernel height and width [25,58].
+Compute time
+To understand the performance of CNNs on edge devices, we used a tool called Augur. Augur
+estimates the resource requirements, including compute time and memory usage for any
+given CNN configuration [25]. It achieves this by analyzing the descriptor of a CNN model
+and using corresponding profiling data. By simulating various configurations, Augur provides
+insights into the most efficient ways to deploy CNNs on edge devices. This tool can also deter-
+mine when performance optimizations or offloading computations are necessary, ensuring
+efficient execution of deep learning tasks on resource-constrained devices.
+Application to CNN models
+These formulas were applied in various studies to model and optimize the deployment of
+CNNs on mobile and embedded platforms. For example, [25] adopted these equations in their
+Augur tool to predict the resources needed for execution of ConvNets on portable devices.
+Likewise, [58] used these formulas to assess the computational costs of various neural net-
+work architectures.
+Table 1 provides information for the amount of memory used (in MB), the number of
+parameters in (M), computation time in (ms) on Tegra K1 CPU, computation time in (ms) on
+Jetson TX1 GPU, number of FLOPs in (M) and GFLOPs for different CNN models and the
+proposed KAN model at the edge devices.
+Experiments and results
+Experimental setup
+The NVIDIA Tegra K1 CPU and Jetson TX1 GPU are important to consider for the utiliza-
+tion of edges devices, particularly relevant to CNN resource requirements. The Tegra K1 CPU
+is powered by a 3.2GHz quad-core ARM Cortex-A15 32-bit processor and paired with a 192
+CUDA cores Kepler GPU along with 2GB of DDR3L RAM. The Jetson TX1 GPU has a more
+powerful configuration with a 1.9GHz quad-core ARM Cortex-A57 64-bit CPU, 256 CUDA
+cores Maxwell GPU, and 4GB of LPDDR4 RAM.
+These components, commonly found in developer kits like the NVIDIA Jetson Tegra K1
+and Jetson TX1 boards. These are necessary for operation and enhance the performance of
+CNN models such as AlexNet, VGG-Net, GoogleNet and ResNet etc. Both platforms sup-
+port CUDA with indicating GPU acceleration, which is critical for high-performance deep
+learning tasks. The Tegra K1 and Jetson TX1 provide for efficient monitoring and evaluation
+of time, memory, and power consumption for different CNN models. It is beneficial to study
+these in order to identify many areas that can be improved. This analysis helps to installing
+CNNs on edge devices, as well as potential solutions for improving system and low-power
+resources. By understanding these limitations the developers can optimize their CNN models
+for efficient performance on limited resource platforms.
+Evaluation metrics
+Evaluation metrics for resource usage. To evaluate the KAN model’s efficiency with
+davailable resources, we compare it to baseline dmodels using appropriate metrics. The met-
+rics are included Model Memory Used (MB), Number of Parameters in million (M), Compute
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+16/ 26
+
+
+--- PAGE 17 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+Time in millisecond (ms) on Tegra K1 CPU and on Jetson TX1 GPU, FLOPs in Millions (M),
+and GFLOPs. The results are summarized in Table 1.
+• Model Memory Used: We describe memory costs for each model in megabytes (MB) to bet-
+ter understand resource usage during inference on edge devices. Less memory consump-
+tion indicates a more efficient model. That is particularly important for deployment on
+resource-constrained devices.
+• Number of Parameters: The number of parameters used in the model is described in mil-
+lions (M). The size of parameters during training and inference are strongly related with
+resource constrained environment. The models with fewer parameters are generally more
+efficient, faster and reducing the computational burden, but accuracy must be maintained.
+• Compute Time: Compute time is evaluated on two different hardware platforms: the Tegra
+K1 CPU and Jetson TX1 GPU, Sect. The execution time, measured in milliseconds (ms). It
+is crucial for understanding the model’s performance on low-power, CPU-based devices,
+which are commonly used in edge computing.
+• FLOPs: Floating Point Operations (FLOPs) measure in millions (M) for the number of
+arithmetic operations required to perform inference. Lower FLOPs indicate a more efficient
+model in terms of computational complexity.
+• GFLOPs: Giga Floating-Point Operations Per Second (GFLOPs) metric represents the num-
+ber of floating-point operations per second in billions. Specifically, 1 GFLOP equals 1 bil-
+lion FLOPs. The lower GFLOPs indicates that fewer computations are needed, which can be
+beneficial in resource constraints devices because it reduces power consumption, speeds up
+processing time, and conserves energy.
+Evaluation metrics for CNN accuracy. The effectiveness of the proposed KAN model is
+evaluated through a comprehensive comparison with several established CNN models. The
+evaluation is based on the accuracy achieved across different datasets and the published year
+of each model to provide context for the technological advancements in the field.
+• Accuracy: The accuracy is a fundamental metric that measures the proportion of correct
+predictions made by the model out of the total predictions. Higher accuracy indicates better
+performance and reliability of the model in correctly classifying or predicting the outcomes.
+The accuracy of the model was calculated using the following formula:
+Accuracy =
+TP + TN
+TP + FP + TN + FN
+(8)
+The accuracy of a binary classification model is often calculated using the formula of 8
+where: True Positives (TP) represent instances where the model correctly predicted a pos-
+itive class. True Negatives (TN), on the other hand, indicate instances where the model
+correctly predicted a negative class. False Positives (FP) occur when the model incorrectly
+predicts a positive class when it was actually negative. Finally, False Negatives (FN) repre-
+sent instances where the model incorrectly predicts a negative class when it was actually
+positive.
+• Publish Year: The publishing year of each model provides context for the technological
+advancements in the field. Furthermore, its also provides context regarding the model’s
+recency and relevance, as newer models incorporate more advanced techniques and opti-
+mizations.
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+17/ 26
+
+
+--- PAGE 18 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+Results
+The proposed KAN model was thoroughly evaluated against of well-established CNN mod-
+els to demonstrate its significance performance in terms of resource utilization and accuracy
+across different datasets. The summary in Tables 1 and 2 , serves to highlight the computa-
+tional efficiency and model’s effectiveness in deepfake detection tasks, respectively. The results
+are aligned with the paper’s objective of introducing a model that balances accuracy with
+resource optimization.
+Resource usage comparison. The resource usage comparison for different CNN mod-
+els, including the proposed KAN, reveals its significane into their efficiency and performance,
+Fig 7 and Table 1. The KAN model demonstrates exceptional memory efficiency, using only
+52.4 MB, which is considerably lower than VGGNet (548 MB), ResNet (103 MB), AlexNet (61
+MB), and InceptionNet (53 MB). This low memory usage makes the KAN model highly suit-
+able for deployment on resource-constrained devices. Furthermore, the KAN model has only
+13.11 million number of parameters, striking a balance between complexity and efficiency.
+It has fewer parameters than VGGNet (138 million), ResNet (25.6 million) and AlexNet (61
+million), but more than InceptionNet (6.8 million).
+When evaluating compute time on the Tegra K1 CPU, the KAN model shows the fastest
+time of 262.16 ms, outperforming VGGNet (7690 ms), ResNet (2068 ms), AlexNet (618 ms),
+and InceptionNet (1064 ms). This superior performance is also evident on the Jetson TX1
+GPU, where the KAN model achieves a compute time of 26.22 ms, significantly faster than
+VGGNet (149 ms), ResNet (97 ms), and InceptionNet (35 ms) but more than AlexNet (20
+ms). The KAN model’s efficiency is further highlighted by its low computational complex-
+ity, requiring only 26.21 million FLOPs, compared to VGGNet (15,503 million), ResNet
+Fig 7. Resource consumption analysis of benchmark CNN models vs proposed KAN.
+https://doi.org/10.1371/journal.pone.0326565.g007
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+18/ 26
+
+
+--- PAGE 19 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+(3,922 million), AlexNet (729 million), and InceptionNet (1,606 million). Additionally, the
+KAN model achieves 0.013 GFLOPs, underscoring its efficiency in terms of computational
+resources.
+Efficiency evaluation and comparison. The performance of the proposed KAN was com-
+pared to several established CNN models across various datasets, with a focus not only on
+accuracy but also on resource consumption, demonstrated in Figs 8, 10 and Table 2.
+The results reveal that traditional models such as VGG-16, ResNet-152, and InceptionNet
+deliver strong accuracy in deepfake detection tasks, they do so at the cost of high resource
+usage as mention in Table 1. For instance, VGG-16 achieved an accuracy of 90% on a cus-
+tom dataset and 88% on the FaceForensics++ dataset. ResNet-152 reached 91% accuracy
+on the Celeb-DF dataset, and InceptionNet recorded a high accuracy of 93% on the Kaggle
+Dataset. However, these models require significant computational resources, making them
+less practical for deployment in resource constrained devices.
+AlexNet, despite enhancements such as additional layers and integration of support vec-
+tor machines (SVM), achieved a more modest accuracy of 87.49% on the FaceForensics++
+and 86.10% on real and fake face detection datasets, respectively. Although AlexNet is less
+resource intensive than models like VGG-16 and ResNet-152, its accuracy falls short, partic-
+ularly in complex deepfake detection tasks.
+In contrast, the proposed KAN model demonstrates that high accuracy does not necessar-
+ily require high resource consumption. KAN achieved an impressive accuracy of 95.01% on
+the FaceForensics++ dataset and 88.32% on the Celeb-DF dataset. These results are compet-
+itive with, and in some cases exceed, the performance of other leading CNN models. More
+importantly, KAN does so with significantly lower memory usage, fewer parameters, and
+faster computation times.
+Fig 8. Accuracy of established CNN models vs proposed KAN model.
+https://doi.org/10.1371/journal.pone.0326565.g008
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+19/ 26
+
+
+--- PAGE 20 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+Fig 9. Memory and accuracy of benchmark CNN vs proposed KAN model.
+https://doi.org/10.1371/journal.pone.0326565.g009
+As mentioned in Table 3 Chen et al. [29] suggest DefakeHop, which utilizes the Celeb-
+DF dataset, achieves an accuracy of 90.56% with 42.8K parameters. However, it has notable
+drawbacks, including its limitation to spatial features and a lack of temporal analysis. This
+Fig 10. Training and validation metrics for Celeb-DF and FF++ datasets of proposed KAN.
+https://doi.org/10.1371/journal.pone.0326565.g010
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+20/ 26
+
+
+--- PAGE 21 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+model struggles with generalizing to newer deepfake techniques and is vulnerable to adver-
+sarial attacks. While it demonstrated good performance on Celeb-DF, it reflects difficulties
+with unseen manipulations.KAN employs spline-based activations that dynamically adapt
+to diverse manipulations, which we hypothesize may offer better generalization and poten-
+tially improved adversarial robustness compared to some other models. However, specific
+tests for adversarial robustness are required to confirm it. Pipin et al. [30] report an impres-
+sive accuracy of 97.89% on the FaceForensics++ and Celeb-DF datasets, but this comes at a
+high computational cost due to PRNU preprocessing. Additionally, the model requires high-
+quality inputs and is less robust when dealing with noisy or compressed videos, which limits
+its scalability for real-time edge applications. KAN stands out with its lightweight architecture,
+using only 52.4 MB of memory, enabling real-time deployment on edge devices without rely-
+ing on computationally expensive preprocessing techniques. Liu et al. [31] model, also tested
+on Celeb-DF, achieves an accuracy of 95%. It is however constrained by a fixed framework
+that cannot be changed. The solution does not address robustness against adversarial attacks
+or noise in new deepfakes. Though it uses a moderate amount of memory but KAN needs the
+smallest number of parameters (13.11 M) while obtaining comparable or even better accu-
+racy. Additionally, KAN employs regularization techniques to enhance its robustness against
+adversarial and noisy inputs. MobiDeep [48], which is trained on the DFDC dataset, likewise
+achieves 93.4% accuracy. The mobile version of the study is characterized that it is uses less
+than 2 MB of memory. However, it focuses on eye locations and excludes other manipulations
+like body gestures. It depends only on the corneal specula’s bright reflection. That will reduces
+its efficiency in low-light conditions or with occlusions such as spectacles. The lack of test-
+ing on popular benchmarks like Celeb-DF and FaceForensics++ make its performance com-
+parisons tough.Furthermore, the model is subject to adversarial attacks on specific aspects,
+as well as having issues on low-quality and compressed data. In contrast, the proposed KAN
+model does not depend on domain-specific features, allowing broader applicability to var-
+ious deepfake types. It has been evaluated against popular benchmarks and demonstrating
+its capacity of generalization. The study deployment on edge devices results in 52.4 MB of
+memory with 26.21 million FLOPs. Additionally, it mitigates noise and adversarial attacks to
+give consistent and reliable solutions. MOreover, the usage of B-splines allows for dynamic
+feature representation. The suggested KAN model performs well on both FaceForensics++
+and Celeb-DF datasets, maintaining the accuracies of 95.01% and 88.32% respectively. Its
+robustness and precision make it ideal for real-time and edge device operations.
+Discussion
+Interpretation of results
+The primary objective of this study was to develop and evaluate the KAN as an efficient model
+for resource constrained devices and an accurate model for deepfake detection. The exper-
+imental results validate the effectiveness of KAN, demonstrating its ability to achieve high
+accuracy on diverse datasets with minimal computational resources, represented in Figs 7,
+9 and Table 1. Specifically, KAN achieved an accuracy of 95.01% on the FaceForensics++
+dataset and 88.32% on the Celeb-DF dataset, closely matching or even exceeding the per-
+formance of leading CNN models such as ResNet-152 and InceptionNet V3, Figs 8, 10 and
+Table 2.
+Moreover, KAN’s ability to maintain such accuracy while significantly reducing resource
+consumption, which is presented in Table 1, lower memory usage, fewer parameters, and
+faster computation times perfectly aligns with the study’s objective. These results highlight
+KAN’s potential as a practical solution for deepfake detection, particularly in environments
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+21/ 26
+
+
+--- PAGE 22 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+where computational efficiency is critical. The insights gained from these experiments con-
+firm that KAN successfully balances the trade-off between high detection accuracy and
+resource efficiency, making it a valuable contribution to the field of deep learning and dig-
+ital media forensics. Our findings demonstrate that KANs outperform existing methods in
+terms of resource efficiency, accuracy, and generalization for classifying various types of deep-
+fake data. However, their robustness against adversarial attacks was not specifically tested and
+remains an area for future research.
+Challenges and limitations
+The current approach presented in this study faces several challenges and limitations, par-
+ticularly regarding the optimization of the KAN Mapping Layer. Extensive experimentation
+was required to ensure that the model could generalize effectively when exposed to differ-
+ent data types. This process was crucial in achieving an optimal balance between accuracy
+and resource efficiency. One of the significant challenges is that deepfake generation is an
+ongoing process, not a one-time event. As a result, continuous updates in detection processes
+are necessary to ensure the effectiveness and accuracy of deepfake media classification. This
+challenge highlights the need for ongoing research focused on developing robust KAN mod-
+els that can effectively address the dynamic nature of the deepfake landscape. Additionally,
+another limitation lies in the scope of the datasets used in this research. Although KAN has
+demonstrated strong generalization and efficiency on the FaceForensics++ and Celeb-DF
+datasets, its performance on other forms of manipulated media and newer deepfake tech-
+niques remains untested. Future studies should explore these areas to further validate the
+model’s adaptability and robustness in evolving real-world scenarios.
+Future work
+Future research should focus on addressing the limitations identified in the current study.
+For example, refining the KAN Mapping Layer would enhance the model’s ability to capture
+non-linear data structures. Additionally, extending the research on KAN to incorporate a
+wider variety of datasets and applying it to different forms of media manipulation and deep-
+fake scenarios will be essential in validating its generalization. Furthermore, focus on design-
+ing and implementing tests with various methods of adversarial attack to assess and enhance
+the model’s resilience, addressing a critical gap in current evaluation. To validate the robust-
+ness of KAN, it is crucial to extend the research by incorporating a wider variety of datasets
+and applying it on different forms of media manipulation and deepfake scenarios. Another
+promising avenue for development is enhancing the KAN model itself and integrating it with
+complementary approaches, such as temporal sequence analysis or multi-modal data fusion,
+to make it less sensitive to new methods of deepfake generation. Moreover, exploring the
+deployment of KAN in real-time and low-latency applications, especially on edge devices
+could significantly extend its applicability and impact.
+Conclusion
+This study explored the use of KANs as a computationally efficient and robust approach for
+deepfake detection.Experimental results demonstrate that KAN with a single hidden layer
+of 200 nodes achieves impressive accuracy of 95.01% on the FaceForensics++ dataset and
+88.32% on the Celeb-DF dataset. These results are competitive with and, in some cases, exceed
+the performance of traditional CNN models. The KAN model also demonstrates significant
+efficiency advantages, requiring only 52.4 MB of memory, 13.11 million parameters, and
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+22/ 26
+
+
+--- PAGE 23 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+26.21 million FLOPs. In contrast, traditional CNNs typically require substantially higher
+computational resources, making KANs particularly suitable for resource-constrained envi-
+ronments. Through extensive experimentation on these datasets, KANs demonstrated their
+ability to match or surpass CNN performance while utilizing significantly fewer resources.
+The efficiency and accuracy of KANs highlight their potential as a scalable solution for deep-
+fake detection. However, despite these promising results the development process encoun-
+tered specific obstacles, such as optimizing the Mapping Layer for effective generalization
+across diverse datasets and the constrained scope of the datasets. Which focused solely on
+visual deepfakes and excluded audio and multimodal forgeries. Additionally, although the
+architecture of KANs suggests possible resilience to adversarial attacks, this aspect has not
+yet been empirically tested. To address these limitations, future research will prioritize sev-
+eral key areas: (1) validating KANs’ robustness against adversarial techniques such as the Fast
+Gradient Sign Method (FGSM), DeepFool and Projected Gradient Descent (PGD); (2) broad-
+ening the dataset to encompass a wider variety of manipulated media, including audio and
+multimodal deepfakes; and (3) enhancing the model through architectural refinements and
+the integration of temporal or multimodal analysis to improve adaptability and real-time per-
+formance. Furthermore, this study aligns with the United Nations Sustainable Development
+Goals, particularly SDG 9: Industry, Innovation, and Infrastructure and SDG 16: Peace, Jus-
+tice, and Strong Institutions, by promoting secure and innovative solutions in digital media
+forensics.
+Author contributions
+Conceptualization: Nadeem Jabbar, Sohail Masood Bhatti, Sheeraz Akram.
+Data curation: Nadeem Jabbar.
+Formal analysis: Nadeem Jabbar, Sohail Masood Bhatti, Muhammad Rashid, Arfan Jaffar.
+Investigation: Nadeem Jabbar, Sohail Masood Bhatti, Muhammad Rashid, Sheeraz Akram.
+Methodology: Nadeem Jabbar, Muhammad Rashid, Arfan Jaffar, Sheeraz Akram.
+Project administration: Nadeem Jabbar.
+Resources: Arfan Jaffar.
+Supervision: Sohail Masood Bhatti.
+Validation: Nadeem Jabbar, Sohail Masood Bhatti, Muhammad Rashid, Arfan Jaffar, Sheeraz
+Akram.
+Visualization: Nadeem Jabbar, Sohail Masood Bhatti, Muhammad Rashid.
+Writing – original draft: Nadeem Jabbar, Muhammad Rashid.
+Writing – review & editing: Nadeem Jabbar, Sohail Masood Bhatti, Muhammad Rashid,
+Arfan Jaffar, Sheeraz Akram.
+References
+1.
+Guarnera L, Giudice O, Nießner M, Battiato S. On the exploitation of deepfake model recognition.
+In: 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW).
+IEEE; 2022. p. 61–70.
+2.
+Delmas M, Kacete A, Paquelet S, Leglaive S, Séguier R. LatentForensics: towards lighter deepfake
+detection in the StyleGAN latent space. arXiv preprint 2023. https://arxiv.org/abs/2303.17222
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+23/ 26
+
+
+--- PAGE 24 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+3.
+Whittaker L, Mulcahy R, Letheren K, Kietzmann J, Russell-Bennett R. Mapping the deepfake
+landscape for innovation: a multidisciplinary systematic review and future research agenda.
+Technovation. 2023.
+4.
+Murphy G, Twomey JE, Linehan C. Face/off: changing the face of movies with deepfakes. PLOS
+ONE. 2023.
+5.
+Yao H, Li M. FakePoI: a large-scale fake person of interest video detection benchmark and a strong
+baseline. IEEE Trans Circuits Syst Video Technol. 2023.
+6.
+Jabbar Nadeem CH, Saghir A, Meer AA, Sahi SA, Hassan B, Siddiqui MY. Media forensics and
+deepfake - systematic survey. RS Open J Innov Commun Technol. 2023;3(8). ResearcherStore.
+7.
+Xu J, Dharamshi K, Lutteroth C. FakeForward: using deepfake technology for feedforward learning.
+2023.
+8.
+Sun F, Zhang N, Xu P, Song Z. Deepfake detection method based on cross-domain fusion. Secur
+Commun Netw. 2021;2021:2482942.
+9.
+Yang Z, Liang J, Xu Y, Zhang X-Y, He R. Masked relation learning for DeepFake detection. IEEE
+TransInform Forens Secur. 2023;18:1696–708. https://doi.org/10.1109/tifs.2023.3249566
+10.
+Jain A, Korshunov P, Marcel S. Improving generalization of deepfake detection by training for
+attribution. In: 2021 IEEE 23rd International Workshop on Multimedia Signal Processing (MMSP).
+2021. p. 1–6. https://doi.org/10.1109/mmsp53017.2021.9733468
+11.
+Rössler A, Cozzolino D, Verdoliva L, Riess C, Thies J, Nießner M. Faceforensics: learning to detect
+manipulated facial images. In: IEEE/CVF International Conference on Computer Vision. 2019. p.
+1–11.
+12.
+Mirsky Y, Lee W. The creation and detection of deepfakes: a survey. ACM Computing Surveys.
+2021;54(1):1–41.
+13.
+Afchar D, Nozick V, Yamagishi J, Echizen I. Mesonet: a compact facial video forgery detection
+network. In: 2018 IEEE International Workshop on Information Forensics and Security (WIFS).
+IEEE; 2018. p. 1–7.
+14.
+Nguyen TTH, Nguyen CM, Nguyen DT, Nguyen DTH, Nahavandi S. Deep learning for deepfakes
+creation and detection. arXiv preprint 2019. https://arxiv.org/abs/1909.11573
+15.
+Li Y, Lyu S. Exposing deepfake videos by detecting face warping artifacts. In: 2019 IEEE/CVF
+Conference on Computer Vision and Pattern Recognition Workshops (CVPRW). IEEE; 2019. p.
+46–53.
+16.
+Cao X, Gong N. Understanding the security of deepfake detection. arXiv preprint 2021.
+https://doi.org/10.48550/arXiv.2107.02045
+17.
+Liu Z, Wang Y, Xu S, Yi Z, Song J, Ma P, et al. KAN: Kolmogorov-Arnold networks. arXiv preprint
+2024. https://arxiv.org/abs/2407.16674
+18.
+Wen J, He T, Hu Y, Liu Z, Zhang J, Zhu Y. A benchmarking study of Kolmogorov-Arnold networks
+on tabular data. arXiv preprint 2024. https://arxiv.org/abs/2407.16675
+19.
+Sun B, Lu Z, Shen K, Sun Y. Chebyshev polynomial-based Kolmogorov-Arnold networks: an
+efficient architecture for nonlinear function approximation. arXiv preprint 2024.
+https://arxiv.org/abs/2405.07200
+20.
+Zang C, Wang G, Li J, Xia K. Kolmogorov Arnold informed neural network: a physics-informed deep
+learning framework for solving PDEs based on Kolmogorov Arnold networks. arXiv preprint 2024.
+https://arxiv.org/abs/2406.11045
+21.
+Deng Y, Ding Y, Zhang J, Zeng F. Smooth Kolmogorov Arnold networks enabling structural
+knowledge representation. arXiv preprint 2024. https://arxiv.org/abs/2405.11318
+22.
+Huang J, Zhao M, Yan H, Yang H, Gong Y. ReLU-KAN: new Kolmogorov-Arnold networks that only
+need matrix addition, dot multiplication, and ReLU. arXiv preprint 2024.
+https://arxiv.org/abs/2406.02075
+23.
+Liu G, Ding C, Li H, Sun B, Jin R, Zhao J, et al. Kolmogorov-Arnold Networks (KANs) for time series
+analysis. arXiv preprint 2024. https://arxiv.org/abs/2405.08790
+24.
+Liu G, Ding C, Sun B, Li H, Jin R, Zhao J, et al. A Temporal Kolmogorov-Arnold transformer for time
+series forecasting. arXiv preprint 2024. https://arxiv.org/abs/2406.02486
+25.
+Lu Z, Rallapalli S, Chan Kevin S, Pu S, La Porta Thomas F. Augur: modeling the resource
+requirements of ConvNets on mobile devices. IEEE Trans Mobile Comput. 2021;20:352–65.
+26.
+Chen Y u, Yu Y ang, Ni R, Zhao Y ao, Li H ao. NPVForensics: jointing non-critical phonemes and
+visemes for deepfake detection. arXiv preprint 2023. https://doi.org/10.48550/arXiv.2306.06885
+27.
+Korshunov P, Marcel S. Improving generalization of deepfake detection with data farming and
+few-shot learning. IEEE Trans Biomet Behav Identity Sci. 2022;4:386–97.
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+24/ 26
+
+
+--- PAGE 25 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+28.
+Hooda A, Mangaokar N, Feng R, Fawaz K, Jha S, Prakash A. Towards adversarially robust
+deepfake detection: an ensemble approach. arXiv preprint 2022.
+https://doi.org/10.48550/arXiv.2202.05687
+29.
+Chen H-S, Rouhsedaghat M, Ghani H, Hu S, You S, Jay Kuo C-C. DefakeHop: a light-weight
+high-performance deepfake detector. In: 2021 IEEE International Conference on Multimedia and
+Expo (ICME), 2021. p. 1–6. https://doi.org/10.1109/icme51207.2021.9428361
+30.
+Pipin SJ, Purba R, Pasha MF. Deepfake video detection using spatiotemporal convolutional network
+and photo response non uniformity. In: 2022 IEEE International Conference of Computer Science
+and Information Technology (ICOSNIKOM). 2022. p. 1–6.
+31.
+Liu J, Zhu K, Lu W, Luo X, Zhao X. A lightweight 3D convolutional neural network for deepfake
+detection. Int J Intell Syst. 2021;36:4990–5004.
+32.
+Jolly V, Telrandhe M, Kasat A, Shitole A, Gawande K. CNN based deep learning model for
+deepfake detection. In: 2022 2nd Asian Conference on Innovation in Technology (ASIANCON).
+2022. p. 1–5. https://doi.org/10.1109/asiancon55314.2022.9908862
+33.
+Ramachandran S, Nadimpalli AV, Rattani A. An experimental evaluation on deepfake detection
+using deep face recognition. In: 2021 International Carnahan Conference on Security Technology
+(ICCST). 2021. p. 1–6. https://doi.org/10.1109/iccst49569.2021.9717407
+34.
+Patel N, Jethwa N, Mali C, Deone J. Deepfake video detection using neural networks. ITM Web
+Conf. 2022.
+35.
+Jose C. Deepfake detection using imagenet models and temporal images of 468 facial landmarks.
+arXiv preprint 2022. https://arxiv.org/abs/2208.06990
+36.
+Bird JJ, Lotfi A. Real-time detection of AI-generated speech for deepfake voice conversion. arXiv
+preprint 2023. https://doi.org/10.48550/arXiv.2308.12734
+37.
+Mateen M, Bawany NZK. Deep learning approach for detecting audio deepfakes in Urdu. NUML Int
+J Eng Comput. 2023;2(1).
+38.
+Hamza A, Javed ARR, Iqbal F, Kryvinska N, Almadhor AS, Jalil Z, et al. Deepfake audio detection
+via MFCC features using machine learning. IEEE Access. 2022;10:134018–28.
+https://doi.org/10.1109/access.2022.3231480
+39.
+Chakravarty N, Dua M. Data augmentation and hybrid feature amalgamation to detect audio deep
+fake attacks. Physica Scripta. 2023.
+40.
+Abdzadeh Ziabary P, Veisi H. A countermeasure based on CQT spectrogram for deepfake speech
+detection. In: 2021 7th International Conference on Signal Processing and Intelligent Systems
+(ICSPIS). 2021.
+41.
+Ha H, Kim M, Han S-Y, Lee S. Robust DeepFake detection method based on ensemble of ViT and
+CNN. In: Proceedings of the 38th ACM/SIGAPP Symposium on Applied Computing. 2023.
+42.
+Anas Raza M, Mahmood Malik K. Multimodaltrace: Deepfake detection using audiovisual
+representation learning. In: 2023 IEEE/CVF Conference on Computer Vision and Pattern
+Recognition Workshops (CVPRW). 2023. p. 993–1000.
+https://doi.org/10.1109/cvprw59228.2023.00106
+43.
+Salvi D, Liu H, Mandelli S, Bestagini P, Zhou W, Zhang W, et al. A robust approach to multimodal
+deepfake detection. J Imaging. 2023;9(6):122. https://doi.org/10.3390/jimaging9060122 PMID:
+37367470
+44.
+Muppalla S, Jia S, Lyu S. Integrating audio-visual features for multimodal deepfake detection. arXiv
+preprint 2023. https://doi.org/arXiv:2310.03827
+45.
+Shahzad SA, Hashmi A, Peng Y-T, Tsao Y, Wang H-M. AV-Lip-Sync: leveraging AV-HuBERT to
+exploit multimodal inconsistency for video deepfake detection. arXiv preprint 2023.
+https://doi.org/10.48550/arXiv.2311.02733
+46.
+Yang W, Zhou X, Chen Z, Guo B, Ba Z, Xia Z, et al. AVoiD-DF: audio-visual joint learning for
+detecting Deepfake. IEEE Trans Inf Forens Secur. 2023;18:2015–29.
+47.
+Perera AS, Atukorale AS, Kumarasinghe P. Employing super resolution to improve low-quality
+deepfake detection. In: 2022 22nd International Conference on Advances in ICT for Emerging
+Regions (ICTer). 2022. 013-8.
+48.
+Mohzary M, Almalki KJ, Choi B-Y, Song S. MobiDeep: mobile deepfake detection through machine
+learning-based corneal-specular backscattering. In: 2023 IEEE 20th Consumer Communications &
+Networking Conference (CCNC). 2023. p. 1104–9.
+49.
+Chen L, Zhang Y, Song Y, Liu L, Wang J. Self-supervised learning of adversarial example: towards
+good generalizations for deepfake detection. In: 2022 IEEE/CVF Conference on Computer Vision
+and Pattern Recognition (CVPR). 2022. p. 18689–98.
+50.
+Zeng Y, Zhou M, Xue Y, Patel VM. Securing deep generative models with universal adversarial
+signature. arXiv preprint 2023. https://doi.org/10.48550/arXiv.2305.16310
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+25/ 26
+
+
+--- PAGE 26 ---
+
+PLOS One
+Single-layer KAN for deepfake classification
+51.
+Chen L, Wang Z, Zhang J, Deng X, Wang Y. KAN or MLP: a fairer comparison. arXiv preprint 2024.
+https://arxiv.org/abs/2407.16674
+52.
+Zhu X, Su X, Shen M, Zhao J, Yao H, Chen C, et al. TKAN: temporal Kolmogorov-Arnold networks.
+arXiv preprint 2024. https://arxiv.org/abs/2405.07344
+53.
+Li X, Hu B, Zhang J, Wang J, Liu Z, He J. DeepOKAN: deep operator network based on kolmogorov
+arnold networks for mechanics problems. arXiv preprint 2024. https://arxiv.org/abs/2405.19143
+54.
+Zhao J, Fan H, Wang S, Gao M, Xiao K, Li J. GraphKAN: enhancing feature extraction with graph
+Kolmogorov Arnold Networks. arXiv preprint 2024. https://arxiv.org/abs/2406.13597
+55.
+Zhou Q i, Han X in, Zhang X ujie, Wei H an, Guo Y ang, Liu Q uanzhi, et al. Convolutional
+Kolmogorov-Arnold networks. arXiv preprint 2024. https://arxiv.org/abs/2406.13155
+56.
+Liu Z, Zang C, Wang G, Li J, Xia K. Kolmogorov-Arnold convolutions: design principles and
+empirical studies. arXiv preprint 2024. https://arxiv.org/abs/2407.01092
+57.
+Li Y, Yang X, Sun P, Qi H, Lyu S. Celeb-DF: A large-scale challenging dataset for deepfake
+forensics. In: IEEE Conference on Computer Vision and Pattern Recognition (CVPR). 2020.
+58.
+Tan M, Le Quoc V. EfficientNet: rethinking model scaling for convolutional neural networks. arXiv
+preprint 2019. https://arxiv.org/abs/1905.11946
+59.
+Raveena CR, Punyani P. Exploring deepfake detection: a comparative study of CNN models. In:
+2024 International Conference on Intelligent Systems for Cybersecurity (ISCS). 2024. p. 1–6.
+60.
+Villegas-Ch., J-A. Evaluating the robustness of deep learning models against adversarial attacks. J
+Mach Learn Appl. 2024;42:123–35.
+61.
+Ritter P, Lucian D, Anderies CA. Comparative analysis and evaluation of CNN models for deepfake
+detection. In: 2023 4th International Conference on Artificial Intelligence and Data Sciences
+(AiDAS). 2023. p. 250–5.
+62.
+Mohamed SN, Ahmed AA, Elsersy WF. FGSM adversarial attack detection on deepfake videos. In:
+2024 Intelligent Methods, Systems, and Applications (IMSA). 2024.
+63.
+Xie D, Chatterjee P, Liu Z, Roy K, Kossi E. DeepFake detection on publicly available datasets using
+modified AlexNet. In: 2020 IEEE Symposium Series on Computational Intelligence (SSCI). 2020. p.
+1866–71,
+64.
+Yao C, Gholami A. Trust region-based adversarial attack on neural networks. In: Proceedings of the
+International Conference on Machine Learning (ICML). 2018. p. 456–65.
+65.
+Rafique R, Nawaz M, Kibriya H, Masood M. DeepFake detection using error level analysis and deep
+learning. In: 2021 4th International Conference on Computing & Information Sciences (ICCIS).
+2021. p. 1–4. https://doi.org/10.1109/iccis54243.2021.9676375
+66.
+Theerthagiri P, Nagaladinne G. Deepfake face detection using deep inceptionnet learning algorithm.
+In: 2023 IEEE International Students’ Conference on Electrical, Electronics and Computer Science
+(SCEECS). 2023. p. 1–6.
+67.
+Khan R, Artusi A. Adversarially robust deepfake media detection using multi-layer architectures.
+ACM Trans Multimedia Comput. 2021;37(4):115–32.
+68.
+Iqbal F, Abbasi A, Javed AR, Almadhor AS, Jalil Z, Anwar S, et al. Data augmentation-based novel
+deep learning method for deepfaked images detection. ACM Trans Multim Comput Commun Appl.
+2023.
+69.
+Lapid M, Haramaty E. AttackAR: attack of the evolutionary adversary. In: Proceedings of the 2022
+ACM International Conference on Multimedia. 2022. p. 214–22.
+PLOS One https://doi.org/10.1371/journal.pone.0326565
+July 9, 2025
+26/ 26

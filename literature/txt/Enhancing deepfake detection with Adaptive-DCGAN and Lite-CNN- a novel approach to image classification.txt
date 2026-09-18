@@ -1,0 +1,1152 @@
+
+
+--- PAGE 1 ---
+
+RESEARCH
+Open Access
+© The Author(s) 2025. Open Access  This article is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International 
+License, which permits any non-commercial use, sharing, distribution and reproduction in any medium or format, as long as you give appropriate 
+credit to the original author(s) and the source, provide a link to the Creative Commons licence, and indicate if you modified the licensed material. 
+You do not have permission under this licence to share adapted material derived from this article or parts of it. The images or other third party 
+material in this article are included in the article’s Creative Commons licence, unless indicated otherwise in a credit line to the material. If material 
+is not included in the article’s Creative Commons licence and your intended use is not permitted by statutory regulation or exceeds the permitted 
+use, you will need to obtain permission directly from the copyright holder. To view a copy of this licence, visit ​h​t​t​p​:​/​/​c​r​e​a​t​i​v​e​c​o​m​m​o​n​s​.​o​r​g​/​l​i​c​e​n​s​
+e​s​/​b​y​-​n​c​-​n​d​/​4​.​0​/.
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+https://doi.org/10.1007/s42452-025-07690-y
+*Correspondence:
+Gordhan Jethava
+gordhan.jethava@paruluniversity.
+ac.in
+1Department of Information 
+Technology, Parul Institute of 
+Engineering & Technology, FET, 
+Parul University, Vadodara, 
+Gujarat 391760, India
+2Department of MCA, Parul Institute 
+of Computer Application, FITCS, 
+Parul University, Vadodara, 
+Gujarat 391760, India
+Enhancing deepfake detection with Adaptive-
+DCGAN and Lite-CNN: a novel approach 
+to image classification
+Deepa Javiya1, Gordhan Jethava1*, Himani Parmar1 and Sweta Jethava2
+1  Introduction
+Social networks are essential to modern life by changing how people worldwide connect 
+and exchange information. Modern online social media platforms including Facebook, 
+Instagram, Twitter, and TikTok have built a system for people, organizations, and public 
+leaders to exchange information instantly [1–3]. Users now can use these platforms to 
+share their thoughts and personal content while developing new relationships and learn­
+ing from others [4]. Today’s social networks go beyond simple chatting by steering how 
+businesses market themselves and affecting political races and social change efforts [5]. 
+The digital world runs on social networks that let us connect with others, track trends, 
+Discover Applied Sciences
+Abstract
+The rapid advancement of digital content generation technologies has led to the 
+proliferation of deepfake media, posing significant security and privacy risks on 
+social networks. Conventional deepfake detection methods struggle with accuracy, 
+computational efficiency, and adaptability to evolving fake image generation 
+techniques. To address these challenges, we propose a novel deepfake detection 
+framework that integrates an Adaptive deep convolutional generative adversarial 
+network (Adaptive-DCGAN) with a lightweight convolutional neural network (Lite-
+CNN). The Adaptive-DCGAN generates high-quality synthetic images, enhancing 
+the training dataset, while the Lite-CNN efficiently classifies real and fake images 
+with minimal computational overhead. Experimental results demonstrate that the 
+proposed model achieves 95% accuracy, significantly outperforming existing GAN-
+CNN-based detection systems, which only reach 53% accuracy. Additionally, the 
+framework exhibits superior performance metrics, including 95% precision, recall, 
+and F1-score, ensuring robust and reliable deepfake detection. The proposed system 
+offers a scalable and efficient solution for securing digital media platforms against 
+deepfake threats. Future work will focus on improving generalization across diverse 
+datasets, incorporating advanced synthetic image generation techniques, and 
+enabling real-time deepfake detection for large-scale social media applications.
+Keywords  Deepfake detection, Adaptive-DCGAN, Lite-CNN, Social media security, 
+Image classification, AI-based forensics, Privacy protection
+
+
+--- PAGE 2 ---
+
+Page 2 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+and share ourselves better while building stronger online communities and learning 
+more about the world [6, 7].
+Social networks deliver multiple useful features yet struggle with major concerns 
+about security and privacy protection [8, 9]. Users worry more about their privacy as 
+daily personal data sharing keeps increasing so they request stronger protection for 
+their information [10, 11]. Social networks face a major danger from deepfake technol­
+ogy since it lets users make real-looking false media content [12]. Social networks face 
+security dangers when users employ deepfake technology to modify media content that 
+affects web users’ respectability [13, 14]. Social media users face constant threats from 
+this technology which enable online attacks that harm individual reputations and affect 
+entire social platforms [15].
+1.1  Research gap and motivation
+Scientists have put forth many studies to spot and prevent deepfakes since their emer­
+gence [16, 17]. Researchers have developed better ways to spot manipulated media but 
+deepfake creators keep finding new ways to outsmart detection systems [18, 19]. Deep­
+fake detection technology is constantly being developed because advanced attackers 
+keep creating more complex methods to hide their fakes. Scientists explore different 
+ML and neural network approaches to find strong deepfake detectors that process large 
+content streams in real time [20]. Modern research stands limited because the detection 
+systems need too many computing resources and take too long while failing to detect 
+up-to-date deepfake methods [21, 22]. The rising demand for fast deepfake detection 
+on social networks drives us to undertake this important research [23]. The high adop­
+tion rate of deepfakes and their misuse potential require us to create fast and reliable 
+detection systems now. Deepfake videos appeared during political elections to harm 
+candidates by promoting fake information against their prospects [24, 25]. This study 
+proposes a new way to identify deepfake images on social media by joining Adaptive 
+Deep Convolutional Generative Adversarial Network (DCGAN) and Lite Convolutional 
+Neural Network (CNN) methods together. Our goal is to create a system that can spot 
+deepfake content well and run fast for actual implementation across social media and 
+news platforms today.
+1.2  Our contributions
+Our research presents a scalable and effective solution for securing digital media against 
+deepfake threats while addressing the limitations of existing detection methodologies. 
+We introduce a novel deepfake detection framework that integrates an Adaptive Deep 
+Convolutional Generative Adversarial Network (Adaptive-DCGAN) with a lightweight 
+Convolutional Neural Network (Lite-CNN) to enhance detection accuracy, computa­
+tional efficiency, and adaptability against evolving deepfake generation techniques. Our 
+contributions can be summarized as follows:
+ 	•
+Hybrid model for deepfake detection: We propose a deepfake detection framework 
+that combines Adaptive-DCGAN for synthetic image generation and Lite-CNN for 
+lightweight and efficient classification. This integration significantly enhances model 
+robustness and adaptability.
+
+
+--- PAGE 3 ---
+
+Page 3 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+ 	•
+Enhanced training data with Adaptive-DCGAN: The Adaptive-DCGAN generates 
+high-quality synthetic deepfake images, enriching the training dataset and improving 
+the modelâ€™s ability to detect emerging deepfake patterns.
+ 	•
+Efficient and accurate detection with Lite-CNN: Our Lite-CNN is optimized to 
+classify real and fake images with minimal computational overhead while maintaining 
+high accuracy, making it suitable for large-scale social media applications.
+ 	•
+Superior performance metrics: The proposed framework achieves 95% accuracy, 
+significantly outperforming conventional GAN-CNN-based detection systems that 
+reach only 53% accuracy. It also demonstrates 95% precision, recall, and F1-score, 
+ensuring high reliability in deepfake detection.
+1.3  Novelty and differentiation from existing methods
+While the integration of GAN-based synthetic data generation with CNN-based clas­
+sification has been explored in previous works, our proposed framework introduces sig­
+nificant advancements that address critical limitations of existing techniques. The key 
+differentiating factors include:
+ 	•
+Adaptive learning mechanism in GAN training: Unlike conventional GAN models 
+that follow static training procedures, our Adaptive-DCGAN dynamically adjusts 
+training parameters based on deviation metrics. This ensures continual learning and 
+adaptation to emerging deepfake generation techniques, mitigating the common 
+issue of model obsolescence.
+ 	•
+Efficient lightweight CNN for real-time applications: We introduce a Lite-
+CNN architecture specifically optimized for deepfake detection with minimal 
+computational overhead. Existing GAN-CNN methods often involve heavy models 
+like ResNet, VGG, or DenseNet, which are impractical for deployment on resource-
+constrained environments. Our Lite-CNN achieves a high detection accuracy (95%) 
+while maintaining low complexity, making it suitable for large-scale social media 
+monitoring and mobile forensic tools.
+ 	•
+Enhanced data augmentation strategy with Adaptive-DCGAN: Unlike standard data 
+augmentation or traditional GAN-based synthetic data generation, our Adaptive-
+DCGAN enriches the training dataset with high-quality synthetic images that 
+adaptively evolve to counter new forgery patterns, improving detection robustness.
+ 	•
+Empirical evidence of superior performance: Through extensive ablation studies and 
+comparative evaluations (Sects. 4.4 and 4.5), we demonstrate that our proposed 
+system outperforms existing GAN-CNN ensemble models by a significant margin, 
+achieving improvements of 42% in accuracy and 60% in F1-score.
+These innovations collectively address existing gaps in scalability, adaptability, and effi­
+ciency, thereby providing a meaningful advancement over traditional GAN-CNN deep­
+fake detection frameworks.
+The structure of this paper is as follows: Sect. 2 looks at recent deepfake detection 
+methods to explain their present functionality and performance boundaries. Section 3 
+demonstrates our deepfake detection method by integrating Adaptive-DCGAN with 
+Lite-CNN features. Section 4 explains our testing procedures through description of 
+datasets and metrics used as evaluation methods. Through a comparison in Sect. 4 we 
+test our model’s effectiveness against the best deepfake detection algorithms available 
+
+
+--- PAGE 4 ---
+
+Page 4 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+today. In our conclusion we explore the significance of our findings and propose new 
+areas to explore in further research in Sect. 5.
+2  Related work
+Science and technology have created Deepfake technology by using AI to make synthetic 
+media look realistic, yet this innovation leads to multiple harmful social consequences 
+affecting all groups in society. The main disadvantage of deepfake technology exists in 
+its ability to spread false information because users can create fake news and fake evi­
+dence and impersonate other individuals with deceptive intent. The integrity of media 
+is under threat because of this which causes public distrust and makes fact-checking 
+operations more complicated. Deepfakes create a substantial threat to privacy together 
+with security which substantially endangers public figures who face the possibility of 
+libel or blackmail attacks. Deepfake technology serves as a powerful political tool which 
+authorities can use to spark social chaos and dissolving governments. Effective detec­
+tion and mitigation systems need rapid development to prevent synthetic media from 
+misuses since they create dangerous effects on society. The critical requirement exists 
+for thorough detection systems which can efficiently spot and handle evolving deepfake 
+techniques during real-time operation.
+The paper [2] establishes a deep learning hybrid model which joins Generative Adver­
+sarial Networks and ResNet50 to advance fake face detection capabilities. The GANs 
+produce authentic synthetic images while adding channel-wise attention features to 
+ResNet50 for detailed extraction capabilities. To maintain training stability preprocess­
+ing methods including normalization and augmentation procedures are employed. The 
+model reaches 83% accuracy because it performs better than VGG16 and ResNet50 
+when detecting counterfeit facial images. The author team clarifies that additional 
+research should focus on testing their model using various and larger datasets as well as 
+defending against adversarial attacks and investigating optimization methods for obtain­
+ing additional accuracy improvements. The authors are pursuing cross-database evalua­
+tions which will test the model’s real-world application capabilities.
+In [3], the authors introduced GAN model improvement targets both synthetic media 
+production and deepfake security through a refined platform. The proposed model 
+incorporates data augmentation and label smoothing methods to obtain better real ver­
+sus fake image discrimination results. Initial evaluations using a DCGAN architecture 
+shaped the research against the Flickr-Faces Nvidia and Fakefaces databases leading to 
+a 98.82% accuracy rate and 55.67 FID value The implementation of this method reduces 
+mode collapse while improving image quality generation capability for synthetic media 
+production. The proposed model delivers better detection performance in comparison 
+to standard GAN implementations. This work recognizes its shortcomings regarding 
+handling differences in lighting but proposes continued study on multiple datasets to 
+develop better adaptability mechanisms. The study generates new knowledge that aids 
+deepfake detection framework development while tackling key training issues in genera­
+tive models.
+The authors of [19] introduce an enhanced Dense Convolutional Neural Network 
+(D-CNN) for deepfake image detection, improving accuracy and applicability. The model 
+is trained on seven datasets using binary cross-entropy loss, the Adam optimizer, and 
+data augmentation for robustness. It achieves 97.2% accuracy, while AttGAN reaches 
+
+
+--- PAGE 5 ---
+
+Page 5 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+98.83%, GDWCT 99.33%, StyleGAN 95.33%, StyleGAN2 94.67%, and StarGAN 99.17%. 
+Confusion matrices confirm strong classification performance, with precision and recall 
+between 97 and 98%. The model outperforms MesoNet but struggles with high-resolu­
+tion images from StyleGAN and StyleGAN2. Future research will explore adaptable neu­
+ral networks with global pooling for varying image sizes. Additionally, improved image 
+enlargement methods and new features for analyzing video temporal information are in 
+development to enhance deepfake video detection.
+The paper [1] aims at improving deepfake detection by trying to fix the challenge of 
+detecting deepfakes from unseen sources while making them robust against real-world 
+variations. The paper performed frequency space analysis and RGB color correlation for 
+feature capture, classifying them using a number of machine learning models. The pro­
+posed framework puts these altogether in allowing for improved generalization across 
+diverse GAN-generated images. Testing was done on a newly created multi-GAN data­
+set comprising images from StyleGAN3, ProGAN, and InterfaceGAN. The beauty about 
+it is that this allows high accuracy across diverse datasets and outperforms previous arti­
+fact-based detection methods. However, one key research gap in the validation of model 
+performance on more extensive and complex datasets with real-world adversarial edits 
+remains. Nonetheless, future work should further explore other preprocessing tech­
+niques and adaptive learning strategies to further reinforce the reliability of detection.
+The authors in [14] developed an ensemble GAN-CNN model to prevent catastrophic 
+forgetting in deepfake detection. This approach enhances accuracy while minimizing 
+loss between forgetting events. The model reduces forgetting by generating and storing 
+past distribution samples, which are replicated during training to retain prior knowl­
+edge. This ensures CNNs maintain efficiency in detecting deepfakes from new data 
+streams. Experimental results show 98.67% training accuracy with stable performance. 
+The authors suggest testing on additional datasets to better evaluate robustness. Future 
+research will focus on improving training techniques and expanding dataset diversity 
+to enhance performance against real-world adversarial modifications and distribution 
+shifts.
+The research [13] explores the evolution of deepfake technology by analyzing advance­
+ments in both generation and detection methods. It examines deep learning techniques, 
+particularly convolutional neural networks, and evaluates the role of blockchain in pre­
+venting digital tampering. The study highlights key developments in deepfake creation, 
+detection challenges, and emerging trends. It offers a comprehensive view of cybersecu­
+rity risks associated with deepfakes and emphasizes the need for practical deployment of 
+blockchain-based authentication systems. Despite current limitations, integrating arti­
+ficial intelligence with decentralized ledger technology is seen as a promising approach 
+to strengthen content verification and combat misinformation effectively. The research 
+underscores the urgency of developing real-world solutions to counter the growing 
+threat of synthetic media.
+The research [17] creates a new deepfake detection method with BNNs joined by FFT 
+and LBP characteristics that boost accuracy for recognizing altered content. Developing 
+a detection system constitutes the fundamental purpose which achieves both high effi­
+ciency and lightweight operation for running in real-time across devices equipped with 
+minimal processing capacity. The integration of BNNs in the methodology enables the 
+system to accelerate by applying bit-wise operations for processing speed enhancement 
+
+
+--- PAGE 6 ---
+
+Page 6 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+suitable for mobile device operation. The deployed model successfully detects manipu­
+lated content across COCOFake, DFFD, and CIFAKE datasets at highest performance 
+standards. This approach provides computational efficiency which surpasses standard 
+deepfake detection architecture by 20 times. The research identifies two key limitations 
+in the model which include optimizing hardware compatibility of BNN architectures 
+and extending their applicability to various deepfake data collections. Future researchers 
+must advance their pre-training techniques for BNN frameworks while optimizing their 
+ability to oppose adversarial attacks and real-world modifications.
+The deepfake detection framework proposed in [22] introduces a novel approach to 
+identifying synthetic artifacts in CNN-based generative models, including both GANs 
+and diffusion models. It presents the Neighboring Pixel Relationships (NPR) method, 
+which analyzes pixel-level connections in local regions rather than relying on frequency-
+based systems. This technique targets forgery artifacts produced during image up-sam­
+pling and achieved a 12.8% improvement over previous methods, tested across images 
+from 28 generative models. NPR also shows effectiveness in detecting deepfakes from 
+previously unseen generators. The study emphasizes the need for real-time detection 
+tools adaptable to diverse synthetic content. Further research is recommended on Regu­
+larized Neural Processing, especially for its integration into advanced machine learning 
+models, diagnostic imaging systems, and digital authenticity verification.
+2.1  Findings from the literature survey
+We summarize our findings from the literature survey in Table 1 as follow:
+3  Proposed solution
+3.1  Overview
+Deepfake technology uses artificial intelligence to create highly realistic counterfeit 
+media products that expose serious security threats to privacy. Artificial intelligence-
+based systems allow people to create false media which serves as a conduit for dissemi­
+nating misinformation to mislead multiple individuals. The proposed system combines 
+an Adaptive-DCGAN with Lite-CNN-based detection to improve its accuracy levels 
+and operational stability. The Adaptive-DCGAN produces counterfeit deepfake images 
+that function with real images for Lite-CNN training purposes to boost its detection 
+capabilities. Through this method the model can adjust its operation automatically in 
+response to current deepfake methods to stay effective over time. The current Genera­
+tive Adversarial Networks (GAN) - Convolutional Neural Networks (CNN) methods 
+face two major problems including weak detection performance and excessive resource 
+usage. Superior classification accuracy, stability and adaptability of the proposed system 
+make it more suitable than traditional GAN-CNN models for real-world deepfake detec­
+tion applications.
+3.2  The proposed system model
+The system schematic for fake and real image discrimination can be observed in the 
+Fig. 1. An Adaptive GAN processes initial input data to generate synthetic images as the 
+
+
+--- PAGE 7 ---
+
+Page 7 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+main initial stage. Further training occurs using both synthetic images alongside authen­
+tic ones which helps to enhance the CNN model functionality. The training model 
+receives 80% of the available data for its development to enhance its capacity for dis­
+tinguishing natural images from artificial ones. A process of testing is conducted on the 
+model after training with the remaining twenty percent of the dataset. The trained net­
+work establishes a two-classification system which distinguee synthesized GAN images 
+as Fake while authentic data remains as Real. The pseudocode in Algorithm 1 provides a 
+step-by-step explanation of the proposed system model.
+Table 1  Summary of deepfake detection studies
+Study
+Research 
+objectives
+Methodology
+Implementation
+Strengths
+Future scope
+[2]
+Develop a hybrid 
+deep learning 
+model for fake face 
+detection
+GANs + ResNet50 
+with channel-
+wise attention, 
+preprocessing 
+(normalization & 
+augmentation)
+Achieved 83% accu­
+racy, outperforming 
+VGG16 & ResNet50
+Improved 
+extraction of 
+fake image 
+features
+Testing on 
+larger datasets, 
+defending against 
+adversarial attacks, 
+optimization for 
+better accuracy
+[3]
+Enhance GAN-
+based deepfake 
+detection & 
+synthetic media 
+quality
+DCGAN with data 
+augmentation & 
+label smoothing
+Evaluated on 
+Flickr-Faces Nvidia & 
+Fakefaces, achieving 
+98.82% accuracy, 
+55.67 FID score
+Reduced 
+mode collapse, 
+better syn­
+thetic image 
+quality
+Study on handling 
+lighting variations, 
+dataset expan­
+sion for better 
+adaptability
+[19]
+Improve D-CNN for 
+deepfake detec­
+tion with higher 
+accuracy
+D-CNN trained on 
+7 datasets using bi­
+nary cross-entropy 
+& Adam optimizer
+Achieved 97.2% 
+accuracy, outper­
+forming MesoNet, 
+yet struggled with 
+high-resolution 
+images
+Robust clas­
+sification, high 
+precision & 
+recall (97-98%)
+Adaptable neural 
+networks, global 
+pooling for varied 
+input sizes, better 
+video deepfake 
+detection
+[1]
+Enhance deep­
+fake detection 
+robustness against 
+unseen sources
+Frequency space 
+analysis + RGB 
+color correlation, 
+ML classifiers
+Tested on multi-GAN 
+dataset (StyleGAN3, 
+ProGAN, Interface­
+GAN), outperform­
+ing artifact-based 
+methods
+High general­
+ization across 
+datasets
+Validation on 
+complex real-world 
+datasets, exploring 
+adaptive learning 
+strategies
+[14]
+Prevent cata­
+strophic forgetting 
+in deepfake detec­
+tion models
+GAN + CNN 
+ensemble with 
+memory storage
+Train accuracy 
+98.67%, stored data 
+samples prevent 
+knowledge loss
+Sustained CNN 
+performance, 
+reduced 
+forgetting
+Testing on diverse 
+datasets, improving 
+training techniques 
+for adversarial 
+robustness
+[13]
+Analyze deep­
+fake generation, 
+detection, and 
+blockchain-based 
+security
+Review of deep 
+learning & block­
+chain applica­
+tions in deepfake 
+detection
+Extensive CNN 
+performance 
+study for detecting 
+manipulations
+Comprehen­
+sive view of 
+deepfake 
+cybersecurity 
+risks
+AI & blockchain 
+integration for 
+better digital 
+authentication
+[17]
+Create efficient 
+deepfake detec­
+tion for low-re­
+source devices
+BNNs + FFT + LBP 
+features
+Runs in real-time on 
+mobile devices, 20x 
+faster than standard 
+models
+High efficien­
+cy, lightweight 
+operation
+Hardware 
+optimization for 
+BNNs, improved 
+pre-training for ad­
+versarial resistance
+[22]
+Introduce a new 
+deepfake detec­
+tion approach 
+using synthetic 
+artifacts
+Neighboring Pixel 
+Relationships (NPR) 
+for CNN-based 
+generative model 
+analysis
+Tested on images 
+from 28 generative 
+models, 12.8% bet­
+ter than previous 
+methods
+Effective 
+against 
+unknown gen­
+erative models, 
+strong forgery 
+detection
+Real-time detec­
+tion, exploring 
+Regularized Neural 
+Processing for digi­
+tal authenticity
+
+
+--- PAGE 8 ---
+
+Page 8 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+Algorithm 1  Deepfake Detection System Model
+3.3  The proposed architecture
+Our Proposed architecture utilizes an Adaptive Deep Convolutional Generative Adver­
+sarial Network (DCGAN) for deepfake detection enhancement. The architecture con­
+tains three key elements: a Generator (G) that produces synthetic images resembling 
+real images using latent space representations, a Discriminator (D) that classifies images 
+as real or fake and is continuously trained alongside the generator, and an Adaptive 
+Learning Module that adjusts training parameters dynamically based on performance 
+Fig. 1  The proposed system model
+ 
+
+
+--- PAGE 9 ---
+
+Page 9 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+metrics such as loss function deviation. By nature, this system maintains adaptability, 
+which enables ongoing detection improvement through continuous learning about 
+freshly developed deepfake techniques. The system design merges GAN components 
+with CNNs to extract advanced features in the overall framework. It includes scalable 
+features that let deepfake detection function smoothly across different platforms.
+Figure 2 illustrates the workflow of the proposed architecture, which starts with input 
+datasets comprising real and fake images.
+The real images are taken from legitimate sources, while the fake images are gener­
+ated using the Adaptive DCGAN. These datasets are then processed through a data 
+preprocessing module, ensuring uniformity in image dimensions and enhancing feature 
+extraction capabilities. The Adaptive DCGAN framework is responsible for generating 
+high-quality synthetic images that are indistinguishable from real images, which are then 
+fed into the Lite-CNN model. This model undergoes extensive training with 80% of the 
+dataset to learn the distinguishing characteristics of real and fake images. The trained 
+model is then evaluated using the remaining 20% of the dataset to measure its effective­
+ness. The classification module finally predicts whether an input image is real or fake, 
+allowing for efficient deepfake detection. The integration of Adaptive DCGAN with Lite-
+CNN ensures enhanced classification accuracy and adaptability to evolving deepfake 
+techniques, making the system more reliable for real-world applications.
+The Adaptive-DCGAN Process is shown in Fig. 3, in which it dynamically adjusts the 
+training process based on performance deviations.
+The model evaluates the deviation between the current value (ACV ) and the condi­
+tional value (AC) using the equation 1 as follow:
+AC −ACV
+ACV
+.
+(1)
+Fig. 2  The proposed architecture
+ 
+
+
+--- PAGE 10 ---
+
+Page 10 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+This deviation is then compared to a predefined threshold (TH). If the deviation 
+exceeds TH, an adjustment factor k (ranging from 0.1 to 0.9) is updated, modifying 
+the training process before proceeding to the next iteration (k + 1). This adaptation is 
+Fig. 4  Components of the proposed Adaptive-DCGAN framework
+ 
+Fig. 3  Adaptive-DCGAN process
+ 
+
+
+--- PAGE 11 ---
+
+Page 11 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+executed at predefined training epochs (i), set manually during training, ensuring model 
+optimization.
+As shown in Fig. 4 our proposed Adaptive-DCGAN framework consists of three main 
+components: the Generator, Discriminator, and Adaptive-DCGAN model.
+The Generator takes a random noise vector and progressively transforms it into a syn­
+thetic image using dense layers, batch normalization, and activation functions like ReLU 
+and Tanh. The Discriminator, on the other hand, is a CNN-based binary classifier that 
+distinguishes between real and fake images. It utilizes LeakyReLU activation, dropout 
+layers, and an adaptive learning rate (Exponential Decay) to improve training stability. 
+The Adaptive-DCGAN integrates both models into a unified system, where the discrim­
+inator is frozen during generator training, allowing adversarial learning. This adaptive 
+approach improves training stability, prevents mode collapse, and enhances the realism 
+of generated images.
+Our proposed Lite-CNN model (shown in Fig. 5) is a lightweight yet effective neural 
+network designed for real vs. fake image classification.
+It consists of two convolutional layers with 32 and 64 filters, followed by batch nor­
+malization and 4×4 max-pooling for feature extraction. The network then flattens the 
+extracted features and passes them through a fully connected dense layer with 128 units, 
+incorporating L2 regularization (0.01) and a dropout rate of 0.9 to reduce overfitting. 
+The final output layer uses a SoftMax activation function for binary classification. The 
+model is optimized using Adam optimizer (learning rate = 0.0001) and categorical cross-
+entropy loss, with an adaptive learning rate scheduler to enhance performance. This 
+CNN model efficiently classifies images with high accuracy while maintaining low com­
+putational cost, making it ideal for detecting GAN-generated fake images.
+The Lite-CNN architecture is intentionally designed as a lightweight model to ensure 
+deployment feasibility in resource-constrained environments, such as mobile forensics 
+and real-time social media monitoring systems. While the architecture is shallow com­
+pared to deeper networks like ResNet or EfficientNet, it is specifically optimized for the 
+targeted detection task by leveraging data augmentation through Adaptive-DCGAN-
+generated synthetic samples. The simplicity of Lite-CNN offers significant benefits in 
+terms of reduced computational complexity, faster inference time, and lower memory 
+Fig. 5  The proposed Lite-CNN model
+ 
+
+
+--- PAGE 12 ---
+
+Page 12 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+footprint, making it suitable for large-scale monitoring scenarios where deploying 
+heavyweight models is impractical.
+3.3.1  Adaptive mechanism justification
+The core novelty of our Adaptive-DCGAN lies in its dynamic training adjustment mech­
+anism, which aims to maintain equilibrium between the generator and discriminator 
+during adversarial learning a known challenge in GAN-based systems due to training 
+instability and mode collapse.
+The adaptation process is guided by a normalized deviation metric:
+Deviation = AC −ACV
+ACV
+
+(2)
+where AC denotes the conditional (target) performance value, and ACV represents the 
+current observed performance. This formulation was chosen because it is scale-indepen­
+dent, allowing the mechanism to operate consistently across datasets of varying sizes and 
+quality distributions. By using a relative rather than absolute difference, the model can 
+detect proportionally significant performance changes regardless of baseline accuracy.
+Threshold (TH)  selection: The threshold TH defines the minimum deviation required 
+to trigger an adjustment. It was determined empirically through a grid search over mul­
+tiple runs, with the objective of maximizing training stability while avoiding over-sensi­
+tivity to normal stochastic fluctuations. This is consistent with best practices in adaptive 
+learning systems, where parameter tuning is performed in a data-driven yet stability-
+conscious manner.
+Adjustment factor (k) selection: Once a deviation exceeding TH is detected, an 
+adaptive factor k (ranging from 0.1 to 0.9) modifies the learning rate and other train­
+ing parameters. This factor was optimized through iterative experimentation to ensure 
+smooth convergence and to prevent either the generator or discriminator from domi­
+nating. This concept parallels proportional–integral control in signal processing, where 
+gradual corrective adjustments help stabilize oscillatory systems.
+Unlike conventional learning rate schedulers (e.g., step decay or cosine annealing), 
+which follow a fixed schedule, our adaptive mechanism responds in real time to perfor­
+mance fluctuations, enabling targeted corrections during adversarial learning.
+Empirical validation: The ablation study in Sect. 4.6 confirms the practical benefit of 
+this mechanism: incorporating the adaptive learning module improved accuracy and 
+F1-score by +4% compared to the static-learning-rate Adaptive-DCGAN. Additionally, 
+convergence curves were smoother, and discriminator overpowering was reduced, indi­
+cating a more balanced adversarial process.
+Algorithm  2 presents the pseudocode for the proposed deepfake detection 
+architecture. 
+
+
+--- PAGE 13 ---
+
+Page 13 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+Algorithm 2  Proposed Adaptive-DCGAN and Lite-CNN Framework
+4  Empirical results and discussion
+4.1  Datasets
+We utilize the “Real and Fake Face Detection” dataset from Kaggle as the primary foun­
+dation for our deepfake detection operations. This dataset comprises 2041 JPG images, 
+including 960 fake images generated using Generative Adversarial Networks (GANs) and 
+1081 real photographs. It is publicly accessible at Kaggle [26] and is widely recognized 
+in deepfake detection research. Due to its balanced distribution of real and synthetic 
+images, the dataset provides a robust foundation for training Convolutional Neural Net­
+works (CNNs) and evaluating GAN-based detection models. The diverse collection of 
+images enhances the generalizability of the proposed model, leading to improved accu­
+racy in distinguishing authentic images from digitally manipulated ones.
+Instead of a fixed train-test split, we applied k-fold cross-validation (k=5) to ensure 
+that performance metrics are not biased by a particular partition of the dataset. The 
+
+
+--- PAGE 14 ---
+
+Page 14 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+dataset was randomly shuffled before splitting into folds, and each fold was used once as 
+the test set while the remaining folds formed the training set.
+4.2  Performance metrics
+The performance of the Adaptive-DCGAN with Lite-CNN model is evaluated using 
+multiple metrics, including three distinct loss functions for the generator and discrimi­
+nator, along with accuracy, precision, recall, and F1-score. These metrics provide a com­
+prehensive assessment of the model’s ability to generate realistic images, differentiate 
+between real and fake content, and maintain stable performance. 
+1.	 Generator loss (G-loss): This metric evaluates how effectively the generator produces 
+realistic images. Lower G-loss values indicate that the generated images are of higher 
+quality and less likely to be misclassified as fake by the discriminator.
+2.	 Discriminator loss (D-loss): D-loss measures the discriminator’s capability to 
+distinguish real images from generated ones. Maintaining a balanced D-loss is crucial 
+to ensuring stable training and preventing either the generator or discriminator from 
+overpowering the other.
+3.	 Accuracy: Accuracy quantifies the model’s ability to correctly classify real and 
+fake images. Higher accuracy signifies improved reliability, as fewer images are 
+misclassified.
+4.	 Precision: Precision assesses how well the model identifies fake images by measuring 
+the proportion of correctly classified fake images among all predicted fake instances. 
+A higher precision value indicates that the model effectively avoids mislabeling real 
+images as fake.
+5.	 Recall: Recall determines the model’s ability to detect all actual fake images within 
+the dataset. A high recall score signifies robust deepfake identification, reducing the 
+chances of fake images going undetected.
+6.	 F1-score: The F1-score balances precision and recall by providing a single performance 
+metric that accounts for both false positives and false negatives. A higher F1-score 
+indicates a well-optimized model with strong discriminatory capabilities.
+4.3  Results
+We implemented and tested the proposed Adaptive-DCGAN alongside Lite-CNN for 
+deepfake detection, and performance evaluations demonstrate its superiority over tra­
+ditional detection systems. The model was trained and tested using the Kaggle“Real 
+and Fake Face Detection”dataset, which comprises 2041 images - 1081 real and 960 fab­
+ricated (shown in Fig. 6). Training was conducted using 80% of the dataset, with 20% 
+reserved for testing.
+During training, the Generator (G) maintained an average loss of 0.10, while the 
+Discriminator (D) stabilized at an average loss of 1.01, indicating effective adversarial 
+learning (shown in Fig. 7). When evaluated using the Lite-CNN classification model, 
+the system achieved an accuracy of 95%, significantly outperforming existing detection 
+methods, which only reached 53% accuracy (depicted in Fig. 8 ). Performance metrics 
+further validate the robustness of our approach, achieving a Precision of 95%, Recall of 
+95%, and an F1-score of 95% (depicted in Fig. 9). The reported accuracy, precision, recall, 
+and F1-score are the mean values obtained across the k-fold cross-validation runs, pro­
+viding a more statistically sound evaluation.
+
+
+--- PAGE 15 ---
+
+Page 15 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+In the testing phase, 492 images were analyzed–192 fake and 217 real. Our system 
+accurately classified 180 fake and 207 real images, with minimal misclassifications. These 
+results highlight the effectiveness of combining Adaptive-DCGAN with Lite-CNN, 
+enhancing deepfake detection capabilities, reducing false positives, and improving over­
+all system robustness against fake media elements.
+Fig. 8  Lite-CNN model training/validation plots
+ 
+Fig. 7  GAN losses
+ 
+Fig. 6  Dataset reading
+ 
+
+
+--- PAGE 16 ---
+
+Page 16 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+4.4  Result comparison
+Experimental results demonstrate that the Adaptive-DCGAN with Lite-CNN model 
+achieves superior deepfake detection ability than the traditional GAN-CNN ensemble 
+model. A 95% accuracy rate stands as the outcome of the proposed model while the 
+existing GAN-CNN ensemble model managed only 53% accuracy. The new model dis­
+plays exceptional performance through its 95% precision, recruits 95% recall along with 
+a 95% F1-score rating above the 57% precision and 50% recall along with 35% F1-score of 
+the current model. The generator (G) loss value in the proposed model equalled 0.10 and 
+the discriminator (D) loss amounted to 1.01 while GAN-CNN models displayed gen­
+erator and discriminator loss values of 7.80 and 1.25 respectively. The adaptive-DCGAN 
+model succeeds in attaining advanced classification accuracy together with enhanced 
+generalization across datasets for making reliable deepfake detection applications in the 
+real world. Table 2 presents a comparative analysis of our approach against the existing 
+system, while Fig. 10 provides a visual representation of the results comparison.
+To assess the competitiveness of our model beyond the Kaggle dataset, we compare it 
+with well-established deepfake detection models on standard benchmarks as reported in 
+existing literature. These include Celeb-DF v2, FaceForensics++, and DFDC datasets that 
+represent complex, high-quality, and diverse manipulation scenarios. Table 3 presents 
+the comparative performance reported by state-of-the-art models alongside our own 
+model performance on the Kaggle dataset.
+Table 2  Comparative analysis
+Parameters
+Proposed system
+Existing system [14]
+Model Type
+Adaptive-DCGAN
+GAN-CNN
+D Loss
+1.01
+1.25
+G Loss
+0.10
+7.80
+Accuracy
+95%
+53%
+Precision
+95%
+57%
+Recall
+95%
+50%
+F1-Score
+95%
+35%
+Fig. 9  Evaluation parameters result
+ 
+
+
+--- PAGE 17 ---
+
+Page 17 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+4.5  Computational efficiency analysis
+To evaluate the computational efficiency of the proposed Adaptive-DCGAN + Lite-
+CNN framework, we analyzed the average inference time, memory usage, and floating-
+point operations (FLOPs). The experiments were conducted on a system with Intel Core 
+i7 CPU, 16 GB RAM, and no GPU acceleration to reflect performance in low-resource 
+environments such as mobile or edge devices.
+As shown in Table 4, our proposed model achieves significantly lower inference time 
+and computational cost compared to deeper networks and hybrid GAN-CNN architec­
+tures, while maintaining high detection performance. This makes it suitable for real-time 
+and on-device deployment.
+Table 3  Comparison with state-of-the-art models on standard benchmarks (from published 
+literature)
+Model
+Dataset
+Accuracy 
+(%)
+Precision 
+(%)
+Recall 
+(%)
+F1-Score 
+(%)
+Source
+Adaptive-DCGAN + 
+Lite-CNN
+Kaggle (CIPLab)
+95
+95
+95
+95
+This 
+work
+XceptionNet
+FaceForensics++
+99.26
+–
+–
+–
+[27]
+MesoNet
+FaceForensics++
+84.7
+–
+–
+–
+[28]
+EfficientNet B4
+Celeb-DF v2
+88.5
+89.0
+87.4
+88.2
+[29]
+DSP-FWA
+Celeb-DF v2
+64.6
+–
+–
+–
+[29]
+Capsule-Forensics
+DFDC Preview
+93.5
+–
+–
+–
+[30]
+Table 4  Computational performance comparison with baseline methods
+Model
+Inference time (ms/img)
+Memory usage (MB)
+FLOPs (GFLOPs)
+Adaptive-DCGAN + Lite-CNN
+12
+42
+0.15
+ResNet-50 + Classifier
+43
+97
+4.1
+GAN-CNN (as in [14])
+58
+108
+5.2
+Fig. 10  Result comparison
+ 
+
+
+--- PAGE 18 ---
+
+Page 18 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+Our approach draws inspiration from recent advances in lightweight attention-based 
+architectures, such as the Transformer-driven multi-scale trapezoidal attention network 
+for saliency detection [31]. However, unlike transformer-based methods that require 
+complex multi-head operations, our model avoids such overhead by leveraging a com­
+pact CNN architecture with adaptive GAN-based augmentation.
+This efficiency is further supported by the model’s simplicity comprising only two con­
+volutional layers and adaptive learning regulation enabling deployment on consumer-
+level devices without GPU dependency.
+4.6  Ablation study and statistical significance analysis
+To evaluate the individual contributions of the core components of our proposed 
+framework, we performed an ablation study by systematically disabling specific mod­
+ules and measuring the model’s performance. Table 5 summarizes the results of these 
+experiments.
+The ablation results clearly show that each component contributes significantly to 
+the overall detection performance. Notably, the adaptive learning module enhances the 
+model’s ability to adjust dynamically to evolving fake generation techniques, resulting in 
+a 4% increase in accuracy compared to Model B (as highlighted in bold in Table 5).
+To evaluate the direct impact of the adaptive learning mechanism on model perfor­
+mance, we conducted comparative experiments with and without the adaptive adjust­
+ment factor k.
+The results (shown in Table 6) demonstrate that the adaptive mechanism contributes 
+to a 4% increase in overall accuracy and improves F1-Score consistency (depicted in bold 
+in Table 6). The model exhibited smoother convergence curves and reduced discrimina­
+tor overpowering, validating the effectiveness of the adaptive component in stabilizing 
+adversarial training and enhancing detection robustness.
+To further validate the robustness of our results, we conducted a paired t-test com­
+paring the proposed framework with the baseline GAN-CNN ensemble model [14]. The 
+resulting p-value of 0.0017 confirms that the observed performance improvement is sta­
+tistically significant (p < 0.05), thus rejecting the null hypothesis.
+Table 5  Ablation study results for proposed framework
+Experiment
+Components used
+Accuracy 
+(%)
+Preci­
+sion 
+(%)
+Recall 
+(%)
+F1-
+score 
+(%)
+Baseline
+Lite-CNN only (no synthetic data augmentation)
+81
+82
+80
+81
+Model A
+Lite-CNN + standard DCGAN (non-adaptive)
+88
+87
+86
+86.5
+Model B
+Lite-CNN + Adaptive-DCGAN (w/o adaptive factor 
+adjustment)
+91
+91
+90
+90.5
+Proposed full 
+model
+Lite-CNN + Adaptive-DCGAN + adaptive learning 
+module
+95
+95
+95
+95
+Table 6  Impact of Adaptive Learning Mechanism on Model Performance
+Configuration
+Accuracy 
+(%)
+Precision 
+(%)
+Recall 
+(%)
+F1-
+score 
+(%)
+Adaptive-DCGAN without adaptive factor (static learning rate)
+91
+91
+90
+90.5
+Adaptive-DCGAN with adaptive learning mechanism (proposed)
+95
+95
+95
+95
+
+
+--- PAGE 19 ---
+
+Page 19 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+4.7  Cross-dataset generalization
+While our proposed system achieves 95% accuracy on the Kaggle dataset, we acknowl­
+edge the importance of evaluating generalization across multiple datasets. Cross-dataset 
+validation is critical in deepfake detection research due to the diversity of manipulation 
+techniques, post-processing artifacts, and compression schemes present in real-world 
+content.
+Existing studies show that even high-performing models like XceptionNet suffer per­
+formance drops when evaluated on unseen datasets. For example, XceptionNet trained 
+on FaceForensics++ achieves 99.26% accuracy but drops to 48.2% on Celeb-DF v2 with­
+out fine-tuning [29]. This illustrates the challenges of generalization and the need for 
+adaptive or ensemble-based approaches.
+In future work, we aim to evaluate our model on challenging datasets such as Celeb-
+DF v2, FaceForensics++, and DFDC, to better assess robustness to unseen manipula­
+tions. Additionally, expanding the dataset diversity during training and incorporating 
+self-supervised learning strategies may enhance generalizability without significantly 
+increasing computational cost.
+5  Conclusion and future work
+The proposed Adaptive-DCGAN model demonstrates significantly superior per­
+formance over existing GAN-CNN systems in distinguishing real from fake images. 
+Achieving a Generator (G) loss of 0.10 and a Discriminator (D) loss of 1.01 highlights 
+the model’s stable training process, leading to the generation of highly realistic synthetic 
+images. A remarkable improvement in detection accuracy was observed, with the pro­
+posed model achieving 95% accuracy compared to the 53% accuracy of the previous 
+system. Furthermore, the Adaptive-DCGAN exhibits outstanding classification metrics, 
+including precision (95%), recall (95%), and F1-score (95%), confirming its reliability in 
+accurately identifying real and fake images. These results establish Adaptive-DCGAN as 
+a robust and effective solution for real vs. fake image classification, reducing misclas­
+sification errors and enhancing deepfake detection capabilities. Unlike prior GAN-CNN 
+based detection frameworks, our Adaptive-DCGAN with Lite-CNN offers a scalable, 
+resource-efficient, and dynamically adaptive solution capable of responding to evolving 
+deepfake techniques, ensuring practical deployment in real-world scenarios where com­
+putational constraints and content diversity present significant challenges.
+Future research should focus on optimizing the model for diverse datasets to improve 
+its adaptability across various real-world applications. Enhancing the model’s robust­
+ness by incorporating advanced deepfake imagery generated by architectures such as 
+StyleGAN and ProGAN will further strengthen its detection capabilities. Integrating 
+self-supervised learning techniques can reduce dependence on labeled datasets, mak­
+ing the system more flexible and scalable. Additionally, to facilitate large-scale deepfake 
+detection in social media security and digital forensics, real-time implementation with 
+computational optimizations should be explored to enhance efficiency and reduce pro­
+cessing costs.
+Author contributions
+Deepa Javiya: conceptualization, methodology, software, validation, formal analysis, investigation, writing—original draft, 
+writing—review & editing, visualization. Gordhan Jethava: resources, validation, formal analysis, investigation, writing—
+review & editing, supervision, project administration. Himani Parmar: resources, validation, formal analysis, investigation, 
+writing—review & editing, supervision, project administration. Sweta Jethava: resources, validation, formal analysis, 
+investigation, writing—review & editing, supervision, project administration.
+
+
+--- PAGE 20 ---
+
+Page 20 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+Funding
+Open access funding provided by Parul University.
+Data availability
+Availability of data and materials: Yes, available from the corresponding author on reasonable request.
+Code availability
+Yes, available from the corresponding author on reasonable request.
+Declarations
+Ethics approval and consent to participate 
+Yes
+Consent for publication
+Yes
+ Competing interests
+The authors declare no Conflict of interest.
+Clinical trial
+Not applicable.
+Received: 3 May 2025 / Accepted: 26 August 2025
+References
+1.	
+Say T, Alkan M, Kocak A. Advancing gan Deepfake detection: mixed datasets and comprehensive artifact analysis. Appl Sci. 
+2025;15(2):923.
+2.	
+Safwat S, Mahmoud A, Fattoh IE, Ali F. Hybrid deep learning model based on GAN and RESNET for detecting fake faces. 
+IEEE Access. 2024;12:86391–402.
+3.	
+Zia R, Rehman M, Hussain A, Nazeer S, Anjum M. Improving synthetic media generation and detection using generative 
+adversarial networks. PeerJ Comput Sci. 2024;10:e2181.
+4.	
+Qureshi SM, Saeed A, Almotiri SH, Ahmad F, Al Ghamdi MA. Deepfake forensics: a survey of digital forensic methods for 
+multimodal deepfake identification on social media. PeerJ Comput Sci. 2024;10:e2037.
+5.	
+Lyu S. Deepfake the menace: mitigating the negative impacts of AI-generated content. Organ Cybersecur J Pract Process 
+People. 2024;4(1):1–18.
+6.	
+Kaur A, Noori Hoshyar A, Saikrishna V, Firmin S, Xia F. Deepfake video detection: challenges and opportunities. Artif Intell 
+Rev. 2024;57(6):1–47.
+7.	
+Alanazi S, Asif S, Moulitsas I. Examining the societal impact and legislative requirements of deepfake technology: a com­
+prehensive study. 2024.
+8.	
+Heidari A, Jafari Navimipour N, Dag H, Unal M. Deepfake detection using deep learning methods: a systematic and com­
+prehensive review. Wiley Interdiscip Rev Data Min Knowl Discov. 2024;14(2):e1520.
+9.	
+Seng LK, Mamat N, Abas H, Ali WNHW. AI integrity solutions for deepfake identification and prevention. Open Int J Inform. 
+2024;12(1):35–46.
+10.	 Ba Z, et al. Exposing the deception Uncovering more forgery clues for deepfake detection. 2024;38:719–28.
+11.	 Gong LY, Li XJ. A contemporary survey on deepfake detection: datasets, algorithms, and challenges. Electronics. 
+2024;13(3):585.
+12.	 Lu Y, Ebrahimi T. Assessment framework for deepfake detection in real-world situations. EURASIP J Image Video Process. 
+2024;2024(1):6.
+13.	 Gambín ÁF, Yazidi A, Vasilakos A, Haugerud H, Djenouri Y. Deepfakes: current and future trends. Artif Intell Rev. 
+2024;57(3):64.
+14.	 Sharma P, Kumar M, Sharma HK. GAN-CNN ensemble: a robust deepfake detection model of social media images using 
+minimized catastrophic forgetting and generative replay technique. Procedia Comput Sci. 2024;235:948–60.
+15.	 Abdullah SM et al. An analysis of recent advances in deepfake image detection in an evolving threat landscape. arXiv 
+preprint arXiv:2404.16212 (2024) .
+16.	 Pellicer AL, Li Y, Angelov P. Pudd: towards robust multi-modal prototype-based deepfake detection. 2024;3809–3817.
+17.	 Lanzino R, Fontana F, Diko A, Marini MR, Cinque L. Faster than lies: real-time deepfake detection using binary neural 
+networks. 2024;3771–3780.
+18.	 Wazid M, Mishra AK, Mohd N, Das AK. A secure deepfake mitigation framework: architecture, issues, challenges, and 
+societal impact. Cyber Secur Appl. 2024;2:100040.
+19.	 Patel Y, et al. An improved dense CNN architecture for deepfake image detection. IEEE Access. 2023;11:22081–95.
+20.	 Aloke EJ, Abah J. Enhancing the fight against social media misinformation: an ensemble deep learning framework for 
+detecting deepfakes. Int J Appl Inf Syst. 2023;12(42):1–14.
+21.	 Kaushal A, Mina A, Meena A, Babu TH. The societal impact of deepfakes: advances in detection and mitigation, IEEE. 2023; 
+pp. 1–7.
+22.	 Tan C. et al. Rethinking the up-sampling operations in CNN-based generative network for generalizable deepfake detec­
+tion. 2024;28130–28139.
+23.	 Kumar M, Sharma HK, et al. A GAN-based model of deepfake detection in social media. Procedia Comput Sci. 
+2023;218:2153–62.
+
+
+--- PAGE 21 ---
+
+Page 21 of 21
+Javiya et al. Discover Applied Sciences          (2025) 7:1229 
+24.	 Nguyen TT, et al. Deep learning for deepfakes creation and detection: a survey. Comput Vis Image Understand. 
+2022;223:103525.
+25.	 Almars AM. Deepfakes detection techniques using deep learning: a survey. J Comput Commun. 2021;9(5):20–35.
+26.	 Lab C. Real and fake face detection. Kaggle Dataset. 2019. ​h​t​t​p​s​:​/​/​w​w​w​.​k​a​g​g​l​e​.​c​o​m​/​d​a​t​a​s​e​t​s​/​c​i​p​l​a​b​/​r​e​a​l​-​a​n​d​-​f​a​k​e​-​f​a​c​e​-​d​e​
+t​e​c​t​i​o​n. Accessed 2025-02-28.
+27.	 Rössler A. et al. Faceforensics++: learning to detect manipulated facial images. 2019;1–11 .
+28.	 Afchar D, Nozick V, Yamagishi J, Echizen I. Mesonet: a compact facial video forgery detection network, IEEE. 2018;1–7.
+29.	 Li Y, Yang X, Sun P, Qi H, Lyu S. Celeb-DF: a large-scale challenging dataset for deepfake forensics, 3207–3216 (2020).
+30.	 Nguyen TT, Nguyen CM, Nguyen DT, Nguyen DT, Nahavandi S. Deep learning for deepfakes creation and detection: a 
+survey. arXiv preprint arXiv:1909.11573 (2019) .
+31.	 Usman MT, Khan H, Rida I, Koo J. Lightweight transformer-driven multi-scale trapezoidal attention network for saliency 
+detection. Eng Appl Artif Intell. 2025;155:110917.
+Publisher's Note
+Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations.

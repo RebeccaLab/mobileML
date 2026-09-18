@@ -1,0 +1,1368 @@
+
+
+--- PAGE 1 ---
+
+Accepted: 4 April 2025 / Published online: 23 April 2025
+© The Author(s) 2025
+Yi Kou and Peng Li these authors contributed equally to this work.
+Extended author information available on the last page of the article
+SFIAD: Deepfake detection through spatial-frequency 
+feature integration and dynamic margin optimization
+Yi Kou1 · Peng Li1 · Hongjiang Ma2 · Jiliu Zhou1 · Zhan ao Huang1 · Xiaojie Li1
+Artificial Intelligence Review (2025) 58:217
+https://doi.org/10.1007/s10462-025-11225-7
+Abstract
+The rapid advancement of generative models has profoundly transformed the field of digi­
+tal content creation, bringing unprecedented opportunities for media generation. However, 
+the widespread adoption of this technology has also led to the emergence of highly realis­
+tic fake facial images and videos, which pose significant threats to public trust and societal 
+security. To address the challenges of deepfake detection, this paper proposes a novel 
+method based on Spatial-Frequency Feature Integration (SFFI), which effectively identi­
+fies fake content by combining spatial and frequency features of images. Additionally, 
+to tackle the issue of class imbalance in the datasets, we propose an Authenticity-Aware 
+Margin Loss (AAML). This loss function dynamically adjusts the decision boundary to 
+enhance the model’s ability to recognize minority class samples. The proposed method 
+was trained and evaluated on four challenging datasets: FaceForensics++, Celeb-DF v1, 
+Celeb-DF v2, and the DeepFake Detection Challenge Preview, and compared against ten 
+state-of-the-art methods. Experimental results demonstrate that the proposed method con­
+sistently outperforms all existing approaches across all datasets.
+Keywords  Generative models · Deepfake · Deepfake detection · SFFI · AAML
+1  Introduction
+Deep generative models (Goodfellow et al. 2020; Karras et al. 2019) have made break­
+throughs in digital content creation. They could generate many fake face images and videos 
+(Chan et al. 2019; Gao et al. 2021; Thies et al. 2019) but simultaneously impose a serious 
+challenge to the authenticity of information, especially in terms of privacy invasion and 
+political speech manipulation. To this end, deepfake detection technology has emerged.
+Early Deepfake detection methods (Dang et al. 2020; Li et al. 2020; Nguyen et al. 2019; 
+Zi et al. 2020; Afchar et al. 2018; Rossler et al. 2019) primarily relied on convolutional neu­
+ral networks (CNNs) to extract local facial features. While effective in specific tasks, their 
+1 3
+
+
+--- PAGE 2 ---
+
+Y. Kou et al.
+applicability to Deepfake detection remains limited. These approaches often overlook the 
+complex global information and frequency domain features inherent in Deepfake images, 
+making them inadequate for handling sophisticated forgeries. To address these limitations, 
+recent studies have shifted focus to identifying specific patterns in forged images, such as 
+noise features (Gu et al. 2022; Zhou et al. 2017), local textures (Chen et al. 2021; Gu et al. 
+2022; Zhao et al. 2021), and frequency information (Li et al. 2021; Qian et al. 2020), to 
+enhance detection accuracy. However, relying on patterns learned from training data renders 
+these methods significantly constrained when facing novel forgery techniques.
+Currently, the focus of deepfake detection research has gradually shifted to improving 
+model generalization. For example, Yan et al. (2023) proposed a decoupling framework that 
+enhances generalization by separating forgery traces from content information. However, 
+this method can still capture specific forgery patterns, limiting its adaptability to unknown 
+forgery techniques. Yan et al. (2024) proposed the LSAD method based on a teacher-student 
+architecture, where the teacher module learns domain-specific features through domain loss, 
+and the student module enhances generalization. However, the performance of LSAD is 
+highly dependent on the diversity of the training data, and its generalization ability is limited 
+when data is insufficient. Moreover, these methods operate over the entire feature space, 
+making them vulnerable to irrelevant factors such as background and identity, which can 
+reduce detection accuracy.
+To address this issue, this paper proposes a novel detection framework, Spatial-Frequency 
+Feature Integration and Dynamic Margin Optimization (SFIAD), whose overall architecture 
+is illustrated in Fig. 1, consisting of four key components: Spatial-Frequency Feature Inte­
+gration (SFFI), a pre-trained Xception model, a frame-level classifier, and the Authenticity-
+Aware Margin Loss (AAML) loss function. The SFFI method combines the original color 
+image with frequency domain information, mitigating cross-image inconsistencies caused 
+by variations in brightness and contrast. The normalization process enhances the model’s 
+sensitivity to structural information, significantly improving its robustness against various 
+forgery techniques. We employ the ImageNet-pre-trained Xception network to extract hier­
+archical features capturing complex image patterns.
+The frame-level classifier processes each frame to extract key features, laying the founda­
+tion for video content understanding and improved classification accuracy. By dynamically 
+adjusting class-specific decision boundaries according to each class’s sample distribution, 
+the AAML loss function increases weight allocation to real images and encourages focused 
+model attention on discriminative features, thus significantly enhancing classification per­
+formance, especially on highly imbalanced datasets.
+Our contributions are summarized as follows:
+	
+●
+We propose the SFIAD, a novel deepfake detection method that innovatively fuses spa­
+tial-frequency features with dynamic boundary optimization, enabling robust identifica­
+tion across unknown data environments.
+	
+●
+We propose the SFFI module, which integrates spatial and frequency domain infor­
+mation from video frames to enhance feature extraction capabilities, simultaneously 
+capturing detailed texture and frequency domain features and improving the model’s 
+performance in complex visual tasks.
+	
+●
+This paper proposes the AAML loss, which addresses the class imbalance problem in 
+deepfake detection through dynamic boundary adjustment, enabling the model to focus 
+1 3
+217 
+Page 2 of 22
+
+
+--- PAGE 3 ---
+
+SFIAD: Deepfake detection through spatial-frequency feature integration…
+more effectively on rare real samples and significantly enhancing real-image recogni­
+tion accuracy.
+2  Related work
+2.1  Deepfake generation
+Traditional image and video forgery techniques typically involve intercepting source con­
+tent and embedding target objects, using simple pixel-level operations to create fake images 
+(Wang et al. 2022; Rossler et al. 2019). However, with the rapid advancement of deep 
+learning (Muksimova et al. 2024), deepfake technology has made significant breakthroughs, 
+greatly enhancing the realism of forged content and making it nearly indistinguishable. 
+Early forgery video generation methods relied on autoencoders (D’Avino et al. 2017) for 
+image reconstruction, but these methods were typically limited to simple reconstruction of 
+input data, resulting in lower-quality fake images.
+Fig. 1  In this study, we compared four classification methods: the traditional approach based on a com­
+plete feature set, an enhanced approach leveraging auxiliary information for improved feature representa­
+tion, a task-specific approach with a customized loss function, and our proposed method, which integrates 
+the strengths of the first three, achieving superior classification performance
+ 
+1 3
+Page 3 of 22 
+217
+
+
+--- PAGE 4 ---
+
+Y. Kou et al.
+The advent of Generative Adversarial Networks (Karras et al. 2019; Li et al. 2018) has 
+revolutionized the generation of forged content. Through the adversarial training between 
+the generator and the discriminator, GANs can generate fake images or videos that are visu­
+ally more realistic and rich in detail. In recent years, GAN-based deepfake technology has 
+made significant progress in areas such as face swapping, voice synthesis, and facial expres­
+sion manipulation. The introduction of Conditional GANs (Odena et al. 2017; Mirza 2014) 
+and Cycle Consistent Networks (Zhu et al. 2017; Wang et al. 2018; Huang et al. 2018) has 
+particularly improved the quality and consistency of generated images and videos.
+However, as technology advances, the generation of fake content has become increas­
+ingly complex, especially with the emergence of diffusion models (Ho et al. 2020; Saharia 
+et al. 2022). Unlike GANs, diffusion models provide more refined control over the gen­
+eration process by simulating a step-by-step denoising process, achieving new heights in 
+the detail and consistency of forged content. This technological advancement has further 
+enhanced the realism of fake images and videos, posing new challenges for traditional forg­
+ery detection methods. Therefore, in response to the growing complexity of forgery tech­
+nology, the deepfake detection field urgently requires more powerful and flexible detection 
+methods.
+2.2  Deepfake detection
+In the field of deep forgery detection, the generalization ability of the model, especially the 
+adaptability to different forgery techniques and datasets, remains a key challenge. Existing 
+research focuses on two main directions: frame-level forgery detection and video-level forg­
+ery detection. Frame-level forgery detection focuses on extracting forgery features from a 
+single image frame, while video-level forgery detection identifies forged content by analyz­
+ing the temporal relationship between video frames.
+In frame-level forgery detection, Chen et al. (2022) proposed a detection method com­
+bining self-supervised learning and adversarial data augmentation, effectively enhancing the 
+model’s adaptability to unknown forgery techniques by generating diverse forged images. 
+Liu et al. (2021) introduced the SPSL method, which combines spatial domain and phase 
+spectrum information, utilizing shallow networks to focus on local texture features, sig­
+nificantly improving the model’s generalization ability across different datasets. Luo et al. 
+(2021) further enhanced the model’s cross-database consistency by incorporating high-fre­
+quency noise features with attention mechanisms. Dong et al. (2023) proposed a detection 
+method that does not rely on identity information, focusing on local forgery features, thus 
+improving the model’s adaptability to unknown forgery techniques. Huang et al. (2023) 
+introduced explicit and implicit identity loss, proposing a framework driven by implicit 
+identities, which effectively enhanced the model’s generalization ability.
+Additionally, feature disentangling learning and reconstruction-based learning methods 
+have shown significant potential in deepfake detection. Yan et al. (2023) proposed a multi-task 
+disentangling framework combining conditional decoders and contrastive regularization, 
+which effectively extracts common features across different forgery techniques, improving 
+detection accuracy. Liang et al. (2022) introduced a framework that constrains feature inde­
+pendence to suppress the interference of content information, enhancing the identification 
+of forgery traces. In terms of network design, Dang et al. (2020) proposed a novel atten­
+tion mechanism and demonstrated its effectiveness on large-scale forgery datasets. Zhao 
+1 3
+217 
+Page 4 of 22
+
+
+--- PAGE 5 ---
+
+SFIAD: Deepfake detection through spatial-frequency feature integration…
+et al. (2021) introduced a multi-attention network that combines region-independent loss 
+and attention-guided data augmentation strategies, achieving state-of-the-art performance 
+across multiple datasets. Cao et al. (2022) proposed an end-to-end reconstruction classifi­
+cation framework (RECCE), which enhances the model’s robustness to unknown forgery 
+patterns by reconstructing real images and exploring the inherent differences between real 
+and forged images. Wang and Deng (2021) proposed the Forgery Region Mining method 
+(RFM), which integrates attention-guided data augmentation to improve detection accuracy 
+and can be seamlessly integrated into existing CNN models. Zhu et al. (2021) introduced 
+a 3D decomposition method and designed a dual-stream network architecture (FD2Net), 
+which achieved excellent detection performance across multiple benchmark datasets.
+In contrast, video-level forgery detection mainly focuses on the temporal relationship 
+between video frames, especially abnormal temporal consistency, eye blinking, and opti­
+cal flow features in forged videos. Haliassos et al. (2021) present a spatio-temporal net­
+work pre-training method that demonstrates good robustness in response to perturbations 
+by learning natural mouth movement patterns and fine-tuning the network to detect forged 
+videos. Li et al. (2018) used a Long Short-Term Memory convolutional network (LRCN) 
+to analyze the blink pattern and successfully identified the missing physiological signal in 
+the forged video, which significantly improved the detection efficiency. FakeSpotter method 
+proposed by Wang et al. (2019) shows strong anti-perturbation ability by monitoring neuron 
+behavior and using average neuron coverage (ANC) to detect fake faces generated by GAN. 
+Amerini et al. (2019), combined with the inconsistency of optical flow field, proposed a 
+detection method based on dynamic features, which can effectively deal with the inconsis­
+tency problem across sequences.
+3  Method
+Algorithm 1  Spatial-Frequency Feature Integration and Classification
+1 3
+Page 5 of 22 
+217
+
+
+--- PAGE 6 ---
+
+Y. Kou et al.
+This section provides an overview of the intuitive design of our method and details the 
+network architecture for video frame processing based on SFFI. Additionally, we propose a 
+loss function to address the class imbalance issue.
+3.1  The intuitive idea behind our method
+3.1.1  An intuitive understanding of SFFI
+Forgery detection should not be limited to spatial domain analysis of images but should also 
+delve into the frequency domain to reveal subtle features of forged content. Forged images 
+often exhibit unnatural high-frequency noise and abnormal frequency distributions in the 
+frequency domain, which are difficult to capture through traditional spatial domain analysis. 
+Our intuition is that by combining spatial domain features with frequency domain features, 
+we can more comprehensively capture the subtle differences in forged images.
+3.1.2  An intuitive understanding of AAML
+Class imbalance is a common issue in deep fake detection, where the number of real sam­
+ples is significantly lower than that of fake samples, leading to a reduced ability of the model 
+to recognize real samples during training. To address this issue, a loss function is proposed 
+that dynamically adjusts the decision boundary based on class imbalance.
+3.2  Overview
+The proposed network architecture is shown in Fig. 2. To address the widespread issue of 
+facial forgery in current deepfake detection datasets, we propose a comprehensive method, 
+and its data processing and processing workflow are as follows: 
+Fig. 2  The architecture of SFIAD. The extracted video frame sequence is first passed through the Dlib 
+face detector for face extraction, which serves as the model input. The SFFI fuses the spatial and fre­
+quency domain features of the image, and the Pretrained-Xception model is used for feature extraction. 
+The resulting feature map is then input into the frame-level classifier for classification. Finally, the model 
+output is compared with the ground truth labels to compute the loss
+ 
+1 3
+217 
+Page 6 of 22
+
+
+--- PAGE 7 ---
+
+SFIAD: Deepfake detection through spatial-frequency feature integration…
+1.	 Face region extraction: The Dlib face detector (Sagonas et al. 2016) performs frame-
+wise facial region detection on input videos, which constrains model attention to dis­
+criminative facial features and enhances computational efficiency by reducing irrelevant 
+background processing.
+2.	 Pre-trained xception: The ImageNet-pre-trained Xception backbone effectively cap­
+tures complex image patterns through its deep convolutional layers. It processes SFFI 
+outputs as a hierarchical feature extractor (with the final FC layer removed) to encode 
+discriminative spatial-spectral representations.
+3.	 Frame-level classifier: The extracted feature maps are processed by a lightweight clas­
+sifier comprising FC layers, which performs frame-wise authenticity classification by 
+leveraging discriminative feature representations while maintaining temporal coher­
+ence across video sequences.
+To address the class imbalance problem between real and fake samples in deepfake detec­
+tion, we propose the AAML loss function. This loss function dynamically adjusts the deci­
+sion boundary based on the sample distribution of each class, assigning a larger margin to 
+real images, thereby increasing their weight during training and encouraging the model 
+to focus more on recognizing real images. This design significantly improves classifica­
+tion performance on imbalanced datasets. To illustrate the steps of the proposed method, 
+Algorithm 1 shows the overall process of our deepfake detection algorithm. The current 
+framework focuses on frame-level detection. When conducting subsequent research on 
+video-level detection, a spatio-temporal feature processing module will be added based on 
+the existing one. This module will be placed between the SFFI module and the pre-trained 
+Xception model. It is responsible for extracting the spatio-temporal features of video frame 
+sequences. For instance, it can use the optical flow method to obtain the speed and direc­
+tion information of facial movements. Then, these spatio-temporal features will be fused 
+with the single-frame features extracted by the SFFI module and input into the pre-trained 
+Xception model for more advanced feature extraction and analysis, thereby achieving more 
+accurate detection of video-level deepfakes.
+3.3  Detailed network architecture
+As illustrated in Fig. 2, our network model consists of three main components: an SFFI 
+module, a Pretrained-Xception (Chollet 2017) model, and a Frame-Level Classifier. Fig­
+ure 2 illustrates the specific implementation of these three modules used in our experimental 
+evaluation. We assume that the input video contains m frames, with each frame having a 
+size of h × w × 3. Therefore, the input size to our model is m × h × w × 3.
+3.3.1  SFFI
+Previous research has mainly focused on spatial domain features of images, overlooking 
+the importance of frequency domain information. Furthermore, there has been no effective 
+method to integrate spatial and frequency domain information. As shown in Fig. 3, signifi­
+cant differences exist between real and forged images in the frequency domain. Based on 
+this observation, this paper proposes the SFFI method, which combines the original color 
+1 3
+Page 7 of 22 
+217
+
+
+--- PAGE 8 ---
+
+Y. Kou et al.
+image with frequency domain information, enabling the model to capture more useful fea­
+tures during the feature extraction phase and enhancing its recognition ability.
+To be specific, we first extract the color image Icolor ∈RH×W ×C from the input data 
+dictionary and convert it to a grayscale image by averaging across channels to obtain a 
+single-channel grayscale image Igray ∈RH×W ×1:
+	
+Igray(x, y) = 1
+C
+C
+∑
+c=1
+Icolor(x, y, c)
+(1)
+where Igray(x, y) is the pixel value of the grayscale image, C is the number of color chan­
+nels, and x, y are the spatial coordinates of the image. Next, we apply a two-dimensional 
+Fast Fourier Transform (FFT) to the grayscale image to obtain its frequency domain repre­
+sentation F (Igray) :
+	
+F(Igray)(u, v) =
+H−1
+∑
+x=0
+W −1
+∑
+y=0
+Igray(x, y) · e−j2π( ux
+H + vy
+W )
+(2)
+where F(Igray)(u, v) is the complex value in the frequency domain, u, v are frequency 
+coordinates, H, W are the height and width of the image, and j is the imaginary unit. And 
+re-arrange the spectrum using centralization (FFTshift):
+	
+u′ = (u + H
+2 ) mod H,
+v′ = (v + W
+2 ) mod W
+(3)
+	
+Fshift(Igray)(u, v) = F(Igray)(u′, v′)
+(4)
+where u′, v′ are the frequency coordinates after centralization. Additionally, to compress the 
+dynamic range of the frequency amplitude, we apply a logarithmic transformation:
+Fig. 3  Frequency analysis for each dataset. We present the average spectra of images, focusing on real 
+and fake images. We observe that artifacts are evident in the average spectra of the displayed deepfake 
+forgeries
+ 
+1 3
+217 
+Page 8 of 22
+
+
+--- PAGE 9 ---
+
+SFIAD: Deepfake detection through spatial-frequency feature integration…
+	
+Alog(u, v) = log(A(u, v) + ϵ)
+(5)
+where A(u, v) represents the amplitude spectrum and ϵ is a small positive constant used 
+to avoid division by zero in the logarithmic operation, thereby reducing the amplitude dif­
+ferences and highlighting detailed features in the image. After processing the frequency 
+domain, we normalize the FFT image so that its values fall within the range [0, 1]:
+	
+Anorm(u, v) =
+Alog(u, v)
+max(Alog(u, v))
+(6)
+where max(Alog(u, v)) is the maximum amplitude in the spectrum, used for normalization. 
+Finally, we concatenate the normalized frequency domain features with the original color 
+image along the channel dimension, forming a multi-channel representation that incorpo­
+rates both spatial and frequency domain information:
+	
+Icombined = Concat(Icolor, Anorm) ∈RH×W ×(C+1)
+(7)
+where Icombined is the concatenated image that incorporates both spatial and frequency 
+domain information.
+The core idea of this method is to combine the spatial and frequency domain features of 
+video frames, fully leveraging the advantages of the Fast Fourier Transform in capturing 
+frequency information. This allows the model to not only capture detailed texture informa­
+tion of the image but also integrate additional frequency domain features, thereby improv­
+ing the model’s adaptability and accuracy in complex visual tasks. To validate the SFFI 
+module’s efficacy, Fig. 4 compares feature activation patterns. Column 1 displays Dlib-
+extracted facial regions; Column 2 contrasts Xception activation heatmaps between baseline 
+(Row 1: raw inputs) and SFFI-enhanced (Row 2: spectral-processed inputs). Quantitative 
+analysis demonstrates that the SFFI module enhances discriminative feature extraction in 
+high-frequency components (e.g., texture edges and spectral anomalies) while expanding 
+the receptive field. This enables the model to extract information from a broader range of 
+image areas, thereby notably improving forgery detection accuracy through comprehensive 
+spatial-spectral pattern learning.
+3.3.2  Pretrained-xception
+We utilize a pre-trained convolutional neural network (CNN) module to extract spatial fea­
+tures from each frame. The Xception model, pre-trained on ImageNet, is selected, with its 
+final fully connected (FC) layer removed to serve as a feature extractor. To accommodate a 
+different number of input channels, we modify the weight-loading process of Xception to 
+handle an input format distinct from the original model. After processing, the output feature 
+map from the pre-trained Xception model has a size of m × 2048, where m represents the 
+number of frames and 2048 is the feature dimension.
+1 3
+Page 9 of 22 
+217
+
+
+--- PAGE 10 ---
+
+Y. Kou et al.
+3.3.3  Frame-level classifier
+The features from the Pretrained-Xception model are fed into the frame-level classifier. It 
+receives feature maps of size 8 for each frame and classifies each frame through a fully con­
+nected (FC) layer. In our implementation, the length of the input video is set to 32 frames 
+(more details provided in Sect. 4), and the size of the input frame is 256 × 256.
+3.4  AAML
+In the task of deepfake detection, class imbalance is a critical issue. With fake samples dom­
+inating the dataset and authentic samples being relatively scarce, this imbalance weakens 
+the model’s ability to recognize the minority class (authentic samples). To address this chal­
+lenge, we propose the AAML loss function. By dynamically adjusting classification bound­
+aries, AAML significantly enhances the model’s ability to distinguish authentic images, 
+particularly in scenarios with severe data imbalance.
+The core mechanism of AAML is to dynamically adjust the classification margin based 
+on the sample count of each class, effectively mitigating the impact of class imbalance on 
+model training. Specifically, for the class with fewer samples (authentic samples), AAML 
+assigns a larger margin my, while for the class with more samples (fake samples), it sets a 
+smaller margin my. This differential margin design encourages the model to focus more on 
+the characteristics of authentic images during classification. Given the sample count ny for 
+class y, the margin my is calculated as follows:
+Fig. 4  Visualization of feature maps of the Xception model before and after applying the SFFI module. 
+The receptive field increases after application
+ 
+1 3
+217 
+Page 10 of 22
+
+
+--- PAGE 11 ---
+
+SFIAD: Deepfake detection through spatial-frequency feature integration…
+	
+my =
+1
+√√ny
+·
+mmax
+max
+(
+1
+√√ny
+)
+
+(8)
+where mmax is the preset maximum margin, and ny represents the number of samples in 
+class y. With this design, the margin is adaptively scaled based on class frequency, giving 
+the less frequent class (real images) a larger margin, thus increasing its importance during 
+training. The specific results of the marginal calculation are shown in Fig. 5.
+Once the margins are defined, we adjust the logits for the model’s outputs. For a given 
+input x and target label y, the logits are adjusted by subtracting the corresponding margin 
+my as follows:
+	
+xi,y = xi,y −my
+(9)
+where xi,y is the logit of the i-th input belonging to class y, and my is the margin associated 
+with that class. This adjustment allows the model to maintain a clearer distinction between 
+classes, especially in imbalanced datasets.
+AAML is based on the standard cross-entropy loss but introduces class-specific margin 
+adjustments to the logits. For a given set of input logits x and the corresponding target labels 
+y, the AAML loss is defined as:
+	
+L(x, y) = 1
+N
+N
+∑
+i=1
+CrossEntropy (s · (xi,y −myi), yi)
+(10)
+where s is the scaling factor, and my is the margin associated with class y, dynamically 
+adjusted based on the sample count in each class. The cross-entropy loss function is 
+employed to compute the loss on the logits following margin adjustment for each sample. 
+By implementing this approach, AAML establishes a more pronounced distinction con­
+straint on the real image class, effectively mitigating the risk of it being "overwhelmed" by 
+the larger volume of fake images.
+Fig. 5  The figure illustrates the 
+dynamic margin adjustment for 
+different classes in the AAML 
+method. For the real image 
+class (Real), a larger margin is 
+assigned due to fewer samples, 
+while a smaller margin is as­
+signed to the fake image class 
+(Fake) because it has more 
+samples. This adjustment helps 
+alleviate the class imbalance 
+issue and enhances the model’s 
+ability to recognize real images
+ 
+1 3
+Page 11 of 22 
+217
+
+
+--- PAGE 12 ---
+
+Y. Kou et al.
+By introducing class-specific margins, AAML effectively mitigates the negative impact 
+of class imbalance on model training. This is particularly important in deepfake detection 
+tasks, where real samples are often the minority class. The dynamic margin adjustment 
+mechanism encourages the model to focus more on the minority class, resulting in sig­
+nificantly improved classification accuracy. Furthermore, the margin adjustment process 
+can be seamlessly integrated into existing training workflows with minimal computational 
+overhead, leading to substantial performance improvements.
+4  Experiments
+4.1  Settings
+Datasets Our method has been evaluated on four challenging datasets, including FaceFo­
+rensics++ (FF++) (Rossler et al. 2019), CelebDF-v1 (CDFv1) (Li et al. 2020), CelebDF-v2 
+(CDFv2) (Li et al. 2020), and DeepFake Detection Challenge Preview (DFDC-P) (Dol­
+hansky et al. 2019). FF++ is currently the most widely used dataset for synthetic video 
+forgery, consisting of 1000 authentic videos and corresponding manipulated videos gen­
+erated through four distinct manipulation techniques: Deepfakes (DF), Face2Face (F2F), 
+FaceSwap (FS), and Neural Textures (NT). The FF++ dataset also offers three versions 
+based on compression levels: original, light compression (c23), and heavy compression 
+(c40). Following the convention of previous studies, we have selected the light compression 
+version (c23) of the FF++ dataset for our experiments. This dataset is primarily utilized for 
+model training, with the others reserved for testing purposes.
+Evaluation metrics Consistent with prior studies (Yan et al. 2023, 2024), our evalu­
+ation employs established metrics: Accuracy (ACC), Average Precision (AP), and the 
+Area Under Curve (AUC), while incorporating F1-score and computational efficiency 
+(GFLOPS/Params) for comprehensive performance characterization.
+Implementation details The experiment configuration parameters are given in Table 
+1. All methods use the same training configuration, including image size, optimizer 
+choice, learning rate, and data augmentation strategy. During the data processing phase, 
+we selected 32 frames from each video sample for training and testing. Additionally, 
+we efficiently executed facial detection, cropping, and alignment tasks using the DLIB 
+library, standardizing the image dimensions to 256×256 pixels. In the training process, we 
+employed the Adam optimization algorithm with a learning rate of 0.0002 and uniformly 
+adopted a batch size of 32. To enhance the robustness of the model, we implemented a 
+range of data augmentation strategies during the training phase, including image compres­
+sion, horizontal flipping, rotation, Gaussian blurring, and random adjustments to bright­
+ness and contrast. All experiments were conducted on NVIDIA GTX 3090 GPUs, ensuring 
+ample computational resources and consistency in the experimental environment. To 
+ensure a fair comparison, all experiments are conducted within the DeepfakeBench (Yan 
+et al. 2023). All our experimental settings follow the default settings of the benchmarks.
+1 3
+217 
+Page 12 of 22
+
+
+--- PAGE 13 ---
+
+SFIAD: Deepfake detection through spatial-frequency feature integration…
+4.2  Generalization ability evaluation
+4.2.1  Comparison with competing methods
+To evaluate generalization capability, we benchmarked against ten state-of-the-art methods 
+under consistent experimental settings: MesoNet (Afchar et al. 2018), FWA (Li and Lyu 
+2018), Xception (Rossler et al. 2019), F3-Net (Qian et al. 2020), RFM (Wang and Deng 
+2021), SRM (Luo et al. 2021), CORE (Ni et al. 2022), Recce (Cao et al. 2022), UCF (Yan 
+et al. 2023), and LSDA (Yan et al. 2024).
+We trained our model on the FF++ dataset and conducted rigorous cross-dataset evalu­
+ation on Celeb-DF-V1, Celeb-DF-V2, and DFDC benchmarks. This protocol challenges 
+generalization capability by introducing significant distribution shifts between training 
+(synthetic forgeries) and testing data (realistic deepfakes with diverse generation pipelines), 
+thereby quantitatively assessing model adaptability and cross-dataset robustness through 
+controlled out-of-domain experimentation.
+Tables 2 and 3 illustrate comparative results using different methods. We know that 
+SFIAD outperforms other methods across multiple datasets. Specifically, it exhibits remark­
+able performance in the Celeb-DF-V1 dataset, attaining the highest scores in all evaluation 
+metrics. Notably, its F1 score exceeds that of the second-best method by 4.49%, which 
+achieves an excellent balance between precision and recall through spectral-spatial fusion. 
+The model maintains generalization prowess on Celeb-DF-V2 (achieving the highest scores 
+in ACC, AUC, AP, and F1) through multi-scale feature learning, while sustaining competi­
+tive AUC (75.88%) and AP (83.86%) on DFDC despite slight accuracy variance. Further­
+more, Table 2 shows an evaluation of computational efficiency in terms of GFLOPS and 
+the number of parameters. Although SFIAD is not the most efficient in these metrics, its 
+Training config
+All methods
+Image size
+256,256
+Weight initialization
+ImageNet Pre-trained
+Optimizer
+Adam
+Base learning rate
+2 × 10−4
+Weight decay
+5 × 10−4
+Optimizer momentum
+B1, B2 = 0.9, 0.999
+Batch size
+32
+Training epochs
+10
+Learning rate schedule
+None, Constant
+Flip probability
+0.5
+Rotate probability
+0.5
+Rotate limit
+[−10, 10]
+Blur probability
+0.5
+Blur limit
+[3, 7]
+Brightness probability
+0.5
+Brightness limit
+[−0.1, 0.1]
+Contrast limit
+[−0.1, 0.1]
+Quality lower
+40
+Quality upper
+100
+Table 1  Experimental setup
+ 
+1 3
+Page 13 of 22 
+217
+
+
+--- PAGE 14 ---
+
+Y. Kou et al.
+significant advantage in detection accuracy makes it a practical choice for applications that 
+prioritize high detection performance.
+LSDA (Yan et al. 2024) adopts a teacher-student architecture, where the teacher module 
+learns domain-specific features through domain loss, while the student network enhances 
+generalization through feature distillation. However, its performance heavily depends on 
+the diversity of training data. When data is insufficient, LSDA struggles to capture the dis­
+tribution of forgery features effectively, limiting its adaptability to unknown forgery types. 
+Furthermore, LSDA involves complex latent space operations, has a long training time, and 
+is highly sensitive to hyperparameters, increasing training difficulty and uncertainty.
+UCF (Yan et al. 2023) uses a multi-task learning strategy and conditional decoder to 
+decouple image features, extracting general forgery features to improve detection general­
+ization. However, UCF has two main issues: first, the computational complexity of feature 
+decoupling is high, especially on large-scale datasets; second, the decision process relies on 
+a complex decoupling and contrastive learning mechanism, resulting in poor interpretability 
+and making it difficult to explain the detection rationale to users.
+Table 2  Testing on the Celeb-DF-V1 dataset
+Methods
+GFLOPS
+PARAMS
+ACC(%)
+AUC(%)
+AP(%)
+F1(%)
+MesoNet
+2.0159
+0.0279
+61.64
+58.63
+64.11
+76.27
+FWA
+192.3708
+20.8111
+64.06
+66.50
+70.13
+80.60
+Xception
+192.3708
+20.8111
+68.59
+74.18
+82.44
+74.74
+F3-Net
+193.7086
+20.8136
+61.19
+62.69
+73.32
+73.92
+RFM
+192.3708
+20.8111
+74.68
+80.93
+86.38
+77.27
+SRM
+441.9139
+53.2384
+60.43
+60.46
+71.02
+71.33
+CORE
+192.3708
+20.8111
+59.76
+62.09
+71.98
+71.64
+Recce
+258.2194
+23.7836
+61.73
+62.05
+74.46
+74.62
+UCF
+390.1280
+44.5052
+71.21
+76.79
+84.10
+76.49
+LSDA
+4.7333
+1.3069
+68.88
+82.46
+87.02
+79.43
+SFIAD
+192.5195
+20.8113
+78.06
+88.40
+92.45
+83.92
+Bold and underlined indicate the best and second-best performance, respectively
+Table 3  Testing results on Celeb-DF-V2 and DFDCP datasets
+Methods
+Celeb-DF-V2
+DFDCP
+ACC(%)
+AUC(%)
+AP(%)
+F1(%)
+ACC(%)
+AUC(%)
+AP(%)
+F1(%)
+MesoNet
+64.33
+56.43
+69.63
+77.08
+66.10
+59.71
+70.26
+79.49
+FWA
+65.62
+57.96
+71.00
+61.57
+62.51
+60.44
+73.89
+68.96
+Xception
+60.39
+73.21
+81.80
+62.90
+63.54
+73.65
+82.05
+67.49
+F3-Net
+62.03
+64.86
+77.81
+70.08
+70.85
+73.10
+81.07
+77.95
+RFM
+59.84
+74.13
+83.50
+78.71
+64.13
+72.32
+80.30
+73.85
+SRM
+63.67
+64.20
+76.32
+72.72
+67.23
+73.39
+82.16
+72.89
+CORE
+65.43
+65.77
+77.85
+74.98
+70.03
+74.83
+83.16
+76.13
+Recce
+67.47
+66.13
+77.73
+78.30
+71.02
+74.15
+82.09
+77.89
+UCF
+64.32
+73.06
+81.61
+68.97
+60.92
+75.05
+83.00
+62.91
+LSDA
+69.50
+75.90
+83.44
+81.10
+67.16
+79.68
+87.05
+79.95
+SFIAD
+75.19
+79.00
+86.58
+81.88
+71.43
+75.88
+83.96
+77.72
+Bold and underlined indicate the best and second-best performance, respectively
+1 3
+217 
+Page 14 of 22
+
+
+--- PAGE 15 ---
+
+SFIAD: Deepfake detection through spatial-frequency feature integration…
+SRM (Luo et al. 2021) and F3-Net (Qian et al. 2020) methods distinguish original images 
+from forged ones by leveraging image frequency components and perform reasonably well 
+when dealing with known forgery patterns. However, these two methods heavily rely on 
+the forgery features learned from the training samples. Due to their inability to extract new 
+features, their performance significantly declines when encountering unknown forgery pat­
+terns. In comparison, our proposed SFIAD model has significant advantages. First, SFIAD 
+fuses spatial and frequency domain features, broadening the capture range of deepfake fea­
+tures and effectively improving detection capabilities. Second, SFIAD employs Fast Fourier 
+Transform (FFT) to perform spatial spectrum synthesis analysis, overcoming the limitations 
+of traditional methods that rely solely on high-pass filtering or specific frequency features.
+CORE (Ni et al. 2022) and Recce (Cao et al. 2022) focus on different detection algo­
+rithms, including designing specific loss functions and employing reconstruction learning. 
+However, these detectors can still be affected by irrelevant factors such as race, gender, or 
+identity, making it challenging to eliminate these confounding influences.
+FWA (Li and Lyu 2018) method detects fake videos by identifying resolution inconsis­
+tencies in face transformations. However, it has two notable limitations: first, it lacks the 
+ability to capture irrelevant transformation artifacts, which leads to a decline in detection 
+performance; second, it relies on specific image processing techniques to generate nega­
+tive samples, making it prone to overfitting to certain forgery patterns and resulting in poor 
+generalization.
+RFM (Wang and Deng 2021) method guides the detector to focus on more representative 
+forged regions through forged attention maps and a suspicious forgery elimination module, 
+improving detection capability across various forgery techniques. However, RFM has two 
+limitations: first, it heavily relies on the quality of training data, with noise or mislabel­
+ing significantly affecting model performance; second, its attention mechanism is prone to 
+interference from specific forgery patterns, leading to an overemphasis on local features and 
+reducing the model’s generalization ability.
+Finally, MesoNet (Afchar et al. 2018) and Xception (Rossler et al. 2019) are pure convo­
+lutional network structures that lack data augmentation, feature disentanglement, or utiliza­
+tion of frequency information. Their performance significantly declines when dealing with 
+unknown forged videos.
+Figures 6, 7, and 8 show the comparison results of AUC, AP curves, and F1-score bar 
+charts for different methods on the Celeb-DF-v1, Celeb-DF-v2, and DFDCP datasets, 
+respectively. Each line represents the performance of a different model, while the F1-scores 
+are displayed as bar charts. Overall, the SFIAD model performs well on multiple datasets, 
+demonstrating its robustness in handling unknown forgery patterns.
+To further verify the effectiveness of our proposed SFIAD method, we conducted a sig­
+nificance analysis comparing its performance with other state-of-the-art methods. Table 
+Fig. 6  Cross-dataset evaluation: Plotting the ROC-AUC curve with the optimal model parameters
+ 
+1 3
+Page 15 of 22 
+217
+
+
+--- PAGE 16 ---
+
+Y. Kou et al.
+4 shows the P-values and levels of significance for the performance comparison between 
+SFIAD and other methods.
+The significance analysis shows that SFIAD is statistically superior to MesoNet, FWA, 
+Xception, F3-Net, SRM, CORE, and LSDA. However, the performance differences between 
+SFIAD and RFM, Recce, and UCF are not statistically significant. These findings indicate 
+that while SFIAD generally achieves overall performance improvements, further optimi­
+zation is needed - especially in reducing the false positive rate, where it is comparable to 
+methods such as RFM, Recce, and UCF.
+4.3  Ablation study
+We conducted ablation experiments to verify the effectiveness of the modules in this paper. 
+The model is trained on the FF++ dataset and evaluated on the other three datasets. This 
+experimental setup demonstrates the challenging nature of models in the evaluation of gen­
+eralization ability.
+Comparison of methods
+P value
+Level of significance
+SFIAD vs. MesoNet
+0.009
+Sgnificant
+SFIAD vs. FWA
+0.007
+Significant
+SFIAD vs. Xception
+0.024
+Significant
+SFIAD vs. F3-Net
+0.049
+Significant
+SFIAD vs. RFM
+0.137
+Not significant
+SFIAD vs. SRM
+0.015
+Significant
+SFIAD vs. CORE
+0.049
+Significant
+SFIAD vs. Recce
+0.070
+Not significant
+SFIAD vs. UCF
+0.058
+Not significant
+SFIAD vs. LSDA
+0.035
+Significant
+Table 4  Significance analysis 
+results
+ 
+Fig. 8  Cross-dataset evaluation: Plotting the bar chart of F1-score with the optimal model parameters
+ 
+Fig. 7  Cross-dataset evaluation: Plotting the Precision-Recall curve with the optimal model parameters
+ 
+1 3
+217 
+Page 16 of 22
+
+
+--- PAGE 17 ---
+
+SFIAD: Deepfake detection through spatial-frequency feature integration…
+To evaluate the impact of the SFFI and AAML modules on the SFIAD method, we per­
+formed ablation experiments by removing each module individually as well as both mod­
+ules simultaneously. The results are summarized in Table 5, which reports accuracy (ACC), 
+area under the curve (AUC), and average precision (AP) on the Celeb-DF-V1, Celeb-DF-
+V2, and DFDCP datasets.
+Removing the SFFI module caused significant performance degradation: on Celeb-DF-
+V1, ACC decreased from 78.06% to 69.71%, AUC from 88.40% to 81.56%, and AP from 
+92.45% to 86.86%; on Celeb-DF-V2, ACC decreased from 75.19% to 71.36%, AUC from 
+79.00% to 76.45%, and AP from 86.58% to 83.29%; on DFDCP, ACC decreased from 
+71.43% to 66.51%, AUC from 75.88% to 74.82%, and AP from 83.96% to 83.23%.
+Similarly, removing the AAML module also led to performance degradation: on Celeb-
+DF-V1, ACC decreased from 78.06% to 73.28%, AUC from 88.40% to 80.95%, and AP 
+from 92.45% to 87.78%; on Celeb-DF-V2, ACC decreased from 75.19% to 64.35%, AUC 
+from 79.00% to 74.85%, and AP from 86.58% to 84.55%; on DFDCP, ACC decreased from 
+71.43% to 70.26%, AUC from 75.88% to 74.13%, and AP from 83.96% to 82.13%.
+When both modules were removed, the performance decline became even more pro­
+nounced: on Celeb-DF-V1, ACC dropped to 68.59%, AUC to 74.18%, and AP to 82.44%; 
+on Celeb-DF-V2, ACC dropped to 60.39%, AUC to 73.21%, and AP to 81.80%; on DFDCP, 
+ACC dropped to 63.54%, AUC to 73.65%, and AP to 82.05%.
+These results demonstrate that both the SFFI and AAML modules are crucial for the 
+SFIAD method, as they complement each other to improve the model’s ability to distinguish 
+between real and fake data.
+In addition, we experimentally verify the effectiveness of AAML. As shown in the Table 
+6, When the loss function we designed is applied to other methods, all methods improve 
+except Meso4, which has a decrease in DFDCP data.
+Table 7 compares the AUC performance of the Xception model combined with different 
+loss functions on the Celeb-DF-V1, Celeb-DF-V2, and DFDCP datasets. The results show 
+that Xception with the AAML loss achieved the highest AUC scores on all three datasets, 
+significantly outperforming Xception models combined with cross-entropy (Krizhevsky 
+et al. 2012), PaCoLoss (Zhu et al. 2022), and AM-Softmax (Wang et al. 2018). This demon­
+strates the effectiveness of the AAML loss in improving detection performance.
+Figure 9 illustrates the feature space distribution based on t-SNE, aiming to analyze the 
+impact of the AAML module on classification boundaries. On the Celeb-DF-V1 test set, 
+the SFIAD model with AAML (SFIAD On Celeb-DF-V1 (test)) significantly improved the 
+separability between real and forged samples, resulting in more discrete feature distribu­
+Table 5  Ablation on the network architecture
+Methods
+Celeb-DF-V1
+Celeb-DF-v2
+DFDCP
+ACC(%)
+AUC(%)
+AP(%)
+ACC(%)
+AUC(%)
+AP(%)
+ACC(%)
+AUC(%)
+AP(%)
+SFIAD
+78.06
+88.40
+92.45
+75.19
+79.00
+86.58
+71.43
+75.88
+83.96
+SFIAD Del 
+SFFI
+69.71
+81.56
+86.86
+71.36
+76.45
+83.29
+66.51
+74.82
+83.23
+SFIAD Del 
+AAML
+73.28
+80.95
+87.78
+64.35
+74.85
+84.55
+70.26
+74.13
+82.13
+SFIAD Del 
+SFFI And 
+AAML
+68.59
+74.18
+82.44
+60.39
+73.21
+81.80
+63.54
+73.65
+82.05
+"Del" denotes removal
+1 3
+Page 17 of 22 
+217
+
+
+--- PAGE 18 ---
+
+Y. Kou et al.
+tions and clearer classification boundaries, with an AUC of 88.40. In contrast, after remov­
+ing AAML (SFIAD Del AAML On Celeb-DF-V1 (test)), the feature distributions became 
+more mixed, the classification boundaries were blurred, and the AUC dropped to 80.95. 
+These experimental results visually demonstrate that the AAML module effectively opti­
+mized the classification boundaries, enhancing the model’s ability to distinguish between 
+real and forged images, thereby improving the performance of deepfake detection.
+Fig. 9  Classification boundary comparison of the SFIAD method using t-SNE visualization on the Celeb-
+DF-V1 dataset
+ 
+Methods
+Celeb-DF-V1
+Celeb-DF-v2
+DFDCP
+Xception + Cross-entropy
+0.7418
+0.7321
+0.7365
+Xception + PaCoLoss
+0.5
+0.5
+0.5
+Xception + AM-Softmax
+0.7502
+0.7504
+0.7422
+Xception + AAML
+0.8156
+0.7645
+0.7482
+Table 7  Comparison of AUC 
+metrics of different loss func­
+tions combined with Xception on 
+Celeb-DF-V1, Celeb-DF-v2, and 
+DFDCP datasets
+ 
+Methods
+Celeb-DF-V1
+Celeb-DF-v2
+DFDCP
+MesoNet
+70.77 ↑
+59.83 ↑
+58.41 ↓
+FWA
+69.53 ↑
+62.29 ↑
+63.10 ↑
+Xception
+81.56 ↑
+76.45 ↑
+74.82 ↑
+F3-Net
+64.05 ↑
+65.44 ↑
+77.26 ↑
+RFM
+84.31 ↑
+77.86 ↑
+72.79 ↑
+SRM
+61.38 ↑
+68.27 ↑
+74.21 ↑
+CORE
+65.59 ↑
+65.70 ↑
+75.68 ↑
+Recce
+64.72 ↑
+66.68 ↑
+75.83 ↑
+LSDA
+84.68 ↑
+80.63 ↑
+81.39 ↑
+Table 6  To validate the effective­
+ness of AAML, it was integrated 
+with other methods to assess its 
+impact
+The displayed metric is AUC
+ 
+1 3
+217 
+Page 18 of 22
+
+
+--- PAGE 19 ---
+
+SFIAD: Deepfake detection through spatial-frequency feature integration…
+4.4  Data augmentation impact analysis
+To investigate the impact of data augmentation on model performance, we compared the 
+performance of the SFIAD model without data augmentation (SFIAD - Data aug) and the 
+SFIAD model with data augmentation on the Celeb-DF-V1, Celeb-DF-V2, and DFDCP 
+datasets. As shown in Table 8, data augmentation significantly improved the model’s perfor­
+mance: on Celeb-DF-V1, the AUC increased from 80.15% to 88.40%; on Celeb-DF-V2, the 
+AUC increased from 72.96% to 79.00%; and on DFDCP, the AUC increased from 73.40% 
+to 75.88%. These experimental results validate the effectiveness of the data augmentation 
+strategy.
+5  Conclusion
+This study proposes a frame-level deepfake detection framework that combines Spatial-
+Frequency Feature Integration (SFFI) and Authenticity-Aware Margin Loss (AAML), sig­
+nificantly improving the accuracy and robustness of fake content detection. Our method 
+effectively integrates spatial and frequency domain features of images, enabling the model 
+to more effectively capture subtle differences in forged images. AAML alleviates the class 
+imbalance issue by dynamically adjusting the margins, particularly improving classification 
+performance in cases where authentic samples are scarce. Experimental results on multiple 
+challenging datasets demonstrate that our method outperforms eight existing mainstream 
+detection methods in terms of accuracy, AUC, and AP, confirming its strong potential in 
+deepfake detection. In the future, we plan to extend this framework to video-level deepfake 
+detection and further incorporate spatiotemporal inconsistencies to enhance the model’s 
+generalization ability.
+Acknowledgements  This work is supported by Sichuan Science and Technology Program (Grant No. 
+2024ZDZX0007), and the CUIT Science and Technology Innovation Capacity Enhancement Program Proj­
+ect under Grant KYTD202330.
+Author contributions  Yi Kou: wrote the main manuscript text, Peng Li: wrote the main manuscript text, 
+Hongjiang Ma: wrote the main manuscript text, Jiliu Zhou: wrote the main manuscript text, Zhan Ao Huang: 
+Financial support, Xiaojie Li: Financial support. All authors reviewed the manuscript.
+Data availability  No datasets were generated or analysed during the current study.
+Declarations
+Competing interests  The authors declare no competing interests.
+Open Access  This article is licensed under a Creative Commons Attribution-NonCommercial-
+NoDerivatives 4.0 International License, which permits any non-commercial use, sharing, distribution and 
+reproduction in any medium or format, as long as you give appropriate credit to the original author(s) and the 
+source, provide a link to the Creative Commons licence, and indicate if you modified the licensed material. 
+Methods
+Celeb-DF-V1
+Celeb-DF-v2
+DFDCP
+SFIAD - Data aug
+80.15
+72.96
+73.40
+SFIAD
+88.40
+79.00
+75.88
+Table 8  Impact of Data augmen­
+tation on model performance
+The displayed metric is AUC
+ 
+1 3
+Page 19 of 22 
+217
+
+
+--- PAGE 20 ---
+
+Y. Kou et al.
+You do not have permission under this licence to share adapted material derived from this article or parts of it. 
+The images or other third party material in this article are included in the article’s Creative Commons licence, 
+unless indicated otherwise in a credit line to the material. If material is not included in the article’s Creative 
+Commons licence and your intended use is not permitted by statutory regulation or exceeds the permitted use, 
+you will need to obtain permission directly from the copyright holder. To view a copy of this licence, visit ​h​
+t​t​p​:​/​/​c​r​e​a​t​i​v​e​c​o​m​m​o​n​s​.​o​r​g​/​l​i​c​e​n​s​e​s​/​b​y​-​n​c​-​n​d​/​4​.​0​/.
+References
+Afchar D, Nozick V, Yamagishi J, Echizen I (2018) Mesonet: a compact facial video forgery detection net­
+work. In: 2018 IEEE international workshop on information forensics and security (WIFS), pp. 1–7. 
+IEEE
+Amerini I, Galteri L, Caldelli R, Del Bimbo A (2019) Deepfake video detection through optical flow based 
+cnn. In: Proceedings of the IEEE/CVF international conference on computer vision workshops, pp. 0–0
+Cao J, Ma C, Yao T, Chen S, Ding S, Yang X (2022) End-to-end reconstruction-classification learning for 
+face forgery detection. In: Proceedings of the IEEE/CVF conference on computer vision and pattern 
+recognition, pp. 4113–4122
+Chan C, Ginosar S, Zhou T, Efros AA (2019) Everybody dance now. In: Proceedings of the IEEE/CVF Inter­
+national conference on computer vision, pp. 5933–5942
+Chen S, Yao T, Chen Y, Ding S, Li J, Ji R (2021) Local relation learning for face forgery detection. In: Pro­
+ceedings of the AAAI conference on artificial intelligence, vol. 35, pp. 1081–1088
+Chen L, Zhang Y, Song Y, Liu L, Wang J (2022) Self-supervised learning of adversarial example: towards 
+good generalizations for deepfake detection. In: Proceedings of the IEEE/CVF conference on computer 
+vision and pattern recognition, pp. 18710–18719
+Chollet F (2017) Xception: Deep learning with depthwise separable convolutions. In: Proceedings of the 
+IEEE conference on computer vision and pattern recognition, pp. 1251–1258
+Dang H, Liu F, Stehouwer J, Liu X, Jain AK (2020) On the detection of digital face manipulation. In: Pro­
+ceedings of the IEEE/CVF conference on computer vision and pattern recognition, pp. 5781–5790
+D’Avino D, Cozzolino D, Poggi G, Verdoliva L (2017) Autoencoder with recurrent neural networks for video 
+forgery detection. arXiv preprint arXiv:1708.08754
+Dolhansky B, Howes R, Pflaum B, Baram N, Ferrer CC (2019) The deepfake detection challenge (dfdc) 
+preview dataset. arXiv preprint arXiv:1910.08854
+Dong S, Wang J, Ji R, Liang J, Fan H, Ge Z (2023) Implicit identity leakage: The stumbling block to improv­
+ing deepfake detection generalization. In: Proceedings of the IEEE/CVF conference on computer vision 
+and pattern recognition, pp. 3994–4004
+Gao Y, Wei F, Bao J, Gu S, Chen D, Wen F, Lian Z (2021) High-fidelity and arbitrary face editing. In: Pro­
+ceedings of the IEEE/CVF conference on computer vision and pattern recognition, pp. 16115–16124
+Goodfellow I, Pouget-Abadie J, Mirza M, Xu B, Warde-Farley D, Ozair S, Courville A, Bengio Y (2020) 
+Generative adversarial networks. Commun ACM 63(11):139–144
+Gu Q, Chen S, Yao T, Chen Y, Ding S, Yi R (2022) Exploiting fine-grained face forgery clues via progressive 
+enhancement learning. Proc AAAI Conf Artif Intell 36:735–743
+Gu Z, Chen Y, Yao T, Ding S, Li J, Ma L (2022) Delving into the local: Dynamic inconsistency learning for 
+deepfake video detection. In: Proceedings of the AAAI conference on artificial intelligence, vol. 36, 
+pp. 744–752
+Haliassos A, Vougioukas K, Petridis S, Pantic M (2021) Lips don’t lie: a generalisable and robust approach 
+to face forgery detection. In: Proceedings of the IEEE/CVF conference on computer vision and pattern 
+recognition, pp. 5039–5049
+Ho J, Jain A, Abbeel P (2020) Denoising diffusion probabilistic models. Adv Neural Inform Proc Syst 
+33:6840–6851
+Huang X, Liu M-Y, Belongie S, Kautz J (2018) Multimodal unsupervised image-to-image translation. In: 
+Proceedings of the european conference on computer vision (ECCV), pp. 172–189
+Huang B, Wang Z, Yang J, Ai J, Zou Q, Wang Q, Ye D (2023) Implicit identity driven deepfake face swapping 
+detection. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pp. 
+4490–4499
+Karras T, Laine S, Aila T (2019) A style-based generator architecture for generative adversarial networks. In: 
+Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pp. 4401–4410
+Krizhevsky A, Sutskever I, Hinton GE (2012) Imagenet classification with deep convolutional neural net­
+works. Adv Neural Inform Proc Syst25
+1 3
+217 
+Page 20 of 22
+
+
+--- PAGE 21 ---
+
+SFIAD: Deepfake detection through spatial-frequency feature integration…
+Liang J, Shi H, Deng W (2022) Exploring disentangled content information for face forgery detection. In: 
+European conference on computer vision, pp. 128–145. Springer
+Li L, Bao J, Zhang T, Yang H, Chen D, Wen F, Guo B (2020) Face x-ray for more general face forgery 
+detection. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, 
+pp. 5001–5010
+Li Y, Chang M-C, Lyu S (2018) In ictu oculi: Exposing ai created fake videos by detecting eye blinking. In: 
+2018 IEEE international workshop on information forensics and security (WIFS), pp. 1–7. Ieee
+Li Y, Lyu S (2018) Exposing deepfake videos by detecting face warping artifacts. arXiv preprint 
+arXiv:1811.00656
+Liu H, Li X, Zhou W, Chen Y, He Y, Xue H, Zhang W, Yu N (2021) Spatial-phase shallow learning: rethink­
+ing face forgery detection in frequency domain. In: Proceedings of the IEEE/CVF conference on com­
+puter vision and pattern recognition, pp. 772–781
+Li J, Xie H, Li J, Wang Z, Zhang Y (2021) Frequency-aware discriminative feature learning supervised by 
+single-center loss for face forgery detection. In: Proceedings of the IEEE/CVF conference on computer 
+vision and pattern recognition, pp. 6458–6467
+Li Y, Yang X, Sun P, Qi H, Lyu S (2020) Celeb-df: A large-scale challenging dataset for deepfake foren­
+sics. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pp. 
+3207–3216
+Luo Y, Zhang Y, Yan J, Liu W (2021) Generalizing face forgery detection with high-frequency features. In: 
+Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pp. 16317–16326
+Mirza M (2014) Conditional generative adversarial nets. arXiv preprint arXiv:1411.1784
+Muksimova S, Umirzakova S, Shoraimov K, Baltayev J, Cho Y-I (2024) Novelty classification model use in 
+reinforcement learning for cervical cancer. Cancers 16(22):3782
+Nguyen HH, Yamagishi J, Echizen I (2019) Capsule-forensics: using capsule networks to detect forged 
+images and videos. In: ICASSP 2019-2019 IEEE international conference on acoustics, speech and 
+signal processing (ICASSP), pp. 2307–2311. IEEE
+Ni Y, Meng D, Yu C, Quan C, Ren D, Zhao Y (2022) Core: Consistent representation learning for face forgery 
+detection. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, 
+pp. 12–21
+Odena A, Olah C, Shlens J (2017) Conditional image synthesis with auxiliary classifier gans. In: International 
+conference on machine learning, pp. 2642–2651. PMLR
+Qian Y, Yin G, Sheng L, Chen Z, Shao J (2020) Thinking in frequency: Face forgery detection by mining 
+frequency-aware clues. In: European conference on computer vision, pp. 86–103. Springer
+Rossler A, Cozzolino D, Verdoliva L, Riess C, Thies J, Nießner M (2019) Faceforensics++: Learning to 
+detect manipulated facial images. In: Proceedings of the IEEE/CVF international conference on com­
+puter vision, pp. 1–11
+Sagonas C, Antonakos E, Tzimiropoulos G, Zafeiriou S, Pantic M (2016) 300 faces in-the-wild challenge: 
+database and results. Image Vis Comput 47:3–18
+Saharia C, Ho J, Chan W, Salimans T, Fleet DJ, Norouzi M (2022) Image super-resolution via iterative refine­
+ment. IEEE Trans Pattern Anal Mach Intell 45(4):4713–4726
+Thies J, Zollhöfer M, Nießner M (2019) Deferred neural rendering: image synthesis using neural textures. 
+ACM Trans Graphics (TOG) 38(4):1–12
+Wang T-C, Liu M-Y, Zhu J-Y, Tao A, Kautz J, Catanzaro B (2018) High-resolution image synthesis and 
+semantic manipulation with conditional gans. In: Proceedings of the IEEE conference on computer 
+vision and pattern recognition, pp. 8798–8807
+Wang F, Cheng J, Liu W, Liu H (2018) Additive margin softmax for face verification. IEEE Signal Proc Lett 
+25(7):926–930
+Wang C, Deng W (2021) Representative forgery mining for fake face detection. In: Proceedings of the IEEE/
+CVF conference on computer vision and pattern recognition, pp. 14923–14932
+Wang C, Deng W (2021) Representative forgery mining for fake face detection. In: Proceedings of the IEEE/
+CVF conference on computer vision and pattern recognition, pp. 14923–14932
+Wang R, Juefei-Xu F, Ma L, Xie X, Huang Y, Wang J, Liu Y (2019) Fakespotter: a simple yet robust baseline 
+for spotting ai-synthesized fake faces. arXiv preprint arXiv:1909.06122
+Wang J, Li Z, Zhang C, Chen J, Wu Z, Davis LS, Jiang Y-G (2022) Fighting malicious media data: a survey 
+on tampering detection and deepfake detection. arXiv preprint arXiv:2212.05667
+Yan Z, Luo Y, Lyu S, Liu Q, Wu B (2024) Transcending forgery specificity with latent space augmentation 
+for generalizable deepfake detection. In: Proceedings of the IEEE/CVF conference on computer vision 
+and pattern recognition, pp. 8984–8994
+Yan Z, Zhang Y, Fan Y, Wu B (2023) Ucf: Uncovering common features for generalizable deepfake detec­
+tion. In: Proceedings of the IEEE/CVF international conference on computer vision, pp. 22412–22423
+1 3
+Page 21 of 22 
+217
+
+
+--- PAGE 22 ---
+
+Y. Kou et al.
+Yan Z, Zhang Y, Yuan X, Lyu S, Wu B (2023) Deepfakebench: a comprehensive benchmark of deepfake 
+detection. arXiv preprint arXiv:2307.01426
+Zhao H, Zhou W, Chen D, Wei T, Zhang W, Yu N (2021) Multi-attentional deepfake detection. In: Proceed­
+ings of the IEEE/CVF conference on computer vision and pattern recognition, pp. 2185–2194
+Zhou P, Han X, Morariu VI, Davis LS (2017) Two-stream neural networks for tampered face detection. In: 
+2017 IEEE conference on computer vision and pattern recognition workshops (CVPRW), pp. 1831–
+1839. IEEE
+Zhu J-Y, Park T, Isola P, Efros AA (2017) Unpaired image-to-image translation using cycle-consistent 
+adversarial networks. In: Proceedings of the IEEE international conference on computer vision, pp. 
+2223–2232
+Zhu J, Wang Z, Chen J, Chen Y-PP, Jiang Y-G (2022) Balanced contrastive learning for long-tailed visual 
+recognition. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, 
+pp. 6908–6917
+Zhu X, Wang H, Fei H, Lei Z, Li SZ (2021) Face forgery detection by 3d decomposition. In: Proceedings of 
+the IEEE/CVF conference on computer vision and pattern recognition, pp. 2929–2939
+Zi B, Chang M, Chen J, Ma X, Jiang Y-G (2020) Wilddeepfake: a challenging real-world dataset for deepfake 
+detection. In: Proceedings of the 28th ACM international conference on multimedia, pp. 2382–2390
+Publisher's Note  Springer Nature remains neutral with regard to jurisdictional claims in published maps and 
+institutional affiliations.
+Authors and Affiliations
+Yi Kou1 · Peng Li1 · Hongjiang Ma2 · Jiliu Zhou1 · Zhan ao Huang1 · Xiaojie Li1
+	
+ Xiaojie Li
+lixj@cuit.edu.cn
+Yi Kou
+19102856453@163.com
+Peng Li
+lpcuit@163.com
+Hongjiang Ma
+mhj68@163.com
+Jiliu Zhou
+zhoujiliu@cuit.edu.cn
+Zhan ao Huang
+huangza2022@gmail.com
+1	
+Chengdu University of Information Technology, School of Computer Science, Chengdu, 
+Sichuan, China
+2	
+Yibin University, School of Computer Science, Yibin, Sichuan, China
+1 3
+217 
+Page 22 of 22

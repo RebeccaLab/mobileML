@@ -1,0 +1,793 @@
+
+
+--- PAGE 1 ---
+
+979-8-3315-5549-8/25/$31.00 ©2025 IEEE 
+Deepfake Forensics Leveraging MobileNetV2 for 
+High Precision Detection 
+ 
+Pallavi Singh 
+Dept. of Electronics and 
+Communication Engineering 
+Hindustan Institute of Technology & 
+Science 
+Chennai, India 
+singh.pallavi73@gmail.com 
+K Tharun 
+Dept. of Electronics and 
+Communication Engineering 
+Hindustan Institute of Technology & 
+Science 
+Chennai, India 
+ tharun.ofcc@gmail.com 
+ S. Sasikumar  
+Dept. of Electronics and 
+Communication Engineering 
+Rajalakshmi Institute of Technolog 
+Chennai, India 
+sasikumar.s@ritchennai.edu.in  
+ 
+M. Kavitha 
+Dept. of Electronics and 
+Communication Engineering 
+Hindustan Institute of Technology & 
+Science 
+Chennai, India 
+kavishree21@gmail.com 
+Ratna Sekhar Geddam 
+Dept. of Electronics and 
+Communication Engineering 
+Hindustan Institute of Technology & 
+Science 
+Chennai, India 
+ratnasekhar004@gmail.com 
+ 
+Thangavel Bhuvaneswari 
+Faculty of Engineering and Technology 
+Multimedia University 
+Melaka.Malaysia 
+t.bhuvaneswari@mmu.edu.my
+Abstract—This Deepfake technology has emerged as a 
+powerful tool for generating synthetic media, leveraging 
+advancements in artificial intelligence and deep learning to 
+create highly realistic fake images and videos. While deepfakes 
+offer potential benefits in fields such as entertainment, media 
+production, and virtual reality, they also present serious 
+threats, including misinformation, identity fraud, and privacy 
+violations. The ability to detect deepfake content accurately 
+and efficiently is critical in safeguarding digital authenticity 
+and preventing misuse. This research focuses on the 
+development of deepfake detection models using Convolutional 
+Neural Networks (CNNs) and MobileNetV2. Three primary 
+detection methods— handcrafted feature analysis, machine 
+learning-based classification, and artifact detection—were 
+implemented and evaluated. A dataset consisting of 20,000 
+images, equally split between real and fake, was used for model 
+training 
+and 
+testing, 
+and 
+optimized 
+using 
+dropout 
+regularization, learning rate tuning, and early stopping. The 
+CNN model achieved an accuracy of 90%, while an optimized 
+MobileNetV2 Subtraction model improved detection accuracy 
+to 97% by reducing overfitting and refining hyperparameters. 
+The study underscores the importance of robust deepfake 
+detection 
+frameworks, 
+particularly 
+in 
+an 
+era 
+where 
+manipulated content is becoming increasingly difficult to 
+differentiate from real media. Future enhancements will 
+explore real-time detection solutions and adversarial training 
+techniques to further improve detection accuracy and 
+resilience.  
+Keywords— Deepfake detection, Convolutional Neural 
+Networks 
+(CNN), 
+MobileNetV2, 
+artificial 
+intelligence, 
+misinformation.   
+I. INTRODUCTION  
+Deepfake technology, a result of advancements in 
+artificial intelligence (AI) and machine learning (ML), 
+enables the creation of manipulated media that convincingly 
+replicates real-life appearances and expressions. Leveraging 
+Generative Adversarial Networks (GANs), deepfake 
+systems generate highly realistic synthetic content by 
+training neural networks to produce and refine forged media 
+iteratively. The increasing accessibility of deepfake 
+generation tools has escalated these risks, necessitating the 
+development of robust detection mechanisms. Traditional 
+methods for detecting manipulated content, such as forensic 
+analysis and manual inspection, prove inadequate against 
+sophisticated AI-generated media.  
+This paper explores deepfake detection using CNNs, 
+focusing on three primary techniques: (i) handcrafted feature 
+analysis, 
+which 
+identifies 
+inconsistencies 
+in 
+facial 
+expressions, (ii) machine learning-based classification, 
+which distinguishes between real and fake media based on 
+pixel-level analysis, and (iii) artifact detection, which 
+identifies GAN-generated traces in manipulated images. 
+This study focuses on image-based detection due to its low 
+computational overhead and suitability for real-time 
+deployment. In contrast, video-based methods analyze 
+temporal inconsistencies but often require more resources. 
+The primary objectives of this study are:  
+• 
+To develop a CNN-based deepfake detection 
+framework. 
+• 
+To assess the efficiency of MobileNetV2 in real-
+time detection. 
+• 
+To enhance accuracy through an optimized 
+MobileNetV2 Subtraction model.  
+II. LITERATURE SURVEY  
+A. Enhancing Practicality and Efficiency of Deepfake 
+Detection (2024)  
+This study presents novel techniques aimed at 
+accelerating deepfake detection in video-based applications. 
+The research focuses on optimizing inference speed, 
+reducing computational overhead, and improving real-time 
+detection capabilities. The study proposes a framework that 
+enhances deployment practicality in real-world scenarios 
+such as security, social media monitoring, and forensic 
+analysis.  
+B. Comprehensive Review of DeepFake Detection Using 
+Advanced Machine Learning and Fusion Methods 
+(2024) 
+ 
+This extensive review examines 67 primary research 
+papers published between 2015 and 2023, analyzing emerging 
+deepfake detection methodologies. It highlights the evolution 
+of deepfake generation techniques and explores how advanced 
+machine learning models, including transformers and hybrid 
+2025 Multimedia University Engineering Conference (MECON) | 979-8-3315-5549-8/25/$31.00 ©2025 IEEE | DOI: 10.1109/MECON67253.2025.11277038
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:38:37 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 2 ---
+
+fusion techniques, have improved detection accuracy. The 
+study emphasizes the need for multi-modal approaches that 
+integrate spatial, temporal, and forensic-based detection 
+mechanisms.   
+C. Gaze Forensics: DeepFake Detection via Gaze-guided 
+Spatial Inconsistency Learning (2023)  
+This research introduces an innovative method that 
+utilizes gaze estimation models to detect deepfakes. By 
+analyzing gaze inconsistencies, the study demonstrates how 
+synthetic videos fail to replicate natural eye movement 
+patterns. The proposed approach enhances detection 
+performance by identifying unnatural gaze shifts, making it 
+highly effective against AI generated facial manipulations. 
+This 
+technique 
+significantly 
+improves 
+deepfake 
+identification in forensic and authentication systems.   
+D. Individualized Deepfake Detection Exploiting Traces 
+Due to Double Neural-Network Operations (2023)  
+This study focuses on enhancing deepfake detection for 
+public figures by leveraging a technique based on neural 
+network idempotency properties. It identifies and exploits 
+subtle artifacts left by neural network-generated facial 
+reconstructions, 
+improving 
+model 
+robustness 
+in 
+distinguishing fake from real content. 
+E. Sok: Facial Deepfake Detectors (2024)  
+This systematic study evaluates the latest state-of-the-art 
+facial deepfake detection methods. The research categorizes 
+existing techniques based on their strengths, limitations, and 
+real-world applicability. Key factors such as dataset quality, 
+adversarial robustness, and computational efficiency are 
+analyzed to provide insights into optimizing detection 
+models. The study serves as a benchmark for future 
+advancements in deepfake detection 
+III. METHODOLOGY   
+This study aimed to develop and evaluate machine 
+learning models for detecting deepfake images, with a 
+particular emphasis on the use of different neural network 
+architectures, data preprocessing techniques, and artifact 
+analysis for robust detection. Below is a detailed description 
+of the dataset, preprocessing steps, model selection, training 
+and optimization techniques, feature extraction, evaluation 
+metrics, and potential deployment scenarios.  
+A. Dataset and Preprocessing  
+The dataset used in this study consists of 20,000 labeled 
+images, with an equal distribution of real and deepfake 
+generated images. The dataset includes samples from 
+FaceForensics++, Celeb-DF, and GAN-generated images 
+using StyleGAN. The choice of dataset was to ensure a 
+comprehensive representation of both authentic and 
+manipulated images, allowing the models to distinguish 
+between the two effectively  
+First, Faces were aligned and cropped using MTCNN 
+before resizing to 96×96. Resizing ensures that the models 
+could process all images in the same format, reducing the 
+complexity of input variation that could arise from different 
+image sizes. To normalize the dataset, pixel values were 
+scaled to a range of [0, 1], preventing any inconsistency that 
+might arise due to variations in brightness or contrast across 
+images. Image normalization is an essential step in deep 
+learning models to maintain uniformity in the input data, thus 
+improving model convergence.  
+Further, data augmentation was applied to enhance the 
+model’s ability to generalize and perform well across a wide 
+variety of images. Augmentation techniques included 
+rotation, flipping, and zooming, which simulated variations 
+in facial features and distortions caused by image 
+manipulation. By applying these transformations, the models 
+were trained to identify deepfake artifacts under different 
+conditions, enhancing their robustness and generalization 
+capabilities.  
+The dataset was then split into three subsets: training 
+(80%), validation (10%), and testing (10%). Stratified 
+sampling was employed to ensure the distribution of real and 
+fake images was proportionally represented in each subset. 
+This method helped preserve class balance, which is critical 
+in training deep learning models for classification tasks. The 
+Image Data Generator utility from Keras was used for real-
+time data augmentation during the training phase, ensuring 
+that each batch of images presented to the model was 
+different, thereby reducing the likelihood of overfitting.  
+B. Model Selection and Architecture  
+Three distinct neural network architectures were selected 
+and implemented for deepfake detection: a Convolutional 
+Neural Network (CNN), MobileNetV2, and a modified 
+version of MobileNetV2, referred to as MobileNetV2 
+Subtraction. These models were chosen to represent a range 
+of approaches, from a traditional CNN baseline to more 
+efficient, lightweight models.  
+1) Convolutional Neural Network (CNN)  
+CNN served as the baseline model in this study. 
+CNNs are well-suited for image classification tasks as 
+they are able to extract spatial hierarchies of features from 
+images. The architecture in figure 1 consisted of multiple 
+convolutional layers followed by ReLU activation 
+functions, which helped capture complex patterns in the 
+input images. Max-pooling layers were used after each 
+convolution to down sample the image and retain only the 
+most important features. The final layers of the model 
+included fully connected (dense) layers, along with 
+dropout mechanisms to prevent overfitting.  
+Fig: 1 Architecture of the CNN model used for deepfake detection. 
+2) MobileNetV2   
+ 
+MobileNetV2 is a more lightweight architecture that 
+employs depth-wise separable convolutions, which reduces 
+computational cost while maintaining accuracy. This model 
+was chosen for its efficiency, particularly in scenarios 
+requiring real-time processing, such as mobile devices and 
+social media platforms. Pre-trained weights from ImageNet 
+were used in the initial layers of the MobileNetV2 model, 
+and fine-tuning was performed to adapt the model 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:38:37 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 3 ---
+
+specifically for deepfake detection. Transfer learning allows 
+the model to leverage pre-learned features from large 
+datasets, thus speeding up training and improving 
+performance.  
+3) MobileNetV2 Subtraction  
+The MobileNetV2 Subtraction model was an optimized 
+version of the previous model. This iteration focused on 
+mitigating overfitting by reducing the training dataset size 
+and limiting the number of training epochs. Hyperparameter 
+tuning played a significant role in refining this model, 
+including adjusting the batch size, learning rates, and 
+dropout rates. This model demonstrated the highest 
+accuracy (97%) among the architectures tested, as it 
+effectively focused on identifying subtle deepfake artifacts. 
+The MobileNetV2 Subtraction model introduces a dual-
+input pipeline where two feature maps (original and 
+perturbed) undergo pixel-wise subtraction. This highlights 
+subtle discrepancies indicative of deepfake manipulations, 
+provided an efficient solution without compromising 
+computational performance, making it suitable for real-time 
+applications. 
+C. Training and Optimization  
+All models were trained using binary cross-entropy loss, 
+a common loss function for binary classification tasks. The 
+Adam optimizer was chosen for its adaptive learning rate and 
+its ability to converge quickly. The initial learning rate was 
+set to 0.001, and training was conducted over 50 epochs, with 
+early stopping mechanisms implemented to prevent 
+overfitting.  
+During training, performance was closely monitored 
+using several key metrics: precision, recall, F1-score, and 
+accuracy. These metrics offered insights into the 
+effectiveness of the models in distinguishing real images 
+from deepfakes, with precision and recall helping to balance 
+false positives and false negatives. All models were trained 
+on an NVIDIA RTX 3060 GPU, with a batch size of 32 and 
+binary cross-entropy loss. The model achieved 97% 
+accuracy on the test set, with ±0.8% confidence over five 
+runs. Accuracy provided an overall measure of correct 
+classifications, while the F1-score provided a balance 
+between precision and recall.  
+D. Feature Extraction and Artifact Analysis  
+In addition to the deep learning models, this study 
+explored feature extraction and artifact analysis techniques 
+to enhance detection accuracy. By analyzing specific 
+artifacts that are unique to deepfake images, the models 
+could gain additional insights into the manipulation process 
+i. 
+Fourier Transform Analysis: This technique was 
+used to detect frequency discrepancies introduced 
+by generative adversarial networks (GANs). 
+Deepfakes often exhibit unusual frequency patterns 
+that can be detected through Fourier transforms, 
+highlighting potential image manipulations. 
+ii. 
+PRNU (Photo Response Non-Uniformity) Analysis: 
+PRNU analysis examines inconsistencies in sensor 
+pattern noise between real and fake images. Real 
+images often have unique noise patterns, while 
+deepfake images might not align with these natural 
+noise patterns, offering a clue to the image's 
+authenticity 
+iii. 
+Edge Detection Techniques: Deepfake images often 
+suffer from unnatural blurring or boundary artifacts, 
+which can be detected using edge detection 
+techniques.  
+By combining deep learning models with artifact 
+analysis, this study created a more comprehensive 
+framework for deepfake detection. The fusion of CNN-based 
+detection with additional artifact analysis provided a multi-
+modal approach that improved overall model accuracy and 
+robustness.  
+E. Evaluation Metrics  
+To assess the performance of each model, a variety of 
+evaluation metrics were considered:  
+• 
+Accuracy: The proportion of correctly classified 
+images.  
+• 
+Precision and Recall: Precision measures the 
+model’s ability to correctly identify deepfake 
+images, while recalling measures how well the 
+model detects all real deepfakes.  
+• 
+F1-Score: The harmonic means of precision and 
+recall, providing a balanced measure of model 
+performance.  
+F. Deployment and Real-World Applications  
+The real-world applicability of deepfake detection models 
+was explored in various scenarios:  
+• 
+Social Media Monitoring: Integrating deepfake 
+detection models into social media platforms can 
+help flag manipulate content, ensuring users are 
+informed about the authenticity of images or 
+videos.  
+• 
+Forensic 
+investigations: 
+Law 
+enforcement 
+agencies can use deepfake detection to authenticate 
+video evidence, helping to distinguish between real 
+and manipulated footage.  
+IV. WORK FLOW OF PROPOSED SYSTEM    
+      The deepfake detection project follows a structured 
+workflow (figure 2) consisting of several key stages: 
+dataset acquisition, preprocessing, model selection, 
+training, evaluation, and deployment.  
+1. Dataset Acquisition and Preprocessing 
+• 
+Collected a dataset of 20,000 labeled images, 
+evenly split between real and deepfake-generated 
+images.  
+• 
+Resized all images to a uniform resolution of 
+96x96 pixels.  
+• 
+Split the dataset into training (80%), validation 
+(10%), and testing (10%) sets using stratified 
+sampling.  
+2.  Model Selection and Implementation  
+• 
+Implemented three architectures: Convolutional 
+Neural Network (CNN), MobileNetV2, and 
+MobileNetV2 Subtraction.  
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:38:37 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 4 ---
+
+• 
+MobileNetV2 used transfer learning with pre-
+trained ImageNet weights.  
+• 
+Optimized MobileNetV2 Subtraction to reduce 
+overfitting while maintaining high accuracy.  
+3. Training and Optimization  
+• 
+Trained models using binary cross-entropy loss 
+and Adam optimizer.  
+• 
+Applied early stopping to prevent overfitting.  
+4. Evaluation and Performance Analysis 
+• 
+Assessed models using accuracy, precision, 
+recall, F1-score, and AUC-ROC.  
+• 
+Performed confusion matrix analysis to identify 
+misclassification patterns.  
+5.  Deployment and Real-World Applications  
+• Explored 
+integration 
+into 
+social 
+media 
+monitoring, forensic investigations, and news 
+verification systems. 
+Fig 2: Proposed Deepfake Detection Workflow 
+V. SIMULATION RESULTS 
+Fig 3: Dataset 1 
+       The Deepfake detection project delivered impressive 
+results across the models it tested—CNN (Fig 1), 
+MobileNetV2, and the MobileNetV2 Subtraction model. 
+Among them, the CNN model stood out, reaching an overall 
+accuracy of 90%. It consistently identified both real and fake 
+images with a high success rate. The model’s strength lay in 
+its ability to extract distinct features through its 
+convolutional layers, making it particularly effective at 
+detecting manipulated media. That said, the model faced 
+challenges when it came to compressed images. The 97% 
+accuracy was achieved on an unseen, stratified test set 
+containing 2,000 images (50% real, 50% fake. As a result, 
+the CNN’s performance dropped when dealing with lower-
+quality or heavily compressed content, limiting its ability to 
+spot fakes with the same precision. Despite this, the CNN 
+model remains a strong contender in the fight against 
+deepfake content, thanks to its ability to analyze intricate 
+visual patterns and separate genuine images from those that 
+have been altered as illustrated in Fig. 4. 
+Fig 4: Dataset 2 
+       The 
+initial 
+MobileNetV2 
+model, 
+designed 
+for 
+lightweight computation, faced difficulties, reaching only 
+50% accuracy (Figure 5). The base MobileNetV2 struggled 
+due to lack of fine-tuning and weak generalization from 
+ImageNet-pretrained features. Its limitations stemmed from 
+overfitting and sensitivity to dataset variations, highlighting 
+issues with using a pre-trained model on new, varied datasets. 
+MobileNetV2’s focus on efficiency over accuracy showed its 
+limitations in distinguishing subtle details between real and 
+fake images, especially in compressed or lower-quality 
+formats. This underscored the need for modifications to 
+improve its detection capability. 
+Fig 5: Accuracy curve of MobileNetV2 model 
+The optimized MobileNetV2 Subtraction model, however, 
+achieved impressive results, reaching a 97% accuracy rate. 
+By reducing the dataset and limiting the number of training 
+epochs, the model avoided overfitting, allowing it to 
+generalize better and detect fake images across different 
+quality levels, including compressed media. This optimized 
+model demonstrated high detection effectiveness, indicating 
+that streamlined, lightweight models, when fine-tuned, can 
+successfully deliver high detection accuracy while 
+remaining computationally efficient. Overall, the project 
+demonstrated that combining efficient model structures with 
+careful tuning can yield robust Deepfake detection, with 
+particular promise for mobile and real-time applications.   
+VI. DISCUSSION    
+       The project’s findings highlight the critical role of 
+optimized CNN architectures in Deepfake detection, 
+especially for real time and mobile applications. The CNN 
+model established a strong baseline but revealed limitations 
+with compressed images, suggesting that CNNs need further 
+adaptation to consistently detect Deepfakes across various 
+resolutions and formats. This study is limited to static image 
+detection and may not generalize directly to video-based 
+manipulations. Further, the model’s robustness to adversarial 
+examples is yet to be tested. Struggled to generalize across 
+varied datasets and compression indicated that lightweight 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:38:37 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 5 ---
+
+models often require targeted adjustments to perform well in 
+specific tasks like Deepfake detection. 
+Fig 6: Real Faces 
+TABLE I: CLASSIFICATION METRICS OF CNN ON DATASET 2 
+Class  
+Precision  
+Recall  
+F1-Score  
+Support  
+0  
+0.93  
+0.86  
+0.90  
+1000  
+1  
+0.87  
+0.94  
+0.90  
+1000  
+Accuracy  
+  
+  
+0.90  
+2000  
+Macro Avg  
+0.90  
+0.90  
+0.90  
+2000  
+Weighted Avg  
+0.90  
+0.90  
+0.90  
+2000  
+       The optimized MobileNetV2 Subtraction model’s 
+performance demonstrates the value of tuning training 
+parameters, 
+particularly 
+for 
+resource-constrained 
+applications. By adjusting the dataset size and training 
+duration, this model achieved high accuracy (from Table 1) 
+while minimizing computational demands, proving that 
+lightweight models can indeed offer strong Deepfake 
+detection capabilities. The approach enables broader 
+scalability, providing a practical solution for integrating 
+detection tools into mobile and web platforms, where 
+efficiency is essential. 
+TABLE II: PREDICTION TABLE 
+ 
+Pred[0]  
+Pred[1]  
+True[0]  
+861  
+139  
+True[1]  
+62  
+938  
+Future improvements could involve expanding this 
+methodology to support multi-modal detection across 
+video, image, and audio, further enhancing detection 
+reliability. This study illustrates that a combination of      
+multiple methods strengthen model robustness and serves 
+as a foundation for future Deepfake detection research, 
+helping address the significant challenges synthetic media 
+poses to digital authenticity and security.  
+ 
+Fig 7: Sample fake face images 
+TABLE III: PRECISION AND F1 SCORE FOR DATA SET 2 
+Class  
+Precision  
+Recall  
+F1-Score  
+Support  
+0  
+0.96  
+0.97  
+0.97  
+1000  
+1  
+0.97  
+0.96  
+0.97  
+1000  
+Accuracy  
+  
+  
+0.97  
+2000  
+Macro Avg  
+0.97  
+0.97  
+0.97  
+2000  
+Weighted Avg  
+0.97  
+0.97  
+0.97  
+2000  
+       The second image presents another classification report 
+but with slightly lower performance metrics compared to the 
+first image. Here, the precision, recall, and f1-score values 
+are lower, particularly for class "1," with precision at 0.87 
+and recall at 0.94. The f1-score for both classes is 0.90, 
+resulting in an overall accuracy of 0.90. This model 
+correctly classifies 90% of the data. The confusion matrix 
+below the report shows 861 true negatives and 938 true 
+positives, while there are 139 false positives and 62 false 
+negatives. The confusion matrix below the report shows 861 
+true negatives and 938 true positives, while there are 139 
+false positives and 62 false negatives. The macro and 
+weighted averages of 0.90 indicate balanced performance, 
+but the model could improve in reducing the false positive 
+and false negative rates. 
+VII. CONCLUSION  
+       The project successfully developed a deep learning 
+model to detect deepfake images using convolutional neural 
+networks (CNNs). Through rigorous training and testing, 
+the model achieved high accuracy and robust performance 
+metrics. The use of CNNs allowed for efficient feature 
+extraction, capturing subtle inconsistencies in facial 
+movements and textures often present in manipulated 
+videos. The model's effectiveness was validated across 
+diverse test datasets, indicating its generalizability and 
+reliability in identifying deepfakes. Overall, this project 
+contributes to the ongoing battle against misinformation by 
+providing an automated and accurate tool for deepfake 
+detection. Future work includes adversarial training, cross-
+modal analysis (audio/video), and deployment in real-time 
+verification tools. 
+Key Achievements:  
+1. Developed a CNN-based model achieving 97% 
+accuracy in detecting deep-fake images.  
+2. Achieved high precision and recall rates, indicating 
+reliable identification of both real and fake images.  
+3. Optimized 
+the 
+model 
+to 
+require 
+minimal 
+computational resources, enabling potential real 
+time applications.  
+Key Findings:  
+1. CNNs 
+effectively 
+capture 
+subtle 
+pixel-level 
+inconsistencies in deepfake images, making them 
+suitable for detection tasks.  
+2. High and balanced precision and recall values 
+indicate the model’s consistent performance across 
+different classes.  
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:38:37 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 6 ---
+
+3. The confusion matrix revealed low false positive 
+and false negative rates, underscoring the model’s 
+reliability.  
+VIII. FUTURE WORK 
+       The future scope of this deepfake detection project is 
+broad, given the increasing prevalence of deepfake 
+technology and its potential misuse. One promising direction 
+is enhancing the model by integrating additional machine 
+learning techniques, such as ensemble learning or hybrid 
+approaches that combine CNNs with recurrent neural 
+networks (RNNs) or transformers. Another area for 
+advancement is real-time processing. As the model is further 
+optimized, it could be adapted for deployment in live video 
+streams to detect deepfakes in real-time, which would be 
+highly beneficial for social media platforms, news agencies, 
+and video conferencing services. Additionally, using 
+adversarial training with Generative Adversarial Networks 
+(GANs) could improve the model's resilience against 
+advanced deepfake generation techniques. By integrating this 
+deepfake detection model with verification systems, 
+organizations could enhance their capacity to combat 
+misinformation. Lastly, the ethical and regulatory landscape 
+surrounding deepfakes is evolving, so this project could 
+contribute valuable insights into establishing standards and 
+guidelines for deepfake identification, verification, and 
+responsible AI use. In summary, this project lays the 
+groundwork for a more robust and adaptable system, capable 
+of addressing future challenges in the field of deepfake 
+detection. 
+ACKNOWLEDGEMENT 
+      The authors would like to thank Hindustan Institute of 
+Technology and Science for their support in conducting this 
+research. 
+REFERENCES 
+ 
+[1] I. Balafrej and M. Dahmane, "Enhancing practicality and efficiency of 
+deepfake detection," Scientific Reports, vol. 14, no. 1, p. 31084, Dec. 
+2024, DOI: 10.1038/s41598-024-82223-y. 
+[2] G. Gupta, K. Raja, M. Gupta, T. Jan, S. T. Whiteside, and M. Prasad, 
+"A comprehensive review of deepfake detection using advanced 
+machine learning and fusion methods," Electronics, vol. 13, no. 1, p. 
+95, Dec. 2023, DOI: 10.3390/electronics13010095. 
+[3] Q. He, C. Peng, D. Liu, N. Wang, and X. Gao, "Gaze Forensics: Deep 
+fake detection via gaze-guided spatial inconsistency learning," Neural 
+Networks, 
+vol. 
+180, 
+2024, 
+p. 
+106636, 
+DOI: 
+10.1016/j.neunet.2024.106636. 
+[4] M. Rahman, R. Liu, C. W. Wong, and H. Dai, "Individualized deepfake 
+detection exploiting traces due to double neural-network operations," 
+arXiv preprint, arXiv:2312.08034, 2023.  
+[5] B. M. Le, J. Kim, S. Tariq, K. Moore, A. Abuadbba, and S. S. Woo, 
+"Sok: Facial deepfake detectors," arXiv preprint, arXiv:2401.04364, 
+2024. 
+[6] T. T. Nguyen, C. M. Nguyen, D. T. Nguyen, D. T. Nguyen, and S. 
+Nahavandi, "Deep learning for deepfakes creation and detection: A 
+survey," arXiv preprint, arXiv:1909.11573, 2019.  
+[7] E. Sabir, J. Cheng, A. Jaiswal, W. AbdAlmageed, I. Masi, and P. 
+Natarajan, “Recurrent convolutional strategies for face manipulation 
+detection in videos,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern 
+Recognit. Worksh. (CVPRW), 2019, pp. 80–87.  
+[8] S. Agarwal, H. Farid, Y. Gu, M. He, K. Nagano, and H. Li, "Protecting 
+world leaders against deep fakes," in Proc. IEEE/CVF Conf. Comput. 
+Vis. Pattern Recognit. Workshops (CVPRW), vol. 1, no. 38, 2019, pp. 
+1–9.  
+[9] S. Y. Wang, O. Wang, A. Owens, R. Zhang, and A. A. Efros, 
+“Detecting photoshopped faces by scripting Photoshop,” in Proc. 
+IEEE/CVF Int. Conf. Comput. Vis. (ICCV), 2019, pp. 10072–10081. 
+[10] H. T. Dang, F. Liu, J. Stehouwer, X. Liu, and A. K. Jain, “On the 
+detection of digital face manipulation,” in Proc. IEEE/CVF Conf. 
+Comput. Vis. Pattern Recognit. (CVPR), 2020, pp. 5781–5790, DOI: 
+10.1109/CVPR42600.2020.00582.  
+[11] X. Zhang, S. Karaman, and S. F. Chang, “Detecting and simulating 
+artifacts in GAN fake images,” in Proc. IEEE Int. Workshop Inf. 
+Forensics 
+Security 
+(WIFS), 
+2019, 
+pp. 
+1–6, 
+DOI: 
+10.1109/WIFS47025.2019.9035107.  
+[12] W. Yang, Y. Li, J. Li, and S. Lyu, "Exposing GAN-synthesized faces 
+using landmark locations," in Proc. IEEE/CVF Conf. Comput. Vis. 
+Pattern Recognit. (CVPR), 2020, pp. 1–10. 
+[13] I. Amerini, L. Ballan, R. Caldelli, A. Del Bimbo, and G. Serra, "A 
+SIFT-based forensic method for copy–move attack detection and 
+transformation recovery," IEEE Trans. Inf. Forensics Security, vol. 6, 
+no. 3, pp. 1099–1110, Sep 2011, DOI: 10.1109/TIFS.2011.2129512.  
+[14] J. Fridrich, D. Soukal, and J. Lukas, "Detection of copy-move forgery 
+in digital images," in Proc. Digit. Forensic Res. Workshop, 2003, pp. 
+1–10. 
+[15] L. Verdoliva, "Media forensics and deepfakes: An overview," IEEE J. 
+Sel. Topics Signal Process., vol. 14, no. 5, pp. 910–932, Aug. 2020, 
+DOI: 10.1109/JSTSP.2020.3002101.  
+[16] L. Jiang, R. Li, W. Wu, C. Qian, and C. C. Loy, "DeeperForensics-1.0: 
+A large-scale dataset for real world face forgery detection," in Proc. 
+IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR), 2020, pp. 1–
+10.  
+[17] L. Guarnera, O. Giudice, and S. Battiato, "Deepfake detection by 
+analyzing convolutional traces," in Proc. IEEE/CVF Conf. Comput. 
+Vis. Pattern Recognit. Workshops (CVPRW), 2020, pp. 1–9.  
+[18] J. Chen, X. Chen, and J. Ni, "Fake Locator: Robust localization of 
+GAN-based face manipulations via semantic segmentation networks 
+with bells and whistles," in Proc. IEEE/CVF Conf. Comput. Vis. 
+Pattern Recognit. (CVPR), 2021, pp. 1–10.  
+[19] F. Matern, C. Riess, and M. Stamminger, "Exploiting visual artifacts to 
+expose deepfakes and face manipulations," in Proc. IEEE Winter Conf. 
+Appl. Comput. Vis. Workshops (WACVW), 2019, pp. 83–92, DOI: 
+10.1109/WACVW.2019.00020.  
+[20] S. Layton, T. Tucker, D. Olszewski, K. Warren, K. Butler, and P. 
+Traynor, "SoK: The good, the bad, and the unbalanced: Measuring 
+structural limitations of deepfake media datasets," in Proc. USENIX 
+Security Symp., 2024, pp. 1027–1044. 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:38:37 UTC from IEEE Xplore.  Restrictions apply. 

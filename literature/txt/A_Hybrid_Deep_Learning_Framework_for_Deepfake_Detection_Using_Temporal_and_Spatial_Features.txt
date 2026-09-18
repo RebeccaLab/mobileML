@@ -1,0 +1,975 @@
+
+
+--- PAGE 1 ---
+
+Received 30 March 2025, accepted 24 April 2025, date of publication 30 April 2025, date of current version 12 May 2025.
+Digital Object Identifier 10.1109/ACCESS.2025.3566008
+A Hybrid Deep Learning Framework for Deepfake
+Detection Using Temporal and Spatial Features
+FAZEEL ZAFAR
+1, TALHA AHMED KHAN
+2, SALAS AKBAR1, MUHAMMAD TALHA UBAID
+3,
+SAMEENA JAVAID
+1, AND KUSHSAIRY ABDUL KADIR
+4, (Senior Member, IEEE)
+1Department of Computer Sciences, School of Engineering and Applied Sciences, Bahria University, Karachi Campus, Karachi 75290, Pakistan
+2Cybersecurity and Technological Convergence (CTC) Section, Malaysian Institute of Information Technology, Universiti Kuala Lumpur, Kuala Lumpur 53100,
+Malaysia
+3Department of Information Technology, University of Central Punjab, Lahore 54000, Pakistan
+4British Malaysian Institute, Universiti Kuala Lumpur, Kuala Lumpur 53100, Malaysia
+Corresponding authors: Talha Ahmed Khan (talha@unikl.edu.my) and Kushsairy Abdul Kadir (kushsairy@unikl.edu.my)
+This work was supported by the Universiti Kuala Lumpur, Kuala Lumpur, Malaysia.
+ABSTRACT The rise of deep-fake technology has sparked concerns as it blurs the distinction between fake
+media by harnessing Generative Adversarial Networks (GANs). This has raised issues surrounding privacy
+and security in the realm. This has led to a decrease in trust during online interactions; thus, emphasizing
+the importance of creating reliable methods for detection purposes. Our research introduces a model for
+detecting deepfakes by utilizing an Enhanced EfficientNet B0 structure in conjunction with Temporal
+Convolutional Neural Networks (TempCNNs). This approach aims to tackle the challenges presented
+by the evolving sophistication of deep-fake techniques. The system dissects video inputs into frames to
+extract features comprehensively by using Multi Test Convolutional Networks (MTCNN). This method
+ensures face detection and alignment by focusing on facial regions. To enhance the model’s adaptability,
+to different scenarios and datasets we implement data augmentation techniques such as CutMix, MixUp and
+Random Erasing. These strategies help the model maintain its strength, against distortions found in deepfake
+content. The backbone of EfficientNet B0 utilizes Mobile Inverted Bottleneck Convolutions (MBConv)
+and Squeeze and Excitation (SE ) blocks to enhance feature extraction by adjusting channels to highlight
+details effectively. A Feature Pyramid Network (FPN) facilitates the fusion of scale features capturing
+intricate details as well, as broader context. When tested on the FFIW 10 K dataset, which comprises 10,000
+videos evenly split between manipulated content, the model attained a training accuracy of 91.5 % and a
+testing accuracy of 92.45 %, after 40 epochs. The findings showcase the model’s proficiency, in identifying
+videos with precision and tackling the issue of class imbalances found in datasets – a valuable contribution,
+to advancing dependable deepfake detection solutions. Furthermore, the model achieves an impressive
+balance between accuracy and computational efficiency, attaining 92.45% testing accuracy with a lightweight
+computational cost of 0.45 GFLOPs, making it a highly practical choice for real-world deployment.
+INDEX TERMS Deepfake detection, face detection and alignment, EfficientNet B0, temporal convolutional
+networks (TCNs), multi-task convolutional neural network (MTCNN), feature pyramid network (FPN),
+mobile inverted bottleneck convolutions (MBConv).
+I. INTRODUCTION
+As technology has significantly advanced in recent years,
+the challenges related to these advancements have also
+risen substantially in various fields. Among all other fields
+The associate editor coordinating the review of this manuscript and
+approving it for publication was Zahid Akhtar
+.
+Deepfake is one of the major concern these days as deep-
+fake has put a question over the legitimacy of the media
+and information security. Deepfake uses namely Generative
+Adversarial Networks (GANs) [1], to generate hyper realistic
+synthesized/simulated media. Because of this artificial fabri-
+cation of digital content, establishing the difference between
+real and synthesized data has become significantly difficult.
+79560
+ 2025 The Authors. This work is licensed under a Creative Commons Attribution 4.0 License.
+For more information, see https://creativecommons.org/licenses/by/4.0/
+VOLUME 13, 2025
+
+
+--- PAGE 2 ---
+
+F. Zafar et al.: Hybrid Deep Learning Framework for Deepfake Detection
+These exaggeration in generation of fabricated media, both
+videos and images, have raised a major concern about media
+validity and its effect on societal norms, as deepfake gen-
+eration may lead to procreation of false and misleading
+information as well as the loss of societal faith over dig-
+ital content [2]. The advancements in GANs models and
+availability of larger datasets have helped in generation of
+remarkably realistic digital media that goes undetected by
+human eye, but as these models work on spatial and tem-
+poral fabrications, these fabrications can be detected using
+advanced techniques of deep learning models [3]. These con-
+cerning advancements in generation of false media demands
+for the establishment of advanced and effective deepfake
+detection algorithms. To overcome the challenges of deepfake
+detection, researchers has opted more advanced deep learn-
+ing approaches that can detect spatiotemporal fabrications
+of media content more accurately [3]. Efficient Net belongs
+to the family of Convolutional Neural Networks (CNNs)
+that handles width, depth and resolution of the network to
+attain maximum accuracy. It is one of the many technologies
+being implemented for detection of deepfake media content,
+as Efficient Net uses far less computational cost then other
+techniques [4], making it one of the potential technique to
+detect fabricated media as it has capacity to extract precise
+information from images and videos. The advancement in
+production of concerning accurate fabricated media has pre-
+sented us with a challenge far greater than just spatial domain,
+lack of temporal coherence in these fabricated images/videos
+is a very crucial aspect to be addressed. In recent years Tem-
+poral Neural Networks (TempCNNs) have become one of the
+main technique to handle sequential data. They offer signif-
+icant advantage over Recurrent Neural Networks (RNNs) as
+TempCNNs maintains the relation between temporal scales in
+hierarchical manner [5]. When TempCNNs and Efficient Net
+are combined together they can provide a technique that can
+analyze spatiotemporal intricacies of deepfake media more
+accurately. In this paper, an integrated approach of Efficient
+Net and TempCNNs is proposed for deepfake detection,
+where Efficient Net is responsible for spatial feature extrac-
+tion and TempCNNs for pattern recognition. By making most
+of the strength, proposed by both architectures this research
+aims for a better approach for detection real media from
+fake media. Given the increasing sophistication of deepfake
+generation techniques, there is a growing need for solu-
+tions that not only achieve high detection accuracy but also
+maintain computational efficiency. Traditional methods often
+sacrifice real-world applicability due to high computational
+costs. Our approach, however, presents a balanced trade-off,
+ensuring that high accuracy can be achieved without exces-
+sive resource consumption, making it a more viable solution
+for practical, real-world deployment.
+II. LITERATURE REVIEW
+The field of deepfake detection and related computer vision
+applications has seen significant advancements in recent
+years, with various models and techniques being developed
+to improve accuracy and efficiency. The literature in this
+domain highlights the evolution of approaches, datasets,
+and performance metrics, demonstrating how research has
+progressively tackled the challenges posed by deep-fake
+technology.
+Deepfake detection has leveraged Convolutional Neural
+Networks (CNNs) and hybrid models to achieve high detec-
+tion accuracy. A 2024 study utilized Inception Net in a
+CNN-based comparative analysis, trained on a Kaggle dataset
+comprising 401 videos and 3,745 images post-augmentation,
+achieving an accuracy of 92.3% with moderate computational
+efficiency [6]. Similarly, a 2023 study applied Support Vector
+Machines (SVM) with Principal Component Analysis (PCA)
+on a custom dataset, transforming RGB images to YCbCr,
+leading to a 92.8% accuracy when using PCA, compared
+to 72.2% without PCA [8]. A 2025 study further enhanced
+face forgery detection by introducing attention-based fea-
+ture learning and Optimized Long Short-Term Memory
+(OLSTM). Using datasets such as FaceForensics++, Deep-
+fake Detection Challenge, Celebrity Deepfake, and Wild
+Deepfake, this approach achieved a cross-validated accu-
+racy of 94.65%, albeit at a lower efficiency due to its
+reliance on OLSTM and ResNet-50 Multi-Head Attention
+(RN50MHA) [9].
+Recent comparative analyses have shed light on the
+performance of various deepfake detection architectures.
+In 2024, researchers compared CNN+RNN, Deepfake
+Detection Network (DAFDN), Hybrid Inception ResNet v2,
+and Xception models on a comprehensive dataset. The
+study reported accuracy rates of 94.8% for CNN+RNN,
+97.8% for DAFDN, and 98% for the Hybrid model, with
+efficiency varying based on computational demands [11].
+Similarly, a 2022 study assessed multiple deepfake detec-
+tion algorithms on FaceForensics++, reporting an accuracy
+of 96%, indicating that efficiency trade-offs are a key factor
+in model selection [20]. Further, Generative Adversarial
+Networks (GANs) have played a crucial role in image syn-
+thesis and deep-fake generation. A 2020 review of GAN
+variants in computer vision examined datasets such as
+LSUN-BEDROOM,
+CELEBA-HQ-128,
+and
+CIFAR-10,
+reporting a precision of over 90% for BigGAN, though
+computational costs were noted as a challenge [7]. Like-
+wise, a 2018 study implemented Enhanced Super-Resolution
+Generative Adversarial Networks (ESRGAN) using Residual
+Dense Blocks (RDDB) without Batch Normalization (BN)
+layers. Despite achieving an RMSE score of 15.15% on the
+PIRM self-validation dataset, the model’s high complexity
+made it less efficient [10].
+On the other hand, Alternative deepfake detection meth-
+ods have incorporated diverse techniques. A 2022 study
+employed MesoNet on FaceForensics++ and Celeb-DF,
+yielding an 88% accuracy while maintaining high efficiency
+due to its lightweight nature [13]. Another 2022 study focused
+on Point of Interest (POI) action detection using Multi-task
+Cascaded Convolutional Networks (MTCNN) and MesoNet
+on a customized dataset of Barack Obama, achieving an
+VOLUME 13, 2025
+79561
+
+
+--- PAGE 3 ---
+
+F. Zafar et al.: Hybrid Deep Learning Framework for Deepfake Detection
+impressive accuracy of 95.75% with high efficiency [14].
+Additionally, a 2022 investigation combined MTCNN-based
+feature extraction with EfficientNet for real/fake classifica-
+tion, obtaining a lower accuracy of 62.5%, but benefiting
+from EfficientNet’s lightweight nature [18].
+A 2021 study compared different versions of Efficient-
+Net on the Deepfake Detection Challenge (DFDC) dataset,
+achieving an accuracy of 82.9% while maintaining computa-
+tional efficiency [19]. In contrast, a 2020 study implemented
+Discrete Cosine Transform (DCT) in an LSTM-based mul-
+timodal network, significantly reducing the feature space
+and improving efficiency despite achieving a relatively lower
+accuracy of 61.95% on DFDC [12]. Beyond deepfake detec-
+tion, Temporal Convolutional Networks (TempCNNs) have
+been applied in remote sensing and epidemic prediction.
+A 2019 study on optical satellite imagery and reference data,
+such as Formsat 2 images and farmer declarations, achieved
+an accuracy of 93.45%, balancing performance with medium
+efficiency requirements [15]. Similarly, a 2021 study adapted
+TempCNN models for epidemic evolution prediction, using
+datasets with global mobility patterns, and reported train-
+ing and validation RMSE scores of 4.1% and 2.7%,
+respectively [17].
+The reviewed studies demonstrate the rapid advancements
+in deep-fake detection, computer vision applications, and
+related fields. While hybrid and attention-based models have
+achieved the highest accuracy, their computational complex-
+ity often limits efficiency. Lightweight models like MesoNet
+and EfficientNet balance accuracy with processing efficiency,
+making them suitable for real-time applications. Addition-
+ally, the use of TempCNNs and GAN-based models extends
+beyond deepfake detection, showcasing the versatility of deep
+learning in image processing and prediction tasks. Future
+research should focus on optimizing high-accuracy models
+for real-world deployment while minimizing computational
+overhead.
+The Efficiency column highlights a tradeoff between
+efficiency and accuracy that how different techniques
+balance computational cost and detection accuracy in deep-
+fake detection methods. While some methods achieve
+high accuracy, they often come with significant computa-
+tional demands, making them less suitable for real-world,
+resource-constrained environments. For instance, models like
+GAN-based approaches and SRGANs prioritize accuracy,
+leading to high-performance results at the cost of requiring
+more computational resources. On the other hand, models like
+EfficientNet and MesoNet offer a better balance, providing
+competitive accuracy with relatively lower computational
+costs, making them more efficient for practical applications.
+This balance is crucial, especially as deep-fake detection
+needs to be fast and scalable without compromising per-
+formance. Models with a lighter computational cost like
+EfficientNet are particularly valuable for real-time applica-
+tions, where efficiency is as critical as accuracy, and they
+enable better deployment in real-world settings with limited
+computational resources.
+TABLE 1. Literature review.
+79562
+VOLUME 13, 2025
+
+
+--- PAGE 4 ---
+
+F. Zafar et al.: Hybrid Deep Learning Framework for Deepfake Detection
+TABLE 1. (Continued.) Literature review.
+TABLE 1. (Continued.) Literature review.
+III. METHODOLOGY
+The video input given to the system first split into discrete
+segments before being processed. The step of Frame extrac-
+tions and preprocessing is performed in order to get more
+features extracted by examining and processing individual
+segments of the videos independently. Video segmentation is
+done by splitting the frames into discrete segments. Video V
+is segmented in N frames each segment represented by Si.:
+V = {S1, S2, S3 . . . .SN}
+(1)
+Each segment is preprocessed, which include normalization
+N(Si), resizing R(Si), and augmentation A(Si)
+S′
+i = A(R(N(Si)))
+(2)
+In order to detect face, its alignment and landmarks of
+the face, Multi-Test Convolutional Neural Network is used.
+Multi-Test CNN works by mapping any image X to a set of
+facial landmarks L, L={(x1, y1),(x2, y2),....(xn, yn)} where
+n is the number of detected land marks, with base CCN
+functions, to make sure filtering off the background noise
+and concentrates the face only to analyze the pertinent facial
+regions.
+L = FCNN (X)
+(3)
+The alignment process makes sure consistency between each
+segment of the video.The methods such as data augmentation
+are used to boost the model’s generalization and variance.
+By incorporating artificial distortion methods such as
+CutMix,
+MixUp,
+for
+any
+given
+data,
+along
+with
+RandomErasing strengthen model’s resistance to different
+kind of modifications and distortions often encountered
+in deepfakes. From the segments of the input video, the
+framework can now work better for varying positions and
+occlusions, all thanks to the performed augmentations. The
+feature extraction method of EfficientNet B0 processes the
+segments of the video once reorganization and preprocessing
+is done The model also has adaptive input feature that modi-
+fies the output of the input segments according to their outset
+complexity. Since more intricate segments maintain greater
+resolution for improved precision, easier segments have to be
+downscaled to minimize computing expenses.
+The Stem Block, which applies a 3 × 3 convolution with
+32 filters, alongwith batch normalization (BN),
+Z=BN (Conv (W, X)) · Swish (Z)
+(4)
+VOLUME 13, 2025
+79563
+
+
+--- PAGE 5 ---
+
+F. Zafar et al.: Hybrid Deep Learning Framework for Deepfake Detection
+as well as Swish activation for effective irregularities are the
+next steps in the machine’s processing of the segments.
+Swish (x) = x.σ (x) =
+x
+1 + e−x
+(5)
+With less resolution yet a greater representation of the feature,
+the feature maps produced by this layer are more detailed. The
+Backbone method EfficientNet B0 that is made up of Mobile
+Inverted Bottleneck Convolutions (MBConv) processes the
+individual segments after that. Individual channel of the input
+data X goes through a filter by MBConv block and then join
+the outputs X’ utilizing a point-by-point 1 × 1 convolution
+in order to reduce the workload of the computation through
+depth wise distinct convolution.
+X′ = X · σ(W2 · ReLU(W1 · GAP(X)))
+(6)
+where W1 and W2 are weight matrices, and σ is the sigmoid
+function.
+Every single MBConv block contains a squeeze-and-
+excitation (SE) block that recalibrates the characteristics of
+the channels and enables the framework to concentrate on
+significant characteristics. This makes sure that unnecessary
+characteristics are hidden and the important details which
+set both real and fake apart are emphasized. Initially the SE
+block works by pressing down the spatial dimensions of the
+characteristic maps through global pooling and then employs
+an activation function of sigmoid along with fully connected
+layers in order to excite the feature channel. To cater the prob-
+lem of the vanishing gradient and encourage secure training,
+residual links are included into the MBConv blocks’ deeper
+layers. Better understanding of deeper depictions is made
+possible by such connections. The addition of Multi-Scale
+Feature Fusion through the Feature Pyramid Network (FPN)
+is a significant structural improvement. The FPN combines
+data through initial, middle, and deeper layers of the back-
+bone EfficientNet B0 to bring together features from different
+layers. The contextual data that is more broadly relevant,
+like irregularities in facial shape, is caught as well as minute
+details like subtle motions of the face due to this broad scale
+fusion. The framework’s capacity to identify minute deepfake
+irregularities, including lip-sync errors or minute changes in
+emotions of the face, is enhanced by this combination. After
+the obtaining of features is finished, a TempCNN is trained
+on the obtained segment feature stream.
+Because deepfake modifications frequently result in incon-
+sistent motion and facial expressions across time, the TCN is
+in charge of simulating the temporal relationships between
+segments. The learning network may develop dependencies
+that are long-range yet preserve secure flow of gradients
+during training thanks to these Residual TCN Layers. The
+significant temporal data is kept in the framework by incorpo-
+rating the residing links. An additional essential component
+of TCN is adaptive dilation. Adaptive dilation rapidly alters
+the TCN’s responsive field to accommodate changes that
+occur in temporal inconsistency’s scale of time. This is nec-
+essary to record both transient and persistent discrepancies in
+the movements of the face present in the video.
+Ht =
+Xk−1
+i=0 Wi.Ft−id
+(7)
+where Wi are learnable weights, k is the filter size, F is a
+feature vector and d is the dilation rate. TCN incorporates
+Gated Linear Units (GLUs) to regulate the data flow across
+the system.
+O = X · σ(G)
+(8)
+GLUs improve the framework’s capacity to identify minute
+spatial oddities, like aberrant actions between segments or
+variations in movement of the face that could be signs of
+modification. After being processed by a layer of linear
+classification, the output of TCN yields just one logit which
+reflects after characterization of the input video either real or
+fake. The temporal discrepancies and spatial characteristics
+that were taken out of the segments are the basis for the ulti-
+mate categorization choice. Calculated binary cross-entropy
+loss function training assists the framework concentrated on
+complex instances in which deepfake modifications tend to
+be subtle and harder to spot. By preventing the framework
+from over fitting to instances which are simple to classify,
+the calculating system raises the general precision of deep-
+fake detection. The last stage involves applying subsequent
+processing methods to the series of forecasts created through-
+out the video segments, including confidence achieving and
+voting by majority. Employing the vote of the majority, the
+forecasts to each of the segments are combined to determine
+the last categorization for the whole footage. To show how
+confident the algorithm is in identifying it, a score for confi-
+dence is also produced. More thorough choices are facilitated
+by this, particularly in ambiguous situations in which cate-
+gorization is unclear. The last real and fake categorization
+is made along with the corresponding confidence score are
+output by the system.
+A. ENHANCED EFFICIENTNET B0 ARCHITECTURE AND
+FEATURE EXTRACTION
+A key element of the suggested method is the Enhanced Effi-
+cientNet B0 design, the basic structure is the mobile inverted
+bottleneck convolution (MBConv) module, which also intro-
+duces the compression and excitation network’s atten-
+tion concept (Squeeze-and-Excitation Network, SENet) [4],
+which is in charge of obtaining fine-grained spatial features
+from segments of the video. Starting with an Input Layer,
+variable data scaling is incorporated. In accordance with
+the amount of detail of the supplied segments, this scaling
+process continually alters the pixel size of the segments.
+Although intricate segments are kept at greater resolutions
+for deeper examination, segments with easier information are
+downscaled to minimize computation overhead costs. The
+optimization of the segments for precision and computational
+effectiveness is ensured by this preliminary processing phase.
+Following that, 32-filter wuth a convolution of 3×3 is applied
+by the Stem Block, which then follows Batch Normaliza-
+tion (BN) and Swish stimulation to produce map features
+79564
+VOLUME 13, 2025
+
+
+--- PAGE 6 ---
+
+F. Zafar et al.: Hybrid Deep Learning Framework for Deepfake Detection
+FIGURE 1. The main architecture.
+with improved visualization of features and lower resolution.
+The Backbone architecture of EfficientNet B0, that includes
+Mobile Inverted Bottleneck Convolutions (MBConv), that
+serves as the foundation of EfficientNet [21], processes such
+data. To minimize the amount of computation required, the
+MBConv eliminates use depth-wise distinct convolutions.
+A 1 × 1 point-by-point convolution is then used for merging
+the resulting channels. To reset the features of the channels,
+squeeze-and-excitation (SE) section have been included to
+every MBConv block. The framework can eliminate unde-
+sirable features and highlight more significant ones thanks
+to this adjustment procedure. For SE blocks to function,
+feature maps’ spatial dimensions are first compressed via
+global average pooling, after which fully connected lay-
+ers along with activation sigmoid function is used as a
+stimulation stage. The capacity of the framework to distin-
+guish minute variations among genuine and fake segments
+is enhanced by this priority. To guarantee secure training
+of complex visualizations and alleviate the gradient dis-
+appearing issue, remaining connections are added to the
+backbone’s deeper layers. Deeper learning is made possi-
+ble through such residual interactions, which also protect
+significant data from previous layers. The Feature Pyramid
+Network (FPN) facilitates Multi-Scale Feature Fusion, which
+improves the framework even more. The EfficientNet B0
+backbone’s multiple layers’ characteristics are combined by
+the FPN to ensure that certain details and more compre-
+hensive context-related data are recorded. The simulator can
+identify minute adjustments in deep-fake footage, such as
+irregularities in facial contours and slight movements of the
+face, thanks to that multi-scale combination of features. The
+algorithm can cope with high quantities deep-fake detection
+tasks because Dynamic Input Scaling makes certain that eas-
+ier segments are processed faster while segments with more
+information are handled at greater resolution as shown in
+figure 2.
+In the above methodology, spatial and temporal features
+are combined through a multi-step process to enhance deep-
+fake detection. Spatial features are extracted from each video
+segment using EfficientNet B0, which captures detailed facial
+landmarks and expressions, while the Feature Pyramid Net-
+work (FPN) integrates features from different layers for
+both fine and broader contextual details. Temporal features
+are then analyzed using a Temporal Convolutional Network
+(TCN), which processes the sequence of spatial features to
+detect inconsistencies in facial motion or expression over
+time. By combining these spatial and temporal insights, the
+system can detect deep-fake artifacts that may not be apparent
+in individual frames, ensuring more accurate classification
+by considering both static facial details and dynamic changes
+across the video.
+B. GLOBAL AVERAGE POOLING, CLASSIFICATION, AND
+TEMPORAL ANALYSIS
+Following the extraction of pertinent spatial features to the
+segments by the backbone, a Global Average Pooling (GAP)
+Layer processes the resultant data. Individual map of features
+is reduced to just one scalar value by the GAP layer, which
+also decreases the spatial dimensions of the mapped features.
+This procedure guarantees every segment’s spatial data is
+reduced in a summary vector. After that, an entirely connected
+layer via regularization for dropouts receives the output
+from the GAP layer. By independently eliminating neurons
+throughout training, dropout guarantees that the algorithm
+applies well to new data and prevents overfitting. A temporal
+convolutional network (TCN) receives the highly dense fea-
+ture vector produced by the fully connected layer to perform
+temporal evaluation. To represent long-range time-dependent
+VOLUME 13, 2025
+79565
+
+
+--- PAGE 7 ---
+
+F. Zafar et al.: Hybrid Deep Learning Framework for Deepfake Detection
+FIGURE 2. Enhanced efficientnet B0.
+relationships among segments, the Temporal Convolutional
+Network (TCN) procedures the feature vector order derived
+from segments [22]. While training, the system assists in
+learning such temporal connections by the Residual TCN
+Layers, which also preserve secure gradient flow. Further-
+more, the TCN’s responsive field is constantly modified via
+Adaptive Dilation, allowing it to detect short- and long-term
+together temporal discrepancies in the clip. Lastly, TCN uses
+Gated Linear Units (GLUs) to control the transfer of data,
+enabling the network to concentrate on minute temporal
+deviations like erratic movements of the face or inconsistent
+motion. The algorithm can reliably and effectively identify
+deep-fake modifications on a variety of video data thanks
+to the integration of improved obtaining of characteristics,
+multi-scale fusion, and temporal evaluation.
+IV. MATERIALS AND METHODS
+A. DATASET
+The dataset we’ve used for our experiment is FFIW 10K [23]
+which consists of 10,000 videos, with an equal distribution
+of 5,000 fake and 5,000 real videos. This ensures that there is
+no class imbalance and this also sets our dataset apart from
+many other deepfake datasets, such as Deepfake TIMIT [24],
+Celeb-DF [25], FaceForensics++ [2], and DFDC [26].
+For example, the Deepfake TIMIT dataset contains about
+320 real and 640 fake, Celeb-DF contains 590 real and
+5639 fake videos, FaceForensics++ contains 1000 real and
+4000 fake videos, and DFDC contains 104500 fake videos
+and 23654 real videos. These class imbalances can introduce
+bias during model training. In comparison to these datasets,
+FFIW 10K provides a more balanced dataset which ensures
+the model makes it more reliable and generalized, and a
+good benchmark for training deepfake detection models.
+This dataset also contains high-quality videos which
+enhances its utility for research in computer vision and deep
+learning.
+The dataset used in this study, FFIW 10K, consists of
+10,000 videos, with an equal distribution of 5,000 real and
+5,000 fake videos, ensuring no class imbalance. This bal-
+anced dataset sets it apart from other datasets like Deepfake
+TIMIT, Celeb-DF, FaceForensics++, and DFDC, which
+typically suffer from unequal distributions, often skewed
+toward fake videos. For instance, Deepfake TIMIT has more
+fake videos, which could introduce bias during training.
+The balanced nature of FFIW 10K helps the model train
+on a more reliable dataset, improving its generalization and
+reducing bias. To further enhance adaptability and robustness,
+several data augmentation techniques were applied, including
+CutMix, MixUp, and Random Erasing. CutMix combines
+two different images by cutting and pasting them together,
+which helps the model learn robust features by exposing
+it to diverse data combinations. MixUp generates synthetic
+samples by averaging two images, encouraging the model to
+learn smoother decision boundaries and reducing overfitting.
+Random Erasing randomly selects and erases parts of an
+image, making the model focus on other important regions,
+which helps it recognize features even when parts of the
+input are missing or altered. These augmentation techniques,
+combined with the balanced nature of FFIW 10K, ensure that
+the model is more adaptable to varying deepfake manipula-
+tions and can generalize better to real-world scenarios where
+videos may have subtle changes or distortions.
+B. IMPLEMENTATION DETAILS
+The system that was used for training and testing the model
+had an AMD Ryzen 5 5600 along with an NVIDIA GeForce
+GTX 1060 6GB and 32GB RAM. Model implementation
+was done on Windows 10 OS with Python 3.9.13 and
+and PyTorch. For activation function, Rectified Linear Unit
+(ReLU) was used in the hidden layers of our TempCNN, and
+for the final output we applied a Sigmoid function to convert
+the logits in probabilities which were then thresholded at
+0.5 to generate binary predictions.
+The learning rate was set to 0.000001 initially during
+training, with a batch size of 16 with Adam optimization
+function and ‘‘Random Normal Initialization’’ method for
+weights initialization, which is stated in this equation:
+(W ∼N((µ,σ 2))
+(9)
+where W is the weight matrix being initialized, and N((µ, σ 2)
+denotes a normal distribution with mean µ and variance σ 2.
+The loss function was Binary Cross-Entropy with Logits
+Loss, which stated in this equation:
+BCEWithLogitsLoss(y, ˆy) = max(ˆy, 0) −ˆy·y
++ log(1 + exp(−| ˆy |)) (10)
+where max(ˆy, 0) ensures numerical stability, ˆy is the predicted
+output. The term log(1 + exp(−| ˆy |)) is derived from the
+sigmoid function. This ensures that the logits ˆy are converted
+79566
+VOLUME 13, 2025
+
+
+--- PAGE 8 ---
+
+F. Zafar et al.: Hybrid Deep Learning Framework for Deepfake Detection
+into a probability-like value without explicitly calculating the
+sigmoid value.
+FIGURE 3. Loss graph of training and testing.
+FIGURE 4. Training and validation accuracy graph.
+The proposed model achieved 91.5% training accuracy and
+92.45% testing accuracy at 40 epochs as shown in Figure 4.
+Our model is able to detect real and fake videos with high
+accuracy.
+The confusion matrix presented in Figure 5 summarizes
+shows the performance of our model in detecting real and fake
+videos during validation. The key elements of the confusion
+matrix are explained below:
+True Positives (TP): 932 videos classified correctly as
+REAL
+True Negatives (TN): 905 videos classified correctly as
+FAKE
+False Positives (FP): 39 REAL videos classified incor-
+rectly as FAKE
+False Negatives (FN): 111 FAKE videos classified incor-
+rectly as REAL
+The accuracy of the model can be calculated using the
+following formula:
+Accuracy =
+TP + TN
+TP + TN + FP + FN
+(11)
+FIGURE 5. Confusion matrix of our model.
+where: TP is number of True Positives = 932
+TN is number of True Negatives = 905
+FP is number of False Positives = 39
+FN is number of False Negatives = 111
+Using these values on the formula:
+Accuracy =
+932 + 905
+935 + 905 + 39 + 111
+= 0.924509 × 100 = 92.45%
+C. COMPUTATIONAL EFFICIENCY
+One of the standout features of our proposed deepfake
+detection model is its lightweight computational footprint,
+achieving an efficiency of 0.45 GFLOPs (Giga Floating Point
+Operations per Second). This efficiency is the result of several
+key architectural optimizations:
+1) EFFICIENTNET B0 BACKBONE
+Our
+model
+utilizes
+the
+EfficientNet
+B0
+architecture,
+which employs Mobile Inverted Bottleneck Convolutions
+(MBConv) to significantly reduce the number of operations
+without compromising feature extraction quality. The depth
+wise separable convolutions within MBConv blocks fur-
+ther minimize computational load by reducing redundant
+operations [27].
+2) DYNAMIC INPUT SCALING
+The model adapts input resolution based on the segment’s
+complexity—higher-resolution processing for intricate seg-
+ments and lower-resolution processing for simpler ones. This
+ensures computational resources are allocated efficiently,
+preventing unnecessary overhead.
+3) FEATURE PYRAMID NETWORK (FPN) FOR MULTI-SCALE
+FUSION
+By incorporating an FPN, our framework merges spatial
+information across different layers, reducing the need for
+VOLUME 13, 2025
+79567
+
+
+--- PAGE 9 ---
+
+F. Zafar et al.: Hybrid Deep Learning Framework for Deepfake Detection
+excessive computation while still capturing crucial deepfake
+artifacts. This method optimizes feature representation with-
+out requiring extra convolutional layers, keeping operations
+minimal.
+4) TEMPORAL CONVOLUTIONAL NETWORK (TCN) WITH
+ADAPTIVE DILATION
+The TCN efficiently models temporal inconsistencies by
+adjusting its receptive field dynamically. Instead of brute-
+force computation over long sequences, adaptive dilation
+selectively expands the network’s focus to capture essential
+temporal dependencies while skipping redundant calcula-
+tions.
+5) GATED LINEAR UNITS (GLUS) FOR EFFICIENT
+PROCESSING
+GLUs regulate the flow of information, ensuring that only
+the most relevant features are processed while filtering out
+redundant activations. This selective computation contributes
+to reducing the overall GFLOPs count.
+6) WHY 0.45 GFLOPS MATTERS
+By achieving a computational cost of 0.45 GFLOPs, our
+model strikes a perfect balance between performance and
+efficiency. This makes it suitable for real-world applications,
+including real-time deepfake detection on consumer-grade
+hardware and mobile devices, where processing power is
+often limited. Unlike many deep learning models that require
+high-end GPUs for inference, our approach ensures that
+deepfake detection remains accessible, fast, and scalable.
+D. RESULTS AND EXPERIMENTS
+In this section we’re comparing the performance of our pro-
+posed model with two other, similar models that were trained
+as an experiment with different parameters. The models were
+evaluated based on their precision, recall, f1-score and accu-
+racy values, which are stated in Eq (12), Eq (13) and Eq (14).
+The learning rate of 0.000001 (1e-6) was held constant across
+all the models.
+Precision =
+TP
+TP + FP
+(12)
+Recall =
+TP
+TP + FN
+(13)
+F1 −Score = 2 ∗Precision ∗Recall
+Precision + Recall
+(14)
+The first model which was trained with batch size of 12 for
+40 epochs had the lowest performance, achieving an accuracy
+of 88.57%. The recall value for the REAL class was much
+higher than the FAKE class which indicated that the model
+was biased towards the REAL class, which affects model
+reliability.
+The second model was trained with batch size of 10 for
+30 epochs. This improved the recall value for FAKE class
+while also achieving higher accuracy of 90.29%. This model
+made more balanced predictions than the previous model.
+TABLE 2. Classification report of 1st model.
+TABLE 3. Classification report of 2nd model.
+Finally, the third model performed the best out of the
+previous two models, achieving a higher accuracy of 92.45%
+and the precision and recall values for both REAL and FAKE
+classes were almost similar, which demonstrated a better
+balance.
+TABLE 4. Classification report of 3rd model.
+V. CONCLUSION
+The proposed study develops a deepfake video detection
+approach through an Enhanced EfficientNet B0 architec-
+ture combined with Temporal Convolutional Networks that
+handle the challenges of deepfake technologies. Our work
+involved segmenting the input videos to extract features,
+while data augmentation methods were used to improve both
+performance and adaptability for the models. During training,
+it achieved 91.5% accuracy and later 92.45% during the test
+runs on the FFIW 10k dataset, which clearly demonstrates the
+efficiency of this network in detecting manipulated videos.
+A key contribution of this paper is the development of a
+computationally efficient model that achieves high detection
+79568
+VOLUME 13, 2025
+
+
+--- PAGE 10 ---
+
+F. Zafar et al.: Hybrid Deep Learning Framework for Deepfake Detection
+accuracy while maintaining a lightweight computational cost
+of just 0.45 GFLOPs. This balance between performance and
+efficiency ensures that the model is not only accurate but
+also practical for real-world applications, including mobile
+and low-power edge devices. Our findings emphasize that
+balanced datasets and advanced architecture play a crucial
+role in developing reliable content detection methods within
+the fast-growing domain of deepfake detection.
+The improvement in deepfake detection could be achieved
+by increasing the dataset with different deepfake methods
+and real-world scenarios to make the model adaptable for
+the future. The inclusion of data sources such as audio and
+text may result in a full-scale detection system that gathers
+information from different sources. Additionally, applying
+adversarial training methods could further strengthen the
+model against emerging deep-fake generation techniques.
+Furthermore, as noted earlier, enhancing both efficiency and
+precision will be crucial in ensuring the model’s real-time
+performance. Researchers and decision-makers must work
+together constantly to ensure that AI is effectively applied
+to mitigate the risks associated with deepfake technology,
+while also addressing ethical concerns and promoting best
+practices.
+REFERENCES
+[1] F. B. Aissa, M. Hamdi, M. Zaied, and M. Mejdoub, ‘‘An overview of
+GAN-DeepFakes detection: Proposal, improvement, and evaluation,’’ Mul-
+timedia Tools Appl., vol. 83, no. 11, pp. 32343–32365, Sep. 2023, doi:
+10.1007/s11042-023-16761-4.
+[2] A. Rössler, D. Cozzolino, L. Verdoliva, C. Riess, J. Thies, and M. Nießner,
+‘‘FaceForensics++: Learning to detect manipulated facial images,’’ 2019,
+arXiv:1901.08971.
+[3] O. de Lima, S. Franklin, S. Basu, B. Karwoski, and A. George,
+‘‘Deepfake detection using spatiotemporal convolutional networks,’’ 2020,
+arXiv:2006.14749.
+[4] V.-T. Hoang and K.-H. Jo, ‘‘Practical analysis on architecture of Efficient-
+Net,’’ in Proc. 14th Int. Conf. Hum. Syst. Interact. (HSI), Jul. 2021, pp. 1–4,
+doi: 10.1109/HSI52170.2021.9538782.
+[5] C. Lea, R. Vidal, A. Reiter, and G. D. Hager, ‘‘Temporal convolutional
+networks: A unified approach to action segmentation,’’ in Proc. Comput.
+Vis.-ECCV Workshops, G. Hua and H. Jégou, Eds., Cham, Switzerland:
+Springer, Jan. 2016, pp. 47–54, doi: 10.1007/978-3-319-49409-8_7.
+[6] D. V. Nagagopiraju, K. Ayyappa, P. Anshulalitha, J. Srikanth, and
+K. T. Teja, ‘‘A effciet deep fake face detection using deep inception net
+learning algorithm,’’ Turkish J. Comput. Math. Educ., vol. 15, no. 1,
+pp. 138–141, Mar. 2024.
+[7] Z. Wang, Q. She, and T. E. Ward, ‘‘Generative adversarial networks in
+computer vision: A survey and taxonomy,’’ 2019, arXiv:1906.01529.
+[8] H. Sabah Abdul kareem and M. S. Mahdi Altaei, ‘‘Detection of deep fake
+in face images based machine learning,’’ Al-Salam J. Eng. Technol., vol. 2,
+no. 2, pp. 1–12, Feb. 2023.
+[9] R. R. Sekar, T. D. Rajkumar, and K. R. Anne, ‘‘Deep fake detection
+using an optimal deep learning model with multi head attention-based
+feature extraction scheme,’’ Vis. Comput., vol. 41, no. 4, pp. 2783–2800,
+Mar. 2025.
+[10] X. Wang, K. Yu, S. Wu, J. Gu, Y. Liu, C. Dong, C. Change Loy, Y. Qiao, and
+X. Tang, ‘‘ESRGAN: Enhanced super-resolution generative adversarial
+networks,’’ 2018, arXiv:1809.00219.
+[11] A. Rajeev and P. Raviraj, ‘‘Performance evaluation of deep learning models
+for detecting deep fakes,’’ Int. J. Systematic Innov., vol. 8, no. 1, pp. 49–62,
+2024.
+[12] J. K. Lewis, I. E. Toubal, H. Chen, V. Sandesera, M. Lomnitz,
+Z. Hampel-Arias, C. Prasad, and K. Palaniappan, ‘‘Deepfake video detec-
+tion based on spatial, spectral, and temporal inconsistencies using multi-
+modal deep learning,’’ in Proc. IEEE Appl. Imag. Pattern Recognit. Work-
+shop (AIPR), Oct. 2020, pp. 1–9, doi: 10.1109/AIPR50011.2020.9425167.
+[13] Z. Xia, T. Qiao, M. Xu, X. Wu, L. Han, and Y. Chen, ‘‘Deepfake video
+detection based on MesoNet with preprocessing module,’’ Symmetry,
+vol. 14, no. 5, p. 939, May 2022, doi: 10.3390/sym14050939.
+[14] Q. Jaleel and I. Hadi, ‘‘Facial action unit-based deepfake video
+detection using deep learning,’’ in Proc. 4th Int. Conf. Current
+Res.
+Eng.
+Sci.
+Appl.
+(ICCRESA),
+Dec.
+2022,
+pp. 228–233,
+doi:
+10.1109/iccresa57091.2022.10352085.
+[15] C. Pelletier, G. Webb, and F. Petitjean, ‘‘Temporal convolutional neural
+network for the classification of satellite image time series,’’ Remote Sens.,
+vol. 11, no. 5, p. 523, Mar. 2019, doi: 10.3390/rs11050523.
+[16] S. R. Adnan and H. A. Abdulbaqi, ‘‘Deepfake video detection based
+on convolutional neural networks,’’ in Proc. Int. Conf. Data Sci.
+Intell. Comput. (ICDSIC), Nov. 2022, pp. 65–69, doi: 10.1109/ICD-
+SIC56987.2022.10075830.
+[17] L. Mohimont, A. Chemchem, F. Alin, M. Krajecki, and L. A. Steffenel,
+‘‘Convolutional neural networks and temporal CNNs for COVID-19 fore-
+casting in France,’’ Appl. Intell., vol. 51, no. 12, pp. 8784–8809, Dec. 2021,
+doi: 10.1007/s10489-021-02359-6.
+[18] T.-A. To, H.-C. Luong, N.-T. Nguyen, T.-T. Nguyen, M.-T. Tran, and
+T.-L. Do, ‘‘Deepfake detection using EfficientNet: Working towards
+dense sampling and frames selection,’’ in Proc. RIVF Int. Conf.
+Comput. Commun. Technol. (RIVF), Dec. 2022, pp. 612–617, doi:
+10.1109/RIVF55975.2022.10013900.
+[19] A. A. Pokroy and A. D. Egorov, ‘‘EfficientNets for DeepFake detection:
+Comparison of pretrained models,’’ in Proc. IEEE Conf. Russian Young
+Researchers Electr. Electron. Eng. (ElConRus), Jan. 2021, pp. 598–600,
+doi: 10.1109/ElConRus51938.2021.9396092.
+[20] L. Deng, H. Suo, and D. Li, ‘‘Deepfake video detection based on
+EfficientNet-V2 network,’’ Comput. Intell. Neurosci., vol. 2022, pp. 1–13,
+Apr. 2022, doi: 10.1155/2022/3441549.
+[21] M. Shaikh, Q. A. Arain, I. F. Siddiqui, and H. A. Shaikh, ‘‘Automated
+classification of pneumonia from chest X-ray images using deep trans-
+fer learning EfficientNet-B0 model,’’ in Proc. 14th Int. Conf. Math.,
+Actuarial Sci., Comput. Sci. Statist. (MACS), Nov. 2022, pp. 1–6, doi:
+10.1109/MACS56771.2022.10022700.
+[22] B. A. Kumar and N. K. Misra, ‘‘Masked face age and gender identifica-
+tion using CAFFE-modified MobileNetV2 on photo and real-time video
+images by transfer learning and deep learning techniques,’’ Expert Syst.
+Appl., vol. 246, Jul. 2024, Art. no. 123179.
+[23] T. Zhou, W. Wang, Z. Liang, and J. Shen, ‘‘Face forensics in the wild,’’
+2021, arXiv:2103.16076.
+[24] Idiap Res. Inst., Artif. Intell. for Soc. DeepfakeTIMIT. Accessed:
+Nov. 11, 2024. [Online]. Available: https://www.idiap.ch/en/scientific-
+research/data/deepfaketimit/index_html
+[25] Y. Li, X. Yang, P. Sun, H. Qi, and S. Lyu, ‘‘Celeb-DF: A large-scale
+challenging dataset for DeepFake forensics,’’ 2019, arXiv:1909.12962.
+[26] B. Dolhansky, J. Bitton, B. Pflaum, J. Lu, R. Howes, M. Wang, and
+C. Canton Ferrer, ‘‘The DeepFake detection challenge (DFDC) dataset,’’
+2020, arXiv:2006.07397.
+[27] S. Javaid and S. Rizvi, ‘‘Manual and non-manual sign language recognition
+framework using hybrid deep learning techniques,’’ J. Intell. Fuzzy Syst.,
+vol. 45, no. 3, pp. 3823–3833, Aug. 2023.
+[28] I. Ali Hasani and O. Arif, ‘‘Pose calibrated feature aggregation for video
+face set recognition in unconstrained environments,’’ IEEE Access, vol. 12,
+pp. 156337–156346, 2024, doi: 10.1109/ACCESS.2024.3481636.
+FAZEEL ZAFAR received the B.S. degree in
+computer science with specialization in computer
+vision and deep learning from Bahria University,
+Karachi Campus, Pakistan. Currently, he is a Free-
+lance Machine Learning Engineer, collaborating
+with various multi-national clients. His research
+interests
+include
+computer
+vision,
+machine
+learning, deep learning, and generative AI.
+VOLUME 13, 2025
+79569
+
+
+--- PAGE 11 ---
+
+F. Zafar et al.: Hybrid Deep Learning Framework for Deepfake Detection
+TALHA AHMED KHAN received the B.Eng.
+degree in electronics and the M.Eng. degree
+in telecommunications from UIT, the P.G.D.
+degree in cyber security, the Postdoctorate degree
+in machine learning from MMU, Cyber Jaya,
+Malaysia, and the Ph.D. degree in AI from UniKL,
+Kuala Lumpur, Malaysia. He is currently asso-
+ciated with the Cybersecurity and Technological
+Convergence Section, MIIT, UniKL. Previously,
+he was associated with the Department of Arti-
+ficial Intelligence, Bahria University, Karachi Campus, as the Head of
+the Department. He has published numerous high scientific impact factor
+research papers in well-reputed journals, IEEE conferences, Scopus indexed
+journals, and HEC recognized journals.
+SALAS AKBAR received the master’s degree in computer science and
+information technology (MCIT) from the Ned University of Engineering and
+Technology, in 2022. Currently, she is a Senior Lecturer with the Program
+of Bachelor’s in Artificial intelligence, Department of Computer Sciences,
+School of Engineering and Applied Sciences. She is also looking for oppor-
+tunities to share her research ideas and deepen her knowledge. She hopes
+to engage with other researchers, gain valuable feedback, and contribute to
+meaningful discussions in her field. Her research interests include machine
+learning, deep learning, and natural language processing.
+MUHAMMAD TALHA UBAID received the M.S.
+degree in computer science with specialization in
+computer vision domain from the University of
+Central Punjab (UCP), Lahore, Pakistan. He was
+associated with the University of Central Pun-
+jab (UCP). Currently, he is a Research Officer
+with the Intelligent Criminology Research Labo-
+ratory, National Center of Artificial Intelligence.
+His research interests include computer vision,
+machine learning, and deep learning.
+SAMEENA JAVAID received the Ph.D. degree in
+computer science from Bahria University, Karachi
+Campus, Pakistan. She has previously served
+Computer Science Department, Bahria Univer-
+sity Karachi Campus. She is currently doing her
+postdoctoral research with Multimedia Univer-
+sity, Malaysia, further enhancing her expertise
+in advanced machine learning techniques and
+real-world applications of computer vision. She is
+the author of several impact factor publications and
+has presented her research at numerous prestigious conferences worldwide.
+Her research interests include computer vision, machine learning, deep
+learning, and ubiquitous computing.
+KUSHSAIRY ABDUL KADIR (Senior Member,
+IEEE) received the Bachelor of Science degree in
+engineering from the University of West England,
+U.K., the Master of Science degree in mecha-
+tronics engineering from the International Islamic
+University of Malaysia, and the Ph.D. degree in
+electronic and electrical engineering from the Uni-
+versity of Strathclyde, U.K. Prior to this, he was
+the Dean of the UniKL British Malaysian Institute
+(UniKL BMI), where he contributed significantly
+to the institute’s growth and development. His areas of expertise include
+image and signal processing, with a focus on biomedical imaging, intelligent
+buildings, biometrics, and rehabilitation robotics. Throughout his career,
+he has been actively involved in research, authoring numerous publications
+in esteemed journals and conference proceedings. He is currently the Deputy
+President of Academic and Technology with Universiti Kuala Lumpur
+(UniKL).
+79570
+VOLUME 13, 2025

@@ -1,0 +1,1054 @@
+
+
+--- PAGE 1 ---
+
+IEEE TRANSACTIONS ON CONSUMER ELECTRONICS, VOL. 71, NO. 1, FEBRUARY 2025
+281
+Efﬁcient Deepfake Detection via Layer-Frozen
+Assisted Dual Attention Network for Consumer
+Imaging Devices
+Muhammad Talha Usman
+, Habib Khan
+, Member, IEEE, Sushil Kumar Singh,
+Mi Young Lee
+, Member, IEEE, and JaKeoung Koo
+Abstract—The advancement of open-source frameworks and
+user-friendly manipulation applications has accelerated the
+spread of deep fakes. In this study, we proposed optimal features
+assisted with a dual attention (DA) network strategy to combat
+this proliferation in consumer imaging devices. We employed
+EfﬁcientNetV2 (ENV2) as the primary feature extractor, initially
+utilizing its pre-trained weights from the ImageNet dataset
+while keeping its layers frozen to leverage their rich feature
+extraction capabilities. We enhance this base model with a
+DA module that integrates the Convolutional Block Attention
+Module (CBAM), which utilizes both channel attention (CA) and
+spatial attention (SA) mechanisms to improve feature represen-
+tation. CA dynamically adjusts channel-wise feature responses to
+capture interdependencies between channels, thereby improving
+feature discrimination. SA allows the network to focus on
+important regions within feature maps, enhancing localization
+and reducing noise. The features are assisted in multi-stages
+of the network with residual fashion to focus on discriminative
+visual information. During ﬁne-tuning, we unfreeze the deeper
+layers of ENV2 for further reﬁnement of learned features to
+better suit the deepfake dataset. We employed a targeted ﬁne-
+tuning approach, unfreezing speciﬁc layers and applying iterative
+adjustments to optimize performance, providing valuable insights
+into countering the growing use of synthetic media in consumer
+imaging. To validate our network, we conducted comprehensive
+experiments on four benchmark datasets: FaceForensics++, the
+World Leaders, Celeb-DF, and DFDC. As a result, our network
+achieved superior performance compared to existing bench-
+marks and state-of-the-art approaches, offering a promising
+solution for robust deepfake detection (DD) in consumer imaging
+technologies.
+Index
+Terms—Deepfake
+detection,
+consumer
+imaging
+technologies,
+attention
+mechanisms,
+model
+optimization,
+progressive fusion, ﬁne-tuning.
+Received 2 April 2024; revised 25 June 2024, 7 August 2024, and
+29 September 2024; accepted 29 September 2024. Date of publication
+9 October 2024; date of current version 12 June 2025. This work was
+supported by the National Research Foundation of Korea (NRF) Grant
+funded by the Korea Government (MSIT) under Grant RS-2023-00240740.
+(Corresponding authors: JaKeoung Koo; Habib Khan.)
+Muhammad Talha Usman, Habib Khan, and JaKeoung Koo are with
+the School of Computing, Gachon University, Seongnam 13120, South
+Korea (e-mail: habibkhan@ieee.org,habibkhan@gachon.ac.kr; jakeoung@
+gachon.ac.kr).
+Sushil Kumar Singh is with the Department of Computer Engineering,
+Marwadi University, Rajkot 360003, India.
+Mi Young Lee is with the School of Computing, Chung-Ang University,
+Seoul 06974, South Korea.
+Digital Object Identiﬁer 10.1109/TCE.2024.3476477
+I. INTRODUCTION
+C
+ONSUMER Electronics, especially smartphones and
+cameras, have transformed media creation and sharing.
+While inexpensive, high-quality CE has made content creation
+more accessible [1], it has also contributed to the development
+of deepfake technology, raising questions about authenticity.
+Deepfakes pose a widespread hazard, affecting the privacy of
+public and private people, especially celebrities, politicians,
+high-security personnel, and other public ﬁgures. This spreads
+false information and scams, compromising personal security,
+damaging reputations, and undermining public trust in media.
+Malicious actors exploit these technologies for misinforma-
+tion, which comes under cyber crime [2]. Hence, face privacy
+preservation is often considered a burning issue [3]. To tackle
+this issue, strong deepfake detection (DD) systems are required
+to be integrated into consumer devices. There is an urgent need
+to detect fake content to safeguard security and conﬁdence in
+the use of digital media [4]. CE companies are more interested
+in addressing challenges posed by deepfake technology to
+retain their brand reputation and customer trust [5].
+The emergence of deepfake technology has resulted in
+situations where facial features in pictures and videos have
+been transformed [6], [7]. This has led to a decrease in trust
+and safety in digital media. Deepfake technology signiﬁ-
+cantly affects consumer appearance as consumers increasingly
+depend on visual media for information, entertainment, and
+communication [8]. Therefore, it is crucial, especially in
+today’s digital era, to develop strong networks that are capable
+of recognizing forgeries to tackle the increasing challenges
+related to security and trust in consumer imaging technology.
+Most of the attempted methods currently in use focus on
+particular varieties of deepfakes. For instance, [9] suggested a
+technique for spotting lip-syncing deepfakes. Their approach
+took advantage of the discrepancies between a phoneme (spo-
+ken word) and a viseme (mouth form). Another attempt [10]
+proposed a data augmentation-based method, Face-Cutout.
+As from the name, they cut the irrelevant facial landmark
+information and then selected only relevant features and parts
+of video frames. To extract facial landmark features, the
+study [11] employed the open-source toolbox OpenFace2.
+These generated features were combined with an action unit to
+train a binary SVM for DD. The work [9] proposed the end-to-
+end system MesoNet to identify phony Face2Face videos and
+1558-4127 c⃝2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.
+See https://www.ieee.org/publications/rights/index.html for more information.
+Authorized licensed use limited to: Fengchia University. Downloaded on September 15,2026 at 08:12:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 2 ---
+
+282
+IEEE TRANSACTIONS ON CONSUMER ELECTRONICS, VOL. 71, NO. 1, FEBRUARY 2025
+deep fakes. Moreover, the work [12] used ensemble learning
+while using four architectures of CNN. They used data
+augmentation like downsampling, hue saturation, JPEG com-
+pression, etc. during training and validation for the robustness
+of the model. The study proposed a TAR approach [13] with
+the utilization of a transfer learning-based autoencoder with
+Residuals to detect several types of deepfakes. It is observable
+that autoencoders are extensively deployed in many domains
+with good results [14]. As the study used FF++ to train the
+model and evaluated it on real-world videos of almost 200
+counts containing 50 different celebrities, it became evident
+that there is a continuous need for intelligent advancements
+in the ﬁeld. These advancements, trained on large amounts of
+data with the progressive integration of attention modules and
+effective ﬁne-tuning, are crucial for enhancing security and
+conﬁdence in consuming digital content.
+A. Limitations of the Related Literature
+The limitations of existing studies in the domain highlight
+the need for feasible techniques for deployment on consumer
+devices. One of the signiﬁcant limitations of most existing
+methods is the inadequate capacity to capture complex features
+precisely. This limitation is often based on the reliance
+on the direct utilization of intermediate feature extractors
+without proper empirical validation at the early stages of the
+networks. Moreover, the lack of optimal features is unable
+to be learned with shallow layered networks to grasp the
+important patterns before the ultimate prediction. Attention-
+based techniques have shown promise in enhancing feature
+representation and discriminability. However, their utilization
+in existing architectures is often technically unsystematic, with
+less representative features. As a result, the learned features
+may not be effectively reﬁned and optimized. This can result
+in less discriminative and less informative feature representa-
+tions, hindering the model’s ability to detect DD accurately.
+Moreover, the lack of generalized optimization methods for
+the utilized modules can impact the overall effectiveness of
+the network, especially when faced with evolving synthetic
+media manipulation methods. These limitations emphasize the
+immediate need for feasible solutions that directly tackle the
+challenges mentioned above, thereby enabling the design of a
+more effective network.
+B. Offered Contributions
+• We introduced a new network that adeptly captures
+the complex features of both fake and real faces. Our
+novel and progressive fusion strategy signiﬁcantly boost
+performance, making it feasible to widely implement DD
+into consumer devices such as smartphones to quickly
+detect and alert authorities about potentially suspicious
+content before sharing it on social media platforms.
+• Optimal intermediate features are extracted with frozen
+initial layers of ENV2 in the initial training phase to
+utilize pre-trained weights effectively. Integrating a DA
+strategy with an optimized dilated convolutions block
+enhances feature extraction. The CBAM reﬁnes features
+by focusing on critical patterns and reducing noise. At
+the same time, the optimized dilated convolutions block
+captures both local details and global context effec-
+tively, expanding the receptive ﬁeld without signiﬁcantly
+increasing computational costs.
+• The proposed ﬁne-tuning strategy includes training the
+model initially for 20 epochs and then ﬁne-tuning the
+more profound layers while keeping the ﬁrst 1000 layers
+of ENV2 frozen. This selective layer training enables the
+model to adapt to the speciﬁc features of the large datasets
+while maintaining stability and preventing overﬁtting.
+The ﬁne-tuning process, which extends from epoch 21 to
+30, results in a signiﬁcant accuracy improvement.
+• Our
+progressive
+modiﬁcations
+underwent
+an exten-
+sive assessment using four benchmark datasets: FF++,
+WLDR, CELEB-DF, and DFDC. The comprehensive
+evaluations demonstrated that our contributions outper-
+formed state-of-the-art (SOTA) networks, highlighting the
+signiﬁcance of our network as the best choice. We con-
+ducted extensive intra-class cross-experiments to assess
+the generalization capabilities of the proposed network.
+Our proposed network consistently maintains its position
+as the benchmark in safeguarding consumer trust and
+privacy in a rapidly evolving digital environment.
+The remaining manuscript is organized: Section II reviews the
+detailed literature review, Section III discusses our proposed
+methodology, Section IV details experimental work and results
+discussion, and our job is concluded in Section V.
+II. RELATED LITERATURE
+Various approaches have been proposed to tackle the DD
+challenge, leveraging both traditional and advanced techniques
+in machine learning (ML) and deep learning (DL) [15].
+To address the unique demands of DD, researchers have
+explored many methodologies for DD [16]. For instance,
+the work [11] used videos of individuals to extract facial
+expressions and head movements from hours-long videos.
+They further extracted features from a 10-second clip, as frame
+by frame and 190-D features were found by them. SVM
+was used to classify the 10-second clip as being consistent
+or not with the learned mannerisms of an individual. The
+attempted technique requires much effort to propose a model
+for each, and hand-crafted features might not be optimal,
+highlighting the complexity inherent in securing CE against
+deepfake threats. Another framework called FakeCatcher was
+proposed [17] for DD using signals from three regions of the
+face in actual videos. The method presented a promising way
+for DD, especially in CE devices, where user interaction is
+vital. Moreover, the study [18] proposed a method that used
+CNN to extract features from video frames and then feed
+them to LSTM to predict sequential patterns. However, the
+technique was evaluated on randomly collected videos from
+different websites rather than from a single standard dataset,
+which may limit the test of the generalization.
+The study [19] proposed a technique, Face X-ray-based
+forgery detection, which used a greyscale image and used to
+ﬁnd whether this image can be decomposed into the blending
+of two images from various sources. Another method [9]
+Authorized licensed use limited to: Fengchia University. Downloaded on September 15,2026 at 08:12:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 3 ---
+
+USMAN et al.: EFFICIENT DEEPFAKE DETECTION VIA LAYER-FROZEN ASSISTED DA NETWORK
+283
+Fig. 1.
+Conceptual Overview of the Proposed Network Suggested for Deployment on Consumer Devices.
+proposed Mesonet to detect deepfakes with an end-to-end
+architecture with stacked layered CNNs. The work [20]
+proposed a vision transformer (ViT)-based model which used
+distillation techniques, along with pre-trained EfﬁcientNetB7.
+They trained the network on DFDC by passing the patches
+extracted from EfﬁcientNet combined with ViT. These com-
+bined patches are then passed to the transformer encoder.
+By considering the previous limitations of DD methods, the
+study [10] proposed a data augmentation-based method, Face-
+Cutout. They cut the irrelevant facial landmark information
+and selected only relevant features and parts of video frames.
+The study [21] developed a DefakeHop technique that uses
+successive space learning for auto-feature extraction from
+different regions of the forged image. The features are
+extracted by c/w Saab Transform and processed through fea-
+ture distillation using spatial dimensionality reduction and soft
+classiﬁcation for a concise description of images. Furthermore,
+the work [13] a transfer learning-based autoencoder with
+Residuals to detect several types of deepfakes. They achieved
+89.49% zero-shot accuracy on this evaluation. Additionally,
+the study [22] used CNN and ViT to classify a video as Real
+or fake. They used CNN for learned feature extraction while
+these learned features were passed as input to the ultimate
+network for predictions. A capsule network was suggested in
+the study [23] for exposing various kinds of images and video
+fake moments.
+In
+addition,
+the
+work
+[12]
+used
+ensemble
+learning
+while using four architectures of CNN with attention. The
+research [24] used GANs-based models, called MRI-GAN
+for DD. Their technique consists of perceptual differences
+between
+images
+to
+detect
+forged
+videos
+and
+a
+plain-
+frames-based model. DFDC was used to train the model
+achieving 91% test accuracy for the plain-based model and
+the MRI-GAN model achieved 74% for perceptual differ-
+ences in images. The research [25] proposed a uniﬁed
+multimodal framework that extracts learned channels from
+audio and visual modalities, mixes them independently and
+then processes them jointly before feeding the combined rep-
+resentation to a multilabel classiﬁcation head. The study [26]
+also used audio and visual features of a video to train
+the model on multi-modality features. Their work uses the
+Siamese approach to learn audio and visual features side by
+side. The authors used DFDC and Deepfake-TMIT datasets
+for the evaluation of their proposed framework. Another
+study [27] tackled the DD problem by utilizing spatiotemporal
+properties in the video frames. Additionally, this design works
+well on the substantial face-swap dataset DFDC, but it is
+highly costly and computationally expensive to propose for
+deployment. The work [28] proposed a convolutional brain
+organization to extricate spatial and transient irregularities
+in deepfakes made with GANs. GANs-created deepfakes are
+outwardly convincing nevertheless, they have a few spatial and
+transient relics that can be taken advantage of for identiﬁca-
+tion errands. The researchers proposed the above-mentioned
+approaches for DD. However, there is still major room for
+developing optimal features-assisted visual intelligence tech-
+niques to effectively grasp the complex features of deepfakes.
+III. PROPOSED METHODOLOGY
+The proposed methodology emphasizes extracting deep fea-
+tures to enhance the robustness of intermediate representations.
+We investigate effective modiﬁcations in CBAM to reﬁne these
+features. Additionally, we introduced an optimized convolution
+block with dilated convolution layers and GAP. Furthermore,
+we analyze the impact of ﬁne-tuning and incremental pro-
+gressive training on overall performance. As illustrated in
+Figure 2, our proposed network integrates these components
+to enhance accuracy and robustness, speciﬁcally designed for
+CE applications.
+A. Deep Features Extraction
+Our proposed technique incorporates the ENV2 model as
+the primary feature extractor. The model is ﬁlled with pre-
+trained weights from the ImageNet dataset and set to be
+non-trainable, meaning the pre-trained weights are used with-
+out being updated during training. This enables the ultimate
+network to take advantage of rich feature extraction ability
+Authorized licensed use limited to: Fengchia University. Downloaded on September 15,2026 at 08:12:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 4 ---
+
+284
+IEEE TRANSACTIONS ON CONSUMER ELECTRONICS, VOL. 71, NO. 1, FEBRUARY 2025
+Fig. 2.
+Visual Overﬂow of the Integrated Modules in the Proposed DD Network.
+Fig. 3.
+CBAM Module with CA and SA for Feature Reﬁnement.
+without making any modiﬁcations to the pre-trained weights.
+In order to further optimize the model, we incorporate several
+progressive components with DA. The CBAM improves fea-
+tures by iteratively computing attention mappings along the
+channel and spatial dimensions. This enhances the capacity
+to identify features with feasible skip connections to assist
+the mature features with initial-level features. In addition, the
+block dynamically adjusts channel-wise feature responses by
+explicitly capturing the relationships between channels, hence
+boosting the network’s ability to enhance information. The
+combination of these progressive improvements, together with
+GAP forms a strong feature extraction architecture. The model
+runs an initial training process for 20 epochs, during which it
+achieves an accuracy as mentioned in Table III. The resultant
+weights are then saved for ﬁne-tuning usage.
+B. Convolutional Block Attention Module
+Attention mechanisms are extensively explored in many
+domains with excellent performances [29], [30], [31], [32],
+[33], [34]. Taking this motivation, we integrated CBAM, which
+effectively boosts the network’s ability to capture and reﬁne
+features at multiple stages. CBAM receives the intermediate
+features β for dynamic recalibration of CA and SA, which
+progressively improves feature representation. This utilization
+reduces noise information while focusing only on channels
+and spatial regions. It signiﬁcantly enhances the potential
+of the network to focus on various types of critical and
+complex deepfakes, as highlighted in the qualitative results.
+The CBAM architecture contains a dual attention scheme
+where the CA module controls inter-channel functions of
+features, considering each channel’s feature map. As shown in
+Figure 3, CBAM architecture with CA and SA includes a GAP
+layer, a maximum pooling layer, fully connected layers, and
+a convolution operation. During training, convolution feature
+maps of each channel do not equally represent an object.
+Therefore, we incorporate both maximum and average pooling
+strategies to obtain separate spatial background descriptions,
+βCavg and βCmax, through average and maximum pooling
+operations on the spatial dimension of the feature map β,
+respectively.
+βCavg = Avg-Pool(β)
+(1)
+βCmax = Max-Pool(β)
+(2)
+Two FC layers, fc1 and fc2, process βCavg and βCmax,
+respectively, followed by ReLU activation to obtain Mmax and
+Mavg. These are then added to produce the weight coefﬁcients
+Mc(β), maintaining feature ﬂow through a skip connection:
+Mavg = σ
+
+fc2(ReLU(fc1(βCavg)))
+
+(3)
+Mmax = σ(fc2(ReLU(fc1(βCmax))))
+(4)
+Mc(β) = Mavg ⊕Mmax
+(5)
+The CA map Fc is obtained by applying an addition function
+to Mmax and Mavg, facilitating feature reﬁnement:
+Fc = Mc(β) ⊗β
+(6)
+The SA module complements the CA module by focusing
+on inter-spatial relationships and identifying the most impor-
+tant regions. Apart from the benchmark way [35], we reduced
+the number of kernel sizes from 7×7 to 3×3. This reduction
+Authorized licensed use limited to: Fengchia University. Downloaded on September 15,2026 at 08:12:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 5 ---
+
+USMAN et al.: EFFICIENT DEEPFAKE DETECTION VIA LAYER-FROZEN ASSISTED DA NETWORK
+285
+aims to enhance computational efﬁciency and reduce model
+complexity while still maintaining effective feature reﬁnement
+through the CBAM mechanism. It creates two-dimensional
+feature maps, βSavg and βSmax, using average and maximum
+pooling operations on the channel dimension of Fc. These
+feature maps are then combined and convolved to produce a
+reﬁned two-dimensional SA feature map, employing convolu-
+tional layers for reﬁnement.
+βSavg = Avg-Pool(Fc)
+(7)
+βSmax = Max-Pool(Fc)
+(8)
+After applying the GAP on the feature maps, we obtain the
+SA map MsFcGAP, which is then concatenated with Fc to create
+the reﬁned feature map Fcs. This feature map is passed to the
+customized ConvNet module before ultimate prediction.
+MsFc = σ
+
+f 3×3(βSavg ⊕βSmax)
+
+(9)
+MsFcGAP = GAP
+
+MsFc
+
+(10)
+Fcs = MsFcGAP ⊗Fc
+(11)
+C. Optimized Dilated Convolutions Block
+The customized dilated convolutions block receives the fea-
+tures from CBAM and enhances features by leveraging dilated
+convolution layers with varying kernel sizes. Initialized with the
+input features, the block sequentially applies 3x3 convolutions
+with dilation rates of 2, 4, and 8, respectively, each followed by
+ReLU activation and padding to maintain spatial dimensions.
+This strategic conﬁguration enables the convolutional ﬁlters to
+expand their receptive ﬁelds exponentially without signiﬁcantly
+increasing computational costs. As a result, the network is
+able to capture both local details and global context more
+effectively, which is crucial for tasks requiring ﬁne-grained
+feature analysis and semantic understanding. Subsequently, the
+feature maps undergo GAP to distill spatial information into
+compact representations, facilitating dimensionality reduction
+while retaining essential features. Additional dense layers
+with ReLU activation reﬁne feature representations, promoting
+nonlinear transformations that enhance discriminative power
+in the extracted features. The features are then passed to the
+classiﬁer layers for ultimate predictions.
+D. Fine Tuning
+Following the initial training phase till the 20th epoch,
+the model undergoes ﬁne-tuning to optimize its performance
+further for the next 10 epochs. The ENV2 model ﬁne-tunes its
+deeper layers by using the ﬁrst 1000 layers as a ﬁxed feature
+extractor with frozen weights. The remaining 329 layers are
+set to be trainable, allowing adjustments to better suit our
+dataset. This strategy allows the model to reﬁne learned
+features to better ﬁt the speciﬁc weights of our large datasets.
+Throughout the ﬁne-tuning phase, the model retains CBAM,
+ConvNet with dilated convolutions, GAP, dense layers, and
+dropout layers from the original setup. Fine-tuning continues
+beyond the initial 20 epochs, spanning from epoch 21 to 30.
+This phase allows for adjustments in the weights of the
+deeper layers to better ﬁt our dataset while leveraging the
+TABLE I
+SUMMARY OF DATASETS
+stability and generalization beneﬁts provided by the frozen
+layers. The work [36] also practiced training plasticity to
+selectively freeze well-trained layers in deep neural networks.
+Our attempted ﬁne-tuning process substantially enhances the
+accuracy, improving from 94% to 98% on FF++. This
+highlights the effectiveness of our approach, combining pre-
+trained knowledge with dataset-speciﬁc parameter reﬁnement
+to achieve optimal performance.
+IV. RESULTS AND DISCUSSION
+This section includes the experimental conﬁguration, the
+dataset used, and the outcomes of assessing the proposed
+network. The ablation study and empirical analysis of the
+integration of different modules are elaborated. It also includes
+a comparison with existing methods and the results of several
+intermediary models.
+A. Experimental Setup
+We implemented our proposed network in the TensorFlow
+DL framework using an NVIDIA GeForce RTX 3090 GPU.
+We employed an Adam optimizer with a momentum of 0.9
+and set the initial learning rate to 1 × 10−4. The network
+was initially trained for 20 epochs with the base model
+frozen. During the ﬁnal 10 epochs of the ﬁne-tuning stage,
+the learning rate was reduced to accommodate the larger
+model and to readapt the pre-trained weights, thereby avoiding
+overﬁtting. The learning rate was further reduced by a factor
+of 0.5 whenever the validation accuracy plateaued for two
+consecutive epochs. We used the ReduceLROnPlateau callback
+to adjust the learning rate based on validation performance.
+Training images were resized to 160 × 160 and the batch size
+was set to 32 as empirically validated. We employ common
+metrics to evaluate our method, including Area Under the
+Receiver Operating Characteristic Curve (AUC), Equal Error
+Rate (EER), Accuracy (ACC), Precision, Recall, and F1-Score.
+The AUC value ranges from 0 to 1, where a value closer to
+1 indicates a better performance. The EER is the point on the
+ROC curve where the false acceptance rate equals the false
+rejection rate.
+B. Datasets
+We used four benchmark datasets to conduct the empirical
+analysis to evaluate the proposed network. Table I shows
+the summary of the utilized datasets in our study. The
+datasets include FF++ [37], Celeb-DF [38], WLDR [39],
+and DFDC [40]. FF + + is a popular dataset that includes
+videos of ﬁve commonly used facial manipulation techniques:
+Deepfakes
+(DF),
+Face2Face
+(F2F),
+NeuralTextures (NT),
+Authorized licensed use limited to: Fengchia University. Downloaded on September 15,2026 at 08:12:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 6 ---
+
+286
+IEEE TRANSACTIONS ON CONSUMER ELECTRONICS, VOL. 71, NO. 1, FEBRUARY 2025
+Fig. 4.
+Visual illustrations of the fake and real samples taken from the utilized four datasets.
+FaceSwap (FS), and FaceShifter (FST). The majority of
+the frames in the dataset show the frontal face. For each
+class, we utilized approximately 72,000 frames. The WLDR
+Dataset comprises videos featuring prominent politicians and
+presidents such as Obama and Clinton. The video clips show
+politicians speaking in continuous dialogue, with every clip
+focusing on a single individual. This dataset includes several
+manipulation techniques, such as face-swapping, lip-syncing,
+and impersonation. We extracted almost 38,715 fake frames
+and 163,177 real frames. The dataset Celeb-DF has videos
+sourced from YouTube, along with fake videos of high quality.
+This dataset includes many celebrity interview clips that are
+of good quality and have consistent background information.
+We worked with 45,000 real and 45,000 fake frames from
+it. The dataset DFDC is very challenging due to the diverse
+manipulation methods. Our study included 89,572 fake frames
+and 26,074 real frames.
+C. Quantitative Analysis
+1) Intermediate Features Analysis: Table II presents a
+comprehensive analysis of various backbone models with
+the proposed network on the FF++ dataset to assess
+intermediate-level features. The reported performance met-
+rics, including accuracy, precision, recall, and F1 score,
+highlight our proposed network’s effectiveness compared to
+several architectures. MobileNetV2 achieved an accuracy of
+89.50%, with precision at 85.04%, recall at 88.01%, and an
+F1 score of 86.53%, indicating reasonably good performance
+but still leaving room for improvement. VGG16, ResNet, and
+InceptionV3 models demonstrated comparatively good feature
+representation capabilities, beneﬁting from their deeper archi-
+tectures. DenseNet and EfﬁcientNet series showed progressive
+improvements with increasing model complexity, highlighting
+their scalability and efﬁciency. In a nutshell, the tabulated
+TABLE II
+INTERMEDIATE FEATURES ANALYSIS
+performances demonstrate that the proposed network surpasses
+existing models across all key performance metrics, conﬁrm-
+ing the efﬁcacy of the proposed enhancements in feature
+extraction and model architecture, making it a highly reliable
+choice. Our proposed network signiﬁcantly outperformed all
+other models, achieving an outstanding accuracy of 98.54%,
+with precision at 98.48%, recall at 98.59%, and an F1 score
+of 98.54%. These results indicate that the ﬁne-tuning of
+progressive feature extraction, CBAM, and customized dilated
+convolution block effectively captures and reﬁnes features for
+robust DD.
+2) Progressive Module Integration: Table III presents the
+analysis of various module integrations to observe the impact
+of each block progressively. Starting with the ENV2, which
+achieved an accuracy of 84.53% on FF++ and 83.55%
+on WLDR. Adding a CA module to ENV2 enhanced the
+Authorized licensed use limited to: Fengchia University. Downloaded on September 15,2026 at 08:12:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 7 ---
+
+USMAN et al.: EFFICIENT DEEPFAKE DETECTION VIA LAYER-FROZEN ASSISTED DA NETWORK
+287
+TABLE III
+PERFORMANCE ANALYSIS ON FF++ AND WLDR WITH INTEGRATED MODULES
+TABLE IV
+CROSS-DATABASE EVALUATION FROM FF++ TO CELEB-DF AND DFDC IN TERMS OF AUC AND EER. THE FF++
+BELONGS TO THE INTRA-TESTING RESULTS, WHILE OTHERS REPRESENT THE UNSEEN DATASET TESTING
+performance to 87.25% on FF++ and 85.20% on WLDR, with
+corresponding increases in other matrices. Further integrating
+SA with CA resulted in an accuracy of 88.60% on FF++
+and 86.65% on WLDR, showcasing the additional assistance
+of combining both attention mechanisms. The utilization of
+the CA and SA with the practiced residuals (CBAM RES)
+markedly improved the result to 90.44% on FF++ and
+88.30% on WLDR, along with a substantial increase in other
+performance metrics. It is observable that incorporating a
+customized convolution block with CBAM RES boosts the
+accuracy to 94.34% on FF++ and 92.95% on WLDR, demon-
+strating the effectiveness of reﬁning features. The proposed
+network, which includes optimal features assisted by modiﬁed
+CBAM (MCBAM), the convolution block, and ﬁne-tuning,
+achieved the best outcomes with a performance of 98.54% on
+FF++ and 96.75% on WLDR. The results clearly indicate
+that the ﬁne-tuning with progressive integrations of the utilized
+modules.
+3) Intra
+Class
+Data
+Validation: Table V
+provides
+a
+detailed cross-evaluation of several prominent evaluation
+methods to assess generalization across data divisions of DF,
+F2F, FS, NT, and FST. These divisions encompass a wide
+range of techniques and scenarios, making them a robust
+testbed for evaluating detection methodologies. Among the
+performances of the tabulated methods, our proposed network
+consistently emerged as the frontrunner. The reported trends
+in the results highlight the robustness of detecting complex
+manipulations. It is important to highlight that when the
+TABLE V
+CROSS-DATA EVALUATION ON DIFFERENT DATA DIVISIONS TO ASSESS
+GENERALIZATION ABILITY OF THE PROPOSED NETWORK
+network is trained over the DF division, it achieves the highest
+accuracy of 99.72% on DF and 93.51% on NT. The proposed
+network also showed optimal results when trained on F2F,
+Authorized licensed use limited to: Fengchia University. Downloaded on September 15,2026 at 08:12:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 8 ---
+
+288
+IEEE TRANSACTIONS ON CONSUMER ELECTRONICS, VOL. 71, NO. 1, FEBRUARY 2025
+Fig. 5.
+Qualitative Analysis of Network Predictions Across Different Deepfake Manipulation Classes.
+FS, NT, and FST data divisions, outperforming other methods
+like Xception, FTCN, and Face X-ray. These reported per-
+formances highlight that the proposed DFNet is effective and
+robust in detecting deepfakes across various data evaluation
+splits. The generalization capability in our context deﬁnes
+the capacity to effectively detect deepfakes across various
+divisions that vary in manipulation, and quality alteration
+approaches. Furthermore, the superior performance of the
+network stems from its ability to capture complex patterns
+speciﬁc to deepfake manipulations. Our network demonstrated
+effectiveness across different data divisions positioning it as a
+promising solution in the domain.
+D. Comparative Analysis
+Table IV highlights the performance metrics of SOTA
+DD methods across FF++, Celeb-DF, and DFDC datasets,
+using AUC and EER as evaluation criteria. It is observ-
+able that higher AUC values indicate superior discrimination
+performance, while lower EER values denote better over-
+all accuracy. The reported performances highlight that the
+proposed approach consistently surpasses other methods
+across all datasets, underscoring its efﬁcacy in detecting
+diverse deepfake manipulations. The performance superiority
+emphasizes that the network’s training strategy, which inte-
+grates advanced feature extraction capabilities, optimal DA,
+customized modules, and robustness enhancements, is well-
+tailored for tackling the complexities of DD. The signiﬁcant
+performance gap observed between the proposed method and
+existing approaches further validates its superior generalization
+capability. These ﬁndings position the proposed network as
+a leading solution in the evolving landscape of DD, offering
+technical insight into its strengths and contributions within the
+ﬁeld.
+Authorized licensed use limited to: Fengchia University. Downloaded on September 15,2026 at 08:12:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 9 ---
+
+USMAN et al.: EFFICIENT DEEPFAKE DETECTION VIA LAYER-FROZEN ASSISTED DA NETWORK
+289
+E. Qualitative Results
+Figure 5 represents the visual predictions of the proposed
+network on the FF++ dataset across different deepfake
+manipulation classes, including FS, FST, F2F, DF, and NT.
+Each row in the ﬁgure corresponds to a speciﬁc manipula-
+tion technique, with columns representing individual sample
+predictions. For each sample, the ground truth label, predicted
+label, and conﬁdence score are provided. The ﬁrst row exhibits
+results for FS modiﬁcations. The network demonstrates an
+impressive level of accuracy in differentiating between real
+and fake images, accompanied by excellent conﬁdence scores.
+All predictions for the fake class are found true, indicating
+strong detection ability against FS alterations. The second
+row represents the outcomes of FST which consistently shows
+outstanding accuracy by often correctly predicting with a high
+level of conﬁdence. Despite detecting one real image with a
+reduced conﬁdence of 0.60, the total average score remains
+robust. The visual overview of F2F variations is placed in
+the third row where the network shows excellent detection
+capabilities, correctly distinguishing the complex features. The
+fourth row presents the outcomes of DF modiﬁcations where
+the network effectively categorizes most of the images, with
+conﬁdence values ranging from 0.79 to 1.00. The last row
+indicates the results for NT modiﬁcations. From the visual
+samples, it can be observed that the network consistently
+achieves excellent accuracy by accurately predicting with
+average conﬁdence scores above 0.94 for six given samples.
+consequently, the qualitative outcomes presented in Figure 5
+indicate that the suggested approach achieves an outstanding
+level of conﬁdence when detecting multiple types of deepfake
+variations.
+V. CONCLUSION
+In this study, we introduced an innovative strategy uti-
+lizing optimal features enhanced by a DA mechanism,
+incorporating the CBAM to dynamically adjust channel-wise
+feature responses and focus on important spatial regions.
+The intermediate features are assisted and strengthened by
+CBAM and customized dilated convolution block. By ﬁne-
+tuning our network with progressive weight training methods,
+we achieved superior performance across benchmark datasets,
+including FF++, WLDR, Celeb-DF, and DFDC, outper-
+forming existing state-of-the-art approaches. We conducted
+intra-class validation across different classes of FF++ datasets
+to evaluate the generalization capabilities of the proposed
+network. There is always a need to provide an effective way
+to mitigate the risks associated with media and dealings to
+ensure security in digital content with greater trust. Our study
+signiﬁcantly improves DDs in consumer imaging technologies.
+REFERENCES
+[1] C. K. Wu, C.-T. Cheng, Y. Uwate, G. Chen, S. Mumtaz, and K. F. Tsang,
+“State-of-the-art and research opportunities for next-generation con-
+sumer electronics,” IEEE Trans. Consum. Electron., vol. 69, no. 4,
+pp. 937–948, Nov. 2022.
+[2] M. Yamauchi, Y. Ohsita, M. Murata, K. Ueda, and Y. Kato, “Anomaly
+detection in smart home operation from user behaviors and home
+conditions,” IEEE Trans. Consum. Electron., vol. 66, no. 2, pp. 183–192,
+May 2020.
+[3] A. Parashar, I. Rida, A. Parashar, and V. Aski, “Protecting the privacy
+of face by de-identiﬁcation pipeline based on deep learning,” in Proc.
+16th Int. Conf. Signal-Image Technol. Internet-Based Syst. (SITIS), 2022,
+pp. 409–416.
+[4] G. Zhang, M. Gao, Q. Li, W. Zhai, G. Zou, and G. Jeon, “Disrupting
+deepfakes via union-saliency adversarial attack,” IEEE Trans. Consum.
+Electron., vol. 70, no. 1, pp. 2018–2026, Feb. 2023.
+[5] I. Lee and K. Lee, “The Internet of Things (IoT): Applications,
+investments, and challenges for enterprises,” Bus. Horizons, vol. 58,
+no. 4, pp. 431–440, 2015.
+[6] L.
+Whittaker,
+R.
+Mulcahy,
+K.
+Letheren,
+J.
+Kietzmann,
+and
+R. Russell-Bennett, “Mapping the deepfake landscape for inno-
+vation: A multidisciplinary systematic review and future research
+agenda,” Technovation, vol. 125, Jul. 2023, Art. no. 102784.
+[7] W. He, L. Fei, S. Zhao, W. Zhang, S. Teng, and I. Rida, “RRFAE-Net:
+Robust RGB-D facial age estimation network,” in Proc. Chin. Conf.
+Biom. Recognit., 2023, pp. 119–128.
+[8] F. Ding, G. Zhu, M. Alazab, X. Li, and K. Yu, “Deep-learning-
+empowered digital forensics for edge consumer electronics in 5G
+HetNets,” IEEE Consum. Electron. Mag., vol. 11, no. 2, pp. 42–50,
+Mar. 2020.
+[9] D. Afchar, V. Nozick, J. Yamagishi, and I. Echizen, “MesoNet: A
+compact facial video forgery detection network,” in Proc. IEEE Int.
+Workshop Inf. Forensics Security (WIFS), 2018, pp. 1–7.
+[10] A. Das, S. Das, and A. Dantcheva, “Demystifying attention mechanisms
+for deepfake detection,” in Proc. 16th IEEE Int. Conf. Automat. Face
+Gesture Recognit. (FG), 2021, pp. 1–7.
+[11] S. Agarwal and H. Farid, “Detecting deep-fake videos from aural
+and oral dynamics,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern
+Recognit., 2021, pp. 981–989.
+[12] N. Bonettini, E. D. Cannas, S. Mandelli, L. Bondi, P. Bestagini,
+and S. Tubaro, “Video face manipulation detection through ensemble
+of CNNs,” in Proc. 25th Int. Conf. Pattern Recognit. (ICPR), 2021,
+pp. 5012–5019.
+[13] S. Lee, S. Tariq, J. Kim, and S. S. Woo, “TAR: Generalized
+forensic framework to detect deepfakes using weakly supervised learn-
+ing,” in Proc. IFIP Int. Conf. ICT Syst. Secur. Privacy Protect., 2021,
+pp. 351–366.
+[14] J. Wu, Z. Qiu, Z. Zeng, R. Xiao, I. Rida, and S. Zhang, “Graph
+autoencoder anomaly detection for E-commerce application by contex-
+tual integrating contrast with reconstruction and complementarity,” IEEE
+Trans. Consum. Electron., vol. 70, no. 1, pp. 1623–1630, Feb. 2024.
+[15] S. Shirali-Shahreza and Y. Ganjali, “Protecting home user devices with
+an SDN-based ﬁrewall,” IEEE Trans. Consum. Electron., vol. 64, no. 1,
+pp. 92–100, Feb. 2018.
+[16] J. Yoon, A. Panizo-LLedot, D. Camacho, and C. Choi, “Triple-modality
+interaction for deepfake detection on zero-shot identity,” Inf. Fusion,
+vol. 109, Sep. 2024, Art. no. 102424.
+[17] U.
+A.
+Ciftci,
+I.
+Demir,
+and
+L.
+Yin,
+“FakeCatcher:
+Detection
+of
+synthetic
+portrait
+videos
+using
+biological
+signals,”
+IEEE
+Trans. Pattern Anal. Mach. Intell., early access, Jul. 15, 2020,
+doi: 10.1109/TPAMI.2020.3009287.
+[18] D. Güera and E. J. Delp, “Deepfake video detection using recurrent
+neural networks,” in Proc. 15th IEEE Int. Conf. Adv. Video Signal Based
+Surveill. (AVSS), 2018, pp. 1–6.
+[19] Y. Li and S. Lyu, “Exposing DeepFake videos by detecting face warping
+artifacts,” 2018, arXiv:1811.00656.
+[20] Y.-J. Heo, Y.-J. Choi, Y.-W. Lee, and B.-G. Kim, “Deepfake detec-
+tion scheme based on vision transformer and distillation,” 2021,
+arXiv:2104.01353.
+[21] H.-S. Chen, M. Rouhsedaghat, H. Ghani, S. Hu, S. You, and
+C.-C. J. Kuo, “DefakeHop: A light-weight high-performance deepfake
+detector,” in Proc. IEEE Int. Conf. Multimedia Expo (ICME), 2021,
+pp. 1–6.
+[22] D. Wodajo and S. Atnafu, “Deepfake video detection using convolutional
+vision transformer,” 2021, arXiv:2102.11126.
+[23] T. T. Nguyen et al., “Deep learning for deepfakes creation and detec-
+tion: A survey,” Comput. Vis. Image Underst., vol. 223, Oct. 2022,
+Art. no. 103525.
+[24] P. Prajapati and C. Pollett, “MRI-GAN: A generalized approach
+to detect DeepFakes using perceptual image assessment,” 2022,
+arXiv:2203.00108.
+[25] M. A. Raza and K. M. Malik, “Multimodaltrace: Deepfake detection
+using audiovisual representation learning,” in Proc. IEEE/CVF Conf.
+Comput. Vis. Pattern Recognit., 2023, pp. 993–1000.
+Authorized licensed use limited to: Fengchia University. Downloaded on September 15,2026 at 08:12:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 10 ---
+
+290
+IEEE TRANSACTIONS ON CONSUMER ELECTRONICS, VOL. 71, NO. 1, FEBRUARY 2025
+[26] T. Mittal, U. Bhattacharya, R. Chandra, A. Bera, and D. Manocha,
+“Emotions don’t lie: An audio-visual deepfake detection method using
+affective cues,” in Proc. 28th ACM Int. Conf. Multimedia, 2020,
+pp. 2823–2832.
+[27] D. M. Montserrat et al., “Deepfakes detection with automatic face
+weighting,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit.
+Workshops, 2020, pp. 668–669.
+[28] O. De Lima, S. Franklin, S. Basu, B. Karwoski, and A. George,
+“Deepfake detection using spatiotemporal convolutional networks,”
+2020, arXiv:2006.14749.
+[29] H. Khan et al., “Visionary vigilance: Optimized YOLOV8 for fallen per-
+son detection with large-scale benchmark dataset,” Image Vis. Comput.,
+vol. 149, Sep. 2024, Art. no. 105195.
+[30] T. Khan, G. Choi, and S. Lee, “EFFNet-CA: An efﬁcient driver
+distraction detection based on multiscale features extractions and channel
+attention mechanism,” Sensors, vol. 23, no. 8, p. 3835, 2023.
+[31] M. Yasir, I. Ullah, and C. Choi, “Depthwise channel attention network
+(DWCAN): An efﬁcient and lightweight model for single image super-
+resolution and metaverse gaming,” Expert Syst., vol. 41, no. 4, 2024,
+Art. no. e13516.
+[32] Y. Wang et al., “Dense hybrid attention network for palmprint image
+super-resolution,” IEEE Trans. Syst., Man, Cybern., Syst., vol. 54, no. 4,
+pp. 2590–2602, Apr. 2024.
+[33] J. Wang, H. Liu, H. Ying, C. Qiu, J. Li, and M. S. Anwar, “Attention-
+based neural network for end-to-end music separation,” CAAI Trans.
+Intell. Technol., vol. 8, no. 2, pp. 355–363, 2023.
+[34] G.-E. Lee, J. Cho, and S.-I. Choi, “Shallow and reverse attention
+network for colon polyp segmentation,” Sci. Rep., vol. 13, no. 1, 2023,
+Art. no. 15243.
+[35] S. Woo, J. Park, J.-Y. Lee, and I. S. Kweon, “CBAM: Convolutional
+block attention module,” in Proc. Eur. Conf. Comput. Vis. (ECCV), 2018,
+pp. 3–19.
+[36] Y. Wang, D. Sun, K. Chen, F. Lai, and M. Chowdhury, “EGERIA:
+Efﬁcient DNN training with knowledge-guided layer freezing,” in Proc.
+18th Eur. Conf. Comput. Syst., 2023, pp. 851–866.
+[37] A. Rossler, D. Cozzolino, L. Verdoliva, C. Riess, J. Thies, and
+M. Nießner, “Faceforensics++: Learning to detect manipulated facial
+images,” in Proc. IEEE/CVF Int. Conf. Comput. Vis., 2019, pp. 1–11.
+[38] Y. Li, X. Yang, P. Sun, H. Qi, and S. Lyu, “Celeb-DF: A large-scale
+challenging dataset for DeepFake forensics,” in Proc. IEEE/CVF Conf.
+Comput. Vis. Pattern Recognit., 2020, pp. 3207–3216.
+[39] S. Agarwal, H. Farid, Y. Gu, M. He, K. Nagano, and H. Li, “Protecting
+world leaders against deep fakes,” in Proc. CVPR Workshops, vol. 1,
+2019, p. 38.
+[40] B. Dolhansky et al., “The Deepfake detection challenge (DFDC)
+dataset,” 2020, arXiv:2006.07397.
+[41] A. Haliassos, K. Vougioukas, S. Petridis, and M. Pantic, “Lips don’t lie:
+A generalisable and robust approach to face forgery detection,” in Proc.
+IEEE/CVF Conf. Comput. Vis. Pattern Recognit., 2021, pp. 5039–5049.
+[42] S. Chen, T. Yao, Y. Chen, S. Ding, J. Li, and R. Ji, “Local relation
+learning for face forgery detection,” in Proc. AAAI Conf. Artif. Intell.,
+vol. 35, 2021, pp. 1081–1088.
+[43] L. Li et al., “Face X-ray for more general face forgery detec-
+tion,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit., 2020,
+pp. 5001–5010.
+[44] K. Sun, T. Yao, S. Chen, S. Ding, J. Li, and R. Ji, “Dual contrastive
+learning for general face forgery detection,” in Proc. AAAI Conf. Artif.
+Intell., vol. 36, 2022, pp. 2316–2324.
+[45] M. Tan and Q. Le, “EfﬁcientNet: Rethinking model scaling for con-
+volutional neural networks,” in Proc. Int. Conf. Mach. Learn., 2019,
+pp. 6105–6114.
+[46] H. Zhao, W. Zhou, D. Chen, T. Wei, W. Zhang, and N. Yu, “Multi-
+attentional deepfake detection,” in Proc. IEEE/CVF Conf. Comput. Vis.
+pattern Recognit., 2021, pp. 2185–2194.
+[47] W. Zhuang et al., “UIA-ViT: Unsupervised inconsistency-aware method
+based on vision transformer for face forgery detection,” in Proc. Eur.
+Conf. Comput. Vis., 2022, pp. 391–407.
+[48] J. Wei, S. Wang, and Q. Huang, “F3Net: Fusion, feedback and focus
+for salient object detection,” in Proc. AAAI Conf. Artif. Intell., vol. 34,
+2020, pp. 12321–12328.
+[49] D. Li, Y. Yang, Y.-Z. Song, and T. Hospedales, “Learning to generalize:
+Meta-learning for domain generalization,” in Proc. AAAI Conf. Artif.
+Intell., vol. 32, 2018, pp. 1–8.
+[50] F. Chollet, “Xception: Deep learning with depthwise separable convo-
+lutions,” in Proc. IEEE Conf. Comput. Vis. Pattern Recognit., 2017,
+pp. 1251–1258.
+[51] K. Sun et al., “Domain general face forgery detection by learning to
+weight,” in Proc. AAAI Conf. Artif. Intell., vol. 35, 2021, pp. 2638–2646.
+[52] Y. Zheng, J. Bao, D. Chen, M. Zeng, and F. Wen, “Exploring temporal
+coherence for more general video face forgery detection,” in Proc.
+IEEE/CVF Int. Conf. Comput. Vis., 2021, pp. 15044–15054.
+[53] Y. Luo, Y. Zhang, J. Yan, and W. Liu, “Generalizing face forgery
+detection with high-frequency features,” in Proc. IEEE/CVF Conf.
+Comput. Vis. Pattern Recognit., 2021, pp. 16317–16326.
+Muhammad
+Talha
+Usman
+received the B.S.
+degree in software engineering from the University
+of Engineering and Technology Taxila, Pakistan,
+in 2022. He is currently pursuing the master’s
+degree with Gachon University, South Korea, and
+a Research Assistant with CIP Research Group.
+His research interests focus on computer vision and
+pattern recognition, image processing, generative
+adversarial networks, and graph neural networks.
+Habib Khan (Member, IEEE) received the B.S.
+degree in computer science from Islamia College
+University Peshawar and the M.S. degrees from
+Sejong University, Seoul, South Korea. He is an
+AI Researcher and a Lab Coordinator with the
+CIP Research Group, Gachon University. He has
+contributed many scientiﬁc articles to prestigious
+international journals and conferences, and some of
+his articles are accepted in the pipeline of the Q1, top
+ten, A* venues. His research interests focus on visual
+intelligence in surveillance, video analytics, saliency
+detection, instance segmentation, precision healthcare, cybersecurity, and
+underwater robotics. He is actively involved as a Reviewer of the Information
+Fusion, Engineering Applications of Artiﬁcial Intelligence, JKSUCI, IEEE
+INTERNET OF THINGS JOURNAL, Expert Systems with Applications, IEEE
+TRANSACTION ON CONSUMER ELECTRONICS, Human-Centric Computing
+and Information Sciences, IEEE Systems Man and Cybernetics Magazine,
+and Journal of Supercomputing, and prestigious conferences, including
+INFOCOM, AIAI 2022, ICANN 2022, ICANN 2023, EAAI 2024, IWCMC
+2024 (Edge Intelligence), and AIAI 2024.
+Sushil Kumar Singh received the M.E. degree
+in information technology from Karnataka State
+University, Mysore, India, the M.Tech. degree in
+computer science and engineering from Uttarakhand
+Technical University, Dehradun, India, and the
+Ph.D. degree from the Seoul National University
+of Science and Technology, Seoul, South Korea.
+He is working as an Associate Professor withe
+the Computer Engineering Department, Marwadi
+University, Rajkot, India. He has also been the Lab
+Leader of the UCS Lab, Department of Computer
+Science Engineering, Seoul National University of Science and Technology.
+He has more than ten-year of experience teaching in the ﬁeld of computer
+science. He has published Four Books Computer C Programming, Cyber
+Security, Big Data Analytics, and Mobile Computing. He has also published
+many high-quality papers (Q1) in international journals and conferences. He
+has already delivered international lectures in many countries. His current
+research interests include blockchain, artiﬁcial intelligence, big data, the
+Internet of Things, smart city security, and cyber–physical systems. He has
+got the Best Lab Leadership Award from UCS Lab from 2019 to 2021. He is
+a Reviewer of the IEEE Wireless Communication Magazine, IEEE SYSTEMS,
+IEEE INTERNET
+OF THINGS JOURNAL, Future Generation Computer
+Systems, Transactions on Emerging Telecommunications Technologies, Expert
+Systems, Journal of Information Security and Applications, Computer
+Network, MDPI, CIE, Human-Centric Computing and Information Sciences,
+The Journal of Indian Prosthodontic Society, Computing, Multimedia Tools
+and Applications, and Science China Information Sciences Journal.
+Authorized licensed use limited to: Fengchia University. Downloaded on September 15,2026 at 08:12:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 11 ---
+
+USMAN et al.: EFFICIENT DEEPFAKE DETECTION VIA LAYER-FROZEN ASSISTED DA NETWORK
+291
+Mi
+Young
+Lee
+(Member, IEEE) received the
+M.S. and Ph.D. degrees from the Department of
+Image and Information Engineering, Pusan National
+University. She served as a Research Professor
+with Sejong University. She is currently working as
+a Research Professor with Chung-Ang University
+and conducting research as a Senior Researcher
+with the Industrial Security Research Center. She is
+broadly working in artiﬁcial intelligence, computer
+vision, image processing, and energy informatics.
+She has published several novel contributions in
+these areas in reputable journals and peer-reviewed conference proceedings,
+including IEEE ACCESS, Multimedia Tools and Applications (Springer), and
+International Joint Conference on Neural Networks in 2020. She has carried
+out several research projects successfully and is a principal investigator
+of several ongoing research projects under the supervision of the Korean
+Government and has ﬁled more than 13 patents during her career. Her
+particular research interests include deep learning, computer vision, generative
+AI, attention mechanism, re-identiﬁcation, energy storage systems, the Internet
+of Things, and neural networks.
+JaKeoung Koo received the B.Eng. and M.Eng.
+degrees from Chung-Ang University, Seoul, South
+Korea, in 2015 and 2017, respectively, and the
+Ph.D. degree from the Technical University of
+Denmark, Denmark, in 2021. He was a Postdoctoral
+Research Associate with the School of Engineering
+and
+Physical
+Sciences,
+Heriot-Watt
+University,
+Edinburgh,
+U.K.,
+and
+a
+Postdoctoral
+Research
+Fellow with the School of Computing, National
+University of Singapore, Singapore. He is cur-
+rently an Assistant Professor with the School of
+Computing, Gachon University, South Korea, and the Director of the CIP
+Research Group. His research interests include computational imaging, geom-
+etry processing, computer vision, and graph neural networks.
+Authorized licensed use limited to: Fengchia University. Downloaded on September 15,2026 at 08:12:22 UTC from IEEE Xplore.  Restrictions apply. 

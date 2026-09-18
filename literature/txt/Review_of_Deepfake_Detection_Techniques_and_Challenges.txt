@@ -1,0 +1,1025 @@
+
+
+--- PAGE 1 ---
+
+867
+979-8-3315-3244-4/25/$31.00 ©2025 IEEE
+ 
+Review of Deepfake Detection Techniques and 
+Challenges 
+ 
+Nur Shidah Ahmad Sharawardi  
+Faculty of Computing and Information 
+Technology  
+Tunku Abdul Rahman University of 
+Management and Technology  
+Tanjung Bungah, Pulau Pinang, 
+Malaysia 
+nurshidah@tarc.edu.my
+Siaw-Hong Liew 
+Faculty of Computer Science and 
+Information Technology 
+Universiti Malaysia Sarawak 
+(UNIMAS), 
+Kota Samarahan, Sarawak, Malaysia 
+shliew@unimas.my 
+ 
+Angkay Subramaniam 
+Faculty of Computing and Information 
+Technology  
+Tunku Abdul Rahman University of 
+Management and Technology  
+Tanjung Bungah, Pulau Pinang, 
+Malaysia 
+angkays@tarc.edu.my 
+Punitha Turumugon 
+Faculty of Computing and Information 
+Technology  
+Tunku Abdul Rahman University of 
+Management and Technology  
+Tanjung Bungah, Pulau Pinang, 
+Malaysia 
+punitha@tarc.edu.my 
+ 
+Abstract—The 
+proliferation 
+of 
+deepfake 
+technology, 
+powered by advanced generative models such as generative 
+adversarial networks (GANs), presents challenges in digital 
+media authenticity, public trust, and cybersecurity. We 
+reviewed recent advancements in deepfake detection across 
+multiple modalities, including image, video, and audio. 
+Benchmark datasets, such as FaceForensics++, the deepfake 
+detection challenge (DFDC), and Celeb-deepfake (Celeb-DF), 
+have been used to develop diverse detection models. These 
+models encompass approaches based on EfficientNet-driven 
+transfer learning, convolutional neural network–long short-
+term memory (CNN-LSTM) hybrids for temporal feature 
+extraction, graph-based neural architectures, and ensemble 
+methods that integrate deep learning with handcrafted features. 
+Although certain models report detection accuracies as high as 
+99.99% 
+on 
+specific 
+datasets, 
+many 
+exhibit 
+limited 
+generalizability across different benchmarks, particularly when 
+confronted with compression artifacts. Additionally, real-time 
+deployment remains constrained by substantial computational 
+demands. 
+Emerging 
+threats, 
+including 
+adversarial 
+perturbations and diffusion-based synthetic media, necessitate 
+the development of more resilient detection strategies. Proactive 
+countermeasures such as blockchain-based timestamping, 
+digital watermarking, and cryptographic hashing have been 
+adopted to enhance media integrity. The results of the review 
+underscore the need for lightweight, interpretable, and 
+multimodal detection frameworks to generalize the models’ 
+applicability across diverse domains, thereby supporting 
+reliable and scalable media verification in increasingly complex 
+digital environments.ion. 
+Keywords—deepfake detection, generative adversarial networks 
+(GANs), convolutional neural networks (CNNs), hybrid models, 
+spatial-temporal models 
+I. INTRODUCTION 
+Deepfakes are the synthetic media created using deep 
+learning models, particularly generative adversarial networks 
+(GANs), where visual or audio content is manipulated to 
+appear convincingly authentic. These technologies generate 
+highly realistic fake videos in which individuals appear to say 
+or do things they never do in reality, posing a growing threat 
+to digital authenticity and public trust. These realistic 
+manipulations of facial expressions, voices, and body 
+movements 
+have 
+been 
+exploited 
+in 
+identity 
+theft, 
+misinformation, and political propaganda [1,2]. As deepfakes 
+become increasingly sophisticated and accessible, their 
+potential for misuse expands, raising serious ethical, legal, and 
+societal concerns. 
+The proliferation of deepfake technology raises ethical and 
+legal 
+concerns, 
+particularly 
+around 
+impersonation, 
+misinformation, and privacy infringement. The unauthorized 
+creation of synthetic media, especially explicit or defamatory 
+content, poses threats to individuals and institutions alike. In 
+response, legislative efforts, such as the Deepfakes 
+Accountability Act in the United States, criminalize malicious 
+usage, yet enforcement remains challenging in the absence of 
+admissible and standardized detection tools. 
+The psychological effect on victims is significant, ranging 
+from anxiety to reputational damage and job loss, highlighting 
+the need for greater institutional responsibility and increased 
+public awareness. Platforms that host user-generated content 
+must enforce strict policies, promote media literacy, and 
+implement reliable detection mechanisms. Additionally, 
+ethical AI deployment should involve transparent model 
+behavior, fair dataset collection practices, and explainable 
+outputs to help prevent misuse and ensure accountability. 
+Researchers have developed a wide array of detection 
+methods and benchmark datasets to mitigate these threats [3]. 
+However, performance often varies significantly due to 
+differences in dataset characteristics, such as in healthcare [4], 
+manipulation types, and media quality. These variations 
+underscore the need for detection models that are robust, 
+scalable, and explainable across diverse scenarios. 
+The application of deepfake detection systems is 
+expanding across various industries [5]. In journalism, real-
+time detection tools help authenticate breaking news and 
+identify disinformation campaigns [6,7]. Social media 
+platforms, including Facebook and YouTube, are integrating 
+artificial intelligence-based moderation systems to flag 
+potentially manipulated content, aiding in content integrity 
+and user safety. 
+2025 IEEE International Conference on Computation, Big-Data and Engineering (ICCBE) | 979-8-3315-3244-4/25/$31.00 ©2025 IEEE | DOI: 10.1109/ICCBE65177.2025.11255645
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 11:07:11 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 2 ---
+
+868
+2025 IEEE International Conference on Computation, Big-Data and Engineering (ICCBE)
+In the financial sector, facial recognition systems are 
+increasingly targeted by deepfake attacks, prompting the 
+adoption of advanced liveness detection, multi-angle 
+validation, and scene consistency checks. A notable case study 
+involves telemedicine [8] and remote healthcare consultation, 
+where verifying the authenticity of video feeds is crucial. 
+Ensuring that a patient’s identity and appearance are unaltered 
+enhances diagnostic reliability and ensures compliance with 
+healthcare regulations. 
+In this study, we conducted a structured review of current 
+deepfake detection methods, organized by architectural 
+approach, dataset usage, and performance. We explored the 
+evolution from convolutional neural network (CNN)-based 
+systems to advanced hybrid, transformer, and graph-based 
+models, while also examining their limitations, including 
+issues of cross-dataset generalizability and real-time 
+feasibility. In addition, we explored emerging prevention 
+techniques and future trends to enhance media integrity and 
+trust. 
+II. METHODOLOGY  
+We evaluated peer-reviewed IEEE-indexed articles 
+published between 2020 and 2025, related to deepfake 
+detection strategies. Each study was assessed using a 
+standardized rubric, considering model architecture, datasets 
+used, detection approach, performance metrics, and strengths 
+and limitations. Through the assessment, emerging trends 
+such as transformer-based models, multimodal fusion, and 
+adversarial robustness challenges were identified [3,6,18]. 
+III. DEEPFAKE DETECTION APPROACHES 
+In recent years, the rapid increase of deepfake content has 
+sparked significant interest in developing robust detection 
+methods [14]. Deepfake detection methods distinguish 
+between real and synthetically generated media using a 
+variety of computational techniques. These methods are 
+categorized into traditional machine learning, deep learning 
+[15], and hybrid approaches. While early deepfake detection 
+methods were developed based on traditional machine 
+learning algorithms that relied on manually extracted facial 
+or motion features, recent methods have adopted deep 
+learning approaches capable of automatic feature extraction 
+and representation learning. 
+A. CNNs 
+CNNs are the backbone of many deepfake detection 
+systems due to their ability to extract spatial features from 
+images and videos. XceptionNet, EfficientNet-B7, and 
+custom CNN models have demonstrated high accuracy on 
+benchmark datasets such as FaceForensics++ and Celeb-DF. 
+EF-Net, which combines two EfficientNet-B5 models (one 
+partially frozen and one fully trained). Models leveraging 
+spatial artifacts and normalized facial features extracted via 
+multi-task cascaded convolutional networks (MTCNN) have 
+achieved up to 97.70% accuracy on the FaceForensics++ 
+benchmark [9]. Similarly, hybrid architectures such as 
+VGG16–CNN have demonstrated 95% accuracy on a Kaggle 
+dataset comprising real and fake facial images, highlighting 
+the efficacy of transfer learning and hierarchical feature 
+extraction [7].  
+Despite these impressive benchmark results, CNN-based 
+deepfake detection models have limitations in practical 
+deployment. High computational overhead, including 
+substantial storage and memory requirements, impedes real-
+time performance. Moreover, these models exhibit poor 
+generalization when applied to unseen datasets or more 
+sophisticated forgery techniques, resulting in notable 
+performance degradation (Table I) [6,11].
+TABLE I.  
+SPECIFICATIONS OF CNN MODELS  
+Method 
+Model/ 
+algorithm 
+Important feature 
+Accuracy and performance 
+Transfer 
+learning-
+based 
+fusion 
+of 
+CNNs [9] 
+Efficient-Fused Net (EF-Net): a fusion 
+of two EfficientNet-B5 models (one 
+partially frozen, one fully trained) with 
+ReLU 
+activation, 
+global 
+average 
+pooling, 
+dropout, 
+and 
+Softmax 
+classification. 
+Spatial artifacts (unnatural edges, facial 
+inconsistencies). 
+ 
+High-level features from pre-trained 
+EfficientNet-B5. 
+ 
+Normalized facial frames (224×224×3) 
+aligned via MTCNN. 
+FaceForensics++: 
+97.70% 
+accuracy, 
+98.62% precision, 96.78% recall, 87.71% 
+AUC. 
+ 
+DFDC-Preview: 89.19% accuracy, 84.1% 
+precision, 78.93% AUC. 
+Hybrid deep learning 
+model 
+combining 
+transfer learning and 
+CNN [10] 
+Integrated 
+VGG16 
+and 
+CNN 
+architecture with pooling, dropout, and 
+dense layers. 
+Pixel-level 
+patterns, 
+texture 
+inconsistencies, and spatial features 
+extracted via CNN and VGG16. 
+Achieved 95% accuracy (94% precision) 
+with a loss of 0.1, validated through k-fold 
+cross-validation (average 95% accuracy). 
+CNN-based 
+deep 
+learning with data 
+augmentation [1] 
+CNN-based deep learning with data 
+augmentation. 
+Spatial features (edges, textures) via 
+convolutional layers. 
+ 
+Data augmentation (rotation, flipping, 
+GAN-generated synthetic samples). 
+Test Accuracy: 92.05%. 
+ 
+AUC: 92.05%  
+ 
+Comparative 
+analysis of machine 
+learning and deep 
+learning models [6] 
+SVM, CNN, Vision Transformer (ViT) 
+Spatial 
+features 
+(CNN), 
+patch 
+embeddings (ViT), handcrafted features 
+(SVM) 
+CNN: 97.25% accuracy, 92.21% precision, 
+90% recall, 93% F1-score 
+ 
+ViT: 98% accuracy, 93% precision, 93% 
+recall, 94% F1-score 
+ 
+SVM: 98% accuracy, 87.75% precision, 
+88.01% recall, 91.10% F1-score 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 11:07:11 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 3 ---
+
+869
+2025 IEEE International Conference on Computation, Big-Data and Engineering (ICCBE)
+B. Spatial-Temporal and Hybrid Models 
+To address the limitations of static image analysis, 
+researchers have integrated temporal modeling with spatial 
+feature 
+extraction. 
+Hybrid 
+models, 
+including 
+InceptionResNetV2 
++ 
+LSTM , 
+analyze 
+frame-level 
+inconsistencies in videos, achieving 91.48% accuracy on Face 
+Forensics++ in 40 epochs [12]. Another notable example 
+is ResNet50 + LSTM, which combines spatial features from 
+ResNet50 with temporal dependencies using long short-term 
+memory (LSTM), yielding 94.1% accuracy on datasets such 
+as Deepfake Detection Challenge (DFDC) and Celeb-
+deepfake forensics (Celeb-DF) [14,15]. These models excel in 
+capturing dynamic artifacts such as unnatural facial 
+movement, mismatched lip-sync, or abnormal eye movement 
+are the key indicators of manipulation, revealing subtle flaws 
+introduced during deepfake generation. However, these 
+models are now easily deployed due to high computational 
+demands and dependence on large-scale training data (Table 
+II) [13,15].  
+TABLE II.  
+SPATIAL-TEMPORAL AND HYBRID MODELS 
+Method 
+Model/ 
+algorithm 
+Important feature 
+Accuracy and performance 
+Deep Learning [12] 
+InceptionResNetV2 (feature extraction) 
++ LSTM (temporal analysis. 
+2048-dimensional 
+feature 
+vectors 
+(spatial) 
+from 
+frames, 
+temporal 
+inconsistencies 
+via 
+LSTM. 
+ 
+Accuracy / Performance: 84.75% (20 
+epochs), 91.48% (40 epochs). 
+Hybrid 
+(spatial-
+temporal 
+deep 
+learning) [13] 
+ResNet50: Extracts spatial features from 
+frames. 
+ 
+LSTM: 
+Analyzes 
+temporal 
+dependencies across frames. 
+Spatial: Facial landmarks, textures (via 
+ResNet50). 
+ 
+Temporal: Frame-sequence anomalies 
+(via LSTM). 
+Accuracy: 94.1%. 
+ 
+AUC: 0.936. 
+ 
+Confusion Matrix: High true positives (TP) 
+and true negatives (TN). 
+Hybrid deep learning 
+(CNN + LSTM) [12], 
+[14] 
+ResNeXt50_32x4d (CNN backbone) + 
+LSTM (256 hidden units) 
+Spatial features (ResNeXt50) 
+ 
+Temporal dependencies (LSTM) 
+ 
+Facial ROIs (cropped and segmented) 
+FF++: 96.67% Accuracy, 96.68% AUC 
+ 
+Celeb-DF V1: 91.80% Accuracy, 92.00% 
+AUC 
+Hybrid deep learning 
+(spatial-temporal 
+analysis) [15] 
+ResNet50 (for spatial feature extraction) 
++ LSTM (for temporal sequence 
+processing) 
+Frame-level spatial features (e.g., facial 
+artifacts, inconsistencies) and temporal 
+patterns (e.g., frame sequences) 
+Accuracy: 94.1% 
+C. Graph-Based and Transformer Approaches 
+Recent 
+advancements 
+include 
+graph-based 
+and 
+transformer architectures, which offer superior generalization 
+and interpretability. GatedGCN, paired with EfficientNet-b0, 
+models region-wise facial inconsistencies (e.g., eyes, nose, 
+mouth) as graph nodes, achieving an area under the curve 
+(AUS) of 98.7% on FMFCC-V and robust cross-dataset 
+performance (a 89.4% AUC on Celeb-DF) [16]. Transformer-
+based methods such as Cross-ViT + DenseNet leverage multi-
+scale attention to fuse global and local features, attaining state-
+of-the-art results (an AUC of 99.99% on DeeperForensics 1.0) 
+[17]. Other models, such as spatial kernel selection and halo 
+attention network (SKSHA-Net), dynamically adjust spatial 
+receptive fields to detect subtle artifacts, achieving a 99.32% 
+AUC on FaceForensics++ HQ [18]. Despite their success, 
+these models are computationally intensive and may struggle 
+with low-quality or compressed media [19,20]. 
+TABLE III.  
+GRAPH-BASED AND TRANSFORMER MODELS 
+Method 
+Model/ 
+algorithm 
+Important feature 
+Accuracy and performance 
+Graph-based 
+deep 
+learning [16] 
+Graph Neural Network 
+(GatedGCN) 
+with 
+EfficientNet-b0 
+for 
+feature extraction 
+Spatial-temporal correlations between 
+facial regions (eyes, nose, mouth, rest), 
+extracted via OpenFace2.0 and cross-
+attention mechanisms 
+Highest 
+AUC 
+(98.7%) 
+on 
+FMFCC-V, 
+demonstrating robustness to Asian face 
+forgeries. 
+ 
+Strong cross-dataset generalization (e.g., 
+89.4% AUC on Celeb-DF without fine-
+tuning). 
+Hybrid deep learning 
+(CNN + Transformer) 
+[17] 
+DenseNet121 + Cross-
+ViT 
+(Cross 
+Vision 
+Transformer) 
+Spatial features (DenseNet), global 
+context 
+(Cross-ViT), 
+multi-scale 
+attention 
+AUC: 99.99% (DeeperForensics 1.0), 97.4% 
+(Celeb-DF); 
+F1-score: 
+99.0% 
+(DeeperForensics 1.0), 95.1% (Celeb-DF) 
+Deep 
+learning-based 
+detection 
+using 
+frequency 
+domain 
+features [18] 
+Frequency 
+Enhanced 
+Self-Blended 
+Images 
+(FSBI) with EfficientNet-
+B5 
+Discrete Wavelet Transform (DWT) 
+coefficients from self-blended images 
+(SBI) 
+AUC of 95.49% on Celeb-DF (cross-dataset) 
+and 95.13% on FF++ (within-dataset) 
+Deep 
+learning-based 
+detection with dynamic 
+spatial 
+and 
+attention 
+mechanisms [19] 
+Spatial Kernel Selection 
+and 
+Halo 
+Attention 
+Network (SKSHA-Net) 
+Multi-scale spatial receptive fields 
+(SKS) and localized pixel relationships 
+(HA) 
+Intra-testing: 97.16% Acc (FF++ HQ), 99.32% 
+AUC (FF++ HQ), 94.75% EER (Celeb-DF) 
+ 
+Cross-testing: 70.54% AUC (Celeb-DF), 
+69.58% AUC (WildDeepfake) 
+Deep 
+learning-based 
+detection 
+with 
+facial 
+landmark guidance [20] 
+Trail Tracing Network 
+(TTNet) 
+Facial landmarks and RGB data, 
+enhanced 
+by 
+Trace 
+Enhancement 
+Module (TEM) 
+In-dataset (FF++ HQ): Avg AUC of 87.6% 
+(best: 99.9% for NeuralTextures) 
+ 
+Cross-dataset: Avg AUC of 83.6% (94.0% on 
+Celeb-DF, 87.5% on DFDCp) 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 11:07:11 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 4 ---
+
+870
+2025 IEEE International Conference on Computation, Big-Data and Engineering (ICCBE)
+IV. DATASET AND PERFORMANCE  
+A thorough understanding of the datasets used in deepfake 
+detection research is crucial for evaluating the effectiveness 
+and generalizability of proposed models. The performance of 
+detection algorithms varies significantly depending on the 
+dataset used for training and testing, as each dataset contains 
+different types of manipulations, quality levels, and facial 
+variations [20]. Moreover, while several models perform well 
+within a single dataset, they might struggle to maintain 
+accuracy across different datasets or under challenging 
+conditions. We analyzed commonly used deepfake datasets 
+and evaluated intra-dataset performance to explore cross-
+dataset generalization issues and the robustness of detection 
+methods in adversarial scenarios. 
+A. Common Datasets and Intra-Dataset Performance 
+The most widely used datasets include FaceForensics++, 
+DFDC, Celeb-DF, and DeeperForensics 1.0, which provide 
+diverse samples of manipulated images and videos. Models 
+trained and tested on the same dataset often achieve high 
+performance. For instance, SFSimNet reached a 99.18% AUC 
+on FaceForensics++ (HQ) [21] while AMTENnet achieved a 
+98.52% accuracy on the same dataset [22]. However, intra-
+dataset results can be misleading, as models overfit to specific 
+artifacts or manipulation techniques [3,23]. 
+B. Common Cross-Dataset Generalization Challenges 
+A significant limitation in deepfake detection is a decrease 
+in performance when models are tested on unseen datasets. 
+For 
+example, frequency-enhanced 
+self-blended 
+images 
+(FSBI), which combine SBI with discrete wavelet transform 
+(DWT), achieved a 95.49% AUC on Celeb-DF but struggled 
+with NeuralTextures due to unique artifact patterns [18]. 
+Similarly, the temporal transformer network (TTNet), which 
+leverages facial landmarks for detection, showed an average 
+cross-dataset AUC of 83.6%, highlighting the difficulty of 
+generalizing across diverse manipulation methods [20]. High-
+frequency diversified augmentation (HFDA) mitigates this 
+issue by perturbing high-frequency components in the Fourier 
+domain, improving cross-dataset AUC to 85.09% on Celeb-
+DF-v2 [24]. 
+C. Robustness to Adversarial Conditions 
+Deepfake detectors must also contend with adversarial 
+attacks, compression artifacts, and low-resolution inputs. A 
+multi-scale graph attention transformer (MSG-GAT), a 
+spectral-guided graph attention network, demonstrated 
+resilience to adversarial conditions, achieving a 99.3% 
+accuracy on Celeb-DF [25]. Conversely, vision transformer 
+(ViT) 
++ 
+EfficientNet models 
+exhibited 
+performance 
+degradation on low-quality videos, underscoring the need for 
+robust preprocessing and adaptive architectures [26]. The lack 
+of standardized evaluation protocols further complicates 
+comparisons, as AUC and accuracy vary based on dataset 
+splits and manipulation types [23,27]. 
+V. STANDARDIZATION AND BENCHMARKING  
+While numerous datasets and evaluation metrics exist, the 
+lack of universal benchmarking standards hampers model 
+comparability and reproducibility. Discrepancies in video 
+resolution, compression artifacts, manipulation techniques, 
+and data partitioning lead to inconsistent and misleading 
+performance metrics. For instance, a model trained on high-
+quality synthetic videos fail on real-world compressed videos 
+sourced from social media. 
+To address this, the unified evaluation protocols and a 
+centralized leaderboard are required to assess detection 
+models across diverse datasets. Incorporating advanced 
+metrics such as compression robustness, adversarial resistance, 
+demographic fairness, and real-time latency enables an 
+understanding of system performance. These benchmarks 
+improve research rigor to build confidence among 
+stakeholders adopting detection technologies. 
+VI. PREVENTION OF DEEPFAKE 
+Several studies have proposed prevention mechanisms to 
+authenticate media and counteract the malicious use of 
+deepfakes. Blockchain timestamping [28], watermark 
+injection [28], and cryptographic hashing [29] are considered 
+in verifying the originality and integrity of media content. 
+However, these approaches face limitations in terms of 
+scalability, susceptibility to anti-forensic attacks, and the need 
+for cross-platform adoption. As a result, their effectiveness 
+remains constrained in real-world settings. 
+Emerging trends indicate a shift toward proactive and 
+intelligent detection systems that integrate explainable 
+artificial intelligence (XAI), federated learning, and real-time 
+deployment 
+optimization. 
+Models 
+leveraging 
+vision 
+transformers, GAN discriminators, and multimodal biometric 
+analysis are gaining prominence due to their enhanced 
+capability to detect and localize manipulated regions with 
+greater precision [10,17,22]. These advancements enable the 
+development of more resilient and adaptive detection 
+frameworks, capable of effectively responding to the rapid 
+evolution of deepfake generation techniques. 
+VII. CONCLUSION 
+Despite remarkable advancements in deepfake detection, 
+challenges persist. Current methods, particularly deep 
+learning models, often struggle with generalization, high 
+computational cost, and real-time deployment feasibility. 
+While hybrid and ensemble models demonstrate superior 
+accuracy, they are often hindered by increased complexity and 
+latency. Moreover, low-quality or adversarial manipulations 
+continue to expose vulnerabilities in existing systems. Further 
+research is necessary to develop adaptive, lightweight, and 
+interpretable detection models supported by standardized 
+benchmarks and robust cross-domain evaluation protocols. 
+Interdisciplinary 
+collaboration 
+and 
+timely 
+regulatory 
+measures are essential in ensuring secure and trustworthy AI-
+driven media authentication. 
+To ensure long-term success in deepfake detection, the 
+current 
+limitations 
+in 
+generalizability, 
+efficiency, 
+explainability, and reproducibility of existing models must be 
+addressed. 
+First, cross-dataset training and evaluation must be 
+prioritized, as generalization across datasets remains one of 
+the most pressing challenges in deepfake detection. Models 
+trained on specific datasets often fail to adapt to unfamiliar 
+manipulation techniques and real-world conditions. Although 
+many detection models achieve high accuracy on their training 
+datasets, performance degrades when applied to unseen data 
+with differing characteristics. To address this limitation, cross-
+dataset evaluation must become a standard practice to ensure 
+robustness in unpredictable environments. A lack of 
+generalizability can be mitigated through domain adaptation 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 11:07:11 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 5 ---
+
+871
+2025 IEEE International Conference on Computation, Big-Data and Engineering (ICCBE)
+techniques, including adversarial training, style transfer, and 
+data augmentation, which enable models to learn invariant 
+features across heterogeneous data distributions. Additionally, 
+multimodal fusion, integrating visual, audio, and textual cues, 
+has demonstrated promise in improving detection accuracy 
+across domains [30,31]. 
+Second, 
+researchers 
+must 
+develop 
+low-latency 
+architectures for mobile and edge deployment. Practical 
+deepfake detection requires models to operate efficiently on 
+resource-constrained 
+devices 
+such 
+as 
+smartphones, 
+surveillance systems, and embedded platforms. Model 
+quantization, pruning, and neural architecture search (NAS) 
+can be used to significantly reduce computational complexity 
+while preserving performance. Lightweight models that 
+maintain high accuracy and enable fast inference are essential 
+for real-time detection and scalability. DeepGuardNet, 
+specifically designed for edge deployment, exemplifies the 
+feasibility of efficient real-time detection [32,33]. 
+Third, the integration of XAI is critical. Deep learning 
+models are criticized for their lack of interpretability, 
+functioning as "black boxes." Explainability modules, such as 
+attention heatmaps, feature attribution maps, and saliency 
+visualizations, enhance transparency and facilitate an 
+understanding of model behavior. This is particularly 
+important in legal and forensic contexts, where model 
+decisions must be justified in formal proceedings. Techniques 
+like Grad-CAM and saliency visualization offer valuable 
+insights into decision-making processes [34,35]. 
+Fourth, future systems must adopt human-AI collaboration. 
+While AI excels at processing large volumes of data, human 
+judgment remains indispensable in scenarios requiring 
+nuanced interpretation. Hybrid workflows that combine 
+automated detection with manual verification yield more 
+reliable outcomes, especially in sensitive domains such as 
+journalism, legal evidence validation, and psychological 
+assessment. Interfaces that support interactive feedback and 
+user-in-the-loop mechanisms will enhance trust, usability, and 
+adoption. 
+Finally, open-source frameworks are required to foster 
+reproducibility 
+and 
+transparency. 
+Publicly 
+available 
+codebases, benchmark datasets, and evaluation results enable 
+researchers to validate results, compare methodologies, and 
+build upon previous results. The adoption of standardized 
+evaluation protocols and shared repositories accelerates 
+innovation and reduces redundant efforts. The findable, 
+accessible, interoperable, and reusable (FAIR) principles in 
+data sharing must be employed to cultivate a collaborative and 
+sustainable ecosystem for deepfake research. 
+Collectively, these recommendations help to bridge the 
+gap between academic innovation and practical deployment, 
+ensuring that deepfake detection systems are robust, efficient, 
+interpretable, and accessible across a wide range of 
+applications. 
+ACKNOWLEDGMENT 
+The authors extend gratitude to Tunku Abdul Rahman 
+University of Management and Technology (TAR UMT) for 
+institutional support and acknowledges all researchers whose 
+works were reviewed in this article. 
+ 
+ 
+REFERENCES 
+[1] 
+2025 IEEE 14th International Conference on Communication Systems 
+and Network Technologies (CSNT). IEEE, 2025. 
+[2] 
+A. Kaushal, S. Singh, S. Negi, and S. Chhaukar, “A Comparative Study 
+on Deepfake Detection Algorithms,” in Proceedings - 2022 4th 
+International Conference on Advances in Computing, Communication 
+Control and Networking, ICAC3N 2022, Institute of Electrical and 
+Electronics 
+Engineers 
+Inc., 
+2022, 
+pp. 
+854–860. 
+doi: 
+10.1109/ICAC3N56670.2022.10074593. 
+[3] 
+D. Garg and R. Gill, “Deepfake Generation and Detection - An 
+Exploratory Study,” in 2023 10th IEEE Uttar Pradesh Section 
+International Conference on Electrical, Electronics and Computer 
+Engineering, UPCON 2023, Institute of Electrical and Electronics 
+Engineers 
+Inc., 
+2023, 
+pp. 
+888–893. 
+doi: 
+10.1109/UPCON59197.2023.10434896. 
+[4] 
+R. Alnuaimi, M. Alawida, M. Almarzooqi, D. T. Alhalabi, and H. A. 
+Alamaireh, “Detecting Deepfakes in Healthcare: A Review and 
+Proposed Solution,” in International Conference on Engineering and 
+Emerging Technologies, ICEET, Institute of Electrical and Electronics 
+Engineers Inc., 2024. doi: 10.1109/ICEET65156.2024.10913568. 
+[5] 
+P. Sharma, S. Gupta, M. Sharma, and N. Gupta, “Deepfake Detection 
+and Mitigation Using Advanced CNN: Ensuring Digital Content 
+Integrity,” in Proceedings - 3rd International Conference on 
+Advancement in Computation and Computer Technologies, InCACCT 
+2025, Institute of Electrical and Electronics Engineers Inc., 2025, pp. 
+661–665. doi: 10.1109/InCACCT65424.2025.11011286. 
+[6] 
+P. Sharma, S. Gupta, M. Sharma, and N. Gupta, “Deepfake Detection 
+and Mitigation Using Advanced CNN: Ensuring Digital Content 
+Integrity,” in Proceedings - 3rd International Conference on 
+Advancement in Computation and Computer Technologies, InCACCT 
+2025, Institute of Electrical and Electronics Engineers Inc., 2025, pp. 
+661–665. doi: 10.1109/InCACCT65424.2025.11011286. 
+[7] 
+S. Atas and M. Karakose, “A New Approach to in Ensemble Method 
+for Deepfake Detection,” in 2023 4th International Conference on Data 
+Analytics for Business and Industry, ICDABI 2023, Institute of 
+Electrical and Electronics Engineers Inc., 2023, pp. 201–204. doi: 
+10.1109/ICDABI60145.2023.10629338. 
+[8] 
+B. Zhu, C. Zhang, Y. Sui, and L. Li, “FaceMotionPreserve: a generative 
+approach for facial de-identification and medical information 
+preservation,” Sci Rep, vol. 14, no. 1, Dec. 2024, doi: 10.1038/s41598-
+024-67989-5. 
+[9] 
+N. Basit, F. Khalid, Q. U. Ain, and M. Andleeb, “Faceswap Finder: A 
+Fusion-Based Deepfake Detection Technique,” in 2025 6th 
+International Conference on Advancements in Computational Sciences 
+(ICACS), 
+IEEE, 
+Feb. 
+2025, 
+pp. 
+1–6. 
+doi: 
+10.1109/ICACS64902.2025.10937811. 
+[10] A. Jaiswal, A. Chamatkar, A. P. Kharat, B. Sharma, I. Ben Dhaou, and 
+S. A. Chaurasia, “A Novel Framework for Deepfake Image Detection 
+Using Deep Learning Approach,” in 22nd International Learning and 
+Technology Conference: Human-Machine Dynamics Fueling a 
+Sustainable Future, L and T 2025, Institute of Electrical and Electronics 
+Engineers 
+Inc., 
+2025, 
+pp. 
+269–273. 
+doi: 
+10.1109/LT64002.2025.10940759. 
+[11] S. K. Singh, R. Yadav, G. Kumar, V. Rai, A. K. Dubey, and A. Sharma, 
+“Image-based DeepFake Detection Using Artificial Intelligence,” p. 
+2025, doi: 10.1109/CSNT.2025.155. 
+[12] A. Saini, Attiuttama, S. Naaz, A. Shivhare, G. Dhuriya, and N. Yadav, 
+“Deepfake Detection: Leveraging InceptionResNetV2 and LSTM for 
+Enhanced Accuracy,” in 2025 International Conference on Pervasive 
+Computational Technologies, ICPCT 2025, Institute of Electrical and 
+Electronics 
+Engineers 
+Inc., 
+2025, 
+pp. 
+747–750. 
+doi: 
+10.1109/ICPCT64145.2025.10941494. 
+[13] M. Kumar, P. K. Rai, and P. Kumar, “A Novel Approach for Deepfake 
+Video Detection,” in ICDT 2025 - 3rd International Conference on 
+Disruptive Technologies, Institute of Electrical and Electronics 
+Engineers 
+Inc., 
+2025, 
+pp. 
+218–223. 
+doi: 
+10.1109/ICDT63985.2025.10986564. 
+[14] N. K. Sagar and S. Arukonda, “A Novel CNN-LSTM Approach for 
+Robust Deepfake Detection,” in Procedia Computer Science, Elsevier 
+B.V., 2025, pp. 1844–1855. doi: 10.1016/j.procs.2025.04.436. 
+[15] M. Kumar, P. K. Rai, and P. Kumar, “A Novel Approach for Deepfake 
+Video Detection,” in ICDT 2025 - 3rd International Conference on 
+Disruptive Technologies, Institute of Electrical and Electronics 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 11:07:11 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 6 ---
+
+872
+2025 IEEE International Conference on Computation, Big-Data and Engineering (ICCBE)
+Engineers 
+Inc., 
+2025, 
+pp. 
+218–223. 
+doi: 
+10.1109/ICDT63985.2025.10986564. 
+[16] 2023 IEEE Smart World Congress (SWC). IEEE, 2023. 
+[17] F. Siddiqui, J. Yang, S. Xiao, and M. Fahad, “Enhanced deepfake 
+detection with DenseNet and Cross-ViT,” Expert Syst Appl, vol. 267, 
+Apr. 2025, doi: 10.1016/j.eswa.2024.126150. 
+[18] A. Abul Hasanaath, H. Luqman, R. Katib, and S. Anwar, “FSBI: 
+Deepfake detection with frequency enhanced self-blended images,” 
+Image 
+Vis 
+Comput, 
+vol. 
+154, 
+Feb. 
+2025, 
+doi: 
+10.1016/j.imavis.2025.105418. 
+[19] S. Guo, Q. Li, M. Gao, X. Zhu, and I. Rida, “Generalizable deepfake 
+detection via Spatial Kernel Selection and Halo Attention Network,” 
+Image 
+Vis 
+Comput, 
+vol. 
+160, 
+Jul. 
+2025, 
+doi: 
+10.1016/j.imavis.2025.105582. 
+[20] Q. Gao, B. Zhang, J. Wu, W. Luo, Z. Teng, and J. Fan, “Leveraging 
+facial landmarks improves generalization ability for deepfake 
+detection,” 
+Pattern 
+Recognit, 
+vol. 
+164, 
+Aug. 
+2025, 
+doi: 
+10.1016/j.patcog.2025.111528. 
+[21] J. Fang, X. Ding, J. Feng, Y. Yu, and L. He, “SFSimNet: An Efficient 
+Spatial-Frequency Multi-Scale Intra-Feature Similarity Measurement 
+Network for Deepfake Detection,” IEEE Transactions on Consumer 
+Electronics, pp. 1–1, 2025, doi: 10.1109/TCE.2025.3580624. 
+[22] S. Sujanthi, R. Priya, S. Ranga Shree, S. Suruthika, and S. Sushmitha, 
+“Comparison Analysis of Transfer Learning Models for Deep Fake 
+Image Detection,” in 2nd International Conference on Machine 
+Learning and Autonomous Systems, ICMLAS 2025 - Proceedings, 
+Institute of Electrical and Electronics Engineers Inc., 2025, pp. 316–
+322. doi: 10.1109/ICMLAS64557.2025.10968764. 
+[23] M. Zubair and S. Hakak, “Exploring the Landscape of Compressed 
+DeepFakes: Generation, Dataset and Detection,” Feb. 28, 2025, 
+Elsevier B.V. doi: 10.1016/j.neucom.2024.129116. 
+[24] Z. Lai, Y. Zhang, D. Li, and J. Ni, “Leveraging High-Frequency 
+Diversified Augmentation for general deepfake detection,” Journal of 
+Information Security and Applications, vol. 89, Mar. 2025, doi: 
+10.1016/j.jisa.2025.103994. 
+[25] M. Irfan, M. J. Lee, A. Neyaz, and D. Nobayashi, “A Novel Multi-Scale 
+Spectral-Guided Graph Attention Network for DeepFake Video 
+Detection,” in 2025 13th International Symposium on Digital Forensics 
+and 
+Security 
+(ISDFS), 
+IEEE, 
+Apr. 
+2025, 
+pp. 
+1–7. 
+doi: 
+10.1109/ISDFS65363.2025.11011972. 
+[26] S. A. Kumar, S. T. Irfan, S. Sanjaykumar, S. L. S. S. Raja, and S. 
+Sasikala, “Towards Enhanced Deep Fake Detection: Integrating Vision 
+Transformers and EfficientNet Deep Features,” in 2025 3rd 
+International Conference on Advancements in Electrical, Electronics, 
+Communication, Computing and Automation, ICAECA 2025, Institute 
+of 
+Electrical 
+and 
+Electronics 
+Engineers 
+Inc., 
+2025. 
+doi: 
+10.1109/ICAECA63854.2025.11012539. 
+[27] M. T. Irfan, B. Arora, N. Sandotra, and A. A. Raza, “On Machine 
+Learning and Deep Learning based Deepfake Generation and 
+Detection,” in Procedia Computer Science, Elsevier B.V., 2025, pp. 
+1927–1936. doi: 10.1016/j.procs.2025.04.148. 
+[28] V. S. Aswathy and T. E. Mathew, “A Brief Study on Deepfake 
+Detection and Prevention Approaches,” in ETIS International 
+Conference on Emerging Technologies for Intelligent Systems, ETIS 
+2025, Institute of Electrical and Electronics Engineers Inc., 2025. doi: 
+10.1109/ETIS64005.2025.10961658. 
+[29] S. Ahirwar and A. Pandey, “A Study on Deepfake Detection Methods,” 
+in 2nd IEEE International Conference on Innovations in High-Speed 
+Communication and Signal Processing, IHCSP 2024, Institute of 
+Electrical 
+and 
+Electronics 
+Engineers 
+Inc., 
+2024. 
+doi: 
+10.1109/IHCSP63227.2024.10960252. 
+[30] A. Kumar, D. Singh, R. Jain, D. K. Jain, C. Gan, and X. Zhao, 
+“Advances in DeepFake detection algorithms: Exploring fusion 
+techniques in single and multi-modal approach,” Information Fusion, 
+vol. 118, Jun. 2025, doi: 10.1016/j.inffus.2025.102993. 
+[31] Z. Lai, Y. Zhang, D. Li, and J. Ni, “Leveraging High-Frequency 
+Diversified Augmentation for general deepfake detection,” Journal of 
+Information Security and Applications, vol. 89, Mar. 2025, doi: 
+10.1016/j.jisa.2025.103994. 
+[32] F. Siddiqui, J. Yang, S. Xiao, and M. Fahad, “Enhanced deepfake 
+detection with DenseNet and Cross-ViT,” Expert Syst Appl, vol. 267, 
+Apr. 2025, doi: 10.1016/j.eswa.2024.126150. 
+[33] J. Fang, X. Ding, J. Feng, Y. Yu, and L. He, “SFSimNet: An Efficient 
+Spatial-Frequency Multi-Scale Intra-Feature Similarity Measurement 
+Network for Deepfake Detection,” IEEE Transactions on Consumer 
+Electronics, 2025, doi: 10.1109/TCE.2025.3580624. 
+[34] B. G. Premasudha and H. R. Rajeev, “Enhanced Attribution 
+Algorithms for Deepfake Image Detection,” in International 
+Conference on Smart Systems for Applications in Electrical Sciences, 
+ICSSES 2025, Institute of Electrical and Electronics Engineers Inc., 
+2025. doi: 10.1109/ICSSES64899.2025.11009947. 
+[35] L. Shi, J. Zhang, Z. Ji, J. Bai, and S. Shan, “Real face foundation 
+representation learning for generalized deepfake detection,” Pattern 
+Recognit, vol. 161, May 2025, doi: 10.1016/j.patcog.2024.111299. 
+ 
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 11:07:11 UTC from IEEE Xplore.  Restrictions apply. 

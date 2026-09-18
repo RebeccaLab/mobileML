@@ -1,0 +1,1218 @@
+
+
+--- PAGE 1 ---
+
+Research paper
+Hybrid CMNV2: DeepFake faces classification and recognition using deep 
+learning methods
+B. Anil Kumar a
+, Neeraj Kumar Misra b
+, Nirupma Pathak c, Seyed-Sajad Ahmadpour d
+,  
+Murugaperumal Krishnamoorthy e
+, Dhirendra Kumar Shukla f, Mukesh Patidar g
+,  
+Musawer Hakimi h,*
+a Department of Computer Science and Engineering, Vignan’s Foundation for Science, Technology and Research (VFSTR), (Deemed to be University) Off-campus 
+Hyderabad, Telangana, India
+b School of Electronics Engineering, VIT-AP University, Amaravathi, Andhra Pradesh 522237, India
+c Department of Computer Science and Engineering, Koneru Lakshmaiah Education Foundation, Green Fields, Guntur District, Vaddeswaram, Andhra Pradesh 522502, 
+India
+d Department of Computer Engineering, Faculty of Engineering and Natural Science, Istanbul Atlas University, Istanbul, Türkiye
+e Department of Electrical and Electronics Engineering, Vardhaman College of Engineering, Hyderabad 501218, India
+f School of Computer Science, Galgotias University, Greater Noida, India
+g Department of Computer Science & Engineering, Parul Institute of Engineering & Technology (Parul University) Vadodara, India
+h Department of Computer Science, Samangan University, Northeast Aybak, Samangan Province, Afghanistan
+A R T I C L E I N F O
+Keywords:
+Deep learning
+Classification
+Detection
+Hybrid CMNV2 model
+Transfer learning
+Deep neural network
+A B S T R A C T
+Deepfake detection has become a critical component of digital forensics and security, as manipulated images and 
+videos increasingly threaten trust in visual media. However, existing methods often struggle with robustness 
+under post-processing operations such as JPEG compression, Gaussian blur, scaling, and filtering, and with the 
+growing diversity and realism of face image modification (FIM) forgeries. This work proposes CMNV2, a hybrid 
+architecture that integrates MobileNetV2 with a custom CAFFE block to enhance feature extraction and classi­
+fication accuracy. By adding five additional layers to a pre-trained structure, the model demonstrates superior 
+resilience against complex real-world conditions and achieves 99.10% accuracy across multiple datasets, out­
+performing 13 baseline CNN models. The study trained and tested CMNV2 on 5,000 images (real and deepfake 
+faces), using a combination of deep neural networks (DNNs), transfer learning (TL), and deep learning (DL) 
+techniques. Compared to 13 CNN-based architectures, the proposed model achieved superior performance across 
+some important evaluation metrics, including accuracy, precision, recall, F1-score, error rate, and computational 
+efficiency. These results highlight hybrid CMNV2 as a robust and efficient solution for deepfake face detection 
+and classification, with potential applications in security, healthcare, and education.
+Introduction
+Deepfake classification systems using photos or videos are increas­
+ingly widespread [1,2]. Deepfake classification models verify identifi­
+cation using facial traits [3,4]. Technologies including Joint 
+Photographic Experts Group (JPEG) compression, Gaussian blur (GB), 
+scaling (SC), median filtering (MED), and mean filtering (ME) are often 
+used in the post-processing of face photos [2,5]. Pre-trained detectors 
+often fail or lose accuracy when face images undergo unknown 
+post-processing [2,4,5]. Therefore, it is becoming more crucial to find 
+out how to detect a huge number of face image modification (FIM) 
+forgeries in complicated settings. A more advanced and flexible tech­
+nique for identifying fake face photos has to be created. Facial detection 
+is very important in criminal identification, credit card verification and 
+security systems [6]. Biometric authentication faces a significant issue 
+that demands advanced security solutions. One challenge in this field is 
+identifying true features from altered or recreated samples [7]. 
+Liveness-insensitive facial recognition technology can be fooled by 
+modified copies of real people. Face credibility is a problem for 
+camera-based security systems. Due to print errors and image blurriness, 
+current methods cannot always verify a face’s authenticity. Advance­
+ments in image-capturing and display technologies enable more realistic 
+* Corresponding author.
+E-mail addresses: Seyed-Sajad.Ahmadpour@ieee.org (S.-S. Ahmadpour), musawer@adc.edu.in (M. Hakimi). 
+Contents lists available at ScienceDirect
+Results in Engineering
+journal homepage: www.sciencedirect.com/journal/results-in-engineering
+https://doi.org/10.1016/j.rineng.2025.107513
+Received 5 September 2025; Received in revised form 13 September 2025; Accepted 29 September 2025  
+Results in Engineering 28 (2025) 107513 
+Available online 30 September 2025 
+2590-1230/© 2025 The Authors. Published by Elsevier B.V. This is an open access article under the CC BY-NC license ( http://creativecommons.org/licenses/by- 
+nc/4.0/ ). 
+
+
+--- PAGE 2 ---
+
+facial pictures [8].
+Generative adversarial networks (GANs) can generate realistic vi­
+suals, but misuse can be dangerous. GANs can modify personal infor­
+mation in videos, compromising privacy and well-being [9]. Intelligent 
+systems struggle with erroneous face recognition due to the strength of 
+generative models. Training models to detect fake faces becomes less 
+accurate with increasing realistic depiction [10]. Advances in image 
+processing and machine learning make it simpler than ever to develop, 
+modify and produce images of the highest quality. Criminals can apply 
+these technologies to create fake images to cause harm, prevent detec­
+tion, or mislead algorithms that detect images [11]. Face image GAN 
+models come in 2 categories. The first form, random GAN, creates 
+realistic-looking facial images of imaginary humans. Second, 
+identity-preserving GAN models build realistic images of a target per­
+son’s face with their input as real image [12]. Identity-preserving GAN 
+paradigm presents challenges in manufacturing fake news and launch­
+ing targeted malware attacks [3,4].
+Social media has seen an abrupt rise in the number of fake avatars, 
+politicians and celebrities. Most of the time, the public is unaware of 
+these appearances, which negatively affects society as a whole [13]. To 
+create detection algorithms, researchers used co-occurrence matrices, 
+pixel points, neural networks, manual feature extraction, and frequency 
+maps. Current GAN techniques, which were based on state-of-the-art 
+image recognition technology, became dominant as a consequence 
+[14]. Modern researchers have developed a number of effective strate­
+gies to address various research and development difficulties in response 
+to the quickly advancing technology for producing false images [3,14]. 
+Finding fake images and preventing any damage they can do are the 
+main goals of studying digital image forensics [3]. Algorithms used to 
+identify fake faces often function at the pixel level. When using a con­
+volutional neural network (CNN) model for binary classification in 
+image analysis, this challenge is crucial [15]. In this method, images are 
+first processed via a high-pass filter to prepare them for further pro­
+cessing. Then, the prepared data is used to train a 5-layer neural 
+network. When it comes to identifying fake photos with homology er­
+rors, the CNN model works effectively despite its simplicity [16].
+Due to advances in technology, it is now simpler than ever to recreate 
+human face images for incorrect media using recordings. These faces 
+could indicate fake attack victims. Numerous commercial and open- 
+source tools can be used to generate appealing videos on certain sub­
+jects [17]. This new approach produces fake faces in images, according 
+to studies. Image alteration using synthetic faces raises ethical, legal, 
+and moral issues. Changing an image becomes easy without generating 
+major visual faults [18]. In the last decade, image forensics and manual 
+feature-based forensic systems have been discussed and suggested. The 
+identification of counterfeit images in photo forensics is challenging due 
+to the potential of computer-generated face representations to deceive 
+humans [19]. Although the production of fake videos is not new, 
+DeepFace employs several machine-learning methods to expand its in­
+fluence [20].
+The following are the main contributions of this research: 
+i. Using 5 different layers, an architectural framework for an 
+improved MobileNetV2 (MNV2) is designed.
+ii. With combining improved MobileNetV2 and CAFFE models, we 
+developed a novel hybrid CMNV2 model.
+iii. Utilizing a total of 14 different models, we carried out a binary 
+classification task and evaluated the outcomes.
+iv. Tables and confusion matrices were used to show the data and 
+findings in an understandable manner.
+v. In this study, 14 various models were analyzed and their per­
+formance was assessed using 9 different evaluation metrics.
+Scope of the Article:
+The scope of the article is focused on deepfake face classification 
+using both image and video data through a deep learning-based hybrid 
+model named hybridCMNV2. The study involves: 
+i. Improving MobileNetV2 through additional layers.
+ii. Integrating a CAFFE-based module for faster feature embedding. iii. 
+Applying the model specifically for binary classification of facial 
+images into real vs deepfake.
+Objectives of the Article: 
+i. Design and develop a hybrid deep learning model (CMNV2) for 
+effective and efficient deepfake detection.
+ii. Enhance performance by modifying the MobileNetV2 architec­
+ture with additional layers and CAFFE block integration.
+iii. Benchmark CMNV2 against 13 well-known models using multi­
+ple metrics (accuracy, precision, recall, F1-score, error rate, 
+computational time).
+iv. Demonstrate the real-world applicability of the model in areas 
+such as intelligent attendance, healthcare, and education.
+CMNV2 has previously been applied to mask detection in photo and 
+real-time video streams using five added layers and CAFFE-based 
+detection pipelines [21], and to multi-class real/fake classification on 
+unbalanced datasets with six added layers and CAFFE–Keras/Tensor­
+Flow integration [22,23]. In contrast, our study focuses on binary 
+deepfake detection with explicit robustness against post-processing 
+perturbations (compression, blur, scaling), and introduces a distinct 
+five-layer head over frozen MobileNetV2. In the following sections, this 
+article discusses: According to Section 2, for relevant research. This 
+paper provides a detailed discussion of data distribution approaches for 
+training and testing in Section 3. This research study utilizes an 
+improved MobileNetV2 model architecture, as explained in Section 4. 
+Additionally, it shows how proposed method uses the CMNV2 model for 
+detection and classification. Section 5 demonstrates that hybrid CMNV2 
+technique outperformed 13 others, as shown by a confusion matrix and 
+other distinctive aspects. The study also included deepfake and real face 
+categorisation and prediction accuracy. Section 6 presents a clear 
+summary of the article’s conclusions.
+Related work
+A new method for detecting deepfake faces in digitally modified 
+images or videos, including faces, was suggested. This technique ad­
+dresses shortcomings of deepfake faces, such as adding a synthetic face 
+area to the original images, using 3D head posture evaluation utilizing 
+face images [24]. A typical counterfeit feature network of GANs is 
+trained using paired learning to distinguish between real and deepfake 
+images [1]. Several studies have been undertaken to detect facial images 
+produced by GAN algorithms due to their potential risk. According to 
+survey research [4], multiple methodologies are utilized to detect an 
+image that is changed or created with GAN model. Various face datasets 
+used for training, evaluating CNN, DNN and incremental classifiers. In 
+the following study, an all-in-one CNN for face analysis [25], a unique 
+idea and complete architecture are presented for integrating face anal­
+ysis tasks effectively with the processes of face data.
+Recent deepfake images and videos modified or manufactured with 
+artificial intelligence (AI) algorithms are more realistic and well-made. 
+These approaches may be used to make fake comments about popular 
+people or videos about imaginary events to influence large audiences to 
+detect deepfakes in web videos [26]. A study explains DeepFace and 
+other face image modification technologies and their detection and 
+classification [27]. A powerful neural network-based image analysis 
+program called Fabricated Face Detect, which was created to recognize 
+and detect many fake or misleading faces. The goal focuses on detecting 
+fake images from humans and GANs [11].
+The model was constructed and confirmed using real and deepfake 
+face datasets utilizing deep learning methods based on neural networks 
+B.A. Kumar et al.                                                                                                                                                                                                                               
+Results in Engineering 28 (2025) 107513 
+2 
+
+
+--- PAGE 3 ---
+
+[10,27]. Deepfake images are classified independently using machine 
+learning and deep learning. Support vector machines (SVM) and 
+K-nearest neighbors (KNN) are used for feature vector classification with 
+hyper-parameter modifications [28]. A new fake video detection system 
+was suggested which integrates transfer learning in autoencoders with 
+convolutional and recurrent neural networks (RNN) [29]. A two-stream 
+approach that uses face images and facial information was proposed for 
+a multi-modality problem. A directed attention technique highlights 
+changing regions [10].
+The hybrid long short-term memory with extreme machine learning 
+techniques (HLSTM-ELM) system classified the deepfake videos created 
+by a GAN. GAN technique replaces fake data with real images or videos 
+[30]. Deepfake technology can be unsafe, particularly with media 
+coverage. Misinformation and internet abuse are examples of technol­
+ogy misuse that potentially harm society [31]. To address StyleGAN2 
+and stable diffusion issues for detecting deepfakes in multiclass envi­
+ronments, to evaluate vision transformers (ViTs), a model is created. The 
+challenge is in navigating the dynamic landscape of deepfake develop­
+ment and manipulation [5].
+Four key kinds of approaches are identified by DeepFace caused in 
+academia: multimodality-based deepfake detection task (DFDT), image- 
+based, audio-based, and video-based [32]. The research assessed the 
+performance of VGG-19 and ResNet-50 models, pre-trained on face 
+datasets of ImageNet and VGG, for distinguishing real and deepfake face 
+images [33]. To address the problems caused by the limited generaliz­
+ability of textures and artifacts collected jointly, a texture and artifact 
+detector (TAD) technique was proposed. The research looks at the 
+similarities between fake data, specifically how consistent textures and 
+artifacts might be used to identify synthetic material [34]. Additionally, 
+to aggregate artifact patterns and textural differences among various 
+kinds of counterfeit, a model ensemble learning technique is used, 
+suggesting a threshold of interpretability for identifying deepfake audio 
+that is comparable to human perception [35]. The model applies the 
+explainable artificial intelligence (XAI) image classification algorithm to 
+noise issues, and the method suggests using a data format to enhance 
+interpretability by looking at the human cognitive approach to XAI for 
+image 
+categorization. 
+DL-based 
+techniques, 
+such 
+as 
+ResNet-Swish-Dense54, are used to accurately detect deepfakes. The 
+first step in preprocessing is to remove people’s faces from the raw video 
+frame. The ResNet-Swish-Dense54 technique is then used to analyze the 
+extracted face in order to identify if the data is modified or genuine [36].
+A newly created approach to data preservation based on BC-based 
+federated learning (FL) is presented by combining a convolutional- 
+deconvolutional capsule network (SEGCAPS) and CNN techniques for 
+visual feature extraction with CapsNet training to enhance generaliz­
+ability [37]. The DL is more accurate when pretreatment and TL tech­
+niques are used, which describes an unconventional method for 
+identifying deepfake videos using face forensic and DFDC databases 
+[38]. Furthermore, video underwent frequency-based frame extraction 
+during the pre-processing phase using CNN-long short-term memory 
+(LSTM) and the fake videos were detected. A deep hybrid system for 
+identifying deepfake films is developed to extract information about face 
+attributes from the videos by using facial landmark detection. A multi­
+layer perception (MLP) is trained using this data to distinguish between 
+genuine and deepfake videos [39].
+A study was conducted on the existing image, video and audio 
+deepfake databases to support the development of next-generation de­
+tectors with better accuracy, generalization, robustness and explain­
+ability. This explores key challenges and future research directions in 
+audio and video deepfake generation and mitigation [2].
+Experiment setup
+“Ciplab@Yonsei University” developed the original images dataset, 
+which is accessible in the Kaggle repository [40]. This study divides 2, 
+040 human face images into 2 categories. This study covers training and 
+testing of 2 binary classification models 3.1. In this research, 2,040 
+images are augmented to 5,000 images of 2 classes by flipping 180 de­
+grees horizontally and cropping to increase model training chances.
+The dataset used in this study comprises 5,000 facial images, equally 
+divided into 2,500 real and 2,500 deepfake samples. Real images were 
+sourced from publicly available facial datasets such as CelebA and LFW, 
+while deepfake images were obtained from DeepFakeDetection (DFD) 
+and FaceForensics++, ensuring a wide range of manipulation tech­
+niques and content diversity. All images were carefully pre-processed 
+with resizing to (224 × 224), grayscale-to-RGB conversion where 
+needed, and normalization. Additionally, we applied data augmentation 
+techniques including rotation, horizontal flipping, brightness adjust­
+ment, and zoom to increase diversity and prevent overfitting. The 
+dataset was also manually reviewed to validate labels and maintain class 
+balance, ensuring the fairness and robustness of the binary classification 
+process.
+The image selection approach: initial random sampling followed by 
+automated curation. Quality control measures, including:
+Minimum image resolution requirement.
+Face alignment using facial landmark detection.
+Verification of full face visibility and absence of occlusion.
+Manual inspection of a subset to confirm automated filtering.
+Removal of duplicate or corrupted images.
+Images from each dataset were initially randomly sampled to avoid 
+selection bias. An automated curation process using a facial landmark 
+detection algorithm ensured proper alignment. Images not meeting a 
+minimum resolution of (224 × 224) pixels, those with partially occluded 
+faces, or exhibiting significant compression artifacts were excluded. A 
+subset of images was manually inspected to verify quality. Duplicates 
+and corrupted files were removed, resulting in a clean dataset of 5,000 
+images for training and testing the CMNV2 model.
+Training and testing distribution of data
+The training data, which helps to learn and improve models’ pre­
+diction capabilities, is shown in Fig. 1 (a). A total of 80% i.e., 4,000 
+images, were used to train 2 groups, proving the model’s extensive 
+dataset access and complicated pattern detection. There are 2,000 photo 
+images in the ‘real face’ and 2,000 images of ‘deepfake face’ photo im­
+ages, respectively. As can be shown in Fig. 1 (b), 20% i.e., the 1,000 
+images for testing are used by proposed model in the testing set. This 
+phase is crucial to model accuracy and predictability. A total of 1,000 
+images were divided into 2 categories: 500 images for ‘real face’ and 500 
+images for ‘deepfake face’.
+Proposed methodology
+Building on prior CMNV2 variants for face mask detection and face 
+classification [21–23], we introduce a modified CMNV2 with five 
+additional layers tailored for binary deepfake detection in photo and 
+real-time video settings. Unlike earlier CMNV2 studies that targeted 
+masks or multi-class real/fake categorization, our focus is forensic 
+robustness to post-processing (JPEG compression, Gaussian blur, 
+scaling, filtering) and comparative evaluation against 13 CNN baselines. 
+It should be noted that a DNN structure developed using Keras, Ten­
+sorFlow, and OpenCV modules accurately classifies and detects real and 
+deepfake faces in real-time video and photos by our technique to classify 
+and detect images. The improvised MobileNetV2 framework with the 
+different layers added is shown in Fig. 2.
+The CAFFE module in the proposed CMNV2 model refers to a 
+custom-designed convolutional block inspired by efficient deep learning 
+principles aimed at Fast Feature Embedding (FFE). This module consists 
+of a sequence of depthwise separable convolutions, batch normalization, 
+and ReLU activations, which accelerate computation while preserving 
+discriminative power. The goal is to quickly reduce spatial dimensions 
+and extract relevant patterns that are crucial for distinguishing between 
+B.A. Kumar et al.                                                                                                                                                                                                                               
+Results in Engineering 28 (2025) 107513 
+3 
+
+
+--- PAGE 4 ---
+
+real and deepfake facial features [41]. The CAFFE module was designed 
+as a lightweight extension that optimizes feature extraction by reducing 
+redundant computations in convolutional operations. Specifically, the 
+module employs depthwise separable convolutions combined with 
+group normalization to lower computational cost while maintaining 
+representational capacity. Furthermore, it integrates a fast activation 
+function to minimize latency during inference. To strengthen this dis­
+cussion, we have incorporated references to prior work on compact 
+convolutional architectures and real-time optimization techniques [21,
+22]. The CAFFE module, therefore, not only accelerates training and 
+inference but also enhances compatibility with resource-constrained 
+environments, making it particularly suitable for real-time applica­
+tions such as surveillance, healthcare, and education.
+Improved MobileNetV2
+This research study added 5 layers to the MNV2 design while 
+maintaining the original MobileNetV2 layers. Baseline CNN Mobile­
+NetV2 architecture [42] was used to build it. We acquired features using 
+transfer learning. Following this, the CAFFE technique [41] enhances 
+MobileNetV2 for quicker classification and detection. CAFFE is a deep 
+learning framework that trains and uses deep neural networks fast. Its 
+speed and adaptability make it perfect for many computer vision ap­
+plications. The foundation of standard MobileNetV2 is the integration of 
+ImageNet [43] and Keras [44] applications into a pre-trained architec­
+ture. In-depth descriptions of the layers are provided below: 
+i. Input (224 × 224 × 3): The images are 224 × 224 pixels in size 
+and have red, green and blue (RGB) colour channels.
+ii. Freezing MobileNetV2 Layers: The Standard MobileNetV2 
+framework depends mainly on feature extraction. MobileNetV2 is 
+a DCNN for image categorization. Importantly, the layer weights 
+are “frozen” to maintain consistency. iii. Transfer learning: It uses 
+a dataset to adapt a model trained for one task to another. This 
+Fig. 1. Visualization of Training and Testing data distribution.
+B.A. Kumar et al.                                                                                                                                                                                                                               
+Results in Engineering 28 (2025) 107513 
+4 
+
+
+--- PAGE 5 ---
+
+study uses transfer learning to take advantage of all relevant data 
+without training.
+iii. BatchNormalization: This layer normalizes the earlier layer 
+output, improving training progress and stability.
+iv. GlobalAveragePooling2D: The feature map’s spatial dimensions 
+are blurred by MobileNetV2. GlobalAveragePooling builds a 
+dimensioned feature vector by averaging feature map data. This 
+is crucial because it ensures that input image features are modi­
+fied evenly at all sizes.
+v. Dense (128): This layer’s 128 neurons collect complex patterns 
+and features using a specified feature vector.
+vi. Dropout (0.5): The dropout rate shows that randomly, 50% of 
+neurons in this layer remain unused after each training cycle to 
+reduce overfitting.
+vii. Dense 1 (2): The model’s output can categorize all classes, 
+matching the number of neurons in the final dense layer. The 
+output is created by this layer after analyzing results for each of 
+the 2 categories in this research study.
+Transfer learning refers to the technique of applying a model trained 
+on one task to a related task that has a smaller dataset. The proposed 
+hybrid CMNV2 model was developed using this approach. Baseline 
+CNN, models are built from the ground up and trained on large volumes 
+of labeled data for specific tasks. In contrast, transfer learning leverages 
+pre-trained machine learning and deep learning models, transferring the 
+knowledge they’ve acquired from one domain to another. This becomes 
+particularly useful when labeled data is scarce. The CMNV2 model was 
+built by combining the modified MobileNetV2 by incorporating five 
+additional custom layers aimed at improving feature extraction and 
+classification performance specific to deepfake detection. The rationale 
+was to enhance the network’s capacity to capture subtle facial manip­
+ulations present in deepfakes, which are often missed by standard 
+lightweight models like standard MobileNetV2. In this work, Mobile­
+NetV2 and CAFFE, which have been previously trained on large datasets, 
+are utilized for pre-training. These models are capable of extracting 
+general features and patterns, which are then applied to classify real and 
+fake face data, as they have already been optimized for classification and 
+prediction tasks. Explanation on the role and impact of the additional 
+five layers incorporated into the CMNV2 model architecture: 
+i. Batch Normalization: This layer standardizes the outputs of the 
+preceding layer, improving training efficiency and model stabil­
+ity. It ensures the inputs to each layer maintain a mean close to 
+0 and variance near 1, enhancing robustness. By computing sta­
+tistics across mini-batches, it normalizes activations and includes 
+learnable scaling and shifting to increase flexibility.
+ii. GlobalAveragePooling2D: After BatchNormalization, a Global­
+AveragePooling layer is applied. At the MobileNetV2 stage, this 
+layer reduces the spatial dimensions of feature maps by averaging 
+values across each map, creating a fixed-length feature vector. 
+This step ensures uniformity in feature extraction regardless of 
+input image size, while also reducing overfitting and computa­
+tional load.
+iii. Dense (128 units): This Dense layer contains 128 neurons, 
+responsible for refining the extracted features. It compresses 
+high-dimensional data into a compact 128-dimensional vector 
+while retaining important information. This aids in learning an 
+Fig. 2. Customized MobileNetV2 framework.
+B.A. Kumar et al.                                                                                                                                                                                                                               
+Results in Engineering 28 (2025) 107513 
+5 
+
+
+--- PAGE 6 ---
+
+efficient and expressive feature representation for downstream 
+processing.
+iv. Dropout (0.5): Following Dense, a Dropout layer with a 0.5 rate is 
+introduced. It randomly deactivates 50% of the neurons during 
+each training cycle, forcing the model to be less dependent on 
+specific nodes. This regularization technique enhances general­
+ization and reduces the risk of overfitting.
+v. Dense 1 (2 units): The final Dense layer contains two neurons 
+corresponding to the binary classification task (real vs fake). It 
+takes the 128-dimensional representation and outputs class 
+probabilities for the two target categories. This output layer 
+concludes the classification process.
+These five additional layers were purposefully chosen to introduce 
+non-linearity, control overfitting and to reveal hidden patterns in the 
+dataset. Various testing configurations were explored to analyze the 
+performance of the enhanced MNV2 model by adjusting the number and 
+type of layers. The results consistently demonstrated that this layered 
+structure improved the model’s adaptability, training speed and accu­
+racy when handling complex and variable-rich data.
+Input data and pre-processing
+The block diagram in Fig. 3 illustrates the usage of photo images for 
+model training and testing. First, data of real and deepfake face images 
+was collected. This study is based on the data collection strategy 
+described in Section 3. Analyzing each person’s expression was impor­
+tant. Folders were used to organize the data for future use. A pre- 
+processing program changes the image size to fit the suggested tech­
+nique for each file.
+Data splitting, CMNV2 model training and testing
+The dataset contains 5,000 face images, separated into training and 
+testing groups. Section 3 provides a detailed explanation of the dataset’s 
+split, which allocates 20% for testing and 80% for training. After loading 
+the baseline model, transfer learning is used to generate all 5 layers, as 
+explained in Section 4.1. New set of trainable CAFFE layers improved 
+facial feature detection and categorization. The model was modified 
+after including CAFFE, using the “weight” files and 2 “TXT” files to 
+preserve dimensions. With minimal processing time, pre-trained models 
+can add bias weights while retaining features. Next, we trained the 
+proposed model for 59 epochs at 0.001 using 32 training batches.
+To ensure optimal training performance of the CMNV2 model, we 
+conducted extensive hyperparameter tuning using a grid search strat­
+egy. The tuning process was carried out on a validation subset (20% of 
+the dataset) to avoid overfitting and ensure generalization. For the 
+learning rate, we tested values in the range 0.001,0.0001,0.1,0.00001 
+and observed that a learning rate of 0.001 consistently yielded faster 
+convergence and higher validation accuracy. For batch size, we 
+experimented with 16, 32 and 64 and found that 32 offered the best 
+trade-off between GPU memory usage and gradient stability. The 
+number of epochs was selected based on early stopping criteria. We 
+monitored the validation loss and stopped training once the loss pla­
+teaued or began to increase. The model consistently converged within 
+59 epochs, beyond which no significant gain was observed. Addition­
+ally, we used the Adam optimizer with which performed better than SGD 
+in terms of both convergence speed and final accuracy.
+In the proposed approach, each video frame is processed using the 
+hybrid CMNV2 model at a frame rate of 30 Frames Per Second (fps), 
+which is widely supported by many systems, devices and broadcasting 
+Fig. 3. CMNV2 block diagram.
+B.A. Kumar et al.                                                                                                                                                                                                                               
+Results in Engineering 28 (2025) 107513 
+6 
+
+
+--- PAGE 7 ---
+
+standards. While higher frame rates like 60 fps require more power for 
+streaming and storage, 30 fps offers a practical balance between smooth 
+performance and visual quality. It ensures consistent video playback, 
+reduces flickering and results in smaller file sizes an advantage for 
+mobile and storage-constrained platforms. This frame rate also helps 
+maintain visual clarity without requiring high-speed connections.
+The CMNV2 model was indeed trained and evaluated using static 
+images extracted from the dataset (5,000 real and deepfake facial im­
+ages), as described in Sections 3 and 4. However, the model was further 
+tested in a real-time video inference scenario, where video streams were 
+processed frame-by-frame. Each frame was treated as an individual 
+image input to the CMNV2 model, enabling the classification of faces as 
+real or deepfake in live or recorded video streams. This use case was 
+demonstrated in Figure 8, where bounding boxes and classification la­
+bels were overlaid on video frames. Each video frame is first passed 
+through a face detection step using OpenCV’s to extract facial regions, 
+which are then resized to 224×224 and fed into the trained CMNV2 
+model. The model outputs real or deepfake labels per frame, which are 
+aggregated for visualization only. This confirms the model’s operability 
+on video streams.
+CMNV2, which combines improved MobileNetV2 with CAFFE, is 
+used for deepfake classification. We distinguish real and deepfake faces 
+using the updated MobileNetV2 framework and the CAFFE framework 
+for FaceNet after training. Deep learning frameworks like CAFFE and 
+OpenCV preprocess and customize images using blob data. The multi­
+dimensional array format for image storage works well for DNNs. Blobs 
+normalize incoming data before feeding it into a neural network. The 
+computer vision toolkit OpenCV can analyze photos and videos in real- 
+time. The technology analyzes static images and videos using DL. 
+OpenCV’s pre-trained face detection and classification models can 
+detect faces in photos and videos. OpenCV finds blobs or zones of in­
+terest in photos or frames with faces. Image scaling, normalization and 
+color correction precede neural network processing in OpenCV. The 
+CMNV2 method was suggested for real and deepfake faces. This includes 
+creating a blob function using the image’s dimensions to train a DNN for 
+detection and classification. The blob function was then applied to facial 
+features and predicted locations.
+We trained the hybrid CMNV2 model with 2 face categories and 
+evaluated its output using photo images. The requirement is accom­
+plished by determining the item’s X and Y bounding boxes once its 
+probability of detecting a face in images approaches 0.5. When a pre­
+diction is correct, the name class labels are green; otherwise, they are 
+red. This feature keeps bounding boxes inside real-time video and photo 
+boundaries. Labels and borders were created using these resources. 
+DeepFake and real face predictions using weights, blob function, pro­
+totxt files, and dimensions of RGB images with labels, as well as 
+boundary boxes, were presented. When prediction is correct, the name 
+class labels are green coloured; otherwise, they are red as shown in Fig. 7 
+and Fig. 8 for detected real-time video and photo image outputs.
+Results and discussion
+Proposed hybrid CMNV2 technique uses a deep neural network 
+framework with the OpenCV, TensorFlow and Keras libraries to accu­
+rately detect and categorize deepfake and real faces in real-time video 
+and photo images. There are several files in the user’s text, including 
+TXT, deploy, prototxt, res10 300×300 ssd iter 140000. caffemodel. The 
+weights of every layer are contained in the CAFFE model, and the layer 
+architecture is detailed in the prototxt and pbtxt files. The experiments 
+in this research were carried out using the Jupyter Notebook, a helpful 
+resource for deep learning model training. Python 3.9 libraries that we 
+utilized in this research, including scikit-learn, pandas and pip, were 
+installed. Pandas, a powerful data processing tool, is used to import and 
+update this dataset and Scikit-learn, an open-source tool for ML and DL 
+models, is used to assess the strategy’s effectiveness. For the experiment, 
+a personal computer with 64 GB of random access memory (RAM) and a 
+W-2125 Xeon(R) Intel(R) CPU operating at 4.00 GHz was used.
+The accuracy of the CMNV2 model in detecting between real and 
+deepfake faces is 99.10%. In statistical analysis, machine learning and 
+deep learning, the confusion matrix is a useful tool for evaluating the 
+performance of classification models [45]. With 2 potential outcomes, 
+true positives
+(T+ve), true negative (T−ve), false positive (F+ve) and false negative 
+(F−ve), this matrix shows the detected and actual categories of a dataset. 
+Number of instances of each class that were accurately or wrongly 
+identified is shown in each column of matrix. 
+Accuracy =
+T+ve + T−ve
+T+ve + F+ve + F−ve + T−ve
+= 99.10%
+(1) 
+ErrorRate =
+F+ve + F−ve
+T+ve + F+ve + F−ve + T−ve
+= 0.90
+(2) 
+We have extended the experimental evaluation by including five 
+independent runs for each model configuration on all datasets (CelebA, 
+LFW, DFD, and FaceForensics++). 
+i. For each reported accuracy, precision, recall, and F1-score, we 
+now provide the mean ± standard deviation (SD) values to reflect 
+the consistency and robustness of Hybrid CMNV2 compared to 
+baseline methods.
+ii. We have conducted a statistical significance test (paired t-test, p 
+less than 0.05 to compare Hybrid CMNV2 against the strongest 
+baseline (EfficientNetV2 + Xception). Results indicate that the 
+performance improvements of CMNV2 are statistically significant 
+across all datasets.
+iii. Additional performance confidence is reported using 95% confi­
+dence intervals (CIs), demonstrating that the results are not only 
+superior on average but also stable across multiple runs.
+Hybrid CMNV2 achieved an average accuracy of 97.8% ± 0.4% on 
+the FaceForensics++ dataset, compared to 95.9% ± 0.7% by the 
+strongest baseline. The paired t-test confirmed statistical significance (p 
+= 0.018).
+Performance of 14 different models
+Fig. 4 (a) to Fig. 4 (n) show the evaluation of 14 distinct models of 
+confusion matrices evaluated in this research work.
+The fewer trainable parameters result in faster training, lower 
+memory usage and reduced risk of overfitting, which improves 
+computational efficiency without decreasing performance. 
+i. Total parameters: The complete number of parameters (weights 
+and biases) in the model, including both trainable and non- 
+trainable.
+ii. Trained parameters: Parameters that are updated during training 
+using back propagation. These are typically found in the custom 
+layers we added.
+iii. Non-trained parameters (also called frozen parameters): Param­
+eters that are not updated during training, usually from pre- 
+trained layers retained for feature extraction (e.g., from Mobile­
+NetV2 backbone).
+Table 1 and Fig. 5 demonstrate that the CMNV2 model outperformed 
+13 remaining models in terms of accuracy, recall, f1-score, error rate, 
+and precision. The run-time performance measures, including total pa­
+rameters, trained parameters, and untrained parameters, have been 
+calculated for each model in Table 2.
+Compared to the other 13 standard models, the CMNV2 model is 
+more efficient in terms of both architecture and computation. There are 
+156 non-trainable layers and 5 trainable layers in the CMNV2 model’s 
+total of 161 layers. With an accuracy rate of 99.10%, it operates 
+B.A. Kumar et al.                                                                                                                                                                                                                               
+Results in Engineering 28 (2025) 107513 
+7 
+
+
+--- PAGE 8 ---
+
+Fig. 4. Evaluation of confusion matrices of 14 models (Continued) Fig. 4: Evaluation of confusion matrices of 14 models.
+B.A. Kumar et al.                                                                                                                                                                                                                               
+Results in Engineering 28 (2025) 107513 
+8 
+
+
+--- PAGE 9 ---
+
+accurately. The results of Table 2 and Fig. 6 show that, in terms of pa­
+rameters and computational time, the CMNV2 model performed better 
+than 13 other models. The following 13 models are explained as follows, 
+which require more computing time as they need more trainable layers: 
+The MobileNet model has 92 trainable layers, 0 non-trainable layers and 
+92 total layers with an accuracy of 76.60%. At 81.50% accuracy, the 
+Table 1 
+Performance evaluation comparison of 14 models.
+Sl.No.
+Model Name
+Accuracy 
+(%)
+Precision 
+(%)
+Recall 
+(%)
+F1-score 
+(%)
+Error Rate 
+(%)
+1
+MobileNet
+76.60
+75.48
+78.80
+77.10
+23.40
+2
+MobileNetV2
+81.50
+80.11
+83.80
+81.91
+18.50
+3
+NASNetMobile
+82.90
+81.21
+85.60
+83.34
+17.10
+4
+ResNet50V2
+84.00
+82.31
+86.60
+84.40
+16.00
+5
+DenseNet121
+86.20
+84.02
+89.40
+86.62
+13.80
+6
+ResNet101V2
+87.00
+84.77
+90.20
+87.40
+13.00
+7
+DenseNet169
+87.90
+85.42
+91.40
+88.31
+12.10
+8
+DenseNet201
+88.70
+86.17
+92.20
+89.08
+11.30
+9
+InceptionV3
+90.50
+88.28
+93.40
+90.76
+9.50
+10
+ResNet152V2
+91.70
+89.26
+94.80
+91.95
+8.30
+11
+Xception
+93.20
+90.75
+96.20
+93.40
+6.80
+12
+InceptionResNetV2
+93.80
+91.16
+97.00
+94.00
+6.20
+13
+EfficientNetV2M
+94.80
+92.26
+97.80
+94.95
+5.20
+14
+Proposed
+99.10
+98.23
+100.00
+99.10
+0.90
+Fig. 5. All 14 models statistical performance analysis.
+Table 2 
+Comparison of 14 different models analysis.
+Sl.No.
+Model Name
+Total Parameters
+Trainable Parameters
+Non-Trainable 
+Parameters
+Run Time 
+(Seconds)
+1
+MobileNet
+32,29,107
+32,07,339
+21,768
+20,509
+2
+MobileNetV2
+22,40,715
+22,06,723
+33,992
+17,606
+3
+NASNetMobile
+53,26,959
+52,90,341
+36,618
+31,084
+4
+ResNet50V2
+6,03,80,891
+6,03,37,267
+1,43,624
+1,74,855
+5
+DenseNet121
+70,37,747
+69,54,219
+83,528
+37,295
+6
+ResNet101V2
+5,26,46,779
+5,25,49,235
+1,51,240
+1,58,660
+7
+DenseNet169
+1,43,08,123
+1,41,49,843
+1,58,280
+46,346
+8
+DenseNet201
+2,02,43,227
+2,00,14,291
+2,28,936
+75,986
+9
+InceptionV3
+2,18,02,927
+2,17,68,715
+34,312
+86,608
+10
+ResNet152V2
+5,83,78,497
+5,82,24,633
+1,53,864
+1,51,355
+11
+Xception
+2,08,82,213
+2,08,27,805
+54,408
+74,642
+12
+InceptionResNetV2
+5,58,74,179
+5,58,13,555
+60,424
+1,68,916
+13
+EfficientNetV2M
+5,31,50,631
+5,28,58,719
+2,91,912
+1,55,910
+14
+Proposed
+25,86,163
+3,28,299
+22,57,864
+3999
+B.A. Kumar et al.                                                                                                                                                                                                                               
+Results in Engineering 28 (2025) 107513 
+9 
+
+
+--- PAGE 10 ---
+
+MobileNetV2 model has 157 total layers, of which 157 are trainable and 
+0 are non-trainable. The NASNetMobile model has 772 total layers, 772 
+trainable layers and 0 non-trainable layers with a performance effi­
+ciency of 82.90% accuracy. The ResNet50V2 model contains 192 total 
+layers, 192 trainable layers and 0 non-trainable layers with accuracy 
+performance efficiency is 84.00%. The DenseNet121 model, with 430 
+trainable layers and 0 non-trainable layers, has an accuracy performance 
+efficiency of 86.20%.
+The DenseNet169 model contains 598 total layers, 598 trainable 
+layers, and 0 non-trainable layers, with an accuracy score of 87.90%. 
+The DenseNet201 model contains 710 total layers, of which 710 are 
+trainable and 0 are non-trainable with an accuracy performance effi­
+ciency of 88.70%. The InceptionV3 model includes 314 layers in total, 
+314 trainable layers and 0 non-trainable layers with an accuracy rate of 
+90.50%. With 567 total layers, 567 trainable layers and 0 non-trainable 
+layers, the ResNet152V2 model has a 91.70% accuracy performance 
+efficiency. With 135 total layers, 135 trainable, and 0 non-trainable, the 
+Xception model contains a 93.20% accuracy performance.
+The InceptionResNetV2 model, with 783 total layers, 783 trainable 
+layers and 0 non-trainable layers, achieves an accuracy of 93.80%. The 
+EfficientNetV2M model has 744 trainable layers out of 744 total layers 
+and 0 non-trainable layers with an accuracy performance efficiency of 
+94.80%.
+As the previously discussed challenges demonstrate, the CMNV2 
+model’s different layer design performance and computational 
+efficiency are crucial for achieving the best choice balancing of trainable 
+and non-trainable layers. Out of the 161 total layers, only 5 have been 
+trained; the remaining 156 layers are used, without training and used for 
+feature extraction using a transfer learning technique. With no non- 
+trainable layers and careful layer distribution, the model maintains its 
+robust and stable architecture while learning valuable features. The 
+proposed hybrid CMNV2 model performs much better in terms of 
+architectural characteristics and computing time efficiency when 
+compared to the other 13 conventional models. Table 1 and Table 2
+provide a thorough analysis of the run-time performance metrics for 
+each model, including total parameters, trained parameters and Frozen 
+(not updated during training) parameters. Proposed hybrid CMNV2 
+method has the lowest total trainable parameter values in the category 
+when compared to the other 13 models currently in use, indicating a 
+carefully created architectural design.
+The dataset used for training and testing comprised 5,000 images. 
+Real images included 3,000 from CelebA (60% of the real category) and 
+2,000 from LFW (40% of the real category). Deepfake images consisted 
+of 2,500 each from DFD and FaceForensics++ (50% each of the deep­
+fake category). This proportional distribution ensures a balanced dataset 
+for effective binary classification of real and deepfake faces using the 
+proposed CMNV2 model as shown in Table 3.
+Deepfake samples were generated using a combination of manipu­
+lation techniques, including FaceSwap, DeepFaceLab, and GAN-based 
+models. The original images used for these manipulations were 
+Fig. 6. Log-scaled comparison of model complexity and execution time of 14 models.
+B.A. Kumar et al.                                                                                                                                                                                                                               
+Results in Engineering 28 (2025) 107513 
+10 
+
+
+--- PAGE 11 ---
+
+sourced from CelebA and LFW datasets. This approach ensured a diverse 
+set of deepfake images varying in facial attributes, backgrounds, lighting 
+conditions, and compression levels, increasing the challenge of binary 
+classification tasks for the proposed CMNV2 model.
+Fig. 7 and Fig. 8 illustrate the CMNV2 model’s accuracy in predicting 
+2 face types in real-time video and photos. Faces in Fig. 7 (a) to Fig. 7 (r) 
+are distinguished by the green bounding box that surrounds them with 
+green label with their names when correctly predicted with their names 
+above each box. From Fig. 7 (s) to Fig. 7 (x), faces are incorrectly 
+detected, resulting in red bounding boxes and labels with their names. 
+The green and red box indicates the face’s position and if the model 
+detects faces, using a bounding box that indicates the results. Fig. 9 (a) 
+and Fig. 9 (b) display the training and testing performance of the pro­
+posed CMNV2 model, prediction accuracy, and loss as ‘blue’ testing 
+curve and ‘green’ training curve colours.
+A receiver operating characteristic area under the curve (ROC-AUC) 
+shows that the CMNV2 model predicts 2 classes effectively. Fig. 10
+shows that the model better distinguishes between the 2 groups, with an 
+outcome larger than 0.5. The convergence of these curves and minimal 
+prediction errors show that the CMNV2 model can distinguish real and 
+deepfake faces. They also help us analyze the model’s efficiency and 
+enhance the CMNV2 model’s ability to detect faces. Different rising 
+curves for each of the 2 classes reflect model categorization. This curve 
+measures a model’s sensitivity and ability to recognize true positives. 
+Another consideration is specificity. It evaluates the ability to identify 
+the model’s true negatives. Their consistency and uniformity show that 
+these models are dependable and stable since they predicted every 
+category correctly. The CMNV2 model is adaptive because of its excel­
+lent ROC-AUC curve and performance in difficult, binary-class detection 
+of face tasks.
+Table 3 
+Proportional breakdown of images from each dataset.
+Sl. 
+No.
+Category
+Dataset Name
+Number 
+of 
+Images
+Percentage 
+of Category 
+(%)
+Percentage 
+of Total 
+Dataset (%)
+1
+Real 
+Images
+CelebA
+3,000
+60
+60
+2
+Real 
+Images
+LFW
+2,000
+40
+40
+3
+Deepfake 
+Images
+DFD
+2,500
+50
+50
+4
+Deepfake 
+Images
+FaceForensics++
+2,500
+50
+50
+5
+Total
+​
+5,000
+100
+100
+Fig. 7. Output prediction results on photo images.
+B.A. Kumar et al.                                                                                                                                                                                                                               
+Results in Engineering 28 (2025) 107513 
+11 
+
+
+--- PAGE 12 ---
+
+Conclusion
+This article introduced a new hybrid CMNV2 model and the results of 
+real and deepfake facial images. In this work, 5,000 photo images were 
+used. Starting with MobileNetV2, a pre-trained CNN architecture, we 
+fine-tuned the DNN by adding 5 layers using transfer learning. Devel­
+oped a CAFFE-based deep learning model that increased performance 
+and learning speed. Further, with the combination of these 2 models, a 
+hybrid CMNV2 model was developed and trained on this dataset with 13 
+other deep-learning methods: MobileNet, MobileNetV2, NASNetMobile, 
+ResNet50V2, DenseNet121, ResNet101V2, DenseNet169, DenseNet201, 
+InceptionV3, ResNet152V2, Xception, InceptionResNetV2, and Effi­
+cientNetV2M. The accuracy of 14 evaluated models varied from 76.60% 
+to 99.10%. CMNV2 is better than 13 standard methods with high ac­
+curacy (99.10%), low error rate (0.90%), better precision, recall, and f1- 
+score, with less computational time to classify and detect real and 
+deepfake faces. CMNV2 model can be used in various applications, like 
+intelligent attendance systems, healthcare and education.
+Limitations: The model performed well on still images but struggled 
+with real-time video, where accuracy drops due to sudden motion, 
+lighting changes, and geographic variations. Rapid participant move­
+ment reduces the prediction accuracy, posing a key challenge for video- 
+based applications.
+Funding
+No outside funds supported this study.
+Fig. 8. Output prediction results on real-time video images.
+Fig. 9. Accuracy and loss of CMNV2 model.
+B.A. Kumar et al.                                                                                                                                                                                                                               
+Results in Engineering 28 (2025) 107513 
+12 
+
+
+--- PAGE 13 ---
+
+Data Availability
+The datasets used in this study are publicly available. Real and fake 
+face datasets were obtained from CelebA, LFW, DeepFakeDetection 
+(DFD), and FaceForensics++ repositories. The original dataset “Real 
+and Fake Face Detection” created by Ciplab@Yonsei University is 
+available on Kaggle (https://www.kaggle.com/datasets/ciplab/real- 
+and-fake-face-detection). Data will be made available upon reasonable 
+request from the corresponding author.
+CRediT authorship contribution statement
+B. Anil Kumar: Writing – review & editing, Writing – original draft, 
+Visualization, Methodology, Formal analysis, Conceptualization. Neeraj 
+Kumar Misra: Writing – review & editing, Writing – original draft, 
+Visualization, Methodology, Formal analysis, Conceptualization. Nir­
+upma Pathak: Writing – review & editing, Writing – original draft, 
+Visualization, Methodology, Formal analysis, Conceptualization. Seyed- 
+Sajad Ahmadpour: Writing – review & editing, Writing – original draft, 
+Visualization, Methodology, Formal analysis, Conceptualization. Mur­
+ugaperumal Krishnamoorthy: Writing – review & editing, Writing – 
+original draft, Visualization, Methodology, Formal analysis, Conceptu­
+alization. Dhirendra Kumar Shukla: Writing – review & editing, 
+Writing – original draft, Visualization, Methodology, Formal analysis, 
+Conceptualization. Mukesh Patidar: Writing – review & editing, 
+Writing – original draft, Visualization, Methodology, Formal analysis, 
+Conceptualization. Musawer Hakimi: Conceptualization, Formal 
+analysis, Investigation, Software, Validation, Visualization, Writing – 
+original draft.
+Declaration of competing interest
+The authors declare that they have no known competing financial 
+interests or personal relationships that could have appeared to influence 
+the work reported in this paper.
+References
+[1] C.-C. Hsu, Y.-X. Zhuang, C.-Y. Lee, Deep fake image detection based on pairwise 
+learning, Appl. Sci. 10 (1) (2020) 370.
+[2] Z. Akhtar, T.L. Pendyala, V.S. Athmakuri, Video and audio deepfake datasets and 
+open issues in deepfake technology: being ahead of the curve, Forensic Sci. 4 (3) 
+(2024) 289–377.
+[3] A. Malik, M. Kuribayashi, S.M. Abdullahi, A.N. Khan, Deepfake detection for 
+human face images and videos: a survey, IEEE Access. 10 (2022) 18757–18775.
+[4] X. Wang, H. Guo, S. Hu, M.-C. Chang, S. Lyu, Gan-generated faces detection: a 
+survey and new perspectives, ECAI 2023 (2023) 2533–2542.
+[5] M.A. Arshed, S. Mumtaz, M. Ibrahim, C. Dewi, M. Tanveer, S. Ahmed, Multiclass 
+aigenerated deepfake face detection using patch-wise deep learning model, 
+Computers 13 (1) (2024) 31.
+[6] C. Kant, N. Sharma, Fake face recognition using fusion of thermal imaging and skin 
+elasticity, IJCSC 4 (1) (2013) 65–72.
+[7] J. Galbally, S. Marcel, J. Fierrez, Image quality assessment for fake biometric 
+detection: application to iris, fingerprint, and face recognition, IEEE Trans. Image 
+Process. 23 (2) (2013) 710–724.
+[8] M. Cho, Y. Jeong, Face recognition performance comparison between fake faces 
+and live faces, Soft. Comput. 21 (2017) 3429–3437.
+[9] C.-C. Hsu, C.-Y. Lee, Y.-X. Zhuang, Learning to detect fake face images in the wild, 
+in: IEEE International Symposium on Computer, Consumer and Control (IS3C), 
+2018, pp. 388–391.
+[10] X. Zhu, H. Wang, H. Fei, Z. Lei, S.Z. Li, Face forgery detection by 3D 
+decomposition, in: Proceedings of the IEEE/CVF Conference on Computer Vision 
+and Pattern Recognition, 2021, pp. 2929–2939.
+[11] S. Tariq, S. Lee, H. Kim, Y. Shin, S.S. Woo, Gan is a friend or foe? A framework to 
+detect various fake face images, in: Proceedings of the 34th ACM/SIGAPP 
+Symposium on Applied Computing, 2019, pp. 1296–1303.
+[12] Z. Tang, J. Yang, Z. Pei, X. Song, B. Ge, Multi-process training gan for identity- 
+preserving face synthesis, IEEE Access. 7 (2019) 97641–97652.
+[13] D. Yadav, S. Salmani, Deepfake: a survey on facial forgery technique using 
+generative adversarial network, in: IEEE International Conference on Intelligent 
+Computing and Control Systems (ICCS), 2019, pp. 852–857.
+[14] R. Caldelli, L. Galteri, I. Amerini, A. Del Bimbo, Optical flow based CNN for 
+detection of unlearnt deepfake manipulations, Pattern. Recognit. Lett. 146 (2021) 
+31–37.
+[15] Dolhansky, B., Bitton, J., Pflaum, B., Lu, J., Howes, R., Wang, M., Ferrer, C.C.: The 
+deepfake detection challenge (dfdc) dataset. arXiv preprint arXiv:2006.07397 
+(2020).
+[16] Y. Li, X. Yang, P. Sun, H. Qi, S. Lyu, Celeb-df: A large-scale challenging dataset for 
+deepfake forensics, in: Proceedings of the IEEE/CVF Conference on Computer 
+Vision and Pattern Recognition, 2020, pp. 3207–3216.
+[17] A. Khodabakhsh, R. Ramachandra, K. Raja, P. Wasnik, C. Busch, Fake face 
+detection methods: can they be generalized?, in: IEEE International Conference of 
+the Biometrics Special Interest Group (BIOSIG), 2018, pp. 1–6.
+[18] H. Mo, B. Chen, W. Luo, Fake faces identification via convolutional neural network, 
+in: Proceedings of the 6th ACM Workshop on Information Hiding and Multimedia 
+Security, 2018, pp. 43–47.
+[19] G. Cao, Y. Zhao, R. Ni, X. Li, Contrast enhancement-based forensics in digital 
+images, IEEE Trans. Inf. Forensics Secur. 9 (3) (2014) 515–525.
+[20] S. Suratkar, S. Bhiungade, J. Pitale, K. Soni, T. Badgujar, F. Kazi, Deep-fake video 
+detection approaches using convolutional–recurrent neural networks, J. Control 
+Decis. 10 (2) (2023) 198–214.
+[21] B.A. Kumar, M. Bansal, Face mask detection on photo and real-time video images 
+using Caffe-MobileNetV2 transfer learning, Appl. Sci. 13 (2) (2023).
+[22] B.A. Kumar, N.K. Misra, Masked face age and gender identification using caffe- 
+modified mobilenetv2 on photo and real-time video images by transfer learning 
+and deep learning techniques, Expert. Syst. Appl. 246 (2024) 123179.
+[23] B.A. Kumar, N.K. Misra, A multi-level classification and prediction of unbalanced 
+dataset real and fake faces using hybrid cmnv2 and deep learning methods, Int. J. 
+Mach. Learn. Cybern. (2025) 1–20.
+[24] X. Yang, Y. Li, S. Lyu, Exposing deep fakes using inconsistent head poses, in: IEEE 
+International Conference on Acoustics, Speech and Signal Processing (ICASSP), 
+2019, pp. 8261–8265.
+[25] R. Ranjan, S. Sankaranarayanan, C.D. Castillo, R. Chellappa, An all-in-one 
+convolutional neural network for face analysis, in: 12th IEEE International 
+Conference on Automatic Face & Gesture Recognition (FG 2017), 2017, pp. 17–24.
+Fig. 10. ROC-AUC curve.
+B.A. Kumar et al.                                                                                                                                                                                                                               
+Results in Engineering 28 (2025) 107513 
+13 
+
+
+--- PAGE 14 ---
+
+[26] S.J. Sohrawardi, A. Chintha, B. Thai, S. Seng, A. Hickerson, R. Ptucha, M. Wright, 
+Poster: towards robust open-world detection of deepfakes, in: Proceedings of the 
+ACM SIGSAC Conference on Computer and Communications Security, 2019, 
+pp. 2613–2615.
+[27] R. Tolosana, R. Vera-Rodriguez, J. Fierrez, A. Morales, J. Ortega-Garcia, Deepfakes 
+and beyond: a survey of face manipulation and fake detection, Inf. Fusion. 64 
+(2020) 131–148.
+[28] R. Rafique, R. Gantassi, R. Amin, J. Frnda, A. Mustapha, A.H. Alshehri, Deep fake 
+detection and classification using error-level analysis and deep learning, Sci. Rep. 
+13 (1) (2023) 7422.
+[29] S. Suratkar, F. Kazi, Deep fake video detection using transfer learning approach, 
+Arab. J. Sci. Eng. 48 (8) (2023) 9727–9737.
+[30] S.K. Sharma, W.A. Khan, M. Kumar, R. Bali, Estimation and concealment deep fake 
+detection in images using hybrid LSTM, Int. J. Intell. Syst. Appl. Eng. 12 (2) (2024) 
+505–522.
+[31] S. Pant, C. Gosavi, S. Barekar, Deep fake detection using lstm and survey of deep 
+fake creation technologies, Int. J. Intell. Syst. Appl. Eng. 12 (6s) (2024) 840–845.
+[32] K. Vyas, P. Pareek, R. Jayaswal, S. Patil, Analysing the landscape of deep fake 
+detection: a survey, Int. J. Intell. Syst. Appl. Eng. 12 (11s) (2024) 40–55.
+[33] T. Aieprasert, Y. Mahdlang, C. Pansiri, N. Sae-Bae, B. Khomkham, Transferability of 
+CNN models for GAN-generated face detection, Multimed. Tools. Appl. (2024) 
+1–17.
+[34] J. Gao, M. Micheletto, G. Orru`, S. Concas, X. Feng, G.L. Marcialis, F. Roli, Texture 
+and artifact decomposition for improving generalization in deep-learning-based 
+deepfake detection, Eng. Appl. Artif. Intell. 133 (2024) 108450.
+[35] S.-Y. Lim, D.-K. Chae, S.-C. Lee, Detecting deepfake voice using explainable deep 
+learning techniques, Appl. Sci. 12 (8) (2022) 3926.
+[36] M. Nawaz, A. Javed, A. Irtaza, Resnet-swish-dense54: a deep learning approach for 
+deepfakes detection, Vis. Comput. 39 (12) (2023) 6323–6344.
+[37] A. Heidari, N.J. Navimipour, H. Dag, S. Talebi, M. Unal, A novel blockchain-based 
+deepfake detection method using federated and deep learning models, Cogn. 
+Comput. (2024) 1–19.
+[38] M.H. Malik, H. Ghous, S. Qadri, S.A. Nawaz, A. Anwar, Frequency-based deep-fake 
+video detection using deep learning methods, J. Comput. Biomed. Inform. 4 (02) 
+(2023) 41–48.
+[39] S. Kolagati, T. Priyadharshini, V.M.A. Rajam, Exposing deepfakes using a deep 
+multilayer perceptron–convolutional neural network model, Int. J. Inf. Manag. 
+Data Insights 2 (1) (2022) 100054.
+[40] University, C.: Real and fake face detection. https://www.kaggle.com/datasets/ 
+ciplab/real-and-fake-face-detection (accessed 2019).
+[41] Y. Jia, E. Shelhamer, J. Donahue, S. Karayev, J. Long, R. Girshick, S. Guadarrama, 
+T. Darrell, Caffe: convolutional architecture for fast feature embedding, in: 
+Proceedings of the 22nd ACM International Conference on Multimedia, 2014, 
+pp. 675–678.
+[42] Howard, A.G., Zhu, M., Chen, B., Kalenichenko, D., Wang, W., Weyand, T., 
+Andreetto, M., Adam, H.: Mobilenets: efficient convolutional neural networks for 
+mobile vision applications. arXiv preprint arXiv:1704.04861 (2017).
+[43] ImageNet http://www.image-net.org.
+[44] Applications, K. https://keras.io/api/applications/.
+[45] C. Room, Confusion matrix, Mach. Learn. 6 (2019) 27.
+B.A. Kumar et al.                                                                                                                                                                                                                               
+Results in Engineering 28 (2025) 107513 
+14 

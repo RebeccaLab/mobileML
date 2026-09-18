@@ -1,0 +1,843 @@
+
+
+--- PAGE 1 ---
+
+ 
+From Survey to Solution: Lightweight and 
+Interpretable Multimodal Deepfake Detection Using 
+CNNs and Grad-CAM 
+ 
+Shivkanya Mohan Mane  
+M. Tech Student 
+Department of Technology (DOT) 
+Savitribai Phule Pune University (SPPU) 
+Pune, India 
+kanyamane93@gmail.com 
+Swati Y. Raut 
+Assistant Professor 
+Department of Technology (DOT) 
+Savitribai Phule Pune University (SPPU) 
+Pune, India 
+Swati05raut@gmail.com 
+Manisha P. Bharati 
+Associate Professor 
+Department of Technology (DOT) 
+Savitribai Phule Pune University (SPPU) 
+Pune, India 
+manishaprakashbharati@gmail.com
+Abstract—Deepfakes made with advanced deep learning 
+methods are a big threat to the safety, privacy, and integrity of 
+digital media. It's getting harder to tell when audio and video 
+content has been changed because they look more real. Recent 
+research has proposed various deepfake detection methods, 
+ranging from unimodal approaches to multimodal frameworks 
+that jointly analyse audio and visual information.  However, 
+many existing solutions are computationally expensive or lack 
+interpretability, limiting their suitability for real-time and 
+forensic applications. The state-of-the-art deepfake detection 
+methods are thoroughly reviewed in this paper, with particular 
+attention paid to model architectures, datasets, evaluation 
+metrics, and significant limitations. Lightweight models, 
+multimodal fusion techniques, and explainable artificial 
+intelligence (XAI) methods are given special attention. A 
+lightweight multimodal deepfake detection framework is 
+proposed based on the identified research gaps. It uses Grad-
+CAM for explainable decision making, late fusion for 
+multimodal integration, and convolutional neural networks for 
+audio and video feature extraction. In order to make it 
+appropriate for real-time deployment, the suggested framework 
+seeks to strike an efficient balance between detection 
+performance, computational efficiency, and interpretability. 
+In addition, a structured experimental validation framework a
+nd computational efficiency analysis strategy are presented to f
+acilitate practical implementation and benchmarking against e
+xisting multimodal techniques. 
+Keywords—Multimodal, CNN, GRAD-CAM, Deepfake, XAI, 
+Late Fusion. 
+I. INTRODUCTION 
+Deepfakes, which are artificially altered audio, video, or 
+image content intended to look real, have become increasingly 
+common as a result of the quick development of deep learning 
+and generative models. Although there are valid uses for these 
+technologies in virtual communication and entertainment, 
+their abuse poses major risks to social stability, digital trust, 
+privacy, and security. Reliable detection mechanisms are a 
+critical research priority because deepfakes are increasingly 
+being used for political manipulation, identity fraud, 
+disinformation campaigns, and the creation of non-consensual 
+content. 
+Visual artifacts in manipulated videos, such as strange 
+facial expressions, irregular eye blinking, and inconsistent 
+blending, were the main focus of early deepfake detection 
+techniques. When dealing with high-quality or compressed 
+content, these video-based techniques frequently failed, 
+despite achieving respectable performance in controlled 
+environments. 
+Simultaneously, 
+audio-based 
+deepfake 
+detection methods were developed to detect synthetic speech 
+produced by text-to-speech and voice cloning systems. Single-
+modal methods are still susceptible, though, since attackers 
+can control one modality while maintaining the relative 
+authenticity of the other. 
+Recent research has moved toward multimodal deepfake 
+detection, which simultaneously examines audio and video 
+data, in order to get around these restrictions. By taking 
+advantage 
+of 
+cross-modal 
+inconsistencies, 
+such 
+as 
+mismatched lip movements and speech patterns, multimodal 
+systems provide increased robustness. Despite their efficacy, 
+a number of multimodal approaches currently in use rely on 
+computationally costly architectures, such as transformers and 
+large-scale attention models, which limit their use in real-time 
+and resource-constrained settings. 
+Although transformer-based multimodal systems have a 
+high detection rate, their enormous parameter size and 
+attention-based computations considerably increase memory 
+and inference overhead. This limits their use in edge devices 
+and real-time forensics systems. As a result, a computationally 
+efficient but interpretable multimodal solution is necessary. 
+The inability of existing deepfake detection systems to be 
+interpreted is another significant drawback. The majority of 
+deep learning models operate as "black boxes," producing 
+classification results without providing an explanation for 
+their choices. In high-stakes applications where explainability 
+and trust are crucial, like digital forensics, law enforcement, 
+and content moderation, this lack of transparency is especially 
+problematic. Explainable artificial intelligence (XAI) methods 
+that can identify the areas or characteristics affecting a model's 
+prediction are therefore in greater demand. 
+To address these issues, this paper provides a thorough 
+analysis of deepfake detection techniques, including 
+explainable methods, lightweight architectures, and single-
+modal and multimodal approaches. A lightweight and 
+comprehensible multimodal deepfake detection framework is 
+also suggested based on the survey's findings. The framework 
+uses a fully connected layer for classification, late fusion to 
+combine multimodal representations, and Convolutional 
+Neural Networks (CNNs) for effective audio and video feature 
+extraction. Gradient-weighted Class Activation Mapping 
+(Grad-CAM) is used to provide visual explanations for both 
+audio and video predictions in order to improve transparency. 
+This paper makes three main contributions: 
+2026 International Conference on Emerging Technologies and Future Innovations (ETFI) 
+Pune, India. Feb 12-14, 2026
+979-8-3315-8265-4/26/$31.00 ©2026 IEEE
+1
+2026 International Conference on Emerging Technologies and Future Innovations (ETFI) | 979-8-3315-8265-4/26/$31.00 ©2026 IEEE | DOI: 10.1109/ETFI68128.2026.11484573
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 11:07:18 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 2 ---
+
+1. A structured review of existing deepfake detection 
+methods 
+with 
+emphasis 
+on 
+multimodality, 
+efficiency, and explainability 
+2. identification of key research gaps in lightweight and 
+interpretable deepfake detection and 
+3. the proposal of a practical multimodal framework 
+suitable for real-time and trustworthy deployment. 
+II. LITERATURE REVIEW 
+A. Video-Based Deepfake Detection 
+Video-based deepfake detection methods analyse spatial 
+and temporal inconsistencies introduced during face 
+manipulation. Early studies relied on handcrafted features 
+such as eye blinking frequency, facial landmarks, and head 
+pose estimation to detect unnatural patterns. These approaches 
+provided good interpretability but lacked robustness against 
+high-quality deepfakes.  
+With the adoption of deep learning, CNN-based 
+architectures 
+became 
+widely 
+used 
+for 
+extracting 
+discriminative visual features from facial regions. Shallow 
+CNNs such as MesoNet demonstrated that lightweight 
+architectures could achieve reasonable accuracy with low 
+computational overhead. However, deeper CNNs and 
+temporal models, including 3D CNNs and CNN–RNN 
+hybrids, were later introduced to capture motion-based 
+inconsistencies. Although these methods improved detection 
+accuracy, they significantly increased model complexity and 
+inference time. 
+B. Audio-Based Deepfake Detection 
+Audio deepfake detection focuses on identifying synthetic 
+speech generated by voice conversion and text-to-speech 
+systems. Traditional signal-processing approaches analysed 
+spectral features and prosodic cues, but these methods were 
+insufficient for detecting modern, high-quality synthetic 
+audio.  
+Recent works employ CNNs trained on Mel-spectrograms 
+or MFCC representations to capture time–frequency artifacts 
+unique to synthetic speech. CNN-based audio detectors have 
+shown strong performance and relatively low computational 
+cost. Nevertheless, audio-only detection remains vulnerable 
+when the visual modality is manipulated independently or 
+when high-fidelity voice cloning is used. 
+C. Multimodal Deepfake Detection 
+Multimodal deepfake detection aims to improve 
+robustness by jointly analysing audio and video modalities. 
+These approaches exploit cross-modal inconsistencies such as 
+lip–speech mismatch and audiovisual synchronization errors. 
+Fusion strategies are typically categorized as early fusion, late 
+fusion, or hybrid fusion.  
+While transformer-based multimodal frameworks with 
+cross-modal attention have demonstrated high detection 
+accuracy, they require substantial computational resources 
+and large training datasets. In contrast, late fusion methods 
+that combine modality-specific features at the decision level 
+offer a more efficient alternative, though they remain 
+underexplored in lightweight and explainable settings. 
+D.  Lightweight and Explainable Approaches 
+The need for real-time deployment has motivated research 
+into lightweight deepfake detection models. Compact CNN 
+architectures 
+and 
+mobile-optimized 
+networks 
+reduce 
+parameter count and inference latency while maintaining 
+acceptable performance. However, many lightweight models 
+compromise interpretability and provide limited insights into 
+decision-making.  
+Explainable AI techniques, particularly Grad-CAM, have 
+been applied to CNN-based deepfake detectors to visualize 
+regions influencing classification. In video-based detection, 
+Grad-CAM highlights manipulated facial regions, while in 
+audio-based detection, it identifies discriminative time–
+frequency components in spectrograms. Despite their 
+effectiveness, explainability is rarely integrated into 
+multimodal deepfake detection frameworks. 
+E. Recent Advances (2024-2026) 
+Recent research has concentrated on transformer-based 
+multimodal 
+architectures 
+and 
+cross-modal 
+attention 
+techniques that improve semantic consistency between audio 
+and visual streams. While these models improve detection 
+robustness and cross-dataset generalization, they also add 
+significant computational complexity. In parallel, lightweight 
+CNN-based models for real-time and edge deployment 
+situations have been developed, with an emphasis on low 
+parameter count and efficient inference. These findings 
+highlight the trade-off between detection performance and 
+computing efficiency, emphasizing the importance of 
+organized lightweight multimodal frameworks. 
+F. Comparative Summary of Literature 
+TABLE I presents a comparative 
+summary of 
+representative deepfake detection methods, categorized by 
+modality, architecture, strengths, and limitations. The table 
+shows that existing techniques prioritize either high detection 
+accuracy through sophisticated multimodal architectures or 
+computational efficiency via lightweight CNN models. 
+However, integrated multimodal explainability within 
+computationally efficient frameworks is still underexplored. 
+TABLE I: SUMMARY OF DEEPFAKE DETECTION METHODS 
+Author 
+/ Year 
+Modali
+ty 
+Method 
+Key 
+Contribu
+tion 
+Advanta
+ges 
+Limitatio
+ns 
+Afchar 
+et 
+al. 
+(2018) 
+Video 
+CNN 
+(MesoN
+et) 
+Detection 
+of visual 
+manipulat
+ion 
+artifacts 
+Lightwei
+ght 
+and 
+fast 
+Limited 
+generalizat
+ion 
+Li et al. 
+(2018) 
+Video 
+Eye 
+blinking 
+analysis 
+Detection 
+of 
+temporal 
+inconsiste
+ncies 
+Interpreta
+ble 
+features 
+Ineffective 
+on newer 
+deepfakes 
+Guera 
+& Delp 
+(2019) 
+Video 
+CNN–
+RNN 
+Spatio-
+temporal 
+deepfake 
+modellin
+g 
+Improved 
+robustnes
+s 
+High 
+computati
+onal cost 
+Yang et 
+al. 
+(2019) 
+Video 
+Head 
+pose 
+analysis 
+Geometri
+c 
+inconsiste
+ncy 
+detection 
+Explaina
+ble cues 
+Sensitive 
+to 
+pose 
+variations 
+Wang et 
+al. 
+(2020) 
+Audio 
+CNN on 
+spectrog
+rams 
+Learning 
+audio 
+manipulat
+ion 
+artifacts 
+Efficient 
+feature 
+learning 
+Audio-
+only 
+limitation 
+2
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 11:07:18 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 3 ---
+
+ASVsp
+oof 
+(2021) 
+Audio 
+CNN-
+based 
+models 
+Benchma
+rk 
+for 
+synthetic 
+speech 
+detection 
+Standardi
+zed 
+evaluatio
+n 
+No visual 
+informatio
+n 
+Mittal et 
+al. 
+(2022) 
+Multim
+odal 
+CNN-
+based 
+fusion 
+Audio–
+video 
+correlatio
+n 
+modellin
+g 
+Improved 
+accuracy 
+Heavy 
+architectur
+e 
+Wu 
+et 
+al. 
+(2023) 
+Multim
+odal 
+Transfor
+mer 
+fusion 
+Cross-
+modal 
+attention 
+learning 
+State-of-
+the-art 
+performa
+nce 
+Computati
+onally 
+expensive 
+XAI-
+based 
+(2024) 
+Audio / 
+Video 
+CNN + 
+Grad-
+CAM 
+Explaina
+ble 
+deepfake 
+detection 
+Improved 
+transpare
+ncy 
+Limited 
+multimoda
+l focus 
+Du et al. 
+(2025) 
+Audio–
+Video 
+Cross-
+modal 
+alignme
+nt 
+& 
+distillati
+on 
+Harmoniz
+ed 
+multimod
+al 
+represent
+ation 
+Better 
+fusion 
+strategy 
+Complex 
+training 
+process 
+Wu 
+et 
+al. 
+(2025) 
+(HOLA
+) 
+Audio–
+Video 
+Hierarch
+ical 
+contextu
+al 
+aggregat
+ion 
+Enhanced 
+spatio-
+temporal 
+modellin
+g 
+Strong 
+performa
+nce 
+Large-
+scale pre-
+training 
+required 
+Sun 
+et 
+al. 
+(2025) 
+(EDVD
+-LLM) 
+Video 
++ XAI 
+Multimo
+dal 
+reasonin
+g model 
+Explaina
+ble 
+deepfake 
+reasoning 
+High 
+interpreta
+bility 
+Resource 
+intensive 
+Kundu 
+et 
+al. 
+(2025) 
+(TruthL
+ens) 
+Video 
+Hybrid 
+local-
+global 
+modelin
+g 
+Explaina
+ble hybrid 
+detection 
+Improved 
+transpare
+ncy 
+Increased 
+architectur
+e 
+complexit
+y 
+Sun 
+et 
+al. 
+(2026) 
+Audio–
+Video 
+Semanti
+c 
+consiste
+ncy 
+fusion 
+Cross-
+modal 
+semantic 
+alignment 
+Improved 
+robustnes
+s 
+Increased 
+computati
+onal 
+overhead 
+Propos
+ed 
+Frame
+work 
+Audio–
+Video 
+CNN + 
+Late 
+Fusion + 
+Grad-
+CAM 
+Lightwei
+ght 
+and 
+interpreta
+ble 
+multimod
+al 
+detection 
+Efficient 
+and 
+transpare
+nt 
+Requires 
+synchroniz
+ed inputs 
+ 
+G. Research Gap 
+TABLE I summarizes contemporary multimodal deepfake 
+detection models that improve resilience via semantic 
+consistency 
+modeling 
+and 
+transformer-based 
+fusion 
+procedures. However, these structures add greatly to 
+computational 
+complexity 
+and 
+training 
+requirements. 
+Lightweight CNN-based techniques minimize model size, but 
+they frequently lack structured multimodal fusion and 
+embedded 
+interpretability. 
+Furthermore, 
+explainability 
+methodologies are usually used as post-hoc analysis rather 
+than being incorporated into architectural design. These 
+findings highlight the need for a lightweight, computationally 
+efficient multimodal deepfake detection framework with 
+structured explainability suitable for real-world use. 
+III. PROPOSED METHODOLOGY AND ARCHITECTURE 
+This section describes the proposed lightweight and 
+interpretable deepfake detection framework, designed to 
+operate under flexible input conditions. The framework 
+supports audio-only, video-only, and combined audio–
+video inputs, enabling robust detection across diverse real-
+world scenarios. The proposed methodology emphasizes 
+efficient feature extraction, multimodal learning, and 
+explainability, making it suitable for real-time and resource-
+constrained environments. 
+A. System Overview 
+The proposed framework employs modality-specific 
+feature extraction pipelines that can operate independently or 
+jointly depending on the availability of input modalities. 
+When both audio and video streams are present, a late fusion 
+strategy is applied to combine high-level representations. In 
+unimodal scenarios, the framework performs classification 
+using the available modality alone. 
+Overall Processing Pipeline: 
+1. The input sample may consist of audio-only, video-
+only, or combined audio–video data. 
+2. If video data is available, frames are sampled and 
+facial regions are detected and aligned using 
+MTCNN. 
+3. If audio data is available, the audio signal is 
+transformed into time–frequency representations. 
+4. CNN-based models extract features independently 
+from the available modalities. 
+5. When both modalities are present, a late fusion 
+mechanism combines multimodal features. 
+6. A 
+fully 
+connected 
+layer 
+performs 
+real/fake 
+classification. 
+7. Grad-CAM generates explainable visualizations for 
+the model’s predictions. 
+The overall architecture of the proposed framework is 
+illustrated in FIG. 1, showing parallel audio and video 
+pipelines with multimodal fusion, followed by explainable 
+classification. 
+B. Video Feature Extraction Module 
+For video-based inputs, frames are uniformly sampled and 
+processed through a facial preprocessing stage. Facial regions 
+are detected and aligned using Multi-task Cascaded 
+Convolutional Networks (MTCNN) to reduce background 
+interference and enhance feature quality. The aligned facial 
+frames are then passed to a lightweight CNN for spatial 
+feature extraction. 
+C. Audio Feature Extraction Module 
+For audio-based inputs, the raw audio signal is converted 
+into Mel-spectrogram representations and processed using a 
+CNN-based audio feature extractor. This module captures 
+spectral anomalies associated with synthetic or manipulated 
+speech. 
+D. Multimodal Late Fusion Strategy 
+When both audio and video modalities are available, the 
+proposed framework applies a late fusion strategy by 
+concatenating the extracted audio and video feature vectors. 
+This unified representation enables complementary learning 
+across modalities and improves robustness against modality-
+specific manipulation. 
+3
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 11:07:18 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 4 ---
+
+In unimodal scenarios, the fusion stage is bypassed, and 
+classification is performed using the available modality alone. 
+E. Classification Module 
+The feature representation - either unimodal or multimodal 
+- is passed through a lightweight fully connected layer 
+followed by a SoftMax activation function to perform binary 
+classification between real and deepfake samples. 
+F. Explainability Using Grad-CAM 
+Grad-CAM is applied to the convolutional layers of the 
+active modality-specific CNNs. For video inputs, Grad-CAM 
+highlights facial regions influencing the decision, while for 
+audio inputs, it visualizes discriminative time–frequency 
+regions in the spectrogram. In multimodal cases, explanations 
+are generated independently for both modalities. 
+Fig. 1. Proposed Framework 
+G. Key Characteristics of the Proposed Architecture 
+The proposed framework is characterized by: 
+x 
+Flexible input support (audio-only, video-only, or 
+audio–video) 
+x 
+Lightweight CNN-based design 
+x 
+Robust facial preprocessing using MTCNN 
+x 
+Multimodal fusion when applicable 
+x 
+Explainability through Grad-CAM 
+x 
+Scalability for real-time and edge deployments 
+IV. EXPERIMENTAL EVALUATION PLAN 
+Implementation and experimental evaluation of the 
+suggested framework are presently underway to confirm its 
+efficacy. To guarantee systematic benchmarking, the 
+evaluation process listed below has been established. 
+A. Datasets 
+The system will be tested using publicly accessible 
+benchmark datasets using a variety of processing methods and 
+compression scenarios, including FaceForensics++, Celeb-
+DF, and DFDC. 
+B. Metrics for Evaluation 
+Standard measures such as Accuracy, Precision, Recall, 
+F1-score, and AUC-ROC will be used to evaluate 
+performance. Class-wise detection performance will also be 
+assessed using confusion matrix analysis. 
+C. Analysis of Computational Efficiency 
+The following metrics will be assessed in order to support 
+the lightweight design: 
+x 
+Total number of parameters 
+x 
+Size of the model (MB) 
+x 
+Time spent inference per frame 
+x 
+GPU memory use 
+D. Analysis via Comparison 
+The suggested framework will be contrasted with: 
+x 
+Unimodal CNN-based models 
+x 
+Transformer-driven multimodal systems 
+x 
+Current models for explainable detection 
+E. Analysis of Robustness 
+Robustness will be assessed in light of: 
+x 
+Compression of videos 
+x 
+Noise that is additive 
+x 
+Testing across datasets 
+V. CONCLUSION AND FUTURE WORK 
+This paper provided a structured examination of current 
+deepfake detection approaches, emphasizing the growing 
+necessity 
+for 
+multimodal 
+analysis 
+and 
+integrated 
+interpretability. According to the review, unimodal systems 
+frequently encounter robustness and generalization issues 
+when confronted with advanced manipulation techniques, 
+whereas recent multimodal and transformer-based models, 
+while effective, add significant computational complexity. 
+To 
+overcome 
+these 
+issues, 
+a 
+lightweight 
+and 
+understandable multimodal deepfake detection system was 
+presented. The architecture includes separate CNN-based 
+audio and video processing pipelines, MTCNN-based face 
+area extraction for accurate visual feature representation, and 
+a late fusion technique for flexible modality merging. Grad-
+CAM allows for structured visual explanations of model 
+predictions, which improves transparency and user trust. 
+At the time of submission, the suggested framework was 
+still being implemented and experimentally validated. A 
+complete evaluation strategy has been developed to evaluate 
+4
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 11:07:18 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 5 ---
+
+detection performance, computing efficiency, and robustness 
+across multiple benchmark datasets. Future research will 
+concentrate 
+on 
+empirical 
+benchmarking, 
+real-time 
+optimization, and the development of enhanced fusion and 
+explainability algorithms to improve scalability and 
+deployment feasibility in practical deepfake detection 
+systems. 
+REFERENCES 
+[1] P. Korshunov and S. Marcel, “Audio-Visual Deepfake Detection: 
+Analysis and Baselines,” IEEE Transactions on Information Forensics 
+and Security, vol. 13, no. 8, pp. 2138–2150, Aug. 2018. 
+[2] Y. Li, M.-C. Chang, and S. Lyu, “In Ictu Oculi: Exposing AI Created 
+Fake Videos by Detecting Eye Blinking,” Proc. IEEE Int. Workshop 
+on Information Forensics and Security (WIFS), pp. 1–7, 2018. 
+[3] S. Afchar, V. Nozick, J. Yamagishi, and I. Echizen, “MesoNet: A 
+Compact Facial Video Forgery Detection Network,” Proc. IEEE Int. 
+Workshop on Information Forensics and Security (WIFS), pp. 1–7, 
+2018. 
+[4] K. Zhang, Z. Zhang, Z. Li, and Y. Qiao, “Joint Face Detection and 
+Alignment Using Multitask Cascaded Convolutional Networks,” IEEE 
+Signal Processing Letters, vol. 23, no. 10, pp. 1499–1503, Oct. 2016. 
+[5] R. R. Selvaraju et al., “Grad-CAM: Visual Explanations from Deep 
+Networks via Gradient-Based Localization,” Proc. IEEE Int. Conf. on 
+Computer Vision (ICCV), pp. 618–626, 2017. 
+[6] Y. Li, M.-C. Chang, and S. Lyu, “Celeb-DF: A Large-Scale 
+Challenging Dataset for DeepFake Forensics,” Proc. IEEE Conf. on 
+Computer Vision and Pattern Recognition (CVPR), pp. 3207–3216, 
+2020. 
+[7] R. Tolosana, R. Vera-Rodriguez, J. Fierrez, A. Morales, and J. Ortega-
+Garcia, “Deepfakes and Beyond: A Survey of Face Manipulation and 
+Fake Detection,” Information Fusion, vol. 64, pp. 131–148, 2022. 
+[8] R. Bohara and A. Bhairwa, “Detecting Deepfake Audio Using 
+Spectrogram-Based Machine Learning Approaches,” IEEE, 2025. 
+[9] H. Jung, J. Lee, and S. Kim, “AASIST: Audio Anti-Spoofing Using 
+Spectro-Temporal Graph Attention Networks,” in Proc. Interspeech, 
+pp. 1–5, 2021. 
+[10] N. Mansoor and A. I. Iliev, “Explainable AI for DeepFake Detection,” 
+Applied Sciences, vol. 15, no. 2, art. 725, Jan. 2025. 
+[11] F. Sun, X. Guo, T. Zhang, Y. Liu, and J. Zhang, “Video Deepfake 
+Detection Based on Multimodality Semantic Consistency Fusion,” 
+Future Internet, vol. 18, no. 2, art. 67, 2026. 
+[12] Y. Du, Z. Wang, Y. Luo, C. Piao, Z. Yan, H. Li, and L. Yuan, “CAD: 
+A General Multimodal Framework for Video Deepfake Detection via 
+Cross-Modal Alignment and Distillation,” arXiv:2505.15233, 2025. 
+[13] X. Wu, D. Huang, H. Sun, X. Yin, Y. Wang, H. Wang, J. Zhang, F. 
+Wang, P. Guo, S. Xing, J. Xue, and L. He, “HOLA: Enhancing Audio-
+visual Deepfake Detection via Hierarchical Contextual Aggregations 
+and Efficient Pre-training,” arXiv:2507.22781, 2025. 
+[14]  H. Sun, C. Cai, H. Zhuang, K. A. Lee, L.-P. Chau, and Y. Wang, 
+“EDVD-LLaMA: Explainable Deepfake Video Detection via 
+Multimodal Large Language Model Reasoning,” arXiv:2510.16442, 
+2025. 
+[15] R. Kundu, A. Balachandran, and A. K. Roy-Chowdhury, “TruthLens: 
+Explainable DeepFake Detection for Face Manipulated and Fully 
+Synthetic Data,” arXiv:2503.15867, 2025. 
+ 
+ 
+5
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 11:07:18 UTC from IEEE Xplore.  Restrictions apply. 

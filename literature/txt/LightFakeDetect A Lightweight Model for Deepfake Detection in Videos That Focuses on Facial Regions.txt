@@ -1,0 +1,1434 @@
+
+
+--- PAGE 1 ---
+
+Academic Editor: Antanas Cenys
+Received: 14 August 2025
+Revised: 15 September 2025
+Accepted: 24 September 2025
+Published: 25 September 2025
+Citation: AlMuhaideb, S.; Alshaya,
+H.; Almutairi, L.; Alomran, D.;
+Alhamed, S.T. LightFakeDetect:
+A Lightweight Model for Deepfake
+Detection in Videos That Focuses on
+Facial Regions. Mathematics 2025, 13,
+3088. https://doi.org/10.3390/
+math13193088
+Copyright: © 2025 by the authors.
+Licensee MDPI, Basel, Switzerland.
+This article is an open access article
+distributed under the terms and
+conditions of the Creative Commons
+Attribution (CC BY) license
+(https://creativecommons.org/
+licenses/by/4.0/).
+Article
+LightFakeDetect: A Lightweight Model for Deepfake Detection
+in Videos That Focuses on Facial Regions
+Sarab AlMuhaideb *
+, Hessa Alshaya, Layan Almutairi, Danah Alomran and Sarah Turki Alhamed
+Department of Computer Science, College of Computer and Information Sciences, King Saud University,
+P.O. Box 266, Riyadh 11362, Saudi Arabia; 443200834@student.ksu.edu.sa (H.A.);
+443200869@student.ksu.edu.sa (L.A.); 443201027@student.ksu.edu.sa (D.A.);
+443201029@student.ksu.edu.sa (S.T.A.)
+* Correspondence: salmuhaideb@ksu.edu.sa; Tel.: +966-11-805-2836
+Abstract
+In recent years, the proliferation of forged videos, known as deepfakes, has escalated
+significantly, primarily due to advancements in technologies such as Generative Adver-
+sarial Networks (GANs), diffusion models, and Vision Language Models (VLMs). These
+deepfakes present substantial risks, threatening political stability, facilitating celebrity im-
+personation, and enabling tampering with evidence. As the sophistication of deepfake
+technology increases, detecting these manipulated videos becomes increasingly challeng-
+ing. Most of the existing deepfake detection methods use Convolutional Neural Networks
+(CNNs), Recurrent Neural Networks (RNNs), or Vision Transformers (ViTs), achieving
+strong accuracy but exhibiting high computational demands. This highlights the need
+for a lightweight yet effective pipeline for real-time and resource-limited scenarios. This
+study introduces a lightweight deep learning model for deepfake detection in order to
+address this emerging threat. The model incorporates three integral components: Mo-
+bileNet for feature extraction, a Convolutional Block Attention Module (CBAM) for feature
+enhancement, and a Gated Recurrent Unit (GRU) for temporal analysis. Additionally, a
+pre-trained Multi-Task Cascaded Convolutional Network (MTCNN) is utilized for face
+detection and cropping. The model is evaluated using the Deepfake Detection Challenge
+(DFDC) and Celeb-DF v2 datasets, demonstrating impressive performance, with 98.2%
+accuracy and a 99.0% F1-score on Celeb-DF v2 and 95.0% accuracy and a 97.2% F1-score on
+DFDC, achieving a commendable balance between simplicity and effectiveness.
+Keywords: deepfake detection; video manipulation; deep learning; multi-task cascaded
+convolutional network (MTCNN)
+MSC: 68T07; 68T10
+1. Introduction
+Deepfake technology employs advanced deep learning methodologies to create highly
+realistic fake images and videos by altering existing content, resulting in visuals that
+are indistinguishable to both human observers and automated systems [1]. The term
+“deepfakes” itself is a combination of “deep learning” and “fakes” [2]. Despite the potential
+for positive applications in film-making and virtual reality, deepfakes are often misused,
+particularly in contexts involving high-profile individuals, leading to privacy breaches,
+harassment, and security risks [3,4]. The first known deepfake video emerged in 2017 when
+a Reddit user manipulated the faces of public figures for pornographic content [1]. The
+Mathematics 2025, 13, 3088
+https://doi.org/10.3390/math13193088
+
+
+--- PAGE 2 ---
+
+Mathematics 2025, 13, 3088
+2 of 22
+rapid increase in deepfakes can be attributed to recent advancements in artificial intelligence
+technologies (e.g., Generative Adversarial Networks (GANs) [5] and autoencoders [6,7]),
+which have facilitated the development of sophisticated tools for multimedia manipulation
+and generation of realistic deepfakes [8].
+Various types of deepfakes exist, including face-swapping, which transfers the facial
+features of one individual to the face of another in a manner that appears seamless and
+unedited. This technique has been applied across privacy preservation, digital forensics,
+and entertainment, relying on face alignment, segmentation, and 3D shape estimation to
+achieve realistic results [9]. Face re-enactment allows the transfer of facial expressions and
+movements from a source face to a target, maintaining unique identity features while mim-
+icking expressions [10]. Additionally, face reconstruction focuses on generating 3D models
+from 2D images, with applications in biometrics, film production, and 3D avatars. Histori-
+cally, high-quality reconstructions required specialized setups, but contemporary methods
+leverage deep learning and statistical models to achieve this with greater efficiency [11].
+In the literature, the problem of deepfake detection has been addressed through a
+wide spectrum of computer vision and machine learning models, most prominently Convo-
+lutional Neural Networks (CNNs) [12,13] for spatial feature extraction, Recurrent Neural
+Networks (RNNs) [14] for temporal modeling, and more recently, Vision Transformers
+(ViTs) [15] for capturing both local and global dependencies. Early CNN-based meth-
+ods, such as Meso-4 and MesoInception-4 [16], targeted mesoscopic facial properties but
+underperformed on video datasets like Celeb-DF and the Deepfake Detection Challenge
+(DFDC) due to the absence of temporal modeling [17]. Advances such as the Temporal
+Dropout 3D CNN (TD-3DCNN) have improved spatio-temporal representation learning
+through temporal dropout, achieving strong results on the Celeb-DF(v2), DFDC, and Face-
+Forensics++ datasets. Hybrid CNN architectures, including Inception-ResNet v2–Xception
+combinations [18] and multilayer Xception frameworks [19], have further boosted detection
+accuracy, though challenges are still posed by low-resolution and compressed videos. RNN-
+based pipelines, often paired with CNN backbones like EfficientNet [20] or DenseNet [21],
+have shown the benefits of temporal analysis, while integrations with Transformers and
+3D Morphable Models (3DMMs) [22,23] have enhanced sequential modeling capabilities.
+ViT-based approaches [24–26] have achieved state-of-the-art performance on datasets such
+as FaceForensics++, Celeb-DF(v2), and WildDeepfake by combining CNN-derived spa-
+tial features with transformer-based global context modeling. Complementary to visual
+analysis, physiological signal-based methods [27–30] leverage eye-blinking patterns and
+photoplethysmography (PPG) signals to distinguish real from manipulated videos. While
+these developments demonstrate substantial progress in this field, existing methods often
+suffer from limited cross-dataset generalization, vulnerability to resolution and compres-
+sion artifacts, and high computational costs, highlighting the need for lightweight, real-time
+deepfake detection models.
+In this work, we propose LightFakeDetect, a lightweight yet effective deepfake de-
+tection framework designed to balance detection accuracy with real-time implementation.
+Motivated by the strong performance of EfficientNet–GRU-based architectures in captur-
+ing spatial–temporal cues [18], we replace the computationally expensive EfficientNet
+backbone [31] with MobileNet v1 [32], significantly reducing model complexity while
+preserving its feature extraction capability. We deliberately employ MobileNet v1 as the
+backbone to prioritize minimal model complexity and the lowest possible number of train-
+able parameters. Among the MobileNet family, V1 remains one of the lightest and simplest
+architectures, making it well suited for the objectives of this study. To further enhance
+spatial feature representation, we integrate the Convolutional Block Attention Module
+(CBAM) [33], enabling the network to focus on facial regions that can me manipulated.
+
+
+--- PAGE 3 ---
+
+Mathematics 2025, 13, 3088
+3 of 22
+Temporal dependencies across video frames are modeled using a Gated Recurrent Unit
+(GRU) [34], which efficiently captures sequential artifacts introduced during manipulation.
+Our design principle stems from the need for a resource-efficient model that can main-
+tain high detection accuracy without incurring prohibitive computational costs, thereby
+enabling deployment on edge devices and in real-time scenarios. The novelty of Light-
+FakeDetect lies in its applied and integrative design. To the best of our knowledge, this
+is the first work to combine a MobileNet backbone with a CBAM and a GRU specifically
+for deepfake video detection, while explicitly optimizing the pipeline for class-imbalanced
+datasets. In addition, we introduce a novel frame preprocessing method that removes
+duplicate frames or frames with high similarity, rather than relying on random frame
+removal as in prior work, effectively reducing redundancy while preserving informative
+temporal content. By demonstrating that this deliberately lightweight architecture achieves
+performance comparable to or exceeding that of substantially more complex models on
+large-scale benchmarks, the study provides a practically significant contribution aimed at
+real-world deployment rather than a purely theoretical advance. The key contributions
+of this study are (1) the introduction of a MobileNet–CBAM–GRU pipeline tailored for
+deepfake detection; (2) a carefully designed preprocessing pipeline using a Multi-Task
+Cascaded Convolutional Network (MTCNN)-based face localization and image pyramids
+to standardize and enhance frame quality; and (3) a comprehensive evaluation of the
+model’s performance on benchmark datasets (Celeb-DF v2 and DFDC) to demonstrate its
+effectiveness under realistic constraints.
+2. Related Work
+Deepfake detection has been approached using a variety of computer vision and
+machine learning techniques, with Convolutional Neural Networks (CNNs) being the
+most widely adopted in the literature [12,13]. Early architectures such as Meso-4 and
+MesoInception-4 [16] were designed to capture mesoscopic facial properties for manipu-
+lation detection. While effective for still images, their lack of temporal modeling limited
+their performance in video-based detection, resulting in relatively low AUC scores of
+54.8% on Celeb-DF and 75.3% on DFDC [17]. To address these limitations, the TD-3DCNN
+method introduced temporal dropout (TD) to selectively omit frames during training,
+thereby enhancing spatio-temporal feature learning. This approach achieved accuracies
+of 81.08%, 82.64%, and 79.09% on Celeb-DF(v2), DFDC, and FaceForensics++, respec-
+tively. Other CNN-based methods have leveraged more sophisticated backbones. Ikram
+et al. [18] integrated Inception-ResNet v2 [35] with Xception [36], combining inception
+modules, residual connections, and depthwise separable convolutions for efficient fea-
+ture extraction, achieving strong results on DFDC. Similarly, a multilayer Xception-based
+framework [19] aggregated clues from multiple domains, reaching 92.34% accuracy on
+Celeb-DF(v2), though its performance remained sensitive to resolution changes. Battula
+and Rajasekaran [37] proposed a deepfake video detection method using the AdaBoost al-
+gorithm, an ensemble learning technique that iteratively combines weak classifiers to focus
+on difficult-to-classify instances. Evaluated on the DFDC dataset, their approach achieved
+86.5% accuracy, 84.7% precision, 88.2% recall, and an F1-score of 86.4%, demonstrating
+robust performance in detecting subtle manipulations. The study highlights AdaBoost as
+an effective alternative to CNN-based methods and suggests future integration with CNN
+feature extractors to further enhance detection capabilities.
+Recurrent Neural Networks (RNNs) [14], which excel in modeling temporal depen-
+dencies, have also been integrated into deepfake detection pipelines. Montserrat et al. [20]
+combined MTCNN-based face detection with EfficientNet feature extraction enhanced by
+ArcFace loss, followed by a Gated Recurrent Unit (GRU) for temporal analysis. An auto-
+
+
+--- PAGE 4 ---
+
+Mathematics 2025, 13, 3088
+4 of 22
+matic weighting mechanism addressed variability in face quality, yielding 91.88% accuracy
+on DFDC. Masi et al. [21] proposed a two-branch recurrent network that fuses color- and
+frequency-domain features via DenseNet [38] and bidirectional Long Short-Term Memory
+(LSTM), achieving an AUC of 93.18% on FaceForensics++ and of 73.41% on Celeb-DF. Other
+approaches have incorporated LSTM and Transformers. For example, Petmezas et al. [22]
+combined CNNs, LSTM, and Transformers with 3D Morphable Models (3DMMs) in a
+one-class learning framework trained solely on pristine VoxCeleb2 videos [39]. BiLSTM
+Multi-Head Self-Attention Network (BMNet) [23] further enhanced sequential analysis by
+integrating BiLSTM with Multi-Head Self-Attention for facial-landmark-based detection,
+achieving accuracy of 80.20% on Celeb-DF and 84.72% on DFDC.
+The emergence of Vision Transformers (ViTs) [15] has led to significant advancements
+in the field by jointly capturing local image features and global inter-pixel relationships.
+Soudy et al. [24] demonstrated that combining CNN-based feature extraction with ViT-
+based global context modeling, alongside majority voting across facial regions, yielded 97%
+accuracy on FaceForensics++. Khormali et al. [25] proposed an end-to-end ViT framework
+incorporating patch extraction, RetinaFace-based landmark detection [40], and multi-stream
+transformer blocks, achieving accuracies of 99.41%, 99.3%, and 81.35% on FaceForensics++,
+Celeb-DF(v2), and WildDeepfake, respectively. Architectural refinements such as inte-
+grating depthwise separable convolutions and Convolutional Block Attention Modules
+(CBAMs) [33] have further enhanced ViT performance, achieving 87.17% accuracy on Celeb-
+DF(v2) [26]. CNN-based attention models, such as the one proposed by Dang et al. [41],
+have also demonstrated improvements, achieving an AUC of 0.712 on Celeb-DF. Ensemble
+approaches leveraging convolutional attention networks with Mobile Inverted Residual
+Bottleneck Convolutions, self-attention, CutMix augmentation, and bagging have achieved
+high accuracy and AUC scores across FaceForensics++ and Celeb-DF, though their compu-
+tational demands may hinder their real-time deployment [42].
+Beyond visual features, physiological signal analysis has emerged as a complementary
+strategy for deepfake detection. Jung et al. [27] introduced DeepVision, which analyzes eye-
+blinking patterns, though it is vulnerable to well-simulated blinks. Ciftci et al. [28] exploited
+photoplethysmography (PPG) signals from facial regions of interest, achieving 76.15%
+accuracy on FaceForensics++. Wu et al. [29] developed a multi-scale spatio-temporal PPG
+map with a Mask-Guided Local Attention module and Temporal Transformer, achieving
+99.38% accuracy on FaceForensics++. Similarly, Ni et al. [30] extracted biometric signals
+from four facial regions rich in blood vessels, combining them with a Visual Geometry
+Group (VGG16) and attention mechanism to achieve 99.2% accuracy. These challenges
+underscore the need to develop lightweight yet robust deepfake detection models capable
+of maintaining high accuracy while operating in real time across diverse and resource-
+constrained settings.
+Lightweight yet high-performing deepfake detection models have recently attracted
+attention to address the limitations of large transformer- or ensemble-based systems in
+resource-constrained environments. Guo et al. [43] proposed Tiny Deepfake Detection
+(TinyDF), a compact framework with only 5.38 M parameters and 0.59 G FLOPs that
+achieves strong intra- and cross-dataset generalization. TinyDF introduces a Pyramid
+Atrous Aggregation (PAA) module to efficiently capture local–global feature relationships
+and a Shuffle Fusion Mixer (SFM) module to enhance multi-level feature interaction, while
+leveraging a Kolmogorov–Arnold network for richer nonlinear feature representation. This
+design enables the model to outperform heavier architectures across several benchmarks,
+attaining 93.84% accuracy and 97.73% AUC on FF++(c23) and 68.58% accuracy with 74.90%
+AUC on DFDC, highlighting its potential for accurate and efficient forgery detection under
+limited computational resources. Yasir and Kim [44] proposed a lightweight deepfake
+
+
+--- PAGE 5 ---
+
+Mathematics 2025, 13, 3088
+5 of 22
+detection approach based on multi-feature fusion, integrating Histogram of Oriented
+Gradients (HOG), Local Binary Pattern (LBP), and KAZE features within classical machine
+learning classifiers such as Random Forest, Extreme Gradient Boosting (XGBoost), Extra
+Trees, and Support Vector Machine (SVM). Their method targets compressed social media
+videos, achieving 92.12% accuracy on FaceForensics++ and 78% on Celeb-DF(v2) while
+significantly reducing computational cost compared to deep learning models. The study
+demonstrates that feature-level fusion of texture-based descriptors enables efficient and
+scalable detection suitable for resource-constrained environments.
+In summary, deepfake detection research has explored a range of model architectures,
+including CNNs for spatial feature extraction, RNNs and their variants (e.g., LSTM, GRUs,
+BiLSTM) for temporal sequence modeling, ViTs for capturing both local and global de-
+pendencies, and multimodal approaches incorporating physiological signals such as PPG
+for biometric verification. These methods have been evaluated on widely adopted bench-
+mark datasets, including Celeb-DF, Celeb-DF(v2), DFDC, FaceForensics++, VoxCeleb2, and
+WildDeepfake, enabling comparative performance assessment across manipulation types
+and resolutions. Despite notable progress in this field, existing techniques face limitations
+such as reduced generalization to unseen manipulation methods, performance degradation
+across varying video resolutions and compression levels, and high computational complex-
+ity, which impede their real-time deployment. Transformer-based and ensemble models,
+while achieving state-of-the-art accuracy, often require substantial resources for training
+and inference, limiting their applicability in edge devices or low-power environments.
+These challenges underscore the need to develop lightweight yet robust deepfake detection
+models capable of maintaining high accuracy while operating in real time across diverse
+and resource-constrained settings.
+3. Materials and Methods
+3.1. Overview of LightFakeDetect Architecture
+The architecture of LightFakeDetect, depicted in Figure 1, is inspired by the work of [20],
+which utilized EfficientNet B5 [31] combined with a GRU [34] for deepfake detection.
+This approach demonstrated EfficientNet’s efficacy in extracting spatial features and the
+GRU’s ability to capture temporal dependencies across video frames, enhancing their
+manipulation detection. To streamline the model, we substitute the heavier EfficientNet B5
+with the lightweight MobileNet v1 [31,32]. Additionally, we implement a Convolutional
+Block Attention Module (CBAM) [33], which integrates effectively with MobileNet, replac-
+ing the original attention mechanisms. Details of the enhancements are provided in the
+following sections.
+Figure 1. LightFakeDetect architecture. Figure has been reconstructed from Refs. [33,45–47].
+
+
+--- PAGE 6 ---
+
+Mathematics 2025, 13, 3088
+6 of 22
+As illustrated in Figure 1, the process starts by acquiring video data from established
+deepfake datasets (Section 3.2). The extracted frames are preprocessed, and an image
+pyramid is created for each frame (Section 3.3). Using an MTCNN [45], we detect and
+crop faces, focusing on areas where deepfake manipulations are most evident, thereby
+enhancing detection accuracy and ensuring consistent input dimensions. Next, we utilize
+MobileNet [32], a lightweight Convolutional Neural Network, to extract spatial features
+from the cropped faces (Section 3.1.1). The extracted feature maps are then refined using a
+CBAM [33]. The CBAM applies both channel and spatial attention mechanisms sequentially,
+emphasizing the most critical features and enhancing the model’s ability to discern subtle
+manipulations (Section 3.1.2). The next stage involves capturing temporal dependencies
+using a GRU [34] (Section 3.1.3). Flattened and refined feature maps are fed into the GRU,
+which models the sequence of frames and captures the temporal relationships that are
+essential for detecting deepfakes. The last hidden state from the GRU is passed through
+a fully connected layer, followed by a sigmoid activation function that outputs the final
+prediction. The key blocks of the architecture are detailed in the following sub-sections.
+3.1.1. MobileNet
+MobileNet v1 [32], a lightweight and efficient model ideal for fast processing of video
+data, is used as the feature extractor for each cropped image. Each cropped image, resized
+to 224 × 224, is passed through the first layer of MobileNet.
+The MobileNet model leverages depthwise separable convolutions [48], which decom-
+pose standard convolutions into two distinct components: depthwise and 1 × 1 pointwise
+convolutions. Each input channel in a depthwise convolution is processed with a separate
+filter, allowing the model to effectively capture spatial features. A pointwise convolution
+combines the features obtained from the depthwise convolution, facilitating the learning
+of interactions across different channels. This architecture enables MobileNet to achieve
+efficient computation and a smaller model size while maintaining strong performance
+across various tasks.
+A depthwise convolution is defined in (1), where G is an input feature map with spatial
+dimensions of DG × DG and M channels, and ˆK is a depthwise convolutional kernel of size
+DK × DK × M, where the mth channel of the filtered output feature map F is computed by
+applying the mth filter in K to the mth channel in G.
+ˆFk,l,m = ∑
+i,j
+ˆKi,j,m · Gk+i−1,l+j−1,m
+(1)
+MobileNet employs 3 × 3 depthwise separable convolutions, resulting in a computa-
+tional efficiency that is 8 to 9 times lower than that of traditional convolutions, with only
+a minor decrease in accuracy [32]. MobileNet v1 is much smaller and quicker than other
+models such as VGG16 and GoogleNet [12].
+MobileNet comprises 28 layers, beginning with an initial convolution layer followed
+by several depthwise separable convolution layers. Each convolution is succeeded by
+Batch Normalization and ReLU activations to enhance training efficiency. The architecture
+concludes with an average pooling layer, a fully connected layer, and a softmax activation,
+which are omitted, allowing the model to output feature maps directly.
+MobileNet features two key hyperparameters: Width Multiplier (α) and Resolu-
+tion Multiplier (ρ). α scales the number of channels in each layer from N to αN (where
+0 < α ≤1), reducing the model’s size and computational cost, potentially at the expense
+of accuracy. α adjusts the input dimensions from H × W to ρH × ρW (where 0 < ρ ≤1),
+lowering spatial resolution to decrease computational demands, also with possible accuracy
+trade-offs. These parameters enable a balance between efficiency and performance.
+
+
+--- PAGE 7 ---
+
+Mathematics 2025, 13, 3088
+7 of 22
+Input frames of size 224 × 224 × 3 are processed by the first layer, which employs a
+3 × 3 convolutional layer with a stride of 2. This operation reduces the spatial resolution
+from 224 × 224 to 112 × 112 while increasing the depth of the feature map to 32. In
+successive layers, the output dimensions progress to 56 × 56, then 28 × 28, and 14 × 14.
+The final output from MobileNet when the hyperparameters (α and ρ) are set to 1 is a
+feature map of size 7 × 7 × 1024 that represents the spatial characteristics of the frame,
+which is then passed through a Convolutional Block Attention Module (CBAM) to enhance
+the features.
+3.1.2. Convolutional Block Attention Module (CBAM)
+The Convolutional Block Attention Module (CBAM), proposed by Woo et al. [49],
+sequentially applies both channel and spatial attention. Channel attention captures global
+information using both average pooling (AP) and max pooling (MP) to create two spatial-
+context descriptors, Fc
+avg and Fc
+max. These descriptors are fed into a shared Multi-Layer
+Perceptron (MLP), and the resulting feature vectors are multiplied element-wise, emphasiz-
+ing important channels. The channel attention is computed as in (2).
+Mc(F) = σ(MLP(AvgPool(F)) + MLP(MaxPool(F)))
+(2)
+Spatial attention generates a spatial attention map by applying AP and MP across
+the channel dimension, producing two feature maps, Fc
+avg and Fc
+max. These maps are
+concatenated and passed through a convolutional layer to create the spatial attention
+map (3).
+Ms(F) = σ( f 7×7([AvgPool(F); MaxPool(F)]))
+(3)
+Here, σ denotes a sigmoid function, and f 7×7 represents a convolution operation with
+a 7 × 7 filter size [33]. After applying both attention mechanisms, a refined feature map is
+obtained, highlighting the most critical spatial and channel-wise information.
+We selected a CBAM as the attention mechanism after evaluating alternatives like
+Residual Attention Networks (RANs) [50] and Squeeze and Excitation (SE) [51]. The CBAM
+proved to be lighter and less computationally intensive than the RAN while delivering
+satisfactory results [33]. Compared to SE, the CBAM excelled by integrating both channel
+and spatial attention, whereas SE focused solely on channel attention, limiting its ability to
+guide the model in identifying relevant areas of the feature map for forgery detection.
+The CBAM processes the feature map generated by MobileNet. Despite MobileNet us-
+ing depthwise separable convolutions and a pointwise convolution layer, the output feature
+map retains sufficient channel information [32] for effective refinement by the CBAM.
+3.1.3. Gated Recurrent Unit (GRU)
+The output from the CBAM is flattened and passed to a Gated Recurrent Unit [34], a
+type of RNN employed to process sequence data, making it particularly well-suited for
+video analysis tasks. We opted for a GRU over LSTM due to its simpler structure with only
+two gates—the update gate and the reset gate—accelerating the training process while still
+effectively capturing temporal dependencies [52]. The model signifies how much of the
+previous hidden state should be used to compute the new candidate hidden state using
+the reset gate (4), while the update gate (5) decides how much of the hidden state from the
+previous time step should carry on to the next time step. Equations (4)–(7) describe the
+calculation performed on the GRU network [52], where rt, zt, ˜ht, and ht represent the reset
+gate, update gate, candidate hidden state, and current hidden state, respectively; V and
+W denote the weight matrices; xt is the input data at time t; h is the hidden state; and b is
+the bias.
+
+
+--- PAGE 8 ---
+
+Mathematics 2025, 13, 3088
+8 of 22
+rt = σ(Vrxt + Wrht−1 + br)
+(4)
+zt = σ(Vzxt + Wzht−1 + bz)
+(5)
+˜ht = tanh(Vhxt + rt ⊕(Whht−1) + bh)
+(6)
+ht = (1 −zt) ⊕ht−1 + zt ⊕(ht)
+(7)
+3.2. Datasets
+We use two datasets in this study: DFDC [53] and Celeb-DF version 2 [54]. The Celeb-
+DF v2 dataset comprises three main folders: Celeb-synthesis, which contains 5639 videos;
+Celeb-real, with 590 videos; and YouTube-real, containing 300 videos. The dataset is divided
+into two categories: fake and real. The average video duration across the dataset is 12.64 s.
+The Deepfake Detection Challenge (DFDC) dataset, created by Facebook AI, comprises
+133,154 diverse videos to enhance deepfake detection research. It includes 107,000 deepfake
+videos (80.36%) and 26,154 real videos (19.64%), divided into training, validation, and
+test sets. The training set features 119,154 videos, with 100,000 deepfakes generated using
+techniques like Deepfake AutoEncoder, Morphable Mask, Neural Talking Heads, and
+faceSwap GAN, alongside 19,154 real videos. The validation set contains 4000 videos,
+evenly split between the real and fake categories, introducing StyleGAN. The test set
+includes 10,000 videos, which are also balanced in terms of the real and fake categories.
+Each video is approximately 10 s long, with an average of 297.56 frames. The distribution
+of video samples for training and testing the LightFakeDetect model is as follows: For
+the Celeb-DF (V2) dataset, the training set consists of 5222 videos, including 711 real and
+4511 fake videos, while the testing set comprises 1306 videos, with 178 real and 1128 fake
+videos. In the DFDC dataset, a subset of 5372 videos was selected, with the training set
+containing 4297 videos (531 real and 3766 fake) and the testing set including 1073 videos
+(133 real and 942 fake). Additionally, 20% of the training set from both datasets was
+allocated for validation. Figure 2 presents the distribution of real and fake samples across
+the Celeb-DF V2 and the DFDC dataset splits.
+(a)
+(b)
+Figure 2. Dataset distribution used in model training and testing: (a) Celeb-DF V2, (b) DFDC.
+3.3. Preprocessing Pipeline
+During preprocessing of the Celeb-DF v2 dataset, facial regions are detected and
+cropped using the MTCNN, then resized to 224 × 224 pixels. Redundant frames are filtered
+based on the structural similarity index (SSIM) [49], with an initial threshold of 0.85 to
+remove duplicates while preserving diverse frames. The threshold is adjusted to maintain
+40 to 55 frames per video [26], duplicating frames as needed. For videos with fewer than
+40 frames, higher SSIM thresholds (up to 0.97) are applied iteratively to retain unique
+frames. Excess frames are randomly selected to ensure uniformity across the dataset.
+
+
+--- PAGE 9 ---
+
+Mathematics 2025, 13, 3088
+9 of 22
+For the DFDC dataset, a two-stage processing approach is employed based on the
+number of video frames. In the first stage, videos with fewer than 100 frames are sent
+directly to the Multi-Task Cascaded Convolutional Network (MTCNN) [45] for face detec-
+tion. If more than 55 valid frames are detected, 55 are randomly selected. For videos with
+over 100 frames, 100 frames are randomly chosen before processing. Approximately 10%
+of videos yield fewer than 40 usable frames and are reprocessed with the MTCNN on all
+frames. If needed, the face detection confidence threshold is lowered from 0.99 to 0.90 to
+ensure sufficient facial feature extraction. Ultimately, each video contains between 40 and
+55 frames to achieve consistent input lengths during training.
+The MTCNN is an efficient deep learning method for face detection and alignment
+that utilizes a three-stage cascaded framework [45]. In the first stage, the Proposal Network
+(P-Net) generates candidate face windows and refines them through bounding box regres-
+sion and non-maximum suppression (NMS) to eliminate redundancies. P-Net is flexible,
+requiring no specific input size. In the second stage, the Refine Network (R-Net) filters
+false positives and further refines bounding boxes with additional regression and NMS,
+necessitating an input size of 24 × 24 pixels. In the third stage, the Output Network (O-Net)
+enhances face alignment by predicting five facial landmarks and requires a 48 × 48 pixel in-
+put. It uses outputs from earlier stages to create patches from normalized images, ensuring
+accurate localization.
+The MTCNN processes input frames of varying sizes using an image pyramid ap-
+proach, beginning with frames as small as 12 × 12 pixels. Bounding boxes from the
+last stage are used to crop images, while landmarks ensure precise alignment. Aligned
+images are then resized for input into MobileNet v1, optimizing feature extraction in
+subsequent processing.
+3.4. Experimental Protocols
+We performed preprocessing of the Celeb-DF v2 dataset using Jupyter Notebook
+with Python 3.12.4, which offers various libraries for efficient data processing. For the
+DFDC dataset and model execution, we utilized Google Colab Pro+, which benefits from
+a high RAM and access to a powerful A100 GPU, ideal for deep learning tasks. The
+libraries employed included TensorFlow [55] and Keras [56] for building and training
+the deep learning model, scikit-learn [57] for data splitting and performance evaluation,
+and joblib [58] for saving and loading model components. The process of choosing the
+hyperparameters of the model is explained in Section 3.4, and the evaluation strategy of
+our deepfake detection model is described in Section 3.5.
+In the hyperparameter selection process, α and ρ for MobileNet V1 were configured to
+1. This selection preserves the standard configuration of MobileNet V1, allowing the model
+to operate at its full width and resolution.
+For the CBAM component, we focused on tuning the reduction ratio, a hyperparameter
+that regulates the degree of dimensionality reduction in the channel attention module. We
+tested values of 1, 4, 8, and 16, with 16 serving as the default. Additionally, we set the
+kernel size of the convolutional layer—which influences the receptive field and spatial
+resolution of the attention map [33]—to 7, as this is the standard value.
+The GRU architecture incorporates several key hyperparameters that significantly
+affect its ability to process and learn from sequential data. One such hyperparameter is the
+number of layers, which defines the model’s depth and enables it to capture more complex
+temporal patterns. We evaluated configurations with 1, 2, 3, and 4 layers. Additionally, the
+number of units in each GRU layer determines the capacity for learning and information
+storage; we explored values of 128, 256, and 512 for this hyperparameter.
+
+
+--- PAGE 10 ---
+
+Mathematics 2025, 13, 3088
+10 of 22
+Additionally, we tuned two hyperparameters: learning rate and batch size. The
+selected learning rate values were 0.01, 0.001, and 0.0001. For batch size, we chose values of
+2, 4, and 8. The number of epochs was set to 10 as in [59], with early stopping implemented
+to prevent overfitting.
+We utilized KerasTuner with a Random Search approach [60], enabling the automated
+and efficient exploration of various configurations to identify the optimal settings based
+on validation accuracy. The optimal hyperparameter values identified through this tuning
+process include a reduction ratio of 1, four layers, 128 units, a learning rate of 0.0001, and a
+batch size of 4.
+3.5. Performance Evaluation
+We assessed the effectiveness of our deepfake detection model using several key
+metrics, including accuracy, precision, recall, and F1-score. Let TP represent the number
+of true positives, FP the number of false positives, TN the number of true negatives, and
+FN the number of false negates. Accuracy (Acc) is a widely utilized metric for assessing
+algorithm performance in classification problems, and is defined as the ratio of correctly
+classified instances to the total number of observations (8). Balanced accuracy (ACCB)
+equally weighs the performance of positive and negative classes (9), and precision (P)
+reflects the proportion of relevant items among those selected by an algorithm, measuring
+how many predicted positives are actually correct (10). Recall (R) represents the proportion
+of relevant data items that are successfully selected (11) and measures how many actual
+positive observations were correctly identified by the algorithm. The F1-score (F1) evaluates
+an algorithm’s performance by integrating both precision and recall. Mathematically, it is
+defined as the harmonic mean of these two metrics (12). We also incorporated measures
+of model efficiency, such as the number of parameters, training time, and Floating-Point
+Operations (FLOPs).
+Acc =
+TP + TN
+TP + TN + FP + FN
+(8)
+AccB = 1
+2(
+TP
+TP + FN +
+TN
+TN + FP)
+(9)
+P =
+TP
+TP + FP
+(10)
+R =
+TP
+TP + FN
+(11)
+F1 = 2 × P × R
+P + R
+(12)
+To evaluate the performance of the LightFakeDetect model, we compared it against
+two benchmark models. The first [18] features an automatic weighting mechanism and
+shares architectural and preprocessing similarities with our approach. It utilizes an MTCNN
+for face detection and alignment, followed by a CNN for feature extraction and a GRU for
+temporal analysis, and was trained on the DFDC dataset. The second model, ViViT [26],
+was selected for its use of CBAM, making it suitable for comparison. However, ViViT’s
+architecture is more complex due to additional components. This comparison aimed to
+determine whether our simpler approach could achieve competitive performance. We
+also compared our results with pretrained models such as Meso-4 [16], Xception [36], and
+Inception [61].
+
+
+--- PAGE 11 ---
+
+Mathematics 2025, 13, 3088
+11 of 22
+4. Results
+4.1. Assessment of Class Weight Integration with Loss Function
+The performance of the proposed LightFakeDetect model was evaluated using
+two benchmark datasets: Celeb-DF(V2) and DFDC. Both datasets exhibit significant class
+imbalance, as shown in Section 3.2, characterized by a considerably higher number of fake
+videos compared to real ones. This imbalance poses a challenge, as it can lead to model
+bias toward the majority class.
+To address this issue, class weights were employed during training, with greater
+importance assigned to the minority class (real videos) by incorporating higher weights
+into the loss function. These weights were computed using the compute_class_weight()
+function from the sklearn library, ensuring that the model effectively learns from the
+underrepresented real videos.
+The model was trained under two conditions: one without class weights and another
+with class weights applied. The results, illustrated in Figure 3, highlight the training and
+validation loss, accuracy, and F1-score over 10 epochs for both configurations. Overall, the
+model exhibited consistent improvement across all metrics during training. The incorporation
+of class weights notably enhanced the model’s performance on real videos, as evidenced by an
+increase in accuracy and F1-scores over time, along with a decrease in training and validation
+loss. The setting with class weights demonstrated superior stability and performance in most
+instances, particularly in addressing the challenges posed by the imbalanced data.
+0
+2
+4
+6
+8
+Epochs
+0.1
+0.2
+0.3
+0.4
+0.5
+Loss
+Train Loss (No Class Weight)
+Val Loss (No Class Weight)
+Train Loss (With Class Weight)
+Val Loss (With Class Weight)
+(a)
+0
+2
+4
+6
+8
+Epochs
+0.1
+0.2
+0.3
+0.4
+0.5
+Loss
+Train Loss (No Class Weight)
+Val Loss (No Class Weight)
+Train Loss (With Class Weight)
+Val Loss (With Class Weight)
+(b)
+0
+2
+4
+6
+8
+Epochs
+0.70
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+Accuracy
+Train Accuracy (No Class Weight)
+Val Accuracy (No Class Weight)
+Train Accuracy (With Class Weight)
+Val Accuracy (With Class Weight)
+(c)
+0
+2
+4
+6
+8
+Epochs
+0.80
+0.85
+0.90
+0.95
+1.00
+Accuracy
+Train Accuracy (No Class Weight)
+Val Accuracy (No Class Weight)
+Train Accuracy (With Class Weight)
+Val Accuracy (With Class Weight)
+(d)
+Figure 3. Cont.
+
+
+--- PAGE 12 ---
+
+Mathematics 2025, 13, 3088
+12 of 22
+0
+2
+4
+6
+8
+Epochs
+0.800
+0.825
+0.850
+0.875
+0.900
+0.925
+0.950
+0.975
+1.000
+F1 Score
+F1 Score (No Class Weight)
+F1 Score (With Class Weight)
+(e)
+0
+2
+4
+6
+8
+Epochs
+0.86
+0.88
+0.90
+0.92
+0.94
+0.96
+0.98
+1.00
+F1 Score
+F1 Score (No Class Weight)
+F1 Score (With Class Weight)
+(f)
+Figure 3. Plots for evaluation of class imbalance mitigation in the LightFakeDetect model: (a) Training
+and validation loss (Celeb-DF v2). (b) Training and validation loss (DFDC). (c) Training and validation
+accuracy (Celeb-DF v2). (d) Training and validation accuracy (DFDC). (e) Validation F1-score (Celeb-
+DF v2). (f) Validation F1-score (DFDC).
+The evaluation of the model was conducted on the test sets of the Celeb-DF(V2)
+and DFDC datasets. Figure 4 presents the confusion matrices, showing how well the
+model distinguished between real and fake videos under both training settings. The
+class-weighted model reduced the misclassifications of real videos, particularly on the
+DFDC dataset.
+(a)
+(b)
+Figure 4. Cont.
+
+
+--- PAGE 13 ---
+
+Mathematics 2025, 13, 3088
+13 of 22
+(c)
+(d)
+Figure 4. Confusion matrix: (a) Training without using class weights (Celeb-DF v2). (b) Training
+using class weights (Celeb-DF v2). (c) Training without using class weights (DFDC). (d) Training
+without using class weights (DFDC).
+Figure 5 displays the ROC curves for both datasets. The class-weighted models achieved
+higher AUC scores, especially on DFDC, indicating better discrimination between classes.
+(a)
+(b)
+Figure 5. ROC curves for the LightFakeDetect model evaluated on the test sets of the (a) Celeb-DF v2
+and (b) DFDC datasets.
+Table 1 summarizes the test performance of the DeepFakeDetect model under both
+training strategies, with and without class weights. On the Celeb-DF(V2) dataset, both
+approaches achieved high accuracy (Acc) and F1-scores, with the weighted model slightly
+improving balanced accuracy. For the DFDC dataset, the use of class weights significantly
+boosted precision (P) and balanced accuracy (AccB), indicating better handling of the
+minority class.
+
+
+--- PAGE 14 ---
+
+Mathematics 2025, 13, 3088
+14 of 22
+Table 1. Performance evaluation of the LightFakeDetect model on the test set for the Celeb-DF V2 and
+DFDC datasets, comparing training configurations with and without the application of class weights.
+Dataset
+Configuration
+R
+P
+F1-Score
+Acc
+AccB
+Inference Time
+FPS
+Celeb-DF
+With class weights
+99.3%
+98.7%
+99.0%
+98.2%
+95.4%
+3 s
+0.33
+No class weights
+99.6%
+98.3%
+98.9%
+98.2%
+94.2%
+2 s
+0.5
+DFDC
+With class weights
+98.9%
+95.5%
+97.2%
+95.0%
+82.9%
+7 s
+0.14
+No class weights
+99.9%
+89.9%
+94.6%
+90.0%
+60.1%
+0.8 s
+1.25
+All inference times reported in Table 1 correspond to the processing of a single frame
+(batch size = 1) on an NVIDIA A100 GPU (NVIDIA Corporation, Santa Clara, CA, USA).
+To facilitate direct comparison with real-time constraints, we converted the average time
+per frame into frames per second (FPS) using FPS = 1/time(s). The resulting FPS values
+are approximately 0.33 FPS for Celeb-DF with class weights (3 s per frame), 0.5 FPS for
+Celeb-DF without class weights (2 s per frame), 0.14 FPS for DFDC with class weights
+(7 s per frame), and 1.25 FPS for DFDC without class weights (0.8 s per frame). These results
+show that, although LightFakeDetect achieves very high detection accuracy, its current
+throughput is below typical real-time requirements (around 10–20 FPS). However, because
+the model is comparatively lightweight, it can be further optimized through quantization,
+pruning, and GPU-accelerated inference engines (e.g., TensorRT or ONNX Runtime) to
+reach real-time performance in deployment scenarios.
+Although LightFakeDetect contains more parameters than compact CNNs such as
+Meso-4, it is termed “lightweight” in this study because its design is considerably simpler
+and less computationally intensive than contemporary transformer-based or multi-stream
+deepfake detectors. Consequently, while LightFakeDetect has ≈22.8 M parameters, it
+still uses far fewer FLOPs (63.2 GFLOPs vs. 289.2 GFLOPs) and shorter training time
+(18 h vs. 41 h) than Automatic Face Weighting, making it much more suitable for deploy-
+ment under constrained computational resources.
+4.2. LightFakeDetect Performance Benchmarking
+Table 2 presents a comparative analysis of the LightFakeDetect model’s performance
+against benchmark models, including ViViT [26], Inception [61], Meso-4 [16], Lightweight
+Deepfake [44], Automatic Face Weighting [20], DeepFake Adaboost [37], and TinyDF [43].
+The evaluation utilizes several metrics, such as balanced accuracy (AccB), overall accu-
+racy (Acc), area under the receiver operating characteristic curve (AUC), F1-score, Giga
+Floating-Point Operations (GFLOPs), training time (Time), and the number of parameters
+(No. Param.).
+Regarding the assessment of deepfake detection on the Celeb-DF dataset, LightFakeDe-
+tect demonstrates competitive performance in terms of both effectiveness and efficiency. It
+achieves a balanced accuracy of 95.4% and an F1-score of 99%, which are notably higher
+than those of traditional models such as Inception and Meso-4, both of which attain accu-
+racies of 86.3% and F1-scores of 92.6%. Additionally, LightFakeDetect has an area under
+the curve (AUC) of 99.8%, indicating its ability to differentiate between authentic and
+manipulated content effectively. While ViViT achieves an accuracy of 87.18%, it does not
+match the robustness or efficiency of LightFakeDetect. The latter also benefits from a more
+streamlined architecture, as reflected in its lower GFLOPs and processing time. In contrast,
+the Lightweight Deepfake model falls significantly short, lacking detailed performance
+metrics but registering only 78% accuracy, which reflects a considerable gap in effectiveness.
+
+
+--- PAGE 15 ---
+
+Mathematics 2025, 13, 3088
+15 of 22
+Table 2. Performance comparison of benchmark models on the Celeb-DF V2 and DFDC datasets.
+Dataset
+Model
+AccB
+Acc
+AUC
+F1-Score
+GFLOPs
+Time
+No.
+Param.
+Celeb-DF
+ViViT [26]
+-
+87.18%
+-
+92.51%
+-
+-
+-
+Inception [61]
+50%
+86.3%
+58.6%
+92.6%
+5.694
+12 h 5 min
+262,401
+Meso-4 [16]
+50%
+86.3%
+55.9%
+92.6%
+0.094
+10 h 5 min
+24,137
+Lightweight Deepfake [44]
+-
+78%
+-
+-
+-
+-
+-
+LightFakeDetect
+95.4%
+95.4%
+99.8%
+99%
+63.249
+12 h 15 min
+22,821,825
+DFDC
+ViViT [26]
+-
+88.03%
+-
+90.23%
+-
+-
+Automatic Face Weighting [20]
+74.04%
+91.42%
+91.80%
+95.22%
+289.195
+41 h 36 min
+48,209,658
+Inception [61]
+50%
+87.6%
+62.9%
+93.4%
+5.694
+10 h 15 min
+262,401
+Meso-4 [16]
+50%
+87.9%
+63.9%
+93.4%
+0.094
+10 h 38 min
+24,137
+DeepFake Adaboost [37]
+-
+86.5%
+-
+86.4%
+-
+-
+-
+TinyDF [43]
+-
+68.58%
+74.90%
+-
+0.59
+-
+5,380,000
+LightFakeDetect
+82.9%
+82.9%
+97.4%
+97.2%
+63.249
+18 h 28 min
+22,821,825
+In the DFDC dataset, LightFakeDetect demonstrates competitive performance com-
+pared to the other models. It achieves a balanced accuracy of 82.9% and an F1-score of
+97.2%, which are respectable results, although it falls short of the accuracy achieved by Au-
+tomatic Face Weighting at 91.42%. However, LightFakeDetect excels in terms of efficiency,
+utilizing only 63.249 GFLOPs and requiring 18 h and 28 min for processing. This contrasts
+sharply with Automatic Face Weighting, which, despite its higher accuracy, demands
+significantly more computational resources, at 289.195 GFLOPs, and a longer processing
+time of 41 h and 36 min. Additionally, LightFakeDetect has a more compact architecture
+with 22,821,825 parameters, compared to the 48,209,658 parameters of Automatic Face
+Weighting. In comparison, DeepFake Adaboost achieves lower metrics with an accuracy of
+86.5% and F1-score of 86.4%. TinyDF, while reporting an accuracy of 68.58% and an AUC
+of 74.90%, did not train on the DFDC dataset and thus may not reflect its true potential in
+this context. It does have minimal resource requirements at 0.59 GFLOPs. Overall, while
+LightFakeDetect may not be the most accurate model, its balance of detection performance
+and efficiency makes it a compelling choice for practical deepfake detection.
+Regarding the comparison of model efficiency, Reference [26] does not provide exact
+values for the FLOPs or parameter counts of the proposed model. For reference, the
+standard ViViT-B/16 model contains approximately 89 million parameters and requires
+about 277.1 to 455.2 Giga Floating-Point Operations (GFLOPs) per video [62]. Since the
+model presented in this paper is a customized variant of ViViT, its complexity is expected
+to be comparable to or slightly lower than that of ViViT-B/16. These figures are offered
+solely for general comparison and should be treated as approximate estimates.
+While LightFakeDetect achieves high accuracy on Celeb-DF, its balanced accuracy is
+lower on DFDC. This discrepancy likely stems from the substantially larger scale and het-
+erogeneity of DFDC, which contains multiple manipulation techniques, varied resolutions,
+and uncontrolled capture conditions, leading to distributional shifts not present in the train-
+ing data. Such shifts are known to degrade the performance of deepfake detectors trained
+on a single dataset. Several strategies can address this limitation. Domain adaptation
+methods (e.g., adversarial feature alignment or domain-invariant representation learning)
+could reduce the discrepancy between source and target distributions. Cross-dataset or
+mixed-dataset training, in which models are simultaneously exposed to multiple sources of
+manipulated data, can also improve robustness. In addition, augmentation strategies that
+simulate unseen manipulations, compression artefacts, and noise could further enhance
+generalization. Investigating these directions is an important avenue for future work to
+extend LightFakeDetect’s applicability to highly diverse or previously unseen forgeries.
+
+
+--- PAGE 16 ---
+
+Mathematics 2025, 13, 3088
+16 of 22
+LightFakeDetect consistently outperforms existing models across both datasets, offer-
+ing a strong balance between accuracy and efficiency. These results highlight its suitability
+for real-world deepfake detection under limited computational resources.
+5. Ablation Experiments
+To better understand the role of each major component in the proposed LightFakeDe-
+tect model, we conducted a series of ablation experiments on the Celeb-DF dataset
+(see Table 3). In each experiment, we removed or replaced a single module of the ar-
+chitecture while keeping all other training and evaluation settings fixed. This approach
+allows us to quantify the individual contribution of the CBAM, the GRU temporal module,
+and the MobileNet backbone to the overall detection performance.
+Table 3. Ablation experiments on Celeb-DF.
+Recall
+Precision
+Accuracy
+AUC
+Time per Step
+Without CBAM
+99.47%
+99.47%
+99.08%
+99.9%
+10 s
+Without GRU
+88.91%
+99.80%
+90.27%
+96.3%
+6 s
+Standard CNN
+100%
+86.37%
+86.37%
+47.8%
+6 s
+Original LightFakeDetect
+98.3%
+99.6%
+95.4%
+99.8%
+3 s
+The full LightFakeDetect model achieved strong results with a recall of 99.6%,
+precision of 98.3%, accuracy of 95.4% and an AUC of 99.8%. When the CBAM was
+removed, the model’s performance remained essentially unchanged—recall 99.47%, pre-
+cision 99.47%, accuracy 99.08% and AUC 99.9%, but the training time per step increased
+noticeably to 10s. This indicates that, under our current settings, although the spatial
+attention module provides only marginal gains in classification metrics, it contributes to
+more efficient computation; without it the network becomes significantly slower to train
+despite producing similar predictive performance.
+By contrast, removing the GRU produced a marked degradation in detection ability.
+The model’s recall fell to 88.91%, accuracy to 90.27% and AUC to 96.3% at 6 s per step,
+although precision slightly increased to 99.8%. These results indicate that the temporal
+aggregation provided by the GRU is critical for maintaining high sensitivity to manipulated
+content, especially for videos where frame-to-frame consistency is informative.
+The largest performance drop was observed when replacing the MobileNet backbone
+with a small conventional CNN. Although the model achieved perfect recall of 100%,
+its precision and accuracy decreased sharply to 86.37% and the AUC collapsed to 47.8%
+at 6 s per step. This behavior reflects a severe loss of discriminative power and poor
+calibration of prediction scores, demonstrating that the lightweight MobileNet backbone
+is essential for producing well-separated feature representations despite its relatively low
+computational cost.
+The ablation results show that although the CBAM module yields only marginal gains
+in predictive metrics, it substantially improves computational efficiency, as removing it led
+to a noticeable increase in training time per step despite similar accuracy. In contrast, the
+GRU module and, in particular, the MobileNet backbone are indispensable for maintain-
+ing the high detection accuracy, balanced precision–recall behavior, and robust ranking
+performance that characterize the full LightFakeDetect model on Celeb-DF.
+6. Discussion
+The study’s final findings demonstrate that the proposed LightFakeDetect model
+effectively addresses the problem of deepfake video detection, particularly when there is a
+notable class imbalance. Experiments on two well-known benchmark datasets, DFDC and
+Celeb-DF(V2), confirm that the model can achieve both high accuracy and stability.
+
+
+--- PAGE 17 ---
+
+Mathematics 2025, 13, 3088
+17 of 22
+To correct the imbalance between real and fake videos, the model was trained in two
+different configurations: with and without class weighting. Since better balanced accuracy
+and precision values were obtained, using class weights proved crucial in enhancing
+the detection of the minority class (real videos). For instance, using class weights on
+the DFDC dataset greatly increased the model’s precision from 89.9% to 95.5% and its
+balanced accuracy from 60.1% to 82.9%. This suggests that the model was able to eliminate
+bias towards the majority fake class and learn more discriminative characteristics for the
+minority real class.
+The strong performance of LightFakeDetect can be attributed to the effective inte-
+gration of its core components: MobileNet, CBAM, and GRU. MobileNet, a lightweight
+CNN, efficiently extracts rich spatial features from each video frame, capturing fine-grained
+facial structures such as textures, edges, and local lighting cues while maintaining low
+computational overhead. These features are then refined by the CBAM, which sequentially
+applies channel and spatial attention to highlight the most informative facial regions such
+as areas exhibiting texture irregularities, unnatural lighting, or blending artifacts, while
+suppressing less relevant background information. This targeted refinement improves the
+discriminative quality of the extracted features. Finally, the GRU processes the temporally
+aligned, refined features across consecutive frames to model motion dynamics and temporal
+dependencies. This enables the model to detect subtle inconsistencies in facial expressions,
+lip-syncing, or movements introduced by deepfake manipulations that may not be evident
+from individual frames. By integrating these three components, LightFakeDetect combines
+efficient spatial representation, focused attention, and temporal modeling to achieve robust
+and lightweight deepfake detection.
+Accuracy, F1-score, and AUC were among the performance metrics on both datasets
+that continuously improved during training, indicating the model’s capability for gener-
+alization. LightFakeDetect demonstrated competitive or better accuracy and F1-scores
+compared to baseline models like ViViT and Automatic Face Weighting despite being
+smaller and requiring less computing power. This is important given the resource con-
+straints that exist in real-world deployment. These findings are supported by the confusion
+matrices and ROC curves, which show improved class separation and fewer misclassifica-
+tions under the class-weighted training scenario.
+To further analyze the model’s limitations, we examined both correct and incorrect
+classifications in the Celeb-DF dataset. Out of 21 misclassified videos, 19 were real videos
+predicted as fake, indicating a stronger tendency toward false negatives, due to the lack of
+real samples in Celeb-DF v2. To better understand these outcomes, we compared represen-
+tative examples of correct and incorrect predictions. Misclassifications frequently occurred
+in videos with abrupt cuts, occluded features, or degraded visual quality. A scenario-based
+inspection revealed several recurring challenges that contributed to misclassification. First,
+occlusions, shadows, or changes in illumination often distorted facial features, reducing
+detection reliability; see Figure 6. Second, low-resolution or distant faces led to poor-quality
+crops by MTCNN, see Figure 7, which limited the detail available for classification. Finally,
+the unexpected appearance of new faces confused the model’s sequence-level analysis.
+Figure 6 represents consecutive frames from videos that were wrongly classified as
+fake, while in fact they are real. This misclassification occurred because of a change in the
+illumination, which caused the model to interpret the videos as fake. As shown in Figure 7a,
+the face was captured from a close distance, while in Figure 6b the camera was positioned
+farther away. The greater distance resulted in low-resolution facial crops, which provided
+insufficient detail for accurate classification and ultimately led to misclassification.
+
+
+--- PAGE 18 ---
+
+Mathematics 2025, 13, 3088
+18 of 22
+ 
+ 
+(a) Frame 19 
+(b) Frame 20 
+Figure 6. Consecutive frames from videos misclassified as fake due to lighting variations.
+ 
+ 
+(a) Cropped face from close distance 
+(b) Cropped face from long distance 
+Figure 7. Comparison of facial capture distances: (a) close-range capture providing high-resolution
+detail, and (b) distant capture resulting in low-resolution facial crops. The decreased detail in
+(b) contributed to insufficient information for accurate classification, leading to misclassification.
+The current results are reported for the full-precision (FP32) LightFakeDetect pipeline.
+Although our system is not yet implemented as a single end-to-end model, each of its
+components (MobileNet backbone, CBAM, and GRU) is compatible with widely used
+model-compression and quantization frameworks (e.g., TensorFlow Lite, ONNX). The liter-
+ature reports that FP16 quantization can roughly halve model size and increase throughput
+on embedded GPUs with <1–2% loss in F1-score, while INT8 quantization provides even
+higher speed-ups with slightly larger (2–4%) accuracy drops. We therefore expect Light-
+FakeDetect to retain high detection performance when ported to small devices after such
+optimizations. A complete evaluation of these trade-offs is planned for future work.
+Although LightFakeDetect in its present form analyzes only the visual modality,
+many deepfake videos also exhibit artifacts in their audio tracks, such as mismatched
+lip movements, altered prosody, or inconsistent background noise. Combining audio-
+based features (e.g., spectrogram or Mel-frequency cepstral coefficients extracted from
+the soundtrack) with our CBAM–GRU video pipeline could capture such inconsistencies
+and provide complementary cues for discrimination. For instance, an audio branch using
+a lightweight convolutional network or a transformer encoder could process temporal
+acoustic patterns in parallel with the video branch, and the outputs could be fused at the
+feature or decision level. This multimodal approach has been shown in related studies to
+
+
+--- PAGE 19 ---
+
+Mathematics 2025, 13, 3088
+19 of 22
+boost robustness against sophisticated forgeries and is a promising direction for future
+work on LightFakeDetect.
+The current pipeline relies on an external MTCNN module for face detection and
+alignment to produce standardized crops for feature extraction. Although MTCNN is fast
+and accurate for most frontal faces, it can misdetect or fail on occluded, low-quality, or
+extreme-pose frames, which may propagate errors into later stages of the pipeline. This
+reliance constitutes a potential limitation of LightFakeDetect’s robustness in unconstrained
+settings. Future work will explore (i) incorporating more resilient detectors (e.g., RetinaFace,
+BlazeFace) or ensemble strategies to reduce single-detector failure, (ii) adding temporal
+smoothing to handle intermittent detection errors, and (iii) developing an end-to-end
+framework that jointly optimizes face localization and deepfake classification to further
+increase robustness.
+Results confirm the initial hypothesis that a lightweight model with balanced training
+can efficiently detect deepfakes, even when faced with performance variances caused
+by dataset size and training conditions. The combination of efficient feature extraction,
+focused attention, and temporal modeling makes LightFakeDetect a reliable, scalable, and
+high-performing solution for real-world deepfake video detection.
+7. Research Implications
+The results of this research hold significant implications for both the academic com-
+munity and real-world applications in the fight against deepfake media. By integrating
+MobileNet for efficient feature extraction, a CBAM for enhanced spatial feature refinement,
+and a GRU for temporal sequence modeling, the proposed model achieves a balance be-
+tween high detection accuracy and computational efficiency. This balance is critical for
+enabling the model’s deployment in resource-constrained environments such as mobile
+devices, embedded edge devices, and real-time monitoring platforms.
+From a practical perspective, the model’s ability to achieve accuracy rates exceeding
+98% on the Celeb-DF v2 and 95% on the DFDC benchmark datasets demonstrates its
+robustness against sophisticated and diverse manipulation techniques. This suggests that it
+has strong potential for integration into social media platforms, digital forensics pipelines,
+and governmental security infrastructures, where rapid and reliable verification of video
+authenticity is essential. Furthermore, the use of a lightweight architecture mitigates the
+operational costs typically associated with large-scale AI deployment, enabling the model’s
+widespread adoption without extensive hardware upgrades.
+On a societal level, the proposed framework contributes to countering the growing
+threats posed by malicious deepfake usage, including political misinformation, reputa-
+tional damage, and manipulation of legal evidence. By lowering the barrier to deploying
+effective detection systems, the proposed approach can serve as a scalable defense mech-
+anism, complementing policy measures and public awareness campaigns. The model’s
+design also allows for straightforward retraining and adaptation to emerging manipulation
+techniques, ensuring that the model’s detection capabilities evolve alongside deepfake
+generation technologies.
+8. Conclusions
+This paper presents LightFakeDetect, a deep learning model designed to detect deepfakes
+in video content, addressing the increasing prevalence of manipulated videos. Through a
+thorough review of existing models and their limitations, we constructed a five-stage pipeline
+that integrates face detection, feature extraction, attention mechanisms, and temporal analysis.
+Our model achieved commendable performance metrics, with a balanced accuracy of 95.4%
+and an F1-score of 99% on the Celeb-DF v2 dataset and a balanced accuracy of 82.9% and an
+
+
+--- PAGE 20 ---
+
+Mathematics 2025, 13, 3088
+20 of 22
+F1-score of 97.2% on the DFDC dataset. LightFakeDetect outperformed benchmark models
+while maintaining compatibility with devices with limited hardware resources. However, the
+proposed LightFakeDetect is not a fully end-to-end pipeline, as it relies on a separate face
+detection and cropping stage using an MTCNN, making it sensitive to errors in preprocessing.
+Moreover, while MobileNet v1 offers efficiency, its reduced representational capacity may
+limit detection of subtle or high-quality manipulations, and GRU-based temporal modeling
+may underexploit complex spatio-temporal patterns. Future research could explore integrat-
+ing lightweight end-to-end architectures that combine face localization, spatial-–temporal
+modeling, and attention in a single framework. In addition, future research could extend the
+model to incorporate audio cues for multimodal detection, thus enhancing the robustness of
+the model against complex forgeries.
+Author Contributions: Conceptualization, S.A.; methodology, S.A., D.A., L.A., S.T.A. and H.A.;
+software, D.A., L.A., S.T.A. and H.A.; validation, S.T.A. and H.A.; formal analysis, D.A. and L.A.;
+writing—original draft preparation, S.A.; writing—review and editing, S.A.; visualization, S.A.;
+supervision, S.A. All authors have read and agreed to the published version of the manuscript.
+Funding: This research received no external funding.
+Data Availability Statement: The datasets used in this study are openly available at https://ai.meta.
+com/datasets/dfdc/ (accessed on 12 June 2025) and on Github at https://github.com/yuezunli/
+celeb-deepfakeforensics?tab=readme-ov-file (accessed on 15 June 2025).
+Conflicts of Interest: The authors declare no conflicts of interest.
+References
+1.
+Yu, P.; Xia, Z.; Fei, J.; Lu, Y. A Survey on Deepfake Video Detection. IET Biom. 2021, 10, 607–624. [CrossRef]
+2.
+Malik, A.; Kuribayashi, M.; Abdullahi, S.M.; Khan, A.N. DeepFake Detection for Human Face Images and Videos: A Survey.
+IEEE Access 2022, 10, 18757–18775. [CrossRef]
+3.
+Delfino, R.A. Pornographic deepfakes: The case for federal criminalization of revenge porn’s next tragic act. Actual Probl. Econ.
+Law 2020, 14, 105. [CrossRef]
+4.
+Citron, D.K.; Chesney, R. Deep fakes: A looming challenge for privacy, democracy, and national security. Calif. Law Rev. 2019,
+107, 1753.
+5.
+Goodfellow, I.J.; Pouget-Abadie, J.; Mirza, M.; Xu, B.; Warde-Farley, D.; Ozair, S.; Courville, A.; Bengio, Y. Generative adversarial
+nets. In Proceedings of the Advances in Neural Information Processing Systems, Montreal, QC, Canada, 8–13 December 2014;
+Volume 27.
+6.
+Baldi, P. Autoencoders, Unsupervised Learning, and Deep Architectures. In Proceedings of the ICML Workshop on Unsupervised
+and Transfer Learning, Bellevue, Washington, DC, USA, 2 July 2012; Guyon, I., Dror, G., Lemaire, V., Taylor, G., Silver, D., Eds.;
+Proceedings of Machine Learning Research: Cambridge, MA, USA, 2012; Volume 27, pp. 37–49.
+7.
+Rumelhart, D.E.; McClelland, J.L.; Group, P.R. Parallel Distributed Processing, Volume 1: Explorations in the Microstructure of
+Cognition: Foundations; The MIT Press: Cambridge, MA, USA, 1986. [CrossRef]
+8.
+Rana, M.S.; Nobi, M.N.; Murali, B.; Sung, A.H.
+Deepfake detection: A systematic literature review.
+IEEE Access 2022,
+10, 25494–25513. [CrossRef]
+9.
+Nirkin, Y.; Masi, I.; Tran Tuan, A.; Hassner, T.; Medioni, G. On Face Segmentation, Face Swapping, and Face Perception. In
+Proceedings of the 13th IEEE International Conference on Automatic Face & Gesture Recognition (FG 2018), Xi’an, China,
+15–19 May 2018; pp. 98–105. [CrossRef]
+10.
+Nirkin, Y.; Keller, Y.; Hassner, T. FSGAN: Subject Agnostic Face Swapping and Reenactment. In Proceedings of the IEEE/CVF
+International Conference on Computer Vision (ICCV), Seoul, Republic of Korea, 27 October–2 November 2019; pp. 7184–7193.
+11.
+Kumar, R.; Luo, J.; Pang, A.; Davis, J. Disjoint Pose and Shape for 3D Face Reconstruction. In Proceedings of the IEEE/CVF
+International Conference on Computer Vision (ICCV) Workshops, Paris, France, 1–6 October 2023; pp. 3115–3125.
+12.
+Fukushima, K. Neocognitron: A self-organizing neural network model for a mechanism of pattern recognition unaffected by
+shift in position. Biol. Cybern. 1980, 36, 193–202. [CrossRef]
+13.
+Gu, J.; Wang, Z.; Kuen, J.; Ma, L.; Shahroudy, A.; Shuai, B.; Liu, T.; Wang, X.; Wang, G.; Cai, J.; et al.
+Recent advances in
+convolutional neural networks. Pattern Recognit. 2018, 77, 354–377. [CrossRef]
+14.
+Elman, J.L. Finding structure in time. Cogn. Sci. 1990, 14, 179–211. [CrossRef]
+
+
+--- PAGE 21 ---
+
+Mathematics 2025, 13, 3088
+21 of 22
+15.
+Dosovitskiy, A.; Beyer, L.; Kolesnikov, A.; Weissenborn, D.; Zhai, X.; Unterthiner, T.; Dehghani, M.; Minderer, M.; Heigold, G.;
+Gelly, S.; et al. An Image is Worth 16 × 16 Words: Transformers for Image Recognition at Scale. arXiv 2021, arXiv:2010.11929.
+16.
+Afchar, D.; Nozick, V.; Yamagishi, J.; Echizen, I. MesoNet: A Compact Facial Video Forgery Detection Network. In Proceedings of
+the 2018 IEEE International Workshop on Information Forensics and Security (WIFS), Hong Kong, China, 11–13 December 2018;
+pp. 1–7. [CrossRef]
+17.
+Zhang, D.; Li, C.; Lin, F.; Zeng, D.; Ge, S. Detecting Deepfake Videos with Temporal Dropout 3DCNN. In Proceedings of the
+IJCAI, Virtual Reality, 19–26 August 2021; pp. 1288–1294.
+18.
+Ikram, S.T.; Priya, V.; Chambial, S.; Sood, D.; Arulkumar, V. A Performance Enhancement of Deepfake Video Detection through
+the use of a Hybrid CNN Deep Learning Model. Int. J. Electr. Comput. Eng. Syst. 2023, 14, 169–178. [CrossRef]
+19.
+Rathoure, N.; Pateriya, R.; Bharot, N.; Verma, P. Combating deepfakes: A comprehensive multilayer deepfake video detection
+framework. Multimed. Tools Appl. 2024, 83, 85619–85636. [CrossRef]
+20.
+Montserrat, D.M.; Hao, H.; Yarlagadda, S.K.; Baireddy, S.; Shao, R.; Horvath, J.; Bartusiak, E.; Yang, J.; Guera, D.; Zhu, F.; et al.
+Deepfakes Detection With Automatic Face Weighting. In Proceedings of the IEEE/CVF Conference on Computer Vision and
+Pattern Recognition (CVPR) Workshops, Seattle, WA, USA, 13–19 June 2020; pp. 668–669.
+21.
+Masi, I.; Killekar, A.; Mascarenhas, R.M.; Gurudatt, S.P.; AbdAlmageed, W. Two-Branch Recurrent Network for Isolating
+Deepfakes in Videos. In Proceedings of the Computer Vision—ECCV 2020, Glasgow, UK, 23–28 August 2020; Vedaldi, A., Bischof,
+H., Brox, T., Frahm, J.M., Eds.; Springer: Cham, Switzerland, 2020; pp. 667–684.
+22.
+Petmezas, G.; Vanian, V.; Konstantoudakis, K.; Almaloglou, E.E.; Zarpalas, D. Video deepfake detection using a hybrid
+CNN-LSTM-Transformer model for identity verification. Multimed. Tools Appl. 2025, 1–20. [CrossRef]
+23.
+Xiong, D.; Wen, Z.; Zhang, C.; Ren, D.; Li, W. BMNet: Enhancing Deepfake Detection Through BiLSTM and Multi-Head
+Self-Attention Mechanism. IEEE Access 2025, 13, 21547–21556. [CrossRef]
+24.
+Soudy, A.H.; Sayed, O.; Tag-Elser, H.; Ragab, R.; Mohsen, S.; Mostafa, T.; Abohany, A.A.; Slim, S.O. Deepfake detection using
+convolutional vision transformers and convolutional neural networks. Neural Comput. Appl. 2024, 36, 19759–19775. [CrossRef]
+25.
+Khormali, A.; Yuan, J.S. DFDT: An End-to-End DeepFake Detection Framework Using Vision Transformer. Appl. Sci. 2022,
+12, 2953. [CrossRef]
+26.
+Ramadhani, K.N.; Munir, R.; Utama, N.P. Improving Video Vision Transformer for Deepfake Video Detection Using Facial
+Landmark, Depthwise Separable Convolution and Self Attention. IEEE Access 2024, 12, 8932–8939. [CrossRef]
+27.
+Jung, T.; Kim, S.; Kim, K. DeepVision: Deepfakes Detection Using Human Eye Blinking Pattern. IEEE Access 2020, 8, 83144–83154.
+[CrossRef]
+28.
+Ciftci, U.A.; Demir, I.; Yin, L. How Do the Hearts of Deep Fakes Beat? Deep Fake Source Detection via Interpreting Residuals
+with Biological Signals. In Proceedings of the 2020 IEEE International Joint Conference on Biometrics (IJCB), Houston, TX, USA,
+28 September–1 October 2020; pp. 1–10. [CrossRef]
+29.
+Wu, J.; Zhu, Y.; Jiang, X.; Liu, Y.; Lin, J. Local attention and long-distance interaction of rPPG for deepfake detection. Vis. Comput.
+2024, 40, 1083–1094. [CrossRef] [PubMed]
+30.
+Ni, Y.; Zeng, W.; Xia, P.; Tan, R. A Deepfake Detection Algorithm Based on Fourier Transform of Biological Signal. Comput. Mater.
+Contin. 2024, 79, 5295. [CrossRef]
+31.
+Tan, M.; Le, Q. EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks.
+In Proceedings of the 36th
+International Conference on Machine Learning, Long Beach, CA, USA, 9–15 June 2019; Chaudhuri, K., Salakhutdinov, R., Eds.;
+Proceedings of Machine Learning Research (PMLR): Cambridge, MA, USA, 2019; Volume 97, pp. 6105–6114.
+32.
+Howard, A.G.; Zhu, M.; Chen, B.; Kalenichenko, D.; Wang, W.; Weyand, T.; Andreetto, M.; Adam, H. MobileNets: Efficient
+Convolutional Neural Networks for Mobile Vision Applications. arXiv 2017, arXiv:1704.04861. [CrossRef]
+33.
+Woo, S.; Park, J.; Lee, J.Y.; Kweon, I.S. CBAM: Convolutional Block Attention Module. In Proceedings of the European Conference
+on Computer Vision (ECCV), Munich, Germany, 8–14 September 2018; pp. 3–19.
+34.
+Cho, K.; van Merrienboer, B.; Gulcehre, C.; Bahdanau, D.; Bougares, F.; Schwenk, H.; Bengio, Y. Learning Phrase Representations
+using RNN Encoder-Decoder for Statistical Machine Translation. arXiv 2014, arXiv:1406.1078. [CrossRef]
+35.
+Szegedy, C.; Ioffe, S.; Vanhoucke, V.; Alemi, A. Inception-v4, Inception-ResNet and the Impact of Residual Connections on
+Learning.
+In Proceedings of the AAAI Conference on Artificial Intelligence, San Francisco, CA, USA, 4–9 February 2017;
+Volume 31. [CrossRef]
+36.
+Chollet, F. Xception: Deep Learning With Depthwise Separable Convolutions.
+In Proceedings of the IEEE Conference on
+Computer Vision and Pattern Recognition (CVPR), Honolulu, HI, USA, 21–26 July 2017; pp. 1251–1258.
+37.
+Devi, B.T.; Rajasekaran, R. Deepfake Video Detection Using Ada-Boosting on the DFDC Dataset. Procedia Comput. Sci. 2025,
+258, 1091–1101. [CrossRef]
+38.
+Huang, G.; Liu, Z.; van der Maaten, L.; Weinberger, K.Q. Densely Connected Convolutional Networks. In Proceedings of the
+IEEE Conference on Computer Vision and Pattern Recognition (CVPR), Honolulu, HI, USA, 21–26 July 2017; pp. 4700–4708.
+
+
+--- PAGE 22 ---
+
+Mathematics 2025, 13, 3088
+22 of 22
+39.
+Chung, J.S.; Nagrani, A.; Zisserman, A. VoxCeleb2: Deep Speaker Recognition. In Proceedings of the Interspeech 2018 (ISCA),
+Hyderabad, India, 2–6 September 2018; pp. 1086–1090. [CrossRef]
+40.
+Deng, J.; Guo, J.; Ververas, E.; Kotsia, I.; Zafeiriou, S. Retinaface: Single-shot multi-level face localisation in the wild.
+In
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, Seattle, WA, USA, 13–19 June 2020;
+pp. 5203–5212.
+41.
+Dang, H.; Liu, F.; Stehouwer, J.; Liu, X.; Jain, A.K. On the Detection of Digital Face Manipulation. In Proceedings of the IEEE/CVF
+Conference on Computer Vision and Pattern Recognition (CVPR), Seattle, WA, USA, 13–19 June 2020; pp. 5781–5790.
+42.
+Omar, K.; Sakr, R.H.; Alrahmawy, M.F. An ensemble of CNNs with self-attention mechanism for DeepFake video detection.
+Neural Comput. Appl. 2024, 36, 2749–2765. [CrossRef]
+43.
+Guo, H.; Wang, L.; Li, B.; Guo, Z. TinyDF: Tiny and Effective Model for Deepfake Detection. In Advanced Intelligent Computing
+Technology and Applications, Proceedings of the International Conference on Intelligent Computing; Springer: Singapore, 2025; pp. 247–256.
+44.
+Yasir, S.M.; Kim, H. Lightweight Deepfake Detection Based on Multi-Feature Fusion. Appl. Sci. 2025, 15, 1954. [CrossRef]
+45.
+Zhang, K.; Zhang, Z.; Li, Z.; Qiao, Y. Joint Face Detection and Alignment Using Multitask Cascaded Convolutional Networks.
+IEEE Signal Process. Lett. 2016, 23, 1499–1503. [CrossRef]
+46.
+Saini, K.; Devi, R. A systematic scoping review of the analysis of COVID-19 disease using chest X-ray images with deep learning
+models. J. Auton. Intell. 2023, 7, 1–19. [CrossRef]
+47.
+Liu, H.; Zhang, M.; Pei, L.; Wang, W.; Li, L.; Pan, C.-C.; Li, Z. Environment Classification for Global Navigation Satellite Systems
+Using Attention-Based Recurrent Neural Networks. In Spatial Data and Intelligence; Meng, X., Xie, X., Yue, Y., Ding, Z., Eds.;
+Springer: Cham, Switzerland, 2021; pp. 60–71.
+48.
+Sifre, L. Rigid-Motion Scattering for Image Classification. Ph.D. Thesis, Ecole Polytechnique, CMAP, Palaiseau, France, 2014.
+49.
+Wang, Z.; Bovik, A.; Sheikh, H.; Simoncelli, E. Image quality assessment: From error visibility to structural similarity. IEEE Trans.
+Image Process. 2004, 13, 600–612. [CrossRef]
+50.
+Wang, F.; Jiang, M.; Qian, C.; Yang, S.; Li, C.; Zhang, H.; Wang, X.; Tang, X. Residual Attention Network for Image Classification.
+In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), Honolulu, HI, USA, 21–26 July
+2017; pp. 3156–3164.
+51.
+Ramachandran, P.; Zoph, B.; Le, Q.V. Searching for Activation Functions. arXiv 2017, arXiv:1710.05941. [CrossRef]
+52.
+Gao, S.; Huang, Y.; Zhang, S.; Han, J.; Wang, G.; Zhang, M.; Lin, Q. Short-term runoff prediction with GRU and LSTM networks
+without requiring time step optimization during sample generation. J. Hydrol. 2020, 589, 125188. [CrossRef]
+53.
+Dolhansky, B.; Bitton, J.; Pflaum, B.; Lu, J.; Howes, R.; Wang, M.; Ferrer, C.C. The DeepFake Detection Challenge (DFDC) Dataset.
+arXiv 2020, arXiv:2006.07397. [CrossRef]
+54.
+Li, Y.; Yang, X.; Sun, P.; Qi, H.; Lyu, S. Celeb-DF: A Large-Scale Challenging Dataset for DeepFake Forensics. In Proceedings of the
+IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), Seattle, WA, USA, 13–19 June 2020; pp. 3207–3216.
+55.
+Abadi, M.; Agarwal, A.; Barham, P.; Brevdo, E.; Chen, Z.; Citro, C.; Corrado, G.S.; Davis, A.; Dean, J.; Devin, M.; et al. TensorFlow:
+Large-Scale Machine Learning on Heterogeneous Systems. arXiv 2015, arXiv:1603.04467.
+56.
+Chollet, F. Keras. 2015. Available online: https://keras.io (accessed on 1 August 2025).
+57.
+Pedregosa, F.; Varoquaux, G.; Gramfort, A.; Michel, V.; Thirion, B.; Grisel, O.; Blondel, M.; Prettenhofer, P.; Weiss, R.; Dubourg, V.;
+et al. Scikit-learn: Machine learning in Python. J. Mach. Learn. Res. 2011, 12, 2825–2830.
+58.
+Joblib Development Team. Joblib: Running Python Functions as Pipeline Jobs. 2020. Available online: https://joblib.readthedocs.
+io/en/latest/ (accessed on 1 August 2025).
+59.
+Güera, D.; Delp, E.J. Deepfake Video Detection Using Recurrent Neural Networks.
+In Proceedings of the 2018 15th IEEE
+International Conference on Advanced Video and Signal Based Surveillance (AVSS), Auckland, New Zealand, 27–30 November
+2018; pp. 1–6. [CrossRef]
+60.
+Bergstra, J.; Bengio, Y. Random search for hyper-parameter optimization. J. Mach. Learn. Res. 2012, 13, 281–305.
+61.
+Szegedy, C.; Vanhoucke, V.; Ioffe, S.; Shlens, J.; Wojna, Z. Rethinking the Inception Architecture for Computer Vision.
+In
+Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), Las Vegas, NV, USA, 27–30 June 2016;
+pp. 2818–2826.
+62.
+Arnab, A.; Dehghani, M.; Heigold, G.; Sun, C.; Luˇci´c, M.; Schmid, C. Vivit: A video vision transformer. In Proceedings of the
+IEEE/CVF International Conference on Computer Vision, Montreal, BC, Canada, 10–17 October 2021; pp. 6836–6846.
+Disclaimer/Publisher’s Note: The statements, opinions and data contained in all publications are solely those of the individual
+author(s) and contributor(s) and not of MDPI and/or the editor(s). MDPI and/or the editor(s) disclaim responsibility for any injury to
+people or property resulting from any ideas, methods, instructions or products referred to in the content.

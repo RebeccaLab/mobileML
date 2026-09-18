@@ -1,0 +1,1448 @@
+
+
+--- PAGE 1 ---
+
+Contents lists available at ScienceDirect
+Neurocomputing
+journal homepage: www.elsevier.com/locate/neucom
+DFD-NAS: General deepfake detection via efficient neural architecture
+search✩
+Xiao Jin
+∗, Wen Yu, Dai-Wei Chen, Wei Shi
+College of Artificial Intelligence, Nankai University, Tianjin 300350, China
+A R T I C L E
+I N F O
+Communicated by G. Yang
+Keywords:
+Deepfake detection
+Face forgery detection
+Video forensics
+Neural Architecture Search (NAS)
+A B S T R A C T
+As the saying goes, ‘‘seeing is believing’’. However, with the development of digital face editing tools, we can
+no longer trust what we can see. Though face forgery detection has made promising progress, most current
+methods are manually designed by human experts, which is labor-intensive. In this paper, we develop an end-
+to-end framework based on neural architecture search (NAS) for deepfake detection, which can automatically
+design network architectures without human intervention. First, a forgery-oriented search space is created to
+choose appropriate operations for this task, which facilitates the search process in finding the most valuable
+gradient information for face forgery detection. Second, inspired by the fact that the gap between training
+error and test error is a good indicator of generalization ability for a classification task, we propose a novel
+performance estimation metric. This metric encourages the error in the performance estimation phase to be
+close to the error in the search phase, which guides the search process to select more general models. The
+cross-dataset search is also considered to develop more general architectures. Eventually, we design a cell
+cascaded pyramid network (C2PN) for final detection, which aggregates multiscale features for performance
+improvements. Compared with state-of-the-art networks artificially designed, our method achieves competitive
+performance in both in-dataset and cross-dataset scenarios.
+1. Introduction
+The emergence of face forgery technology has caused serious con-
+cerns in the whole society [1–5]. First, using photos of political figures,
+stars, and other people may incur legal issues, such as reputations,
+portrait rights, intellectual properties, and so on. Second, videos of im-
+portant persons are highly valuable intelligence. The abuse of counter-
+feit technology can lead to the spread of false information, even cause
+diplomatic crises. In addition, privacy disclosure may further affect
+asset security and personal safety. The fraud of such vivid deepfakes
+will cause a number of legal, social, and ethical problems.
+To fight against the abuse of facial manipulation technologies, many
+pioneers have made significant progress [6–8]. However, the problem
+is far from completely solved. On one hand, though decent performance
+has been achieved when training and tests are implemented in the same
+dataset, the generalization ability in the cross-dataset scenario is still
+challenging. There is an urgent demand for more general architectures.
+On the other hand, most of these methods are hand-crafted by human
+✩This work was supported in part by the National Natural Science Foundation of China (62401295), Tianjin Natural Science Foundation, China (22JC-
+QNJC01650), Fundamental Research Funds for the Central Universities of Nankai University (63201192, 63211116), Wukong Investment - Entropy Control
+Network Fund (078-G02J0455).
+∗Corresponding author.
+E-mail address: jinxiao@nankai.edu.cn (X. Jin).
+experts, which is labor-consuming. The emergence of neural architec-
+ture search (NAS) makes it possible to automatically design neural
+networks for deepfake detection.
+In this paper, we mainly focus on two challenges of face forgery de-
+tection. The first one is the limitation of the performance in cross-dataset
+settings. Existing methods often suffer from performance degradation
+when the training set is different from the test set. The forgery tools
+and video contents can vary significantly between two datasets. Forgery
+tools have diverse principles and processes, leaving distinct clues in
+the video. In addition, video content also affects the practicability of
+some existing techniques. Due to the difference in skin colors and facial
+features of persons, the performance of classifiers may decrease to a
+certain degree [6,9,10].
+There are some prior arts for general face forgery detection. The
+previous approaches mainly aim to extract more general features [11–
+13]. However, feature extraction is only a part of a neural network.
+How to design a general detection framework as a whole has attracted
+relatively much less attention. Additionally, till now, most networks for
+https://doi.org/10.1016/j.neucom.2024.129129
+Received 19 August 2024; Received in revised form 10 October 2024; Accepted 1 December 2024
+Neurocomputing 619 (2025) 129129 
+Available online 17 December 2024 
+0925-2312/© 2024 Elsevier B.V. All rights are reserved, including those for text and data mining, AI training, and similar technologies. 
+
+
+--- PAGE 2 ---
+
+X. Jin et al.
+Fig. 1. Conventional NAS pipeline mainly consists of two parts, searching for the ar-
+chitecture hyper-parameter and updating network weights for performance estimation.
+(1) For the first part, we observe that the manipulation traces are too fragile to be
+discovered by ordinary layers in the neural networks. The gradient information plays
+a vital role in deepfake detection. The value of 𝜃in central difference convolution
+(CDC) controls the proportion of gradient information. Thus, we gradually change the
+value of 𝜃in the search space. (2) For the second part, we notice that some NAS
+methods are prone to overfitting, while generalization capability is of importance for
+facial manipulation detection. Therefore, we introduce a novel performance estimation
+indicator, encouraging the error in the performance estimation phase to be close to the
+error in the search phase.
+face forgery detection are manually designed, which requires a lot of
+experience from experts.
+The second challenge is the limitation of manually designed networks.
+Artificially designed neural networks have achieved good performance,
+while they require rich professional knowledge and massive repeated
+experiments. As the number of network layers increases, more hyper-
+parameters need to be manually adjusted, which consumes labor, time,
+and computing resources. This situation limits the further development
+of this field to some extent. Fortunately, the emergence of NAS tech-
+nology provides a possibility to solve deepfake detection from a new
+perspective.
+Though numerous NAS algorithms have been proposed, the inherent
+difference between face forgery detection and other computer vision
+tasks makes it difficult to adopt other NAS methods directly. First,
+the manipulation traces are too fragile to be discovered by ordinary
+layers in the neural networks. Second, some NAS methods are prone to
+overfitting, while generalization capability is of importance for facial
+manipulation detection. Third, increasing the number of operations in
+the candidate search space causes an inefficient search process.
+The main contributions of this paper are illustrated in Fig. 1. In
+summary, our contributions are as follows:
+• We propose a novel end-to-end NAS framework to automatically
+design a network architecture for face forgery detection. To bet-
+ter fit this task, we create a forgery-oriented search space by
+gradually select appropriate gradient information. To the best of
+our knowledge, it is the first NAS-based method with specialized
+search space for deepfake forensics.
+• Additionally, inspired by the fact that the distance between train-
+ing error and test error is a typical indicator of generalization
+ability for a classification task, we also introduce a novel perfor-
+mance estimation metric. The proposed metric can select more
+general architectures by encouraging the error in the performance
+estimation phase to be close to the error in the search phase.
+• Based on the cells obtained by NAS, we further develop a cell cas-
+caded pyramid network (C2PN) for final face forgery detection,
+which incorporates multiscale features for performance improve-
+ments. Extensive experiments and visualizations demonstrate the
+effectiveness of the proposed method on four benchmark datasets.
+The rest of the paper is structured as follows. In Section 2, we
+introduce the related work. Then DeepFake Detection (DFD) framework
+is presented in Section 3. The experimental result and analysis will
+be detailed in Sections Section 4. The conclusion of the paper is
+summarized in Section 5.
+2. Related works
+2.1. Face forgery detection
+Some prior arts are proposed for face forgery detection [2–5,14]. In
+this subsection, we summarize the previous works by the architectures
+they choose. In the early years, researchers explore hand-crafted fea-
+tures for face forgery detection. Qi et al. [15] propose DeepRhythm
+to classify deepfakes by monitoring the heartbeat rhythms. Agarwal
+et al. [16] detect face forgery by modeling facial expressions and move-
+ments that character the speaking patterns. Yang et al. [17] observe
+that deepfakes are generated by splicing synthesized face regions, and
+present a forensics pipeline by 3D head pose estimation.
+The performance of the above methods based on hand-crafted fea-
+tures is quickly surpassed by the forensic framework designed by deep
+learning. Nirkin et al. [18] design a method for detecting fake videos
+using a single frame. This method includes a face recognition network
+and a context recognition network for facial features. Yang et al. [19]
+adopt central difference convolution and atrous spatial pyramid pooling
+(ASPP) to propose a multi-scale texture difference model for face
+forgery detection. Yu et al. [13] introduce a specific forgery feature
+extractor and a common forgery feature extractor for learning uni-
+versal forensic features. Wang et al. [20] use a cross-modality knowl-
+edge distillation method for near-infrared face forgery authentication.
+Nevertheless, as the structure of neural networks becomes more and
+more complex, the hyperparameters that need to be adjusted increase
+geometrically. Designing networks manually for deepfake detection
+becomes labor-consuming due to repetitive experiments.
+With the popularity of Transformer architecture, more and more de-
+tection methods based on this technique appeared. Miao et al. [21] at-
+tempt to exploit this problem from both spatial and frequency domains.
+They design a high-frequency fine-grained Transformer network, which
+consists of central difference attention and high-frequency wavelet
+samplers. Zhao et al. [22] employ an interpretable spatial–temporal
+video Transformer to capture spatial artifacts and temporal incon-
+sistency for robust deepfake detection. This framework is composed
+of a decomposed spatial–temporal self-attention and a self-subtract
+mechanism. Though Transformer-based methods bring performance
+improvements, the architectures designed by human experts require
+substantial experience and repeated experiments.
+Adopting NAS framework for face forgery detection receives rel-
+atively less research attention. Liu et al. [23] develop an automated
+deepfake detection framework using common convolutional layers as
+the search space. However, ordinary convolution is not specially de-
+signed to extract forgery traces. There is still room for performance
+improvement if the search space is appropriately selected.
+2.2. Neural architecture search
+Neural architecture search has proposed for automatically design
+neural networks [24]. The NASNet [25] is the first algorithm to use
+modular search, which greatly reduces the computation time due to
+normal cells and reduction cells. The ENAS [26] samples subgraphs
+from a large hypergraph, and the operations in the subgraph inherit
+the weights of the hypergraph. This approach facilitates the sharing of
+weights between different structures and greatly reduces the training
+time of neural network structures in performance prediction. The Prox-
+ylessNAS [27] searches based on MobileNetV2, changing the number
+of convolutional layers, convolutional kernel sizes, and the number of
+filters in its internal MBConv unit. All MBConv units have no shared
+Neurocomputing 619 (2025) 129129 
+2 
+
+
+--- PAGE 3 ---
+
+X. Jin et al.
+Fig. 2. The framework of the proposed method. There are three main steps in our approach: search, training, and test. In the search step, differentiable architecture search updates
+the architecture hyper-parameter and the network weights alternately. Due to the limitation of GPU memory, we adopt a lightweight network in this step. In training and test
+steps, we employ a deeper network to preserve valuable multiscale information for face forgery detection.
+structure and therefore have more flexibility. The MnasNet [28] for-
+mulates the search process as a multi-objective optimization problem,
+considering both model accuracy and inference latency. The differen-
+tiable architecture search (DARTS) [29] defines the search space as a
+continuous space. Each searched cell is derivable and can be optimized
+by stochastic gradient descent.
+Ge et al. [30,31] utilize DARTS and its variant for anti-spoofing and
+speech authenticity identification. Wu et al. [32] propose an approach
+based on NAS for image inpainting detection. However, they only
+use NAS for designing an extraction block. The forgery clues are still
+discovered by manually designed layers, which is not an end-to-end
+NAS framework.
+Furthermore, due to the intrinsic discrepancy between deepfake
+detection and other computer vision tasks, directly applying other
+NAS frameworks has not achieved satisfactory results in face forgery
+detection [23,33]. There is still room for performance increase if the
+framework is specifically designed for deepfake detection. How to
+analyze fake videos from a NAS-based perspective is still an open
+problem.
+3. The proposed method
+In this section, we first revisit the differentiable architecture search
+process. Then, we describe the search space, cell topology, perfor-
+mance estimation strategy, search strategy, and cross-dataset search,
+respectively. After that, we suggest the C2PN for final detection. Even-
+tually, we also discuss the novelty of the proposed method. The whole
+framework is illustrated in Fig. 2.
+3.1. Revisit differentiable architecture search
+The process of neural architecture search mainly includes three
+parts: search space, search strategy and performance estimation. First,
+the search space defines all the candidate neural network operations or
+components. Then, the corresponding search strategy selects a certain
+neural network structure from the space. This intermediate network is
+evaluated by several performance indicators. Finally, the evaluation re-
+sults are fed back to the search strategy until the optimal architectures
+are obtained.
+Differentiable architecture search (DARTS) regards operation selec-
+tion as a weighted combination of operator sets, so that the search space
+is relaxed to be continuous [29]. In this way, the hyperparameters can
+be calculated differentiably by gradient descent. The basic component
+in the architecture is a cell, which can be considered as a directed
+acyclic graph (DAG) with 𝑁nodes. A topological node represents for a
+layer in the neural network. Usually, each cell is composed of two input
+nodes, one output node, and the remaining intermediate nodes. For the
+𝑗th intermediate node, its output is a summation of all the forward
+results of preceding nodes,
+𝐱𝑗=
+∑
+𝑖<𝑗
+𝑓𝑖,𝑗
+(𝐱𝑖
+) , 0 ≤𝑖≤𝑗≤𝑁− 1,
+(1)
+where 𝐱𝑖symbolizes the output feature map from the 𝑖th node, 𝑓𝑖,𝑗(⋅)
+is the operation from the 𝑖th node to the 𝑗th node. In a cell, the directed
+edge between two nodes defines an operation, e.g., convolution, pool-
+ing, and activation function, selected from the search space . These
+Neurocomputing 619 (2025) 129129 
+3 
+
+
+--- PAGE 4 ---
+
+X. Jin et al.
+Fig. 3. The structure of central difference convolution.
+operations can be formulated as,
+𝑓𝑖,𝑗
+(𝐱𝑖
+) =
+∑
+𝑜∈
+exp
+{
+𝛼𝑜
+𝑖,𝑗
+}
+∑
+𝑜′∈exp
+{
+𝛼𝑜′
+𝑖,𝑗
+} ⋅𝑜(𝐱𝑖
+) ,
+(2)
+where 𝑜(⋅) ∈indicates candidate operations, 𝛼𝑜
+𝑖,𝑗is a trainable
+variable that determines the network architecture. Thus, the task of
+searching the network architecture is converted to optimizing all the
+𝛼𝑜
+𝑖,𝑗in the network. After the search process, every node is connected
+with two preceding nodes that have maximum 𝛼𝑜
+𝑖,𝑗value. The final
+output architecture is constructed by several cells. These cells can be
+divided into two types, i.e., the normal cell that preserves the spatial
+resolution, and the reduction cell that decreases the resolution.
+3.2. Search space
+In this paper, the search space is mainly composed of central dif-
+ference convolution (CDC). Fig. 3 shows the structure of CDC. Central
+difference operations have shown their effectiveness for face forgery
+detection. The features extracted with central difference can enhance
+the discriminability for forged images [19]. According to [19,34], the
+input is denoted as 𝑧, the output is represented by 𝑦, the process of CDC
+can be formulated as,
+𝑦(𝑝0
+) =
+∑
+𝑝𝑛∈
+𝑤(𝑝𝑛
+) ⋅𝑧(𝑝0 + 𝑝𝑛
+)
+⏟⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏟⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏟
+vanilla convolution
++𝜃⋅
+(
+−𝑧(𝑝0
+) ⋅
+∑
+𝑝𝑛∈
+𝑤(𝑝𝑛
+)
+)
+⏟⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏟⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏟
+central difference term
+,
+(3)
+where stands for local receptive field region, 𝑤is the weight, 𝑝0
+is the current location on feature maps, 𝑝𝑛is the other locations
+in , hyperparameter 𝜃∈ [0, 1] means the importance of gradient
+information.
+In this type of operation space, we involve eight central difference
+operations with various parameter settings as shown in Fig. 4(a).
+‘‘Sep’’ denotes ‘‘separable’’, while ‘‘Dil’’ represents for ‘‘dilated’’. For
+example, ‘‘SepCDC_3x3_0.5’’ is defined as a separable central difference
+convolutional layer, where the kernel size is 3 × 3, and 𝜃is 0.5.
+When 𝜃= 0, central difference operations are converted to vanilla
+CNN. The vanilla CNN operations aim to discover some visual forgery
+artifacts, e.g., uncommon manipulated region boundaries. Concretely,
+since the multiscale information plays an important role in deepfake
+detection [19], we emphasize the skip connection and dilated convo-
+lution in the search space, which are denoted as ‘‘skip_connect’’ and
+‘‘DilCDC_3 × 3’’, respectively.
+In preliminary experiments, we also analyze the effectiveness of
+some noise extractors, e.g., Bayar layer [35] and SRM layer [36]. We
+find central difference operations perform better.
+3.3. Cell topology
+The topology structure of a cell is illustrated in Fig. 4(b), where
+‘‘C’’ symbolizes concatenation. In our method, each cell contains seven
+nodes, including two input nodes, e.g., S0 and S1, four intermediate
+Algorithm 1 The proposed method
+Input: dataset ; operation set 
+Output: cell topology
+1: Split the dataset evenly into two parts, 𝑆for search, and 𝐸 𝑣𝑎𝑙for
+evaluation;
+2: Randomly sample a super-network and tune the network weights
+in the first 10 epochs;
+3: while not converged do
+4:
+Update architecture hyper-parameters on 𝐷𝑆;
+5:
+Update network weights on 𝐷𝐸 𝑣𝑎𝑙;
+6:
+Updatē 𝐸𝑜
+𝑖,𝑗and̂ 𝐸𝑜
+𝑖,𝑗;
+7:
+Calculate operation importance 𝐻𝑜
+𝑖,𝑗by Eq. (8);
+8:
+Update each operation state .
+9:
+if epoch>19 and epoch %20 == 0 then
+10:
+Prune operations according to their state on each edge;
+11:
+Update channel sampling rate 𝑛= 2𝑛;
+12:
+end if
+13: end while
+14: return cell topology
+nodes, e.g., N0, N1, N2, and N3, and one output node. The edges indi-
+cate the operations searched from the forgery-oriented search space. At
+the beginning of the search, every node is linked with all predecessor
+nodes. At the end of the search, every node only keeps a connection
+with the two antecedent nodes with the highest scores. Finally, the
+search process produces two types of cells. The normal cells maintain
+the same resolution, while the reduction cells decrease the resolution
+of feature maps by half.
+3.4. Performance estimation strategy
+In previous gradient-based NAS methods, the significance of opera-
+tions is ordered by architecture parameters 𝛼= {𝛼𝑜
+𝑖,𝑗, 0 ≤𝑖≤𝑗≤𝑁− 1},
+which indicates the relative importance of an operation compared with
+other candidate operations. However, the operation with the highest
+value of 𝛼may not always bring the best performance [37]. Further-
+more, DARTS tends to overfit [38], while the generalization ability on
+unseen datasets is significant to face forgery detection.
+Therefore, we introduce additional conditions to select suitable
+operations,
+𝐸𝑜
+𝑖,𝑗=
+exp(1∕‖̄𝐸𝑜
+𝑖,𝑗−̂ 𝐸𝑜
+𝑖,𝑗‖−∞)
+∑
+𝑜′∈exp(1∕‖̄𝐸𝑜
+𝑖,𝑗−̂ 𝐸𝑜
+𝑖,𝑗‖−∞)
+,
+(4)
+wherē 𝐸𝑜
+𝑖,𝑗is the classification error in the search stage,̂ 𝐸𝑜
+𝑖,𝑗is the error
+in performance estimation process. Here, ‖⋅‖−∞denotes the negative in-
+finite norm, which returns the smallest absolute values of all elements.
+In this way, we encourage the error in performance estimation to be
+close to the error in search, improving the generalization capability of
+the network. The total estimation indicator is defined as,
+𝐼𝑜
+𝑖,𝑗=
+exp
+{
+𝛼𝑜
+𝑖,𝑗
+}
+∑
+𝑜′∈exp
+{
+𝛼𝑜′
+𝑖,𝑗
+} + 𝜆𝐸𝑜
+𝑖,𝑗,
+(5)
+where 𝜆= 0.15 is the balance parameter.
+3.5. Search strategy
+To improve the efficiency of the search process, the feature maps
+are sampled by the proportion of 1∕𝑛in the channel dimension [39].
+This process can be defined as,
+𝑓𝑖,𝑗
+(𝐱𝑖; 𝑀𝑖,𝑗
+) =
+∑
+𝑜∈
+𝐼𝑜
+𝑖,𝑗⋅𝑜(𝑀𝑖,𝑗⊙𝐱𝑖
+)
++ (1 −𝑀𝑖,𝑗
+) ⊙𝐱𝑖,
+(6)
+Neurocomputing 619 (2025) 129129 
+4 
+
+
+--- PAGE 5 ---
+
+X. Jin et al.
+Fig. 4. The illustration of the NAS. (a) The connections between nodes in a cell. Each edge indicates an operation obtained from the search space. (b) The topological structure
+of a cell. (c) The architecture of the whole detection networks.
+where ⊙represents the Hadamard product, 𝑀𝑖,𝑗∈ {0, 1} is channel
+mask, 1 denotes this feature channel is taken, and 0 indicates this
+channel is discarded.
+In the preliminary experiments, we find that the search process
+tends to select several types of operations, while neglecting other kinds
+of operations. To increase the diversity of the operations in the cell, we
+further take the edge parameter 𝛽𝑖,𝑗into consideration. The output of
+the 𝑗th intermediate node is defined as,
+𝐱𝑗=
+∑
+𝑖<𝑗
+exp {𝛽𝑖,𝑗
+}
+∑
+𝑖′<𝑗exp {𝛽𝑖′,𝑗
+} ⋅𝑓𝑖,𝑗
+(𝐱𝑖
+) .
+(7)
+The importance of the connections between edges is determined by
+𝐼𝑜
+𝑖,𝑗and 𝛽𝑖,𝑗. We define 𝐻𝑜
+𝑖,𝑗to describe this process,
+𝐻𝑜
+𝑖,𝑗=
+exp {𝛽𝑖,𝑗
+}
+∑
+𝑖′<𝑗exp {𝛽𝑖′,𝑗
+} ⋅𝐼𝑜
+𝑖,𝑗.
+(8)
+The operation with the highest 𝐻𝑜
+𝑖,𝑗is adopted for final neural network
+architecture,
+𝑓∗
+𝑖,𝑗= ar g max
+𝑜∈
+𝐻𝑜
+𝑖,𝑗,
+(9)
+where 𝑓∗
+𝑖,𝑗denotes the final operation from the 𝑖th node to the 𝑗th node.
+Moreover, to further accelerate the search procedure, we update the
+operation state ∈ {𝚃𝚛𝚞𝚎, 𝙵𝚊𝚕𝚜𝚎} between two nodes according to 𝐻𝑜
+𝑖,𝑗.
+True denotes this operation is retained for the following search, while
+False indicates this operation is discarded for the search in the next
+step. After every twenty epochs, we remove the two operations with
+the lowest scores, and increase the rate of channel sampling. The whole
+procedure is illustrated in Algorithm 1.
+3.6. Cross-dataset search
+A key challenge for deepfake detection is the performance degra-
+dation in cross-dataset scenarios. In this paper, we try to analyze this
+problem by automatically searching a general architecture. Inspired
+by [40], we adopt a cross-dataset search strategy. For simplicity, assum-
+ing we have 𝐾datasets = {1, 2, … , 𝐾}, the randomly selected
+samples in (𝐾− 1) datasets are defined as the source datasets 𝑠, while
+the rest one is denoted as the target dataset 𝑡. Then, the sample
+batch examples 𝑠
+𝑖(𝑖= 1, 2, … , 𝐾− 1) in every dataset of 𝑠, and 𝑡in
+𝑡are employed for inner-updated network weights and architecture
+optimization stage, respectively. The process of cross-dataset search is
+described in Algorithm 2. Compared with [40], our work utilizes a
+more flexible search space to fully explore the potential of cross-dataset
+search strategy.
+Algorithm 2 The cross-dataset search process
+Input: dataset = {1, 2, ⋯, 𝐾}
+Output: cell topology
+1: Initialize weights and architecture;
+2: while not converged do
+3:
+Randomly select (𝐾− 1) datasets in as source datasets 𝑠, and
+the rest one as target dataset 𝑡;
+4:
+Sample batch examples 𝑠
+𝑖(𝑖= 1, 2, ⋯, 𝐾− 1) in every dataset of
+𝑠, the examples 𝑡in 𝑡;
+5:
+for each 𝑠
+𝑖do
+6:
+Update weights in the 𝑖-th dataset;
+7:
+end for
+8:
+Update weights using all learners’ loss on the 𝑡;
+9:
+Update architecture on the 𝑡;
+10: end while
+11: return cell topology
+3.7. Cell cascaded pyramid network
+After obtaining the cells, we connect them in series to detect face
+forgery videos. Since there are a large number of connections between
+nodes at the beginning of the search phase, it is computationally
+consuming. We use a relatively lightweight network, which contains
+two groups of cells, for architecture search. Each group is composed of
+two normal cells and a reduction cell. In total, six cells are used for the
+search stage, which is illustrated at the top of Fig. 2.
+Multiscale information is vital in deepfake forensics [19]. We try
+to preserve this valuable multiscale information for the final detection.
+Thus, we use a deeper network to gradually decode the feature maps.
+As shown in the bottom of Fig. 2, the detection network contains
+four groups of cells. Each group has two normal cells followed by
+a reduction cell. We adopt the cells obtained from the above search
+stage without any training weights. The detection network is trained
+on benchmark datasets for in-dataset and cross-dataset tests.
+3.8. Discussion of the novelty
+In this paper, we collect the forgery-oriented search space. The
+manipulation traces are too fragile to be discovered by ordinary layers
+in the neural networks. CDC can be used for face anti-spoofing, which
+indicates its effectiveness in extracting face features. However, previous
+methods only consider the fixed value of 𝜃of the CDC. The value
+of 𝜃controls the proportion of gradient information. The gradient
+information plays an important role in deepfake detection. Thus, we
+gradually change the value of 𝜃in CDC in the search space. This
+Neurocomputing 619 (2025) 129129 
+5 
+
+
+--- PAGE 6 ---
+
+X. Jin et al.
+attempt encourages the search process to find the most valuable gra-
+dient information for deepfake detection. The detection results have
+been improved. Table 2 shows the performance comparison between
+our method and common search space, e.g., ‘‘AutoDFD [arXiv21]’’ [23].
+Table 4 shows the performance improvements of our search space
+compared with ‘‘vanilla CNN operations’’.
+We also introduce a novel performance estimation strategy to select
+more general architectures. Some NAS methods are prone to overfitting,
+while generalization capability is of importance for facial manipulation
+detection. The distance between the error of the training set and the
+error of the test set is a good indicator of generalization ability for
+a classification task. This idea carries over to the search process of
+NAS. We introduce a novel performance estimation indicator in Eq. (5)
+to encourage the error in the performance estimation phase to be
+close to the error in the search phase. This attempt helps us to find
+a suitable architecture with the minimum errors in the performance
+estimation phase, which improves the performance for cross-dataset
+deepfake detection. The experimental results are shown in Table 5.
+4. Experiment
+In this section, we describe the experiments in detail. First, we
+establish the experimental setup, including datasets, evaluation metrics,
+compared methods, and implementation details. Then, we analyze the
+comparison with state-of-the-art approaches. After that, we give the
+ablation study by trying different choices of search space, search strat-
+egy, cell connection, and input size. Finally, we illustrate visualization
+analysis and discuss the limitations.
+4.1. Experimental setup
+4.1.1. Datasets
+We evaluate our method on four publicly available datasets. Face-
+Forensics++ (FF++) [41] consists of four forgery approaches, e.g.,
+DeepFakes (DF), Face2Face (F2F), FaceSwap (FS), and NeuralTextures
+(NT). This dataset covers two compression rates, e.g., high-quality
+(C23) and low-quality (C40). Celeb-DF [42] contains 590 real and 5639
+forged videos totally from YouTube website. These clips are generated
+by advanced synthesis techniques. WildDeepfake [43] collects 7314
+real-world face sequences from the Internet. The duration of the video
+clip changes dramatically. DFDC-preview [44] is composed of more
+than 5000 videos with various manipulation methods. The faces in the
+video may be partially forged.
+In-dataset search only uses FF++ for searching neural architectures.
+Cross-dataset search adopts four datasets alternately. For in-dataset
+scenes, after determining the network structure, the models are trained
+and tested on the above four datasets, respectively. For cross-dataset
+experiments, we train the networks on FF++ dataset and test on
+the other three datasets to verify the generalization ability. In FF++
+dataset, following the official splits, we use 720 videos for training,
+140 videos for validation, and 140 videos for test. Each video takes 20
+frames for training and 10 frames for validation and test. For the other
+three datasets, we divided them into the training set, validation set, and
+test set according to the ratio of 8:1:1.
+4.1.2. Evaluation metrics
+As a common practice in this field [9], we apply two widely used
+metrics, accuracy score (Acc), and area under the receiver operat-
+ing characteristic curve (AUC) for evaluation. Their definition can be
+formulated as follows,
+Acc =
+𝑇 𝑃+ 𝑇 𝑁
+𝑇 𝑃+ 𝑇 𝑁+ 𝐹 𝑃+ 𝐹 𝑁,
+(10)
+AUC = ∫
+1
+𝑥=0
+𝑇 𝑃 𝑅(𝐹 𝑃 𝑅−1(𝑥))𝑑 𝑥,
+(11)
+where TP, TN, FP, and FN denote the number of correctly predicted
+real frames, accurately predicted fake frames, wrongly predicted real
+frames, and mistakenly predicted fake frames, respectively, TPR and
+FPR represent true positive rate and false positive rate, respectively.
+4.1.3. Compared methods
+The proposed method is compared with 23 face forgery detection
+frameworks, including
+• Meso4 [45] focuses on the mesoscopic properties of images.
+• MesoInception4 [45] replaces the first two convolutional layers
+of Meso4 by a variant of the inception module [46].
+• RNN [47] uses a CNN to extract frame-level features, and train a
+RNN that learns to classify a video.
+• FWA [48] is inspired by the limited resolutions of the generated
+images of deepfake algorithm.
+• Xception [41] is a face forensic method based on Xception-
+Net [49].
+• Multi-Task [50] denotes the multi-task learning network includ-
+ing an encoder and a Y-shaped decoder.
+• Capsule [51] equips with a capsule network to detect various
+kinds of spoofs.
+• EfficientNet-B4 [52] is a forensic pipeline, adopting Efficient-
+Net [52] as backbones.
+• F3-Net [53] is short for frequency in face forgery network, which
+employing two frequency-aware clues.
+• Multi-Attention [54] framework consists of spatial attention
+heads, textural feature enhancement block, and multi-level fea-
+ture aggregation.
+• LTW [55] is based on the meta-weight learning algorithm, which
+configures different weights for face images.
+• FT-TS [56] is composed of two-stream backbones, analyzing from
+frame-level and temporality-level of videos.
+• AutoDFD [23] employs neural architecture search for deepfake
+detection.
+• FInfer [57] is a frame inference-based detection method for
+high-visual-quality deepfake detection.
+• RECCE [58] focuses on the common compact representations of
+genuine faces based on reconstruction-classification learning.
+• NoiseDF [59] emphasizes the underlying forensic noise traces left
+behind the deepfake videos.
+• MRL [60] formulates deepfake detection as a graph classification
+problem.
+• F2Trans
+[21] 
+develops 
+a 
+high-frequency 
+fine-grained
+Transformer to explore the fine-grained forgery traces.
+• ISTVT [22] adopts an interpretable spatial–temporal video Trans-
+former for face forgery detection.
+• DDL-STC [9] designs a dynamic fine-grained difference capture
+module and a multi-scale spatio-temporal aggregation module.
+• FedForgery [61] uses variational autoencoder to formulate resid-
+ual federated learning.
+• ForensicSymmetry [10] introduces a dual-stream structure to
+determine whether two symmetrical face patches contain the
+same or different natural features.
+• SFIC [6] constructs new backbone networks via space-frequency
+interactive convolution.
+We directly report the quantitative results in the published papers if
+accessible.
+4.1.4. Implementation details
+The facial areas are extracted by the face_recognition toolbox.
+Due to GPU memory limitations, the input pictures are resized to
+32 × 32 for the search phase. For in-dataset search, a half of the
+data in FF++ is used for searching architecture hyper-parameters,
+while the other half is used for updating network weights. For cross-
+dataset search, we randomly selects 2000 samples from each dataset
+to participate in the search in each epoch. The search process uses the
+Adam optimizer [62] for 65 epochs. The batch size is set to 96 for the
+search phase. The initial number of channels is 16, and the initial rate of
+channel sampling is 1/8. The running time of search stage is about 3 h
+Neurocomputing 619 (2025) 129129 
+6 
+
+
+--- PAGE 7 ---
+
+X. Jin et al.
+Table 1
+Comparisons of the in-dataset results on Celeb-DF, WildDeepfake, and DFDC-preview
+datasets. The accuracy and AUC scores (%) are reported.
+Method
+Celeb-DF
+WildDeepfake
+DFDC-pre
+Acc
+AUC
+Acc
+AUC
+Acc
+AUC
+Meso4 [45] [WIFS18]
+67.53
+66.17
+64.47
+66.5
+75.39
+76.47
+RNN [47] [AVSS18]
+71.20
+86.52
+66.87
+67.35
+75.02
+77.48
+FWA [48] [CVPRW19]
+64.73
+60.16
+55.46
+57.92
+73.25
+72.97
+Xception [41] [ICCV19]
+90.34
+89.75
+75.26
+80.89
+79.32
+81.58
+FT-TS [56] [TCSVT21]
+80.74
+86.67
+68.78
+68.09
+63.85
+64.03
+FInfer [57] [AAAI22]
+90.47
+93.30
+75.88
+81.38
+80.39
+82.88
+DFD-NAS (Ours𝑖𝑛)
+94.92
+99.59
+78.25
+85.45
+80.80
+88.72
+DFD-NAS (Ours𝑐 𝑟𝑜𝑠𝑠)
+94.34
+99.75
+78.55
+86.41
+79.57
+88.70
+Table 2
+Comparisons of the in-dataset results on FF++, and the cross-dataset results on Celeb-DF
+datasets. These methods are trained on FF++. The AUC scores (%) are reported.
+Method
+FF++
+Celeb-DF
+AUC
+AUC
+Meso4 [45] [WIFS18]
+84.70
+54.80
+MesoInception4 [45] [WIFS18]
+83.00
+53.60
+RNN [47] [AVSS18]
+90.13
+63.56
+FWA [48] [CVPRW19]
+80.10
+56.90
+Xception [41] [ICCV19]
+99.70
+65.30
+Multi-Task [50] [BTAS19]
+76.30
+54.30
+Capsule [51] [ICASSP19]
+96.60
+57.50
+EfficientNet-B4 [52] [ICML19]
+99.70
+64.29
+F3-Net [53] [ECCV20]
+98.10
+65.17
+Multi-Attention [54] [CVPR21]
+99.80
+67.44
+LTW [55] [AAAI21]
+98.50
+64.10
+FT-TS [56] [TCSVT21]
+92.47
+65.56
+AutoDFD [23] [arXiv21]
+91.71
+66.48
+FInfer [57] [AAAI22]
+95.67
+70.60
+RECCE [58] [CVPR22]
+99.32
+68.71
+DDL-STC [9] [TIFS23]
+-
+71.36
+ForensicSymmetry [10] [TIFS23]
+99.44
+58.10
+SFIC-ResNet26 [6] [TIFS24]
+96.38
+70.70
+DFD-NAS (Ours𝑖𝑛)
+98.04
+67.62
+DFD-NAS (Ours𝑐 𝑟𝑜𝑠𝑠)
+98.15
+72.48
+Table 3
+Comparisons of the cross-dataset results on WildDeepfake, and DFDC-preview datasets.
+These methods are trained on FF++. The AUC scores (%) are reported.
+Method
+WildDeepfake
+DFDC-pre
+AUC
+AUC
+Meso4 [45] [WIFS18]
+59.74
+59.30
+RNN [47] [AVSS18]
+67.03
+59.37
+FWA [48] [CVPRW19]
+67.35
+59.49
+Xception [41] [ICCV19]
+60.54
+64.29
+FT-TS [56] [TCSVT21]
+59.82
+59.09
+FInfer [57] [AAAI22]
+69.46
+70.39
+RECCE [58] [CVPR22]
+64.31
+69.06
+NoiseDF [59] [AAAI23]
+-
+63.89
+MRL [60] [TIFS23]
+-
+71.53
+F2Trans-B (IL) [21] [TIFS23]
+-
+71.81
+ISTVT [22] [TIFS23]
+-
+74.20
+DDL-STC [9] [TIFS23]
+-
+73.08
+FedForgery [61] [TIFS23]
+74.59
+-
+ForensicSymmetry [10] [TIFS23]
+-
+54.62
+SFIC-ResNet26 [6] [TIFS24]
+-
+63.85
+DFD-NAS (Ours𝑖𝑛)
+74.32
+74.85
+DFD-NAS (Ours𝑐 𝑟𝑜𝑠𝑠)
+74.71
+75.79
+on an NVIDIA 3080Ti GPU due to channel sampling and pruning. After
+obtaining the determined architecture, we train the model on FF++ or
+the other three datasets for 150 epochs. It takes nearly 20 h for the
+training phase, when the input picture size is 64 × 64 and the batch
+size is 48. We adopt the SGD optimizer [63] with an initial learning
+rate of 0.025, a momentum of 0.9, a weight decay of 3e−4.
+Table 4
+Ablation analysis of different search spaces. The accuracy and AUC scores (%) are
+reported.
+Method
+Celeb-DF
+Acc
+AUC
+Vanilla CNN operations (PC-DARTS [39])
+92.42
+97.56
+Fixed 𝜃= 0.7 in CDC
+93.06
+98.23
+Ours𝑐 𝑟𝑜𝑠𝑠
+94.34
+99.75
+Table 5
+Ablation analysis of different search strategies. ‘‘IND" denotes the proposed performance
+estimation indicator. The accuracy and AUC scores (%) are reported.
+Method
+Pruning
+Indicator
+Search time
+Celeb-DF
+(GPU-Days)
+Acc
+AUC
+w/o pruning+IND
+✗
+✗
+0.31
+93.87
+99.62
+w/o IND
+!
+✗
+0.13
+94.06
+99.50
+w/o pruning
+✗
+!
+0.33
+94.12
+99.65
+Ours𝑐 𝑟𝑜𝑠𝑠
+!
+!
+0.13
+94.34
+99.75
+4.2. Comparison with state-of-the-art methods
+‘‘Ours𝑐 𝑟𝑜𝑠𝑠’’ denotes the performance using cross-dataset search strat-
+egy. ‘‘Ours𝑖𝑛’’ means that the search process only uses FF++ dataset
+without cross-dataset search strategy. After the search process, the
+architecture obtained by NAS is trained and tested on the benchmark
+datasets. When training and test using the same dataset, the results are
+shown in Table 1 and the first column of Table 2. When the architecture
+obtained by NAS is trained on the FF++ dataset and tested on the other
+datasets, the results are shown in the second column of Tables 2 and 3.
+4.2.1. In-dataset evaluation
+After the search process, the architecture is trained and tested on
+the above datasets, respectively. The results are shown in Table 1 and
+the first column of Table 2. Except for FF++, the proposed method
+outperforms other baselines in this scenario. ‘‘Ours𝑖𝑛’’ means that the
+search process only uses FF++, while ‘‘Ours𝑐 𝑟𝑜𝑠𝑠’’ denotes cross-dataset
+search. Note that our method also beats another NAS framework,
+e.g., AutoDFD [23].
+4.2.2. Cross-dataset evaluation
+To validate the generalization capability, we train the network
+on FF++. Then, we test this model on other datasets. As listed in
+the second column of Tables 2 and 3, the proposed method achieves
+competitive performance with cross-dataset search. Considering the
+strict definition of cross-dataset test, we denote the situation when the
+search stage is only conducted on FF++ as ‘‘Ours𝑖𝑛’’, our method still
+shows its effectiveness.
+Neurocomputing 619 (2025) 129129 
+7 
+
+
+--- PAGE 8 ---
+
+X. Jin et al.
+Fig. 5. Detailed structure of the best cells discovered on FF++ by our in-dataset search. (a) normal cell. (b) reduction cell. It is obvious that the operations are different from
+vanilla CNN. Diverse operations and 𝜃values in the forgery-oriented search space are necessary.
+Table 6
+Ablation analysis of different cell connections. ‘‘N’’ represents a normal cell, and ‘‘R’’
+denotes a reduction cell. The accuracy and AUC scores (%) are reported.
+Connections between cells
+Celeb-DF
+Acc
+AUC
+N × 6 + R + N × 6 + R + N × 6 (PC-DARTS [39])
+93.55
+97.78
+N × 6 + R + N × 6 + R
+93.77
+98.33
+N × 8 + R + N × 8 + R
+94.05
+98.68
+N × 4 + R + N × 4 + R + N × 4 + R
+94.10
+95.99
+Ours𝑐 𝑟𝑜𝑠𝑠
+94.34
+99.75
+4.3. Ablation study
+In this subsection, we analyze the necessity of some key settings in
+our method, including search space, search strategy, cell connection,
+and input size. In the following ablation experiments, we only consider
+the performance of in-dataset evaluation. The final detection networks
+are trained on Celeb-DF [42].
+4.3.1. Different search space
+The forgery-oriented search space plays an important role in our
+method. As shown in Table 4, our search space is more effective
+than vanilla CNN in PC-DARTS [39]. Central difference has a positive
+influence apparently. Various 𝜃values also perform better than the
+default value 𝜃= 0.7.
+4.3.2. Different search strategy
+We also compare the effects of the search strategy in Table 5. ‘‘IND’’
+denotes the proposed performance estimation indicator. The proposed
+method adopts pruning and a novel performance estimation indicator,
+making the whole algorithm more effective for this forensics task.
+Concretely, pruning saves nearly half of the search time. The proposed
+new indicator also contributes to better performance.
+4.3.3. Different cell connection
+Since the multiscale information conveys vital clues for forgeries
+[19], we gradually downsample the resolutions between cells. In Table 6,
+‘‘N’’ represents a normal cell, and ‘‘R’’ denotes a reduction cell. The
+number of reduction cells has an impact on performance. As the number
+of reduction cells increases, the results become better. The proposed
+C2PN adopts four reduction cells (N×2+R+N×2+R+N×2+R+N×2 +R)
+to progressively downsample feature maps. This choice obtains the best
+results among all the approaches, including the cell connection method
+in PC-DARTS [39].
+4.3.4. Different input size
+In this field, the input size of most methods is 256 × 256. If the
+input size is 256 × 256 for training, the batch size can only be set to
+4, which takes about 2.6 h to train an epoch. If using a 64 × 64 image
+for training, the batch size can be set to 48, which only takes about
+8 min to train an epoch. When the input is 64 × 64, the FLOPs of our
+model is 1.744G and the parameter quantity is 13.37M. Due to GPU
+memory limitations, we choose smaller images as inputs. Though our
+input image resolution is smaller than other baselines, we still achieved
+competitive performance.
+4.4. Visualization analysis
+4.4.1. Detailed structure of the best cells
+The best cells obtained by in-dataset search and cross-dataset search
+are shown in Figs. 5 and 6, respectively. The normal cell preserves
+the resolution, while the reduction cell downsamples the feature maps
+by half. The operations in both normal cells and reduction cells are
+obviously different from vanilla CNN, which indicates the significance
+of central difference convolution. Diverse operations and 𝜃values are
+necessary. In Fig. 5, the reduction cell adopts dilate convolution to
+enhance the multiscale information of forged faces.
+4.4.2. Detailed structure of the best cells searched by PC-DARTS
+We use PC-DARTS [39] as a baseline for visualization analysis. The
+normal cell and the reduction cell searched by PC-DARTS are shown in
+Fig. 7. In these cells, the operations mainly consist of pooling and skip
+connections. The structures of these cells are obviously different from
+the cells produced by our method.
+4.4.3. Visualization analysis on activation maps
+The Grad-CAM [64] visualizations on FF++ datasets are illustrated
+in Fig. 8. These activation maps are generated from the outputs of
+the fourth reduction cell in the final detection networks. As we can
+see, most response areas are in the face regions, especially in the
+nose and the mouth. The clues of different forgery types locate in
+distinct regions. For example, the activations of Face2Face always cover
+the whole face, including mouth areas. The activations of FaceSwap
+Neurocomputing 619 (2025) 129129 
+8 
+
+
+--- PAGE 9 ---
+
+X. Jin et al.
+Fig. 6. Detailed structure of the best cells discovered on FF++ by our cross-dataset search. (a) normal cell. (b) reduction cell. It is obvious that the operations are different from
+vanilla CNN. Diverse operations and 𝜃values in the forgery-oriented search space are necessary.
+Fig. 7. Detailed structure of the best normal cell and reduction cell discovered by PC-DARTS [39]. It is obvious that the operations are different from the cells obtained by our
+algorithm.
+Fig. 8. The activation map visualization on FaceForensics++ dataset [41].
+Neurocomputing 619 (2025) 129129 
+9 
+
+
+--- PAGE 10 ---
+
+X. Jin et al.
+Fig. 9. The activation map visualization on Celeb-DF dataset [42].
+are usually concentrated in the central facial regions. Note that the
+regions reflected by Grad-CAM are the basis for determining the final
+classification results, rather than exactly tampered regions.
+The Grad-CAM [64] visualizations on Celeb-DF dataset [42] are
+illustrated in Fig. 9. The first row in Fig. 9 shows the fake faces in the
+videos. The second row denotes the activation maps when we replace
+the proposed search space with the search space of PC-DARTS. The last
+row in Fig. 9 illustrates the activation maps of the proposed method,
+which are generated from the outputs of the fourth reduction cell in
+the final detection networks.
+As we can see, our method performs better. Compared with PC-
+DARTS, the response to the tampered areas is more accurate in the
+proposed method. These visualizations prove that the proposed forgery-
+oriented search space is more effective for facial manipulation detec-
+tion.
+4.5. Discussion of the limitation
+The main objective of this article is to explore the potential of NAS
+for deepfake detection without manual intervention. Nonetheless, the
+automatically searched neural network is still based on the CNN ar-
+chitecture. Compared with graph-based frameworks and Transformer-
+based models, our method did not show significant performance im-
+provement on some datasets.
+However, our method utilizes fewer parameter quantities and
+achieves comparable results. The parameter quantity of our model is
+13.37M.
+SFDG [65] adopts EfficientNet-b4 (#Params: >19M) as backbone.
+Our method performs better in cross-dataset test on WildDeepfake
+dataset (AUC: 74.71 vs. 69.27) and DFDC dataset (AUC: 75.79 vs.
+73.64). PEL [66] employs a dual-stream framework using EffcientNet-
+b4 as backbones (#Params: >38M). We obtain better performance
+in cross-dataset circumstances on Celeb-DF (AUC: 72.48 vs. 69.18),
+WildDeepfake (AUC: 74.71 vs. 67.39), DFDC (AUC: 75.79 vs. 63.31).
+Compared with UIA-ViT [67], we obtain comparable results in DFDC-
+pre dataset (AUC: 75.79 vs. 75.80) in cross-dataset setting. The param-
+eter quantity of our network is much fewer than the ViT-Base structure
+in UIA-ViT (#Params: 13.37M vs. 86M).
+In practical application scenarios on mobile devices, methods with
+smaller parameter quantities are more convenient to deploy and have
+better practicality.
+5. Conclusion
+In this paper, we propose an end-to-end face forgery detection
+framework based on NAS, which can automatically design suitable
+neural networks for this task. First, we create a forgery-oriented search
+space to find appropriate operations for deepfake detection. Then, we
+take the actual estimation error as guidance to improve the search gen-
+eralizability. Besides ordinary search manners, we also consider cross-
+dataset search to obtain a more general neural network architecture.
+Eventually, we connect the cells obtained by NAS with skip connections
+in a cascaded pyramid way. Extensive experimental results demonstrate
+the proposed method achieves competitive performance compared with
+state-of-the-art approaches, especially good generalization ability in
+cross-dataset settings.
+In the future, since the Transformer architecture [68] has shown
+significant performance improvements in many fields, we will try to
+further expand the search space to make DFD-NAS compatible with
+Transformer modules and thus search for more promising architectures.
+Furthermore, considering the convergence can indicate the superior-
+ity of the searched architectures in an unsupervised NAS setting, we
+would like to extend our NAS framework in the unsupervised learning
+manner [69].
+CRediT authorship contribution statement
+Xiao Jin: Writing – review & editing, Writing – original draft,
+Methodology, Conceptualization. Wen Yu: Software, Data curation.
+Dai-Wei Chen: Data curation, Software. Wei Shi: Software, Data cu-
+ration.
+Declaration of competing interest
+The authors declare that they have no known competing finan-
+cial interests or personal relationships that could have appeared to
+influence the work reported in this paper.
+Data availability
+Data will be made available on request.
+References
+[1] M. Barni, P. Campisi, E.J. Delp, G. Doërr, J. Fridrich, N. Memon, F. Pérez-
+González, A. Rocha, L. Verdoliva, M. Wu, Information forensics and security:
+A quarter-century-long journey, IEEE Signal Process. Mag. 40 (5) (2023) 67–79,
+http://dx.doi.org/10.1109/MSP.2023.3275319.
+[2] F. Juefei-Xu, R. Wang, Y. Huang, Q. Guo, L. Ma, Y. Liu, Countering malicious
+deepfakes: Survey, battleground, and horizon, Int. J. Comput. Vis. 130 (7) (2022)
+1678–1734.
+[3] Y. Mirsky, W. Lee, The creation and detection of deepfakes: A survey, ACM
+Comput. Surv. 54 (1) (2021) 1–41, http://dx.doi.org/10.1145/3425780.
+[4] R. Tolosana, R. Vera-Rodriguez, J. Fierrez, A. Morales, J. Ortega-Garcia, Deep-
+fakes and beyond: A survey of face manipulation and fake detection, Inf. Fusion
+64 (2020) 131–148, http://dx.doi.org/10.1016/j.inffus.2020.06.014.
+[5] L. Verdoliva, Media forensics and DeepFakes: An overview, IEEE J. Sel. Top. Sign.
+Proces. 14 (5) (2020) 910–932, http://dx.doi.org/10.1109/JSTSP.2020.3002101.
+[6] Z. Guo, Z. Jia, L. Wang, D. Wang, G. Yang, N. Kasabov, Constructing new
+backbone networks via space-frequency interactive convolution for deepfake
+detection, IEEE Trans. Inf. Forensics Secur. 19 (2024) 401–413, http://dx.doi.
+org/10.1109/TIFS.2023.3324739.
+[7] R. Xia, D. Liu, J. Li, L. Yuan, N. Wang, X. Gao, Mmnet: Multi-collaboration and
+multi-supervision network for sequential deepfake detection, IEEE Trans. Inf.
+Forensics Secur. 19 (2024) 3409–3422, http://dx.doi.org/10.1109/TIFS.2024.
+3361151.
+[8] Z. Qu, Z. Xi, W. Lu, X. Luo, Q. Wang, B. Li, DF-RAP: A robust adversarial
+perturbation for defending against deepfakes in real-world social network sce-
+narios, IEEE Trans. Inf. Forensics Secur. (2024) http://dx.doi.org/10.1109/TIFS.
+2024.3372803, 1–1.
+[9] Q. Yin, W. Lu, B. Li, J. Huang, Dynamic difference learning with spatio–temporal
+correlation for deepfake video detection, IEEE Trans. Inf. Forensics Secur. 18
+(2023) 4046–4058, http://dx.doi.org/10.1109/TIFS.2023.3290752.
+[10] G. Li, X. Zhao, Y. Cao, Forensic symmetry for DeepFakes, IEEE Trans. Inf.
+Forensics Secur. 18 (2023) 1095–1110, http://dx.doi.org/10.1109/TIFS.2023.
+3235579.
+[11] Y. Yu, R. Ni, W. Li, Y. Zhao, Detection of AI-manipulated fake faces via mining
+generalized features, ACM Trans. Multimed. Comput. Commun. Appl. 18 (4)
+(2022) 1–23.
+[12] Y. Luo, Y. Zhang, J. Yan, W. Liu, Generalizing face forgery detection with high-
+frequency features, in: Proceedings of the IEEE Conference on Computer Vision
+and Pattern Recognition, 2021, pp. 16317–16326.
+Neurocomputing 619 (2025) 129129 
+10 
+
+
+--- PAGE 11 ---
+
+X. Jin et al.
+[13] P. Yu, J. Fei, Z. Xia, Z. Zhou, J. Weng, Improving generalization by commonality
+learning in face forgery detection, IEEE Trans. Inf. Forensics Secur. 17 (2022)
+547–558, http://dx.doi.org/10.1109/TIFS.2022.3146781.
+[14] T. Sakirin, S. Kusuma, A survey of generative artificial intelligence techniques,
+Babylon. J. Artif. Intell. 2023 (2023) 10–14.
+[15] H. Qi, Q. Guo, F. Juefei-Xu, X. Xie, L. Ma, W. Feng, Y. Liu, J. Zhao, DeepRhythm:
+Exposing DeepFakes with attentional visual heartbeat rhythms, in: Proceedings
+of the ACM International Conference on Multimedia, 2020, pp. 4318–4327,
+http://dx.doi.org/10.1145/3394171.3413707.
+[16] S. Agarwal, H. Farid, Y. Gu, M. He, K. Nagano, H. Li, Protecting world leaders
+against deep fakes., in: Proceedings of the IEEE Conference on Computer Vision
+Pattern Recognition Workshops, 2019, pp. 38–45.
+[17] X. Yang, Y. Li, S. Lyu, Exposing deep fakes using inconsistent head poses,
+in: Proceedings of the IEEE International Conference on Acoustics, Speech
+and Signal Processing, 2019, pp. 8261–8265, http://dx.doi.org/10.1109/ICASSP.
+2019.8683164.
+[18] Y. Nirkin, L. Wolf, Y. Keller, T. Hassner, DeepFake detection based on discrep-
+ancies between faces and their context, IEEE Trans. Pattern Anal. Mach. Intell.
+(2021) 1–10, http://dx.doi.org/10.1109/TPAMI.2021.3093446.
+[19] J. Yang, A. Li, S. Xiao, W. Lu, X. Gao, MTD-Net: Learning to detect deepfakes
+images by multi-scale texture difference, IEEE Trans. Inf. Forensics Secur. 16
+(2021) 4234–4245, http://dx.doi.org/10.1109/TIFS.2021.3102487.
+[20] Y. Wang, C. Peng, D. Liu, N. Wang, X. Gao, ForgeryNIR: Deep face forgery and
+detection in near-infrared scenario, IEEE Trans. Inf. Forensics Secur. 17 (2022)
+500–515, http://dx.doi.org/10.1109/TIFS.2022.3146766.
+[21] C. Miao, Z. Tan, Q. Chu, H. Liu, H. Hu, N. Yu, F2Trans: High-frequency fine-
+grained transformer for face forgery detection, IEEE Trans. Inf. Forensics Secur.
+18 (2023) 1039–1051, http://dx.doi.org/10.1109/TIFS.2022.3233774.
+[22] C. Zhao, C. Wang, G. Hu, H. Chen, C. Liu, J. Tang, ISTVT: Interpretable spatial-
+temporal video transformer for deepfake detection, IEEE Trans. Inf. Forensics
+Secur. 18 (2023) 1335–1348, http://dx.doi.org/10.1109/TIFS.2023.3239223.
+[23] P. Liu, Y. Lin, Y. He, Y. Wei, L. Zhen, J.T. Zhou, R.S.M. Goh, J. Liu, Automated
+deepfake detection, 2021, arXiv:2106.10705.
+[24] A.A. Nafea, S.A. Alameri, R.R. Majeed, M.A. Khalaf, M.M. AL-Ani, A short review
+on supervised machine learning and deep learning techniques in computer vision,
+Babylon. J. Mach. Learn. 2024 (2024) 48–55.
+[25] B. Zoph, V. Vasudevan, J. Shlens, Q.V. Le, Learning transferable architectures for
+scalable image recognition, in: Proceedings of the IEEE Conference on Computer
+Vision and Pattern Recognition, 2018, pp. 8697–8710.
+[26] H. Pham, M. Guan, B. Zoph, Q. Le, J. Dean, Efficient neural architecture
+search via parameters sharing, in: Proceedings of the International Conference
+on Machine Learning, 2018, pp. 4095–4104.
+[27] H. Cai, L. Zhu, S. Han, ProxylessNAS: Direct neural architecture search on target
+task and hardware, in: Proceedings of the International Conference on Learning
+Representations, 2019, pp. 1–13.
+[28] M. Tan, B. Chen, R. Pang, V. Vasudevan, M. Sandler, A. Howard, Q.V. Le,
+MnasNet: Platform-aware neural architecture search for mobile, in: Proceedings
+of the IEEE Conference on Computer Vision and Pattern Recognition, 2019, pp.
+2820–2828.
+[29] H. Liu, K. Simonyan, Y. Yang, DARTS: Differentiable architecture search, in:
+Proceedings of the International Conference on Learning Representations, 2019,
+pp. 1–13.
+[30] W. Ge, M. Panariello, J. Patino, M. Todisco, N. Evans, Partially-connected differ-
+entiable architecture search for deepfake and spoofing detection, in: Proceedings
+of Interspeech, 2021, pp. 4319–4323, http://dx.doi.org/10.21437/Interspeech.
+2021-1187.
+[31] W. Ge, J. Patino, M. Todisco, N. Evans, Raw differentiable architecture search
+for speech deepfake and spoofing detection, in: Proceedings of the Automatic
+Speaker Verification and Spoofing Countermeasures Challenge, 2021, pp. 22–28.
+[32] H. Wu, J. Zhou, IID-Net: Image inpainting detection network via neural archi-
+tecture search and attention, IEEE Trans. Circuits Syst. Video Technol. 32 (3)
+(2022) 1172–1185, http://dx.doi.org/10.1109/TCSVT.2021.3075039.
+[33] J. Moreno Claver, Neural architecture search for detection of deepfakes, 2020.
+[34] Z. Yu, C. Zhao, Z. Wang, Y. Qin, Z. Su, X. Li, F. Zhou, G. Zhao, Searching
+central difference convolutional networks for face anti-spoofing, in: Proceedings
+of the IEEE Conference on Computer Vision and Pattern Recognition, 2020, pp.
+5295–5305.
+[35] B. Bayar, M.C. Stamm, Constrained convolutional neural networks: A new
+approach towards general purpose image manipulation detection, IEEE Trans.
+Inf. Forensics Secur. 13 (11) (2018) 2691–2706.
+[36] J. Fridrich, J. Kodovsky, Rich models for steganalysis of digital images, IEEE
+Trans. Inf. Forensics Secur. 7 (3) (2012) 868–882.
+[37] Y. Zhou, X. Xie, S.-Y. Kung, Exploiting operation importance for differentiable
+neural architecture search, IEEE Trans. Neural Netw. Learn. Syst. (2021) 1–14,
+http://dx.doi.org/10.1109/TNNLS.2021.3072950.
+[38] A. Zela, T. Elsken, T. Saikia, Y. Marrakchi, T. Brox, F. Hutter, Understand-
+ing and robustifying differentiable architecture search, in: Proceedings of the
+International Conference on Learning Representations, 2020, pp. 1–28.
+[39] Y. Xu, L. Xie, W. Dai, X. Zhang, X. Chen, G.-J. Qi, H. Xiong, Q. Tian, Partially-
+connected neural architecture search for reduced computational redundancy,
+IEEE Trans. Pattern Anal. Mach. Intell. 43 (9) (2021) 2953–2970, http://dx.
+doi.org/10.1109/TPAMI.2021.3059510.
+[40] Z. Yu, J. Wan, Y. Qin, X. Li, S.Z. Li, G. Zhao, NAS-FAS: Static-dynamic central
+difference network search for face anti-spoofing, IEEE Trans. Pattern Anal.
+Mach. Intell. 43 (9) (2021) 3005–3023, http://dx.doi.org/10.1109/TPAMI.2020.
+3036338.
+[41] A. Rossler, D. Cozzolino, L. Verdoliva, C. Riess, J. Thies, M. Nießner, FaceForen-
+sics++: Learning to detect manipulated facial images, in: Proceedings of the IEEE
+International Conference on Computer Vision, 2019, pp. 1–11.
+[42] Y. Li, X. Yang, P. Sun, H. Qi, S. Lyu, Celeb-DF: A large-scale challenging dataset
+for deepfake forensics, in: Proceedings of the IEEE Conference on Computer
+Vision and Pattern Recognition, 2020, pp. 3207–3216.
+[43] B. Zi, M. Chang, J. Chen, X. Ma, Y.-G. Jiang, Wilddeepfake: A challenging real-
+world dataset for deepfake detection, in: Proceedings of the ACM International
+Conference on Multimedia, 2020, pp. 2382–2390.
+[44] B. Dolhansky, R. Howes, B. Pflaum, N. Baram, C.C. Ferrer, The deepfake
+detection challenge (DFDC) preview dataset, 2019, arXiv:1910.08854.
+[45] D. Afchar, V. Nozick, J. Yamagishi, I. Echizen, MesoNet: a compact facial video
+forgery detection network, in: 2018 IEEE International Workshop on Information
+Forensics and Security, 2018, pp. 1–7, http://dx.doi.org/10.1109/WIFS.2018.
+8630761.
+[46] C. Szegedy, W. Liu, Y. Jia, P. Sermanet, S. Reed, D. Anguelov, D. Erhan, V.
+Vanhoucke, A. Rabinovich, Going deeper with convolutions, in: Proceedings of
+the IEEE Conference on Computer Vision and Pattern Recognition, 2015, pp.
+1–9.
+[47] D. Güera, E.J. Delp, Deepfake video detection using recurrent neural networks,
+in: Proceedings of the IEEE International Conference on Advanced Video and
+Signal Based Surveillance, 2018, pp. 1–6.
+[48] Y. Li, S. Lyu, Exposing DeepFake videos by detecting face warping artifacts, in:
+Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition
+Workshops, 2019, pp. 46–52.
+[49] F. Chollet, Xception: Deep learning with depthwise separable convolutions, in:
+Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition,
+2017, pp. 1251–1258.
+[50] H.H. Nguyen, F. Fang, J. Yamagishi, I. Echizen, Multi-task learning for detecting
+and segmenting manipulated facial images and videos, in: Proceedings of the
+IEEE International Conference on Biometrics Theory, Applications and Systems,
+2019, pp. 1–8, http://dx.doi.org/10.1109/BTAS46853.2019.9185974.
+[51] H.H. Nguyen, J. Yamagishi, I. Echizen, Capsule-forensics: Using capsule networks
+to detect forged images and videos, in: Proceedings of the IEEE International
+Conference on Acoustics, Speech and Signal Processing, 2019, pp. 2307–2311.
+[52] M. Tan, Q. Le, EfficientNet: Rethinking model scaling for convolutional neural
+networks, in: Proceedings of the International Conference on Machine Learning,
+2019, pp. 6105–6114.
+[53] Y. Qian, G. Yin, L. Sheng, Z. Chen, J. Shao, Thinking in frequency: Face
+forgery detection by mining frequency-aware clues, in: Proceedings of European
+Conference on Computer Vision, 2020, pp. 86–103.
+[54] H. Zhao, W. Zhou, D. Chen, T. Wei, W. Zhang, N. Yu, Multi-attentional deepfake
+detection, in: Proceedings of the IEEE Conference on Computer Vision and
+Pattern Recognition, 2021, pp. 2185–2194.
+[55] K. Sun, H. Liu, Q. Ye, Y. Gao, J. Liu, L. Shao, R. Ji, Domain general face forgery
+detection by learning to weight, in: Proceedings of the AAAI Conference on
+Artificial Intelligence, Vol. 35, 2021, pp. 2638–2646.
+[56] J. Hu, X. Liao, W. Wang, Z. Qin, Detecting compressed deepfake videos in social
+networks using frame-temporality two-stream convolutional network, IEEE Trans.
+Circuits Syst. Video Technol. 32 (3) (2021) 1089–1102.
+[57] J. Hu, X. Liao, J. Liang, W. Zhou, Z. Qin, Finfer: Frame inference-based deepfake
+detection for high-visual-quality videos, Proc. AAAI Conf. Artif. Intell. 36 (1)
+(2022) 951–959, http://dx.doi.org/10.1609/aaai.v36i1.19978.
+[58] J. Cao, C. Ma, T. Yao, S. Chen, S. Ding, X. Yang, End-to-end reconstruction-
+classification learning for face forgery detection, in: Proceedings of the IEEE
+Conference on Computer Vision and Pattern Recognition, 2022, pp. 4113–4122.
+[59] T. Wang, K.P. Chow, Noise based deepfake detection via multi-head relative-
+interaction, in: Proceedings of the AAAI Conference on Artificial Intelligence,
+Vol. 37, 2023, pp. 14548–14556.
+[60] Z. Yang, J. Liang, Y. Xu, X.-Y. Zhang, R. He, Masked relation learning for
+DeepFake detection, IEEE Trans. Inf. Forensics Secur. 18 (2023) 1696–1708,
+http://dx.doi.org/10.1109/TIFS.2023.3249566.
+Neurocomputing 619 (2025) 129129 
+11 
+
+
+--- PAGE 12 ---
+
+X. Jin et al.
+[61] D. Liu, Z. Dang, C. Peng, Y. Zheng, S. Li, N. Wang, X. Gao, FedForgery:
+Generalized face forgery detection with residual federated learning, IEEE Trans.
+Inf. Forensics Secur. 18 (2023) 4272–4284, http://dx.doi.org/10.1109/TIFS.
+2023.3293951.
+[62] D.P. Kingma, J. Ba, Adam: A method for stochastic optimization, 2014, arXiv:
+1412.6980.
+[63] S. Ruder, An overview of gradient descent optimization algorithms, 2016, arXiv:
+1609.04747.
+[64] R.R. Selvaraju, M. Cogswell, A. Das, R. Vedantam, D. Parikh, D. Batra, Grad-
+CAM: Visual explanations from deep networks via gradient-based localization,
+in: Proceedings of the IEEE International Conference on Computer Vision, 2017,
+pp. 618–626.
+[65] Y. Wang, K. Yu, C. Chen, X. Hu, S. Peng, Dynamic graph learning with
+content-guided spatial-frequency relation reasoning for deepfake detection, in:
+Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition,
+2023, pp. 7278–7287.
+[66] Q. Gu, S. Chen, T. Yao, Y. Chen, S. Ding, R. Yi, Exploiting fine-grained face
+forgery clues via progressive enhancement learning, Proc. AAAI Conf. Artif. Intell.
+36 (1) (2022) 735–743, http://dx.doi.org/10.1609/aaai.v36i1.19954.
+[67] W. Zhuang, Q. Chu, Z. Tan, Q. Liu, H. Yuan, C. Miao, Z. Luo, N. Yu, UIA-
+ViT: Unsupervised inconsistency-aware method based on vision transformer for
+face forgery detection, in: Proceedings of the European Conference on Computer
+Vision, 2022, pp. 391–407.
+[68] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A.N. Gomez,
+L.u. Kaiser, I. Polosukhin, Attention is all you need, in: Advances in Neural
+Information Processing Systems, Vol. 30, 2017.
+[69] X. Zhang, P. Hou, X. Zhang, J. Sun, Neural architecture search with random
+labels, in: Proceedings of the IEEE Conference on Computer Vision and Pattern
+Recognition, 2021, pp. 10907–10916.
+Xiao Jin received the B.S. degree and Ph.D. degree from
+Tianjin University, Tianjin, China, both in electronic infor-
+mation engineering. He is currently an assistant professor
+with the College of Artificial Intelligence from Nankai Uni-
+versity, Tianjin, China. From 2017 to 2018, he was a visiting
+student with the Department of Electrical and Computer
+Engineering, University of British Columbia, Vancouver,
+Canada. His current research interests include information
+security, computer vision and multimedia computing.
+Wen Yu received his bachelor degree in automation from
+Tianjin Polytechnic University in China in 2018 and is
+currently pursuing a master degree in control engineering
+at Nankai University. His research interests include informa-
+tion security, computer vision and multimedia computing.
+Dai-Wei Chen received his bachelor degree in civil engi-
+neering from Hunan Institute of Science and Technology in
+China in 2024 and is currently pursuing a master degree
+in control engineering at Nankai University. His research
+interests include information security, computer vision, and
+multimedia computing.
+Wei Shi obtained the B.S. degree in Artificial Intelligence
+from the University of Science and Technology Beijing
+(USTB), China, in 2024. Currently, he is pursuing the
+M.S. degree in computer science at Nankai University. His
+academic focus lies in the realms of information security,
+computer vision and multimedia computing.
+Neurocomputing 619 (2025) 129129 
+12 

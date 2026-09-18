@@ -1,0 +1,2434 @@
+
+
+--- PAGE 1 ---
+
+Academic Editor: Gianni D’Angelo
+Received: 15 December 2025
+Revised: 2 February 2026
+Accepted: 4 February 2026
+Published: 11 February 2026
+Copyright: © 2026 by the authors.
+Licensee MDPI, Basel, Switzerland.
+This article is an open access article
+distributed under the terms and
+conditions of the Creative Commons
+Attribution (CC BY) license.
+AI
+Review
+A Comprehensive Review of Deepfake Detection Techniques:
+From Traditional Machine Learning to Advanced Deep
+Learning Architectures
+Ahmad Raza 1,*
+, Abdul Basit 1
+, Asjad Amin 1, Zeeshan Ahmad Arfeen 2,*
+, Muhammad I. Masud 3
+,
+Umar Fayyaz 1
+and Touqeer Ahmed Jumani 4
+1
+Department of Information and Communication Engineering, The Islamia University of Bahawalpur (IUB),
+Bahawalpur 63100, Southern Punjab, Pakistan; abdulbasit028363@gmail.com (A.B.);
+asjad.amin@iub.edu.pk (A.A.); umar.fayyaz@iub.edu.pk (U.F.)
+2
+Faculty of Electrical Engineering & Technology, The Islamia University of Bahawalpur (IUB),
+Bahawalpur 63100, Southern Punjab, Pakistan
+3
+Department of Electrical Engineering, College of Engineering, University of Business and Technology,
+Jeddah 21361, Saudi Arabia; m.masud@ubt.edu.sa
+4
+College of Engineering, A’Sharqiyah University, Ibra 400, Oman; touqeer.ahmed@asu.edu.com
+*
+Correspondence: ahmedraaza52@gmail.com (A.R.); zeeshan.arfeen@iub.edu.pk (Z.A.A.)
+Abstract
+Deepfake technology is causing unprecedented threats to the authenticity of digital media,
+and demand is high for reliable digital media detection systems. This systematic review
+focuses on an analysis of deepfake detection methods using deep learning approaches,
+machine learning methods, and the classical methods of image processing from 2018 to
+2025 with a specific focus on the trade-off between accuracy, computing efficiency, and
+cross-dataset generalization. Through lavish analysis of a robust peer-reviewed studies
+using three benchmark data sets (FaceForensics++, DFDC, Celeb-DF) we expose important
+truths to bring some of the field’s prevailing assumptions into question. Our analysis pro-
+duces three important results that radically change the understanding of detection abilities
+and limitations. Transformer-based architectures have significantly better cross-dataset
+generalization (11.33% performance decline) than CNN-based (more than 15% decline),
+at the expense of computation (3–5× more). To the contrary, there is no strong reason
+to assume the superiority of deep learning, and the performance of traditional machine
+learning methods (in our case, Random Forest) is quite comparable (accuracy of 99.64%
+on the DFDC) with dramatically lower computing needs, which opens up the prospects
+for their application in resource-constrained deployment scenarios. Most critically, we
+demonstrate deterioration of performance (10–15% on average) systematically across all
+methodological classes and we provide empirical support for the fact that current detection
+systems are, to a high degree, learning dataset specific compression artifacts, rather than
+deepfake characteristics that are generalizable. These results highlight the importance of
+moving from an accuracy-focused evaluation approach toward more comprehensive evalu-
+ation approaches that balance either generalization capability, computational feasibility,
+or practical deployment constraints, and therefore further direct future research efforts
+towards designing systems for detection that could be deployed in practical applications.
+Keywords:
+deepfake; machine learning; deep learning; computer vision; artificial
+intelligence; forensics
+AI 2026, 7, 68
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 2 ---
+
+AI 2026, 7, 68
+2 of 42
+1. Introduction
+Deepfake technology takes advantage of recent technology in artificial intelligence
+(AI) and deep learning to produce hyper-realistic so-called synthetic media such as videos,
+images, and audio [1,2].
+Such rigged contents are capable of portraying people doing or saying things that
+did not take place. Sophisticated algorithms, including generative adversarial networks
+(GANs), variational autoencoders (VAEs), and transformer-based models are used in the
+technology to produce an unprecedented level of realism in its face expression manipulation
+capabilities, voice synthesis, and scene generation [3].
+Malik et al. comprehensively survey deepfake detection methods for face images
+and videos. They classify deepfake generation techniques into five categories and detec-
+tion approaches into traditional forensic methods and deep learning-based techniques,
+including pixel-level, DNN, and artifact-based analyses.The survey determines the critical
+datasets (UADFV, FaceForensics++, and Celeb-DF) and major problems such as scanty
+data, unidentified attacks, and chronological incompatibilities, and stressing the desire of
+powerful, universalized models to battle the emerging deepfakes [4].
+Since their emergence in 2017 deepfakes have experienced evolution far greater in
+a short time, fuelled by accessible open source tools, enormous available online data,
+and growing computational power. Despite without possible benefits in entertainment,
+education and creative technology deep-fakes have immense harm to the cohesion of the
+society and democratic systems by causing erosion to human and trust and magnifying
+false information [5,6].
+This accessibility has created a situation in which disinformation, financial fraud,
+identity theft, and forced content generation coming to the fore considerably compromising
+privacy, trust and information integrity. Despite without possible benefits in entertainment,
+education and creative technology deep-fakes have immense harm to the cohesion of the
+society and democratic systems by causing erosion to human and trust and magnifying
+false information [7,8].
+These challenges highlight the need for effective and efficient detection systems to aid
+in addressing the existing issues.These challenges highlight the urgency of robust detection
+systems as well as effective mitigation regulatory systems, and raising the media literacy to
+fight the risks of the deepfakes [9,10].
+This review analyzes the increasing menace of AI created deepfakes which undermine
+confidence in online media by obscuring the individual through meddling with endanger-
+ing them privacy. It gives a review of technical and non-technical preventive measures,
+with incorporating the current detection techniques and regulation frameworks that are
+capable of assisting. mitigate these risks [11,12].
+The development of deepfake technology was studied by Ruben Tolosana et al. from
+the Biometrics and Data Pattern Analytics (BIDA) Lab. They concentrated on facial area
+analysis and detection system performance throughout deepfake datasets from the first
+and second generations. The study emphasizes how deepfakes are becoming more realistic
+and challenging to identify [13].
+The intensive development of the deepfake generation and detection techniques was
+systematically reported in the recent and extensive surveys.This review notes a growing
+complexity of synthesis algorithms and defense mechanisms, especially the complexity
+of the more recent generation models, by the use of advanced generative adversarial
+networks and transformer generation models [14,15]. The creation of many challenging
+benchmark datasets like Celeb-DF has facilitated the stronger testing of detection methods
+under a variety of manipulation conditions to augment prior benchmarks with high-quality
+celebrity deepfakes that best simulate manipulation issues in the real world [16].
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 3 ---
+
+AI 2026, 7, 68
+3 of 42
+Dolhansky et al. developed the deepfake detection challenge(DFDC) dataset, which
+provides a large scale ethically sourced collection of 128,154 movies made with over
+3400 consenting actors and with eight deepfake algorithms. In order to overcome the
+shortcomings of previous datasets, DFDC offers a variety of excellent material and acts
+as a uniform standard foe assessing detection techniques. Strong generalization to real
+world deepfakes was shown by the challenge’s top performing models, like EfficientNet
+and XceptionNet [17].
+The Anti-Deepfake Transformer (ADT) is a vision transformer framework that ad-
+dresses the generalization limitations of CNN-based deepfake detectors. ADT leverages
+variant residual connections (VRC) in four trans-blocks, an attention-leading module
+(ALM), and a multi-forensics module (MFM) to capture both global and regional informa-
+tion.Trained with token-level contrastive loss on FaceForensics++, ADT achieves state-of-
+the-art cross-dataset performance (84.97% AUC on Celeb-DF) and competitive intra-dataset
+results (96.30% AUC on FF++ HQ) [18].
+In a 2022 Applied Sciences publication, Khormali and Yuan introduce DFDT, a vi-
+sion transformer-based deepfake detection framework. DFDT overcomes the receptive
+field limitations of CNNs by modeling both local and global pixel relationships across
+various forgery scales. The framework uses patch extraction and embedding, a multi-
+stream transformer block, attention-based patch selection, and a multi-scale classifier. It
+incorporates a re-attention mechanism for improved scalability and to prevent attention
+collapse. DFDT achieves high accuracy on FaceForensics++ (99.41%), Celeb-DF V2 (99.31%),
+and WildDeepfake (81.35%), demonstrating strong cross-dataset and cross-manipulation
+generalization [19].
+Nirkin et al. suggest a face-swapping detection approach which makes use of dispari-
+ties between the manipulated face and the surrounding load context with two Xception-net
+based networks one is face identification and the other context recognition.The approach
+outperforms traditional classifiers, achieving state-of-the-art results on FaceForensics++
+and Celeb-DF while generalizing effectively to unseen manipulation methods [20].
+Guo et al. introduce Space-Frequency Interactive Convolution (SFIConv), which
+replaces standard convolution layers in backbone networks to improve deepfake detection.
+SFIConv incorporates Multichannel Constrained Separable Convolution (MCSConv) to
+jointly capture spatial and high-frequency manipulation traces. This can be shown by
+experiments on HFF, FF++, FDDC, and CelebDF precision and lower cost of computation.
+However, its performance drops on unseen manipulations methods highlighting persistent
+generalization challenges [21].
+Wang et al. provide a deep convolutional Transformers model that uses convolutional
+pooling and re-attention techniques to aggregate local and global picture information for
+deepfake detection. on benchmarks like FaceForencise++ and Celeb-DF the model performs
+better than conventional CNN based baselines. By introducing keyframe extraction to
+preserve high-resolution information and mitigate loss of video compression, the method
+achieves improved performance, reaching up to 97.69% AUC in FF++ in both within- and
+cross-dataset evaluations [22].
+Zhao et al. suggest a deepfake detector framework, which is multi-attentional scale-
+invariant attention to manipulation artifacts. Their method utilizes a spatial attention
+module so as to pay attention to the areas of the face that are susceptible. Whereas channel
+attention mechanisms focus on discriminative, manipulation artifact feature representations.
+The multi-scale architecture has the ability to detect both local blending boundaries and
+distortions of facial features inconsistencies) together with global artifacts (such as lighting
+anomalies and lapses in time). Evaluated on FaceForensics++ and Celeb-DF, the algorithm
+shows high-quality results on various environments manipulation, that is, competitive
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 4 ---
+
+AI 2026, 7, 68
+4 of 42
+precision without loss of computational performance, which is appropriate to be used in
+practice. The trend is represented in this work towards attention-based architectures, which
+are explicit about spatial and semantic relationships between deep fake and detection [23].
+Yang et al. [24] introduce AVoiD-DF, a multi-modal deepfake detection framework
+that learns audio-visual inconsistencies. AVoiD-DF outperforms uni-modal methods by
+using a two-stream Temporal-Spatial Encoder (TSE), a Multi-Modal Joint Decoder (MMD)
+with bi-directional cross-attention, and a cross-modal classifier to fuse features. It achieves
+state-of-the-art accuracy on DefakeAVMIT (91.2%), FakeAVCeleb (92.3%), and DFDC
+(91.4%), exceeding Xception, LipForensics, and CViT. To further research, they present
+DefakeAVMIT, a dataset of 6480 audio-visual deepfake samples. AVoiD-DF exhibits strong
+cross-dataset generalization, effectively detecting unseen forgeries. The better performance
+shows the importance of audio-visual synchrony analysis, which is especially to detect
+temporal misalignment, phoneme and viseme mismatch, prosodic expression inconsistency
+and lip sync degradation (achieved 6–8% improvement of visual-only methods) [24].
+This study presents a CNN-based multi-color spatio-temporal method for deepfake
+detection. By analyzing facial color inconsistencies and temporal artifacts, it achieves
+high AUC scores on FaceForensics++, outperforming physics-based detectors in capturing
+flickering and boundary effects. However, computational complexity and limited general-
+ization due to sensitivity to advanced GAN-based deepfakes highlight the need for better
+temporal continuity modeling [25].
+Figure 1 shows a comprehensive multimodal deepfake detection framework that
+takes both the visual and audio inputs in parallel and detects the content that is manipu-
+lated. This architecture is of fundamental importance as it overcomes the key limitation
+of unimodal detection methods that only analyze visual/audio features separately and
+are therefore unable to capture cross-modal inconsistencies that are often a reveal of deep-
+fake manipulation. The power of the framework is that it is able to identify very subtle
+differences between audio and visual streams that are inherently characteristic of synthetic
+media, but hard for human observers to detect.
+Figure 1.
+Multimodal Deepfake Detection Framework analyzing the audio and visual in-
+puts to find the cross modal inconsistencies including the lip sync mismatches and prosodic
+expression contradictions.
+The framework has four interrelated components that work in harmony to result in
+robust detection. First, the spatiotemporal encoder processes the video frames to extract
+features related to the visual contents representing both inconsistencies in space (within
+single frames) and inconsistencies in time (within the frames sequences) that will help to
+identify manipulation artifacts that occur across time. Second, an audio feature extractor
+is used to analyse acoustic features such as spectral features, prosodic features, and voice
+quality features which can be used to identify synthetic audio.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 5 ---
+
+AI 2026, 7, 68
+5 of 42
+Third, these extracted features are fused through a joint decoder using cross attention
+mechanisms to learn complex dependencies among modalities e.g., in lip synchronization,
+detecting when lip movements are inconsistent with the audio phonemes or when there are
+inconsistencies between the dynamics of the facial muscles and those of voice production.
+Fourth, alignment and inconsistency detection modules pick up relative light differences
+in the audio-visual signal that are hallmarks of synthetic manipulation, such as temporal
+levels of misalignment, or unnatural synchronization patterns.
+The main innovation demonstrated in this architecture is the use of the cross attention
+mechanism in the joint decoder which helps the model to find the correlations between the
+video and audio streams that would be invisible to unimodal approaches. For example,
+genuine videos have a natural matching between facial muscle movements and vocaliza-
+tion, whereas deepfakes have temporal desynchronisations or sound and pronunciation
+mismatches, because of the independent generation of visual and audio information.
+This type of multimodal method, such as the AVoiD-DF method, can yield better results
+(91.2% on DefakeAVMIT, 92.3% on FakeAVCeleb) with respect to unimodal methods thanks
+to some complementary information between the different modalities, which explains why
+integrated detection frameworks are the current state-of-the-art for deepfake detection.
+Rossler et al. present FaceForensics++, a full-size benchmark data and detection sys-
+tem that has developed into the standard to assess deepfake detection schemes. These are
+the conditions that define the systematic evaluation protocols in various manipulation and
+their work compression levels and techniques (Deepfakes, Face2Face, FaceSwap, Neural-
+Textures), making it possible to reasonably compare methods of detection. The sample
+consists of 1000 original videos manipulated with five variations of methods in generating
+conditions estimating method-based detection abilities. This quality measure addresses
+past constraints in the area where inconsistent assessment guidelines impaired significant
+assessment comparisons of performance between studies. FaceForensics++ was referenced
+more than 3000 times and has been the most commonly-used benchmark in our reviewed
+corpus (40% of studies) [26].
+Jayakumar et al. present a conceptualized deepfake detection model that is visually
+interpretable and is based on an EfficientNetB0 backbone trained on a subset of FaceForen-
+sics++. Using MTCNN as the face detector and other preprocessing methods, such as
+scaling, normalizing, and augmentation, the system has 89.58% fidelity under human-
+grounded evaluation with Anchors XAI and SLIC as the segmentation system in generating
+visual explanations about manipulated areas. Anchors perform better than LIME when it
+comes to giving similar interpretations, although additional testing in bigger datasets is
+necessary [27].
+Zou et al. propose a semantics-oriented multitask learning framework for deepfake
+detection, introducing a dataset expansion technique and a joint embedding approach
+using vision-language models. Their Semantics-based Joint Embedding DeepFake Detector
+(SJEDD) utilizes face semantics, bi-level optimization, and automated task focus and is
+significantly outperforming 18 state-of-the-art detectors on 6 datasets that it competes in.
+The lack of variety in datasets and the complexity of computation is a challenge, and the
+generalizability and interpretability of SJEDD are improved [28].
+Cozzolino et al. introduce POI-Forensics, which uses contrastive learning to de-
+rive identity-specific features by using real videos and an audio-visual deepfake detec-
+tor. The technique impacts strong cross-dataset results, such as an AUC of 73.4% on
+FakeAVCelebV2 and good results on pDFDC and KoDF, by comparing audio and video
+embeddings with a reference set. Its usefulness in facial reenactment (AUC: 70–80%) is
+however lower and it requires having a large set of references [29].
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 6 ---
+
+AI 2026, 7, 68
+6 of 42
+Pham et al. had done a dual study benchmarking both on facial forgery and facial
+detection the data used is a collection of forged images (91,885 large data set) and videos
+(2000 videos) out of FaceForensics++. The authors made the comparison of conventional
+computer vision algorithms, and the deep learning algorithms such as XceptionNet and
+GAN-Fingerprint and their stability to brightness, resolution, and so on and compression.
+Most techniques were greatly affected by compression Despite GAN-Fingerprint being
+stronger. This bi-dimensional benchmarking data gives users the option to confronts
+forging and detection procedures directly and provides helpful performance information.
+Nevertheless, certain information was lost due to the limitation of OCR [30].
+On black-box, grey-box and white-box evaluation of 16 state of the art detectors,
+Le et al. systematize deepfake detection using a five stepping conceptual framework
+environments with data sets such as DFDC Spatial-temporal and transformer models out
+distort others, especially detect subtle changes of a face. However these limited problem of
+diversity and repeatability of datasets, and only 30 percent of the models are open source
+hinder generalization. The paper focuses on the architecture of the model and data variety
+as necessary to effective deepfake detection [31].
+Shahzad et al. examine cinematographic deepfake detection ability of ChatGPT-4 by
+compares the results with human judges and the latest AI models in the FakeAVCeleb
+dataset. ChatGPT with context-rich prompts is similar in human-comparable performances
+(65 percent) compared to AI models (87.5–97.5 percent) but underperforms AI models.
+Although its interpretabilities and generalization are good strengths, the use of traditional
+characteristics and inability to work with simple prompts limits its functionality. The paper
+recommends that future detection systems can be enhanced through the integration of deep
+learning with large language models (LLMs) [32].
+Rana and Sung provide a summary of deepfake detection in their IWSPA has in their
+tutorial and dividing approaches into Digital Media Forensics, Face Manipulation, Machine
+Learning models like (SVM, CNN) and other Computational Methods. On the visual
+materials and facial landmarks, and when analyzed on a dataset such as FaceForensics++,
+the weaknesses are evident of individual methods. They suggest mixed methods and
+different data sets to increased protection against emerging deepfakes [33].
+Figure 2 shows a detailed classification of deepfake detection techniques in a tax-
+onomic structure of three main categories and methodologies are classified depending
+on their underlying algorithm and operation principles. This classification is important
+in order to comprehend the landscape of approaches to detection since it highlights the
+fundamental trade-offs between multiple and methodology paradigms, which ultimately
+help researchers in choosing the suitable techniques for particular deployment scenarios.
+The tri-partite taxonomy reflects the evolution of the detection methods from the old school
+signal processing methods to the classical machine learning and finally to the latest deep
+learning architectures.
+The first category, which includes Deep Learning-Based Detection Techniques, in-
+cludes advanced neural architectures such as Transformers, Convolutional Neural Net-
+works (CNNs), Long Short-Term Memory networks (LSTMs), Capsule Networks, Gener-
+ative Adversarial Networks (GANs), XceptionNet, Recurrent Neural Networks (RNNs),
+Autoencoders and attention mechanisms. These approaches are currently leading the
+research field because of the capacity to automatically learn hierarchical representations of
+features from raw data with state-of-the-art accuracy on benchmark datasets. However,
+as detailed in Sections 2 and 4, this category shows a large amount of variability in terms of
+the generation of the need for computational resources and cross-dataset generalization
+capabilities. The second category, MachineLearning and Traditional Methods, comprise of
+Support Vector Machines (SVM), Random Forest, K-Nearest Neighbors (KNN) & Logistic
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 7 ---
+
+AI 2026, 7, 68
+7 of 42
+Regression. There comes a case where we have approaches that are based on handcrafted
+features, and some classical optimization techniques. Despite the fact that such models
+are overshadowed by deep learning in latter literature, our analysis in Section 3 shows
+that the accuracy of these models is competitive with much lower computational overhead,
+especially Random Forest which is able to get 99.64% accuracy on DFDC. The third category,
+which is Traditional Image Processing Techniques, includes frequency domain analysis
+methods such as Discrete Cosine Transform (DCT), Discrete Fourier Transform (DFT) and
+Pixel and Frequency Analysis, Edge Detection and Wavelet Analysis that take advantage of
+statistical regularities in deepfake generation processes.
+Figure 2. Deepfake Detection Techniques Classification Diagram. The diagram uses color coding to
+distinguish methodology categories: blue for deep learning techniques, green for machine learning
+methods, and yellow for traditional image processing approaches.
+This taxonomic organization makes some very important points related to method-
+ological diversity and research gaps. The underlying rate of deep learning approaches
+(approximately 70% of reviewed studies) represents the current research trends, but our
+systematic evaluation refutes the affirmation of complexity of architecture equates to
+better performance.
+Traditional methods have intriguing advantages in terms of interpretability, compu-
+tational efficiency, and deployment feasibility which should be continued to explore in
+parallel with the deep learning innovations. The classification framework is obviously not
+just an organizational tool, but it is an analytical instrument than discovers the need to have
+multi-dimensional evaluation criteria that include accuracy, efficiency, and generalization
+and not only to optimize accuracy.
+Generative adversarial networks have boosted the development of deepfake technol-
+ogy (GANs). This has developed to severe worries as to whether digital media can be
+trusted, which means that there should be powerful detection systems. Cao and Gong [34]
+disclose that although the accuracy was very high (0.94–0.99) in controlled environments,
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 8 ---
+
+AI 2026, 7, 68
+8 of 42
+present detection models are susceptible to Gaussian noise adversarial attacks weak cross-
+method generalization and backdoor exploits. This review addresses the recent advance-
+ment and identifies the main challenges and antagonistic threats of coming up with a secure
+and reliable method of detecting deepfakes [34].
+1.1. Novel Contributions
+This review makes four innovative contributions that differentiate it from existing
+deepfake detection surveys and provide new knowledge regarding the capabilities, limita-
+tions and future directions of deepfake detection.
+1.1.1. Contribution 1: Deployment-Centric Evaluation Framework
+Unlike previous surveys focused on architectural categorization, in this review, meth-
+ods are addressed from the deployment point of view by systematically comparing the
+different methods with their associated practical constraints such as their computational
+overhead, the robustness to cross-datasets, and the need to operate in real time. We
+show that methodological superiority is not a given, but context sensitive—transformer
+architectures are superior in a cross-disease setting despite the computational burden and
+classical machine learning approaches are competitive in terms of accuracy with little
+resource needs in particular deployment scenarios. This framework changes a focus on
+evaluation of “which method is best” to a focus on “which method is optimal for specific
+operational constraints.”
+1.1.2. Contribution 2: Challenging Deep Learning Dominance Assumptions
+Through this rigorous analysis of the type of computational efficiency, we dispute
+common assumptions of the superiority of deep learning over traditional methods. We
+show that using Random Forest, we obtain 99.64% accuracy on DFDC with 2 ms inference
+time (better than many deep learning methods that need 60 ms to attain 91% accuracy).
+This result, which was systematically documented in many different traditional methods,
+shows that intelligent feature engineering can be a very good competitor in comparison to
+learned representations in resource-constrained applications, and suggests that an implicit
+assumption in the recent literature is incorrect-namely, that complexity in the architecture
+guarantees superior performance.
+1.1.3. Contribution 3: Systematic Cross-Dataset Generalization Analysis
+We provide the first quantification of cross-dataset generalization failures across
+areas of methodologies to reveal systematic 10 to 15% of degradation of performance,
+which hints of learning dataset specific rather than a universal deepfake characteristic.
+While Le et al. [31] point out the issues with generalization and discuss theoretically, our
+systematic empirical study quantifies the patterns of degradation and shows that such
+patterns are the same for transformer (11.33% decline), CNN (15%+ decline) and traditional
+methods. Such proof is a fundamental limitation: something that needs paradigm shifts in
+the methodologies for training as well as dataset construction, not so much incremental
+refinements within the architecture.
+1.1.4. Contribution 4: Comprehensive Computational Efficiency Quantification
+We give the first systematic comparison within computational overhead (inference
+time, parameter count) between the different methodology categories, and it turns out
+that quite often marginal increases in accuracy necessitate disproportionate increases of
+computational cost. As an example, for ADT, it delivers only 1% better accuracy than for
+XceptionNet even with being 4x more computationally costly. This quantification enables
+evidence based architecture selection between performance and efficiency for specific
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 9 ---
+
+AI 2026, 7, 68
+9 of 42
+deployment scenarios—critical information missing from existing surveys mainly dealing
+with accuracy. These contributions separately present researchers and practitioners with
+practical understanding to select methods, convey basic limitations requiring research focus
+or attention, and set evaluation frameworks focusing on practical feasibility of deployment
+together with laboratory performance.
+1.2. Research Gap and Motivation
+Despite the recent rise in research focus on deepfake detection, the literature in the
+topic has a number of critical limitations that hinder our understanding of detection ca-
+pabilities and the ability to deploy them in practice. First, the literature to date is mostly
+focused on deep learning approaches and systematically understudies or ignores competi-
+tive performance of traditional machine learning approaches under certain deployment
+constraints. This prejudice on the part of the educated for architectural complexity tends to
+cloud situations in which simpler methods may provide better efficiency-accuracy trade-
+offs, especially in resource-constrained or in any real-time applications. Second, most
+reviews break methods down by the type of architecture (CNNs, Transformers, LSTMs)
+without systematically considering the underlying trade-offs among computational effi-
+ciency, detection accuracy and cross-dataset generalization—factors that have been shown
+to be important when assessing the viability of real-world system deployment beyond
+suspiciousness benchmarking on many datasets, which include a diversity of raw datasets
+including images, videos, corpus biologies, and more. This methodological aspect of
+taxonomy over performance trade-offs offers little information for practitioners to aid in
+choosing detection methodologies within particular operational scenarios.
+Third, benchmarking performance comparisons in existing literature usually focus on
+within-dataset accuracy (ranging from 99%+ accuracy on FaceForensics++) without report-
+ing or ignoring cross-dataset generalization failures that make many approaches unsuitable
+for production systems that must contend with evolving manipulation approaches.
+The methodical body of cross-dataset performance degradation and what these pat-
+terns indicate about fundamental limitations in current procedures for how to detect have
+largely remained untested. Fourth, there is an underexploration of the complexity dimen-
+sion versus the practical deployment viability dimension here is almost no analysis of the
+computation cost (inference time, number of parameters, memory) versus the marginal
+performance benefits. This oversight is especially important because detection systems
+need to be scaled for various platforms beforehand from high-performance servers to
+mobile devices. Finally, the field is missing rich synthesis of the methodological diver-
+sity that spans from deep learning all the way to classical machine learning and more
+traditional image processing techniques and it is difficult to understand the full landscape
+of the different detection approaches and their relative strengths in terms of different
+evaluation dimensions.
+1.3. Research Questions
+To fill these critical lacuna in deepfake detection literature, we deal with this systematic
+review which contains four critical research questions.
+1.3.1. RQ1: Comparative Performance Across Methodological Paradigms
+How do various detection methodologies, including deep learning architectures (Trans-
+formers, CNNs, LSTMs), classical machine learning methodologies (SVM, Random Forest,
+KNN) and traditional image processing techniques (DCT, DFT, wavelet analysis) com-
+pare with each other with respect to the dimensions of detection accuracy, computational
+efficiency and ability to generalize to new automated datasets?
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 10 ---
+
+AI 2026, 7, 68
+10 of 42
+1.3.2. RQ2: Cross-Dataset Generalization Patterns
+What are the systematic patterns in cross-dataset performance degradation when
+the considered methods for detection are tested on datasets they have never seen before
+and what can their patterns tell us about whether currently considered approaches learn
+deepfake characteristics that are generalizable rather than dataset-specific?
+1.3.3. RQ3: Viability of Traditional Methods
+Do certain traditional machine learning and image processing approaches provide
+feasible alternatives to deep learning approaches in particular deployment scenarios with
+limited computational resources, real-time processing needs, or the need to provide some
+form of model interpretability?
+1.3.4. RQ4: Architectural Innovations for Generalization
+I am already involved in the research, perhaps not quite yet (nor even close), but in
+my own views, the best questions are how can we achieve the goals that matter most
+(not all) and how can we make it most reliable with what is or is not in the most
+instrumented representation?
+These research questions pertain to our systematic analysis of studies published
+between 2018–2025 for the purpose of providing evidence to assess detection capabilities,
+fundamental limitations, and promising research directions for the field.
+1.4. Review Objectives
+This extensive systematic review aims to have three main objectives which are directly
+related to the research gaps and questions found.
+1.4.1. Objective 1: Comprehensive Methodological Synthesis
+We systematically synthesize the deepfake detection methodologies from a total of
+peer-reviewed studies of deepfake detection methods published between January 2018
+and December 2025 by which approaches are categorized into 9 different technological
+categories which are in a deep learning architectures [Transformers, CNNs, LSTMs, Capsule
+Networks, GAN de Synthesis, XceptionNet, RNN, Autoencoders, Attention Mechanisms],
+classical machine learning methods [Support Vector Machines, RandomForest, K Nearest
+Neighbors, Logistic Regression], and the traditional image processing methods [Discrete
+Cosine Transform, This taxonomic organization covers the first comprehensive mapping
+of methodology diversity across the different spectrum of possible detection approaches
+instead of just focussing on deep learning methods.
+1.4.2. Objective 2: Multi-Dimensional Performance Analysis
+We perform from rigorous comparative performance analysis on three benchmark
+performance data sets (FaceForensics++, DFDC, Celeb-DFase and Celeb-DF) and quantify
+accuracy efficiency trade-offs as well as cross-data sets generalization powers for represen-
+tative algorithms belonging to each category of technology. Unlike existing reviews, which
+mainly focus on single metric optimization (most commonly in the form of accuracy on
+FaceForensics++), in our analysis, we systematically assess three key dimensions related
+to performance evaluation: (1) detection accuracy for various types of manipulations and
+quality levels, (2) computational efficiency, in terms of the inference time and numbers of
+parameters, and (3) cross-dataset generalization, in terms of the problem of degradation
+in performance, on unseen data distributions. This multi-dimensional framework offers
+means of deployment centric evaluation taking into consideration economically important
+operational constrains beyond the laboratory environment.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 11 ---
+
+AI 2026, 7, 68
+11 of 42
+1.4.3. Objective 3: Fundamental Limitation Identification and Future Directions
+We recognize failure patterns in the literature in terms of methodology as well as
+suggest evidence-based directions for future work to address basic challenges related
+to generalization, efficiency, and deployment issues. Through performed cross-dataset
+analysis, we report whether performance degradation shows random manifestations or
+systematic limitations that indicate that the methods currently in use learn dataset specific
+artifacts and not universal deepfake features. This is a highly important evaluation, which
+will steer a field away from attempting to improve the accuracy slightly on corners and
+saponified benchmarks, toward solving underlying issues of detection failure.
+1.5. Review Methodology and Organizational Framework
+This systematic review adheres to a systematic approach for the systematic coverage
+and rigorous analysis of the deepfake detection literature. Whilst narrative reviews do
+not require the formality of protocols in systematic reviews (PRSMA guidelines), we
+use transparent selection criteria/analytical frameworks to allow reproducibility and
+systematic synthesis.
+1.5.1. Literature Selection Protocol
+We did systematic searches in five major academic databases: the libraries of the
+research communities of the world’s major tech companies and publishers, or more specifi-
+cally: the libraries of the world’s major techs—the world’s major tech databases: attractive
+and user-friendly libraries of scientific data and content: libraries of which the full text con-
+tent is available online. The search term was used with Boolean operators in order to obtain
+relevant literature: ((”deepfake detection”OR ”face manipulation detection” OR ”synthetic
+media detection” OR ”facial forgery detection”) AND ”deep learning” OR ”machine learn-
+ing” OR ”computer vision” OR ”image processing”). We limited the temporal objects
+within the given papers from January 2018 to December 2025, i.e., the time frames from the
+innovation of deepfakes in late 2017 to current state-of-the-art methods. This period spans
+the full development of various detection techniques from the initial convolution-based
+techniques (CNN) to the latest transformer-based models and multimodal models.
+The search process has resulted in 327 potentially relevant publications. We applied
+systematic inclusion criteria requiring: (1) peer-reviewed publications in either journals
+or conferences or including highly-cited preprints (>20 citations) from reputable archives
+(arXiv, ResearchGate), (2) empirical evaluation using established/unofficial benchmark
+datasets, being either FaceForensics++, DFDC, Celeb-DF or equivalent, (3) clear method-
+ological description to allow for methodological replication or critical assessment, and
+(4) quantitative performance metrics reporting, including accuracy, AUC, F1-score, etc.;
+Exclusion criteria that were removed from our search were: (1) pure theoretical papers
+lacking implementation and/or empirical validation; (2) papers that do not contain quanti-
+tative results or merely provide qualitative analysis; (3) duplicate publications or extended
+versions of previous research publications (we kept the most complete version); (4) papers
+that exclusively focus on deepfake generation techniques and not on deepfake detection
+techniques; and (5) papers that do not address modalities outside of our scope of study
+(e.g., exclusively audio deepfakes lacking visual components, text-based manipulation).
+This-focused systematic filtering process produced primary studies that make up the final
+review corpus.
+1.5.2. Analytical Framework and Categorization
+We divided the preferred detection methodologies into three main categories depend-
+ing on the algorithmic basis and working principle of the detection. The firstcategory,
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 12 ---
+
+AI 2026, 7, 68
+12 of 42
+Deep Learning-Based Detection Techniques (Section 2) contains nine groups of algorithms,
+i.e., the Transformers (dependencies among the global objects, using self-attention mecha-
+nisms), Convolution-based Neural Networks (global feature examination, using hierarchies
+of space features), Long Short Term Memory networks (dependencies over time), Capsule
+Networks (preserving the hierarchies of space), Generative Adversarial Networks (Using
+devices gained), Recurrent Multiscale Networks (Acting on events irrespective of spatial
+hierarchies) and Multi-level Networks (Multi-scale network) via adversarial training), Xcep-
+tionNET (separable convolutional operations for depthwise processing of images), RNN
+(processing sequence data networks), Autoencoders (learning process by reconstruction)
+and Attention Mechanism (selecting salient features). Such granular categorization makes
+it possible to identify architecture-specific abilities and disabilities instead of considering
+“deep learning” to be a monolithic category.
+The second category, Machine Learning and Traditional Detection Techniques
+(Section 3), is the classical supervised learning techniques and the signal processing tech-
+niques: Support Vector Machines (Optimization of margin, classification) Random Forest
+(decision trees—ensemble) K-Nearest Neighbors (instance-based learning) Logistic Re-
+gression (probabilistic linear classification) User Discrete Cosine Transform (Frequency
+domain analysis) Discrete Fourier Transform (spectral decomposition) Pixel and Frequency
+Analysis (hybrid between space—spectrum) Edge Detection (Gradient-based features)
+Wavelet Analysis (Multi-resolution). Inclusion of traditional methods covers the found
+gap in current surveys that systematically under-examine approaches that are based on
+a non-deep learning strategy, although they may have theoretical advantages in terms of
+computational efficiency and interpretability.
+The third category, Performance Analysis (Section 4), can be the synthesis in the form of
+a comparative evaluation in the benchmark data sets. For each of the reviewed techniques,
+we extracted the following information: (1) architectural design, algorithmic technique,
+(2) computational requirements (inference time, parameter number, memory footprint
+when reported), (3) within-dataset performance on FaceForensics++, DFDC and Celeb-DF
+(4) cross-dataset generalization in terms of performance degradation of the tests on unseen
+benchmarks, and (5) deployment considerations (real-time capability, hardware).
+1.5.3. Evaluation Metrics and Comparative Analysis
+In our performance comparison framework, we place a large emphasis on three di-
+mensions which are critical for determining practical deployed viability beyond single
+metric optimization: First, detecting accuracy is evaluated in three benchmark datasets of
+different manipulation characteristics: FaceForensics++ (controlled manipulations using
+5 generation methods at multiple compression levels), DFDC (large-scale realistic varia-
+tions, 128,154 videos) and Celeb-DF (realistic celebrity deepfakes which are close to realistic
+scenarios).The overall accuracy, AUC (Area Under ROC Curve), and F1-score are used
+as the metrics of accuracy and can be compared with each other even though the metrics
+are heterogeneous as only what the original studies reported is in use. F1-score presents
+the combination of precision and recall in a balanced way, which is especially useful with
+imbalanced datasets, typical of the deepfake detection tasks [35].
+Second, computational efficiency is measured by inference time (mili-seconds frame
+or video) and model complexity (number of parameters FLOPs if known). This dimension
+touches on the gap we have observed in terms of computational cost benefits, in that insights
+into whether there is a great deal of additional accuracy that warrants a great deal of extra
+computation for particular deployments (real-time content moderation vs. forensic analysis
+vs. resource-constrained mobile deployment). Third, cross-dataset generalization is defined
+as performance degeneration when approaches trained using one dataset are tested on a
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 13 ---
+
+AI 2026, 7, 68
+13 of 42
+different benchmark. This metric provides insight into whether techniques are learning the
+characteristics of deepfakes in general or these specific datasets—a very important distinc-
+tion to make if we are to deploy these deepfake detection methods for practical applications
+to real-world scenarios where manipulation techniques might evolve continuously. This tri-
+dimensional evaluation framework allows for subtle evaluation beyond conventional tests
+of accuracy (i.e., in relation to other studies and datasets, RQ1 comparative performance
+tests by methodology and RQ2 generalization patterns across data sets). Methods that excel
+in all three dimensions are ideal solutions and those which maximise one dimension at the
+cost of another are appropriate for particular deployment situations.
+1.5.4. Organizational Structure and Roadmap
+The review is defined to increase a understanding from individual methodologies to
+comparing synthesis and critical analysis. Section 2 presents a systematic discussion of deep
+learning architectures, which starts fromTransformer based architectures (demonstrate su-
+perior generalization in spite of computational overhead), through the Commun innovation
+technology (CNN-s) architectures (trade between effectiveness and efficiency) to specialized
+architectures targeting on solvable challenges (temporal modeling with long short term
+memories (LSTMs), spatial hierarchy preservation with Capsule Networks). Within each
+family of architecture, we analyze representative methods, document performance in each
+of the benchmarks, and detect failure patterns.
+Section 3 is an analysis of machine learning and the conventional image processing
+methods and by that challenge the assumption that deep learning is overwhelming and
+show that it provides the same performance in some situations. For each method cate-
+gory (SVM, Random forest, frequency domain analysis), we conduct a synthesis of the
+different studies within the set so as to observe, not isolated results, but rather consistent
+findings. Section 4 is devoted to comparative analyses of the performance through the use
+of structured tables and cross-method analysis synthesis, which relate directly to research
+questions using factual evidence. Section 5 (Discussion) involves synthesis of findings to
+identify fundamental trade-offs and systematic limitations as well as promising (future)
+research path directions. Section 6 (Conclusion), distils some key insights and suggestions
+for action.
+Such organizational format that CD readers can; (1) understand individual method-
+ologies in their architectural context (Sections 2 and 3), (2) compare methods based on
+evaluation dimensions through systematic analysis (Section 4), (3) determine basic patterns
+and limitations that transcend single methods (Section 5), and (4) draw out ways to use
+the methodology to inform the choice of a method and guide future research (Section 6).
+The structure allows for both the type of reading that moves toward comprehension for the
+deep understanding of particular ideas and the type of selective navigation for practitioners
+who may need to find specific information.
+1.6. Bibliometric Analysis and Research Landscape
+To give quantitative and objective visualization of the research landscape of deepfake
+detection, we performed a bibliometric analysis of our 74-study corpus, analyzing pub-
+lication trends and methodology evolution and discovering the clustering patterns with
+respect to its themes over time.
+1.6.1. Temporal Publication Trends and Growth Patterns
+Our corpus shows that the research on deepfake detection has grown exponentially,
+as the number of publications has grown from 3 studies in 2018 and 23 studies in 2024,
+which is a 667% growth rate. This evolution is in numerous dimensions and is thoroughly
+reported in recent comprehensive surveys published in the best-tier journals. Media
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 14 ---
+
+AI 2026, 7, 68
+14 of 42
+forensics is also discussed in IEEE reviews around the foundations of media forensics
+and media benchmarking challenges, whereas state-of-the-art methodologies and open
+challenges are evaluated in surveys published by Springer and Elsevier [36]. Wiley has
+systematic coverage of deep learning approaches in the MDPI and ACM publications
+emphasize machine learning fusion techniques and perspectives on reliability. In general,
+these 2023–2024 surveys intersect as they are focused on defining underlying issues, such
+as cross-dataset generalization, computational efficiency and the necessity of the evaluation
+frameworks that go beyond single-dataset accuracy measures.In her paper, Kaur et al. talk
+about the main challenges of GAN-based generation methods which are the detection
+approaches that need to be tailored according to the specific case. The bibliometric analysis
+performed by the authors uncovers the trends in publication and the dominant research
+fields, thus indicating that there is still an active interest from the academic community
+in the GAN-driven detection methods [37]. This acceleration is a true reflection of the
+other two factors branching from the problem: an accelerated deepfake threat, as well
+as the mature detection methodologies. Publication distribution reveals three clearly
+distinguished phases at the end of which CNN-based detection paradigms (1) continued
+its founding phase 2018–2019 (15% overall studies), (2) with the diversification phase
+2020–2021 (28% overall studies) introducing attention mechanism and spatial-temporal
+modelling and (3) with the sophistication phase 2022–2025 including 70% of overall studies.
+Figure 3 shows the methodological evolution in 3 different phases. Phase 1 (2018–
+2019) Operations for foundational detection capabilities based on traditional hand-crafted
+features as Local Binary Patterns (LBP), Histogram of Oriented Gradients (HOG) and
+KSZ Lapini Descriptors together with classical machine learning classifiers as Support
+Vector Machine (SVM) classifiers and Random Forest classifiers. This phase corresponds
+to 15% of the studied, and is focused on the mainly interpretability, and also computa-
+tional efficiency. Phase 2 (2019–2021) Corresponds to the switching towards deep learning
+architectures, in particular for the second phase where Convolutional Neural Networks
+(XceptionNet, ResNet50, EfficientNet), and Long Short-Term Memory networks (LSTMs
+networks) for temporal modeling were mostly used. This phase of diversification granted
+the introduction of attention mechanisms and hybrid algorithms of fusion for the spatial-
+temporal combination, that represent 28% of the total number of studies, which gave a
+high accuracy for the detriment of the understanding. Phase 3 (2022–2025) represents the
+current state-of-the-art which is composed of advanced Vision Transformers (ADT, DFDT),
+multimodal audio-visual frameworks (AVoiD-DF), and hybrid spatialrequency approaches.
+This sophistication phase is the one that dominates the current research (70% of studies)
+and it focuses on issues related to dealing with cross-dataset generalization problems while
+remaining computationally feasible for use in practice.
+Keyword analysis shows three major research clusters. The Deep Learning Architec-
+ture cluster (45% of studies) emphasizes CNNs, Transformers, LSTMs, and hybrid models
+for the accuracy of the models with architecture innovation. The Cross-Dataset Generaliza-
+tion cluster (25% of studies) discusses issues of lack of performance across benchmarks,
+which is directly tied to our RQ2. The Computational Efficiency cluster (18% of studies)
+studies the trade-offs of accuracy and efficiency as well as deployment constraints which
+support our deployment-centric evaluation framework. The Multimodal Detection cluster
+(12% of studies) involves unresolved audio-visual integration approaches and represents
+new areas of research. The Multimodal Detection cluster (12% of studies) focuses on audio-
+visual synchrony enlargements such as lip-sync violations and voice-expression violations
+with approaches such as AVoiD-DF achieving 91–92% accuracy.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 15 ---
+
+AI 2026, 7, 68
+15 of 42
+PHASE 1
+2018–2019
+Traditional
+Hand-Crafted
+LBP, HOG, KAZE
+SVM, Random Forest
+15% studies
+PHASE 2
+2019–2021
+Deep Learning
+CNNs, LSTMs
+XceptionNet
+ResNet, EfficientNet
+28% studies
+PHASE 3
+2022–2025
+Advanced
+Vision Transformers
+ADT, DFDT
+Multimodal
+70% studies
+Timeline
+2018
+2019
+2020
+2021
+2023
+2025
+Interpretable
+Accurate
+Generalizable
+Evolution of Deepfake Detection Methodologies
+Figure 3. Temporal evolution showing three phases: Phase 1 (2018-2019) traditional methods (red
+background), Phase 2 (2019–2021) deep learning (yellow background), Phase 3 (2022–2025) advanced
+transformers (green background).
+1.6.2. Benchmark Dataset Utilization Patterns
+Consistent with Figure 4, FaceForensics++ is far more popular for benchmarks (40%
+studies), followed by DFDC (25%) and Celeb-DF (20%). This high of a concentration
+leads to possible evaluation biases because methods that have been tuned for FF++’s
+controlled conditions, might learn dataset specific in addition to the overall characteristics
+of deepfakes. The growing number of specialized datasets (WildDeepfake 3%, audio-visual
+datasets 3%, speech-specific datasets 2%) is reflective of understanding that the assessment
+of single-benchmark evaluation method is inadequate as evidence for useful detection
+capability in practice.
+Figure 4. Global Distribution of Deepfake Incidents with Highest Concentration in the US, China
+and India. The color intensity on the map indicates incident frequency: red represents highest
+concentration, orange represents high concentration, yellow represents moderate concentration,
+green represents low concentration, and grey represents areas with no data or very low incidents.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 16 ---
+
+AI 2026, 7, 68
+16 of 42
+1.6.3. Citation Network and Methodological Evolution
+Analysis of citation patterns reveals ground-breaking works that set paradigms for
+detection: date datasets creation by Dolhansky et al., Wang et al. [17,18] are highly influ-
+ential publications that define the further research directions. Citation network analysis
+shows the evolution in methodology from the extraction of spatial features (2018–2019),
+attention mechanisms (2020–2021) to the focus currently on generalization across data sets
+and computational efficiency (2022–2025).
+1.6.4. Research Gap Validation
+This bibliometric landscape empirically gives our identified research gaps legitimacy.
+The systematic 10–15% cross-dataset performance degradation ability we document is
+25% of the papers with explicit evaluation of the generalization ability considered, sug-
+gesting that this is still not a fully solved problem. This 18% of studies concerned with
+computational efficiency makes sense for our finding that this dimension is given far too
+little attention compared to its importance in deployment. The focus of 70% of studies on
+deep learning approaches justifies our observation that traditional approaches of machine
+learning are systematically underexamined, even though they are competitive performers
+on certain deployment scenarios.
+This bibliometric analysis enhances the contribution of our review by showing that
+our categorisation framework (Figure 2), identified research gaps (Section 1.2), and multi-
+dimensional evaluation approach (Section 1.5.3) are consistent with objective patterns in
+the research landscape and not with subjective choices in categories.
+2. Deep Learning-Based Detection Techniques
+There are three main categories of deepfake detection techniques.
+2.1. Transformers (TFM)
+The transformer-based methods can be considered an ideal development of deepfake
+detection from which global contextual dependencies may be derived by leveraging the
+self-attention mechanisms that traditional Convolutional Neural Networks (CNNs) are
+not able to model well enough. The aggregated study of transformer implementations
+shows that there are three possible architectural forms strategies like pure vision trans-
+former, hybrid CNN-transformer, and specialized spectral ultrasound in forensic uses.
+The examples of vision transformer show a high level of cross-dataset generalization as
+compared to CNN-like methods. The Anti-Deepfake Transformers of Wang et al. [18]
+with variant residual connections (ADT) sets the paradigm at 96.30% on FaceForensics++
+and 84.97% on Celeb-DF, which is a drop of 11.33 percent, which, though a massive loss
+in performance, does still beat the majority of CNN-powered cross-dataset evaluations.
+The DFDT structure introduced by Khormali and Yuan develops this strategy. Multi-stream
+transformer and re-attention are used and which reaches 99.41% on FaceForensics++ and
+displays a resilient cross-manipulation generalization. This observation suggests an inverse
+relationship between the accessibility and refined digital resources and the phenomenon of
+deepfakes. On the contrary, countries that have enforced healthy ones have put in place
+sound policies and systems of digital governance, showing fewer serious cases of deep-
+fakes. Mixed methods are promising better efficiency. Similar results (AUC 0.951 on DFDC)
+are obtained by Coccomini et al.’s Effective ViT, but with less reduction and deliberate
+CNN-transformer interleaving. The MoEFW architecture even maximizes the efficiency of
+parameters by means of a Mixture of Experts. LoRA architecture, which gives evidence
+that the transformer benefit can be realized with fewer computational expenses [38].
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 17 ---
+
+AI 2026, 7, 68
+17 of 42
+A geographical visualization of the deepfake incident distribution by nation with
+a color-coded intensity scheme to reflect the documented prevalence of deepfake cases
+worldwide is available in Figure 4. This global perspective is important to comprehend
+the patterns of proliferation of deepfakes and their relationship with infrastructure of
+the technologies, frameworks of digital governance and factors of societal vulnerability.
+The visualization exposes extreme geographical inequities that are correlated with levels
+of both technological development and regulatory maturity and provides insights into
+sociotechnical aspects of the threats of the creation of deepfakes beyond the technical
+difficulty of their detection.
+The map identifies three layers of the concentration of deepfake incidents. The nations
+with the highest incidence of a disease (shown in red color) include the United States,
+China, India, and Indonesia representing countries with large populations, well-developed
+technological infrastructure, and widespread adoption of social media. The presence
+of this correlation indicates that deepfake proliferation is ample both by the availability
+of complex generation tools, as well as by the existence of massive digital populations
+available for manipulation. Some high-incidence countries, which are colored in orange,
+include Brazil, Turkey, Russia, and South Korea, which have high levels of deepfake activity
+which are fueled by factors such as active social media landscapes, political polarization,
+and the advancement of technology. Moderate incidence countries (yellow) such as Mexico,
+Germany, Ukraine, Japan, and several European countries have registered measurable but
+less frequent deepfake challenges which could be a result of stronger regulatory options and
+lower digitization. Low incidence areas (green) which include Australia, Nordic countries,
+and some European countries reflect comparatively fewer cases showing evidence of
+serious incidents, suggesting further that digital governance, media literacy interventions
+and proactive regulation seems to be successful in mitigating the threat of deepfakes.
+The geographical distribution demonstrates a fundamental issue with the proliferation
+of deepfakes; namely, countries with the most advanced technological capabilities have the
+highest rates of occurrence, suggesting that the process of technology is an enabler of both
+capabilities-diagnosis and deepfaking.
+This pattern highlights a need for more than technical detection solutions to tackle the
+issue—integrated approaches incorporating technological detection, regulatory frameworks
+and governance of the platforms as well as media literacy in the public sphere need to be
+considered. The higher concentration of incidents in technologically advanced countries
+also hints that currently the deepfake regime may only reflect the initial stages of global
+proliferation with possible accelerated proliferation when generative AI tools become more
+readily accessible in currently low incidence areas. This geographical analysis thereby
+focuses the urgency of establishing detection systems that are scalable and computationally
+efficient and can be implemented in all kinds of technological and economic circumstances.
+Also, transformers try to solve fundamental CNN drawbacks with global attention
+their computational loads make modeling and restrict their practical application. The con-
+sistent cross-dataset performance advantage: attention mechanisms are able to get more
+generalizable artifacts of manipulation, but the efficiency-accuracy trade-off has not been
+sorted out as far as real-time applications are concerned [39].
+Distributions of Datasets in Deepfake Detection Survey
+Figure 5 describes the relative use of benchmark datasets of the 74 studies reviewed
+in this review and shows that alongside focus on accepted benchmarks, there is also in-
+creasing diversification to consider specialized and multimodal evaluation frameworks.
+This distribution pattern has profound implications for the understandability of detection
+performance in general and reported detection performance in particular, because dataset
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 18 ---
+
+AI 2026, 7, 68
+18 of 42
+selection fundamentally informs both the kinds of manipulations targeted to be de-
+tected by attacks and scenarios of evaluation that are realistic for real world applications
+during deployment. Tables 1–3 summarize the performance characteristics and compara-
+tive results for the analyzed methodologies.
+FaceForensics++ (FF++) is the winner of this evaluation, with 40% of dataset usage
+being divided between reviewed studies. This prevalence is in line with FF++ being the
+de facto standard benchmark, and provides for controlled evaluation using 1000 origi-
+nal videos manipulated through 5 different generation methods (Deepfakes, Face2Face,
+FaceSwap, NeuralTextures, FaceShifter) and several different compression levels. However
+this dominance produces potential biases in evaluation, because of, for instance, the sys-
+tematic performance degradation [loosening by at least 10–15%] documented in Table 3
+where methods optimized for FF++ may learn dataset motivated compression artifacts, not
+generalizable deepfake characteristics. The DeepFake Detection Challenge (DFDC) dataset
+is 25% of the usage, and it offers large-scale evaluation with 128,154 videos featuring differ-
+ent actors and realistic changes of lighting, compression and recording conditions. The fact
+that DFDC is a more challenging benchmark with more real world artifacts results in lower
+absolute accuracy score (Table 2) compared to FF++ (Table 1). Celeb-DF stands for 20%
+of evaluations that focus on high-quality celebrity deepfakes that are close to real-world
+manipulations encountered in the social media world.
+Figure 5. Deepfake Dataset Distribution.
+Table 1. Performance Comparison on FaceForensic++ Dataset.
+Ref
+Year
+Method
+AUC
+Params
+(M)
+Time
+(ms)
+Strength
+Limitation
+[5]
+2022
+ADT
+96.30%
+86
+45
+Cross-dataset
+High cost
+[6]
+2022
+DFDT
+99.41%
+92
+50
+Scalable
+Complex
+[16]
+2022
+Hybrid-TF
+89.58%
+23
+18
+Interpretable
+Small data
+[28]
+2022
+EfficientB0
+97.00%
+5
+12
+Low overfit
+Limited test
+[40]
+2022
+DFT-MF
+99.20%
+1
+8
+Motion
+Motion only
+[41]
+2021
+3D-CNN
+99.33%
+48
+35
+Temporal
+High cost
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 19 ---
+
+AI 2026, 7, 68
+19 of 42
+Table 2. Performance Comparison on DFDC Dataset.
+Ref
+Year
+Method
+AUC
+Params
+(M)
+Time
+(ms)
+Strength
+Limitation
+[13]
+2023
+AVoiD-DF
+91.40%
+120
+60
+Audio-visual
+Needs sync
+[25]
+2024
+GPT-4o
+64.25%
+–
+–
+Zero-shot
+Low accuracy
+[42]
+2023
+MCX-API
+90.87%
+35
+25
+Open-set
+Unknown drops
+[37]
+2024
+Random Forest
+99.64%
+0.01
+2
+Low cost
+Manual features
+Table 3. Cross-Dataset Generalization Performance.
+Ref
+Method
+FF++
+Acc
+Cross-DS
+Acc
+Drop
+(%)
+Analysis
+[5]
+ADT
+96.30%
+84.97%
+11.33
+Best transformer
+[28] Hybrid-TF
+97.00%
+97.00%
+0.00
+Robust augmentation
+[42] MCX-API
+98.48%
+90.87%
+7.61
+Strong pairwise
+[43] XceptionNet
+95.00%
+78.50%
+16.50
+Typical CNN
+[37] Random Forest
+99.64%
+85.20%
+14.44
+Manual features
+Average degradation: 10–15%.
+The distribution points to an important methodological trend in the general direc-
+tion of specialized evaluation frameworks. Smaller specialized datasets have a sum of
+the usage for 15%, i.e., WildDeepfake (3%) providing in-the-wild manipulations, audio-
+visual datasets (DefakeAVMIT and FakeAVCeleb; 3%) allowing multimodal evaluation and
+datasets specific to speech synthesis (ViTIMIT and DI-TIMIT; 2%). This diversification is
+due to increasing recognition of the fact that single-benchmark evaluation is insufficient to
+provide evidence for practical detection capability. The movement towards multimodal
+data sets is especially notable because it shows that AVoiD-DF is better able to exploit the
+audio-visual inconsistencies, suggesting that in future detection systems, it is necessary
+to tackle multiple modes of manipulation at the same time. However, the persistency of
+FF++ even with the qualities of saturation (of >99% by most methods) makes it appear that
+evaluation practices are lagging behind a level of methodological sophistication that could
+shape the need for evaluation strategies to involve cross-dataset evaluation protocols with
+even harder benchmarks to access involving contemporary deepfake generation capacities.
+Surveys by IEEE and Springer include more recent complete publications which note
+that the transformer architectures have better generalization than CNNs, but need to
+take into consideration computational efficiency issues in practice. IEEE benchmarking
+research points the significance of the evaluation frameworks that introduce orderly eval-
+uation of accuracy and efficiency trade off to support our multi dimensional evaluation
+strategy [10,11,15,36]. Detailed surveys of various publishers reveal that more and more
+focus is built on the understanding that architectural complexity cannot be deployed with-
+out deployments being considered in terms of inference time, parameter efficiency and
+resources consumption, which justifies our deploy-based approach [9,12,13,37].
+2.2. Capsule Networks (CapsNet)
+The implementation of capsule networks takes the form of architecture swaps, which
+address. Convolutional Neural Network spatial hierarchy preservation limitations alone
+retain the drawbacks of having the same computational cost as transformer methods.
+The overall assessment suggests that the spatial relationships can be maintained in
+capsule networks and can be reduced maximal loss of information in the process of
+feature extraction.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 20 ---
+
+AI 2026, 7, 68
+20 of 42
+Capsule-Forensics by Nguyen et al. [44] provides some basic capabilities for discov-
+ering the spatial association of facial images and videos, a strong generalization between
+datasets, FaceForensics. It is the integration strategies, as illustrated by Local Binary Pat-
+terns are used with the modified HRNet in iCops-Dfake by Khalil et al. and Capsule
+Networks, attaining superior detection on Celeb-DF and DFDC-P data with multi-modal
+feature combination [45]. The article by Stanciu and Ionescu centers on the optimization of
+dynamic routing, and it has achieved high precision and lower parameters on benchmark
+sets. The hybrid Capsule LSTM model has efficiency in parameters and can compete with
+XceptionNet, especially effective with performance that has many fewer parameters (34 M
+vs. 27 M), lossless on DFDC all levels, and frame selection [46].
+2.3. Convolutional Neural Networks (CNN)
+The constructions of approaches based on convolutional neural networks have been
+the main method of deepfake detection, going from basic classification networks to highly
+developed multi-modal architectures. The combined examination uncovers that there are
+still overfitting issues that cannot be solved with new architectures and that there are certain
+specialized areas where CNN methods are still very competitive [40,47].
+Multi-modal integration strategies show promising results for comprehensive de-
+tection. The innovative VGG-16 CNN with transformer encoder approach utilizes self-
+attention for facial artifacts and cross-attention for lip-audio discrepancies, demonstrat-
+ing superior performance on DFDC, DF-TIMIT, and FakeAVCeleb datasets through
+modality fusion.
+The methods employed by CNN still possess substantial computational benefits
+compared to the transformer implementations. The CNN architectures proposed by Math-
+ews et al. have explainability components integrated into their design, while efficiency
+is still preserved. The integrated biosensor based on plasmonic resonance of Mahesh-
+wari et al. [41] is able to deliver 1.2 % false positive and 0.5% false negative rates along with
+a very small amount of computational overhead [41].
+2.4. Generative Adversarial Networks (GAN)
+Nguyen et al. propose a multi-task learning system that identifies concurrently and
+detects manipulated areas in face images and videos. They use a standard encoder and
+decoder test with subdivision based on a binary spectrum (authentic and manipulated) and
+pixel segmentation of the manipulated regions. This Multi-task formulation enables the
+network to learn a stronger feature representation with the use of supplementary signals
+of detection and localization of the supervision objectives. Assessed on FaceForensics++
+and Celeb-DF, the approach has good results in terms of its capacity to perform the two
+tasks, as well as giving manipulable outputs and localization masks. It is shown in the
+work that detection and joint optimization optimize the goals of segmentation provide a
+better generalization than that of single-task techniques, especially with the artifacts of
+subtle manipulation [44].
+2.5. Long Short-Term Memory (LSTM)
+The implementations of Long Short-Term Memory (LSTM) are designed to detect the
+errors of the time scale with the help of the sequential processing abilities to recognize
+the artifacts of manipulations across video frames. The overall examination shows the
+functionality of LSTM on particular scalability constraints of processing large video data,
+as well as temporal patterns. The 100% accuracy of Hosler et al. on DFDC using the
+Low-Level audio and video descriptor analysis proves a remarkable achievement in the
+error detection of emotions. The use of LSTM in semantic temporal analysis. This strategy
+plays off on emotions, continuity violations, which deepfake generation is apt to add [48].
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 21 ---
+
+AI 2026, 7, 68
+21 of 42
+The CNN-LSTM integration by Jolly and Shitole consists of the ResNet18 spatial
+feature extraction on LSTM temporal dependencies measured on FaceForensics++ with
+Gaussian blur image enhancement. But the comparative analysis of Lu et al. shows that
+Channel-Wise Spatiotemporal Aggregation (CWSA) is a superior STL-based approach
+with emphasis on the shortage of spatial features in LSTM approaches. The systematic
+review by Sandotra and Arora puts the LSTM-based approaches in perspective, presents
+extensive detection taxonomies, but demonstrates the scalability difficulties of large-scale
+video processing programs [49].
+2.6. Attention Mechanisms
+The various applications of the attention mechanism suggest that it is one of the core
+implementation technologies that has made transformers successful, and it has presented
+at the same time its portability to deepfake detection. The capacity is uncovered in the joint
+examination of the attention process that is capable of capturing contextual dependency,
+and also to make detection interpretable. The self-supervised ViT exploration provided
+by Nguyen et al. demonstrates the mechanism of attention ability to extract features and
+is interpretable by visualizing attention maps. It is in the comparison of frozen weights
+and fine-tuning methods that the comparison is drawn, with flexibility in the attention
+mechanism to meet different deployment situations [50].
+The Meta Deepfake Detection (MDD) proposed by Tran et al. is a combination of at-
+tention mechanisms and meta-learning models, i.e, Pair-Attention Loss (PAL) and Average-
+Center. Alignment Loss (ACA) by use of block shuffling transformation to increase gener-
+alization across unseen domains. Attention mechanisms not only offer the fundamental
+technology of transformer success but are also interpretable, to help single-mindedly detect.
+Their combination with flexibility is represented by meta-learning and forensic-specific
+applications. This is because of the computational cost, which is one of the factors to be put
+into consideration during the deployment of such systems [51].
+2.7. XceptionNet
+Chollet [52] invented XceptionNet, an optimized convolution neural networks (CNN)
+architecture with depthwise separable convolutions that are more computationally efficient
+and can provide the same detection performance. Chollet’s (2017) modification of depth-
+wise separable convolutions provides the computational efficiency boost than Inception
+classics. Despite recent breakthroughs in improved transformer-based models deepfake
+detection models, XceptionNet is still a notable baseline model [52]. Xu et al. [53] made
+a step ahead and proposed the Multi-Channel Xception Attention Pairwise Interaction
+(MCX-API) framework involving pairwise learning and multi-color space inputs to enhance
+the detection performance. Xu et al. had an accuracy of 98.48% on the FaceForensics++ data
+set and 90.87% on the Celeb-DF data set [53]. XceptionNet retains its competitiveness in
+the detection of the deepfake phenomenon through relentless optimization of the network
+architecture and the invention of new strategies of integration. The persistence of the
+research interest in XceptionNet-based methods speaks to the fact that it likely has a place
+in research, especially applications where efficiency is of the utmost importance. However,
+Thing (2023) shows that transformer-based architectures have better generalization ability
+on a wide range of data sets and manipulations [54].
+2.8. Recurrent Neural Networks (RNNs)
+Recurrent Neural Network (RNN) implementations are interested in sequential data
+processing representing early temporal analysis methods, in detecting temporal inconsis-
+tency that laid the groundwork for further development of LSTM and transformers.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 22 ---
+
+AI 2026, 7, 68
+22 of 42
+The work of Guera and Delp is the pioneering work in the field of RNN-based deepfake
+detection by using convolutional LSTM networks to determine temporal inconsistency,
+developing the paradigm of the sequence-based deepfake detection [53].
+RNN methods laid the groundwork of temporal analysis of deepfake detection, which
+is later outperformed by the development of LSTM and transformers. long-term depen-
+dency modelling and computational efficiency [55].
+Distribution of deep learning Figure 6 shows architectures used in various reviewed
+deepfake detection papers indicating the relative popularity of various neural network
+paradigms showing the predominating research trends for methodology choice. This distri-
+bution of the architecture gives us a glimpse into the history of the field from convolutional
+methods toward more advanced methods that incorporate attention and temporal model-
+ing and also shows the gaps that still remain in the search of certain architectural families
+regardless of their potential benefits.
+Figure 6. Deep Learning Architecture Distribution.
+Convolutional Neural Networks (CNNs) make up the largest number at around
+45–50% of the deep learning implementations, as they are proven to be a core architecture
+used for computer vision tasks, as well as being an effective architecture for extracting
+spatial features in facial regions as well. The prevalence of CNN variants from simple
+designs such as VGG-16 to sophisticated variants such as EfficientNet and ResNet—shows
+the versatility of this architecture in different detection situations. However, as documented
+in Section 4, CNN based approaches show cross dataset generalization problems with a
+performance degradation around >15%, which leads us to believe that pure convolutional
+approaches may reach fundamental limits in learning manipulation invariant features.
+Transformer-based architectures have an implementation share of 25–30% and this is a
+huge and increasing share reflecting recent realization that self-attention mechanisms can
+capture long-range dependence and global context when compared to convolution’s local
+receptivity fields. Transformers exhibit significantly superior cross-dataset generalization
+(11.33% degradation for ADT) as described in Table 3 = admirable expresses control in
+prolonged in the cost when with kept to CNNs practicalities (3–5× more computation) to
+deployment trade-offs.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 23 ---
+
+AI 2026, 7, 68
+23 of 42
+Long Short-Term Memory (LSTM) Networks 15–20% of architectures, mostly used in
+consistency modeling in temporal series and sequential artifact detection among frames of
+a video. LSTMs provide the opportunity to learn explicit temporal (could not be captured
+by purely spatial approaches) dependencies that larger purely spatial approaches cannot,
+as illustrated by the semantic temporal analysis approach by Hosler et al. [48], which
+achieved 100% accuracy DFDC (learning by modeling emotional continuity). XceptionNet
+10–12% of implementations for its depthwise separable convolutions allowing for efficient
+computation with competitive accuracy 98.48% on FF++, 90.87% on Celeb-DF for MCX-
+API variant.
+Capsule Networks and Autoencoders together account for only 2–5% each,representing
+under-explored architectural families regardless of theoretical benefits (capsule networks
+maintain spatial hierarchies maxpooling operations destroy, autoencoders make it possible
+to detect unsupervised manipulation through reconstruction error analysis. This distribu-
+tion shows the concentration of research on known architectures (CNNs, Transformers)
+and may result in overlooking hybrid approaches or specialized architectures that may
+be able to solve specific problems in detection. The field would benefit from systematic
+exploration of diversity in architectural use beyond the dominant paradigms, however,
+exploring the hybrid CNN-Transformer designs to find the right balance between efficiency
+and generalization of children models like Effective ViT is successful.
+2.9. Autoencoders
+The applications of autoencoders rely on unsupervised learning of features and
+reconstruction-based detection, which provides manipulation properties that are unique
+direction finding using reconstruction error analysis.
+The Stacked Denoising Autoencoders by Vincent et al. exhibit excellent learning of
+feature representations when presented with corrupted features, which is better than the
+conventional autoencoders classification tasks that could be used in deep learning detection.
+Autoencoders work well in unsupervised learning to detect deepfakes, although they
+are not as good as supervised deep learning. The reconstruction-based new forms of
+manipulation can be regarded as being well-detected by the detection paradigm, but more
+work is needed to be able to compete [56].
+So, upon a systematic comparison of the architectures of deep learning, there are
+underlying trade-offs. Transformers show much better cross-dataset generalization (11.33%
+decline) compared with Philips (CNNs that perform 15%+ worse), 3–5× computational
+overhead (30–45 ms vs. 10–15 ms). LSTMs are very good in temporal analysis of 100%
+semantic accuracy, but have a scalability issue. Achieving 91–92% accuracy, multimodal ap-
+proaches can be limited in real-time deployment by an inference time of 60 ms. CNNs offer
+the best trade-off to be practically implemented. No one architecture is proactive—selection
+is on the basis of operational requirements.
+3. Machine Learning and Traditional Detection
+It was found, as reflected in recent extensive reviews in Springer, Elsevier, and MDPI
+journals, that even though deep learning is winning the majority of the literature, conven-
+tional machine learning and feature-based methods have a high practical appeal. These
+surveys bring out the interpretation, computational and specific manipulation advantages
+of classical methods, and establish the result of our study that Random Forest has an 99.64%
+accuracy on DFDC with a tiny computational bias. IEEE and ACM surveys point out the
+significance of testing different paradigms of methodology not just architectural complex-
+ity and to this end justifies architectural complexity our deployment-oriented evaluation
+model, which takes into consideration not only efficiency but also accuracy.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 24 ---
+
+AI 2026, 7, 68
+24 of 42
+3.1. Support Vector Machine (SVM)
+The texture feature approach used by Yasir and Kim gives the percentage of 92% (Face-
+Forensics++) with handcrafted features (HOG, LBP, KAZE), 96% (Celeb-DFv2) accuracy at
+handcrafted features SVC classification, proving that properly designed features can be
+highly competitive with learned representations and also use much less computational
+resources [57].
+The issues of profound class imbalance are covered by the extensive analysis conducted
+by Rezvani et al. [58] in deepfake detection; there is a prevalence of real samples. False
+positives would be minimized, and the minority-class would be improved through cost-
+sensitive SVM implementations, which puts a particular focus on the latter data-balancing
+incorporation towards forensic strength. The Cholesky kernel by Sahoo and Maiti has
+a covariance to optimize its decision boundary better than RBF and polynomial kernels;
+it has better precision/recall than its counterparts’ metrics. This improvement shows
+that SVM is still going through the process of being developed by adding the kernel.
+High-dimensional method innovation of feature space, such as facial texture analysis.
+Noiseprint and Laplacian filtering with Linear are used in the residual noise texture analysis.
+The selected results are SVM to recognize interpretable, explainable deepfakes based on
+5-fold cross-validation forensic application decision mechanisms [58].
+The SVM methods have a superb computational performance and readability, and de-
+velop advanced feature engineering competitive. Handcrafted features surviving domi-
+nance assumptions in deep learning, particularly in deployment, where the decisions and
+limitations on the available resources are explainable [59].
+3.2. Random Forest & Decision Trees
+The superior performance of the implementations of the random forests disputes
+profoundly with assumptions of superiority in learning. There are several scenarios of
+evaluation demonstrating Random Forest as the best method.
+VOTSTACK model shows the efficiency of ensemble learning, approaching the ac-
+curacy of 91.6% with the help of the Random Forest meta learning and the Xception
+feature extraction. The method is better than LSTM+Xception Net (83.42%) and standalone
+Random Forest (70.6%), which show social media deepfake detection potential using an
+ensemble [60,61].
+Random has the greatest risk to the deepfake detector of deep learning, with superior
+performance of Random Forest. They are very accurate, hence low computational and
+inherently interpretable, intelligently designed traditional machine learning styles can be
+improved on most realistic deployment applications [62].
+3.3. K-Nearest Neighbors (KNN)
+KNN implementation shows inconsistent characteristics of performance in terms of
+feature extraction and ensemble scenarios. This overall analysis shows the importance
+of KNN in specific situations, but it also reveals the weakness of KNN in standalone
+deepfake detection.
+The Deepfake/Faceswap classifier using KNN in the hybrid method of Alzurfi and
+Altaei reaches 0.95 accuracy with the combination of VGG16 transfer learning, but the
+performance of the hybrid system is highly dependent on the type of manipulation. It can
+be seen in the comparative analysis that KNN works best with certain combinations of
+features and struggles with others [63].
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 25 ---
+
+AI 2026, 7, 68
+25 of 42
+Comparative Performance Analysis of State-of-the-Art Methods Across
+Benchmark Datasets
+Figure 7 shows the results of a comprehensive comparative analysis of the performance
+of nine representative methods using three benchmark datasets (FaceForensics++, DFDC,
+Celeb-DF) to reveal critical patterns in the performance of these methods, which challenge
+traditional assumptions about the superiority of certain methodological approaches and
+highlight systematic limitations of existing approaches to detection. This multi-dataset
+comparison is very important, in order to gain an understanding of the reliability and
+generalisability of the detection methods, for single-dataset evaluation gives an incomplete
+and potentially misleading evaluation of the practical viability of deployment.
+Figure 7. Methods Performance Comparison Across Datasets. The table uses color coding to
+highlight performance levels across different benchmark datasets, with darker shades indicating
+higher accuracy.
+The visualization uncovers three basic patterns with great implications. First, there is
+a remarkable stability of the performance of FaceForensics++ in terms of methods-while
+most of them appear to be in the accuracy range between 97–99%, a few of them reach
+up to 99 or more (DFDT, MCX-API, 3D-CNN, DFT-MF, etc.). This saturation implies that
+FF++ has very little discriminative power for modern detection techniques, and is less of
+reflecting challenging discrimination against autism than an item for baseline verification
+of the soundness of a methodological approach. The uniformly high performance suggests
+that the controlled conditions of manipulation and consistent compression artifacts offered
+by FF++ combined with even relatively simple methods to achieve near perfect accuracy
+casts doubt on the further utility of this dataset for distinguishing state-of-the-art methods.
+Second, DFDC performance shows considerably higher variance; varying from 65% (GFT-
+40) to 99% (Random Forest), with most methods showing 85–93% accuracy. This dispersion
+reflects the more realistic and difficult characteristics of DFDC, such as diverse manipulation
+quality, varied quality of compression artifact, and in-the-wild recording conditions.
+Importantly, Random Forest’s impressive 99% DFDC accuracy is challenging the
+deep learning dominance notions and has already proved the fact that intelligent features
+engineering using classical machine learning algorithms can measure up (and even clearly
+outperform) intelligent AI architectures (neural networks) in some scenarios. Third, Celeb-
+DF has the worst performance reduction with only ADT providing evaluation results
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 26 ---
+
+AI 2026, 7, 68
+26 of 42
+(89% accuracy) between displayed methods. This limited evaluation coverage and lower
+accuracy highlight Celeb-DF as the trickiest of all cross-dataset benchmarks, and contain
+high-quality deepfakes that are close to real-world manipulations.
+The cross-dataset performance patterns highlight a fundamental limitation of state-
+of-the-art detection methodologies methods perform well on data they were trained on
+but when faced with an unseeen distribution of data they tend to systematically degrade
+across data distributions. The performance gap between FF++ (97–99 %) and DFDC (99–
+65%) for identical methods suggests that detectors are learning dataset specific artifacts:
+compression pattern, blending boundary, color space inconsistencies and not fundamental
+and generalizable properties of synthetic media. This interpretation is supported by the
+fact that there is no guarantee that advanced architectural sophistication makes the method
+robust across datasets—for example, methods that are 99% on FF++ might be far worse on
+DFDC despite being built upon advanced deep learning architectures. The figure therefore
+demonstrates the importance of some cross-dataset evaluation protocols and development
+of training methodologies that are optimised for generalization and not maximisation of
+single-datasets accuracy. Future research needs to be concerned with ways of evaluating
+how well methods will work across different benchmarks rather than whether they achieve
+marginal accuracy improvements on saturated datasets such as FF++.
+The XtractNet of MFCC-GNB of Gujjar et al. reaches the maximum accuracy of KNN
+99.93 to prove the use of KNN in audio deepfake. It is needed to show that it can detect
+deepfake voice detection with relevant feature extraction (MFCC) and Gaussian [64].
+Naive Bayes enhancement KNN shows to be extremely variable with feature extrac-
+tion, maintenance, and orchestral amalgamation. Although it demonstrates a potential
+in detecting audio deepfakes, as well as in special ensemble cases, visual deep fake stan-
+dalone KNN performance recognition is weak as compared to other machine learning
+methods [65].
+3.4. Logistic Regression
+The CNN ensemble stacking of Hafeez et al. uses the Logistic Regression as a high-
+level dense combination based on DenseNet121/Inception V3, with 98.7% accuracy on
+140,000 images. This is a method that shows the effectiveness of Logistic Regression meta-
+learning on ensemble architectures, where the CNN feature extractors need to be integrated
+several times [43].
+In the investigation of deepfake detection, evaluation can be performed. The method
+of forensic evaluation developed by Reis and Ribeiro transforms similarity in a facial
+recognition logistic regression score to likelihood ratios, with Half Total Error Rate. Improv-
+ing the forensic applicability (HTER) of 0.020 and AUC of 0.994 on Celeb-DF (v2) by the
+interpretation in probabilities.
+Atas and Karakose et al.’s [66] ensemble approach improves the accuracy of identifying
+spoof photos based on multi-classifier consensus by combining SVM and logistic regression
+with random forest following CNN feature extraction.
+The ensemble model of Chiang et al. is a mixture of Logistic Regression and SVM,
+and Random Forest in Vision Transformer-based feature extraction, which had 74 percent
+accuracy on Celeb-DF (v2) and DeeperForensics-1.0 datasets with no harm to computational
+performance in low-resolution, compressed, short video [66].
+3.5. Traditional Image Processing Techniques
+Traditional methods of image processing examine deepfakes using the spatial and
+frequency domain characteristics. A comparative view of these complementary approaches
+is given in Figure 8.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 27 ---
+
+AI 2026, 7, 68
+27 of 42
+Figure 8 illustrates the basic differences of space and frequency domain detection
+approaches. Spatial domain artifact—this appears as directly visible inconsistencies within
+the visual data. Eye blinking problems are abnormal eye blinking patterns and irregular
+frequency than natural human being blinking behavior. Skin texture blur results as non-
+natural smoothness and loss of characteristic pores and fine details which authentic faces
+show. Facial boundaries exhibit irregular shapes and inconsistent colors at the point of
+transition between the manipulated area and actual content. Color incons dalje Vector
+paintings, The differences between face and background areas as a result of processing by
+independent computations at the stage of deepfake generation.
+Spatial Domain Artifacts
+Frequency Domain Artifacts
+Eye Blinking Issues
+Checkerboard Patterns
+Abnormal blink patterns, irregular fre-
+quency
+Visible in DCT coefficient maps
+Skin Texture Blur
+High-Frequency Noise
+Unnatural smoothness, loss of pores
+Anomalies in DFT spectrum
+Facial Boundaries
+Wavelet Discontinuities
+Irregular edges, color mismatches
+Multi-scale manipulation traces
+Color Inconsistencies
+GAN Fingerprints
+Face-background color differences
+Characteristic Fourier signatures
+Figure 8. Spatial vs. Frequency Domain Artifacts. (left) spatial issues (blurry skin, eye problems,
+boundaries). (right) frequency issues (checkerboard, DFT noise, wavelet patterns). Hybrid methods
+detecting both achieve superior performance. The table uses color coding: red for eye blinking issues,
+yellow for texture blur, green for boundary problems, orange for color inconsistencies (left column);
+corresponding frequency domain artifacts are shown in the right column.
+Frequency domain artifacts on the other hand, expose traces of manipulation in the
+spectral representation of images. Checkerboard patterns become evident within DCT
+coefficient maps, which occur as an upsampling demand as face generation makes place.
+High frequency noise looks like anomalies in the Fourier transform that filter out synthetic
+content from real images. Wavelet discontinuities reveal the traces of manipulation at multi-
+resolution scales of the frequencies. GAN fingerprints present as specific characteristic
+Fourier signatures of particular generative architectures, allowing this to be detected as
+well as attributed to their source.
+The complementary nature of these categories of artifacts explains why hybrid types
+of detection methods perform better. Spatial only methods can miss signature of attributes
+in frequency domains, while methods based on frequency domains can fail to equate
+visually apparent inconsistencies. Methods that combine both domains like PDCNet with
+96.34% accuracy on FaceForensics++, 96.14% accuracy on Celeb-DF, and 88.19% accuracy
+on DFDC, show that full analysis on spatial and frequency representations gives more
+robust detection than single-domain methods.
+3.5.1. Discrete Cosine Transform (DCT)
+Discrete Cosine Transform (DCT) techniques based on frequency-domain analysis
+methods identify deepfakes both in real time and proactive. Comprehensively, the strength
+of DCT lies in behalf of types of particular manipulation, and the opportunities of integra-
+tion with existing systems are shown.
+The implementation of HashShield inserts a perceptual hash of DCT low-frequency
+manipulation detection comparison bands. This approach assists in-house tracking and
+privacy protection through forensic usage, indicating that DCT remains consistent with
+stable hash extraction of the following tampering [67].
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 28 ---
+
+AI 2026, 7, 68
+28 of 42
+3.5.2. Pixel and Frequency Analysis
+At their implementations, PFA strategies are a combination of both the spatial and
+frequency domain analysis in order to detect deepfakes comprehensively. The general result
+of the collective analysis indicates the efficacy of PFA in the detection of GAN-generated
+content and emphasizes computational complexity problems.
+Guarnera et al.’s [68] convolutional trace extraction achieves up to 99.81% accuracy on
+CELEBA (STYLEGAN2) through EM-based feature analysis from various GAN architec-
+tures (GDWCT, STARGAN, ATTGAN, STYLEGAN, STYLEGAN2), offering explainability
+by linking features to specific GAN architectures.
+The StyleGAN2-ADA identification approach achieves 94% accuracy for identifying
+specific generation models through Resnet-18 texture and spatial feature extraction with
+SVD processing. While not directly using frequency analysis, the method acknowledges
+PFA detectability with 80% noise robustness, enabling forensic attribution [68].
+Mao et al.’s PDCNet introduces Pixel Difference Convolution for capturing fine-
+grained local patterns through intensity and gradient data aggregation, achieving high ac-
+curacy across FaceForensics++ (0.9634), Celeb-DF (0.9614), and DFDC (0.8819) datasets [42].
+PFA techniques show promise for model attribution and GAN-generated content
+detection, providing special forensic analysis capabilities. Nevertheless, there is a prac-
+tical limitation to the scalability of deployment due to the complexity of computing and
+restricted extrapolation to sophisticated methods of manipulation [69].
+3.5.3. Discrete Fourier Transform (DFT)
+DFT performances show the power of frequencies to detect deepfakes and other
+benefits of being computationally efficient compared to complicated deep learning methods.
+Convertini et al. [70] showed the high performance of Discrete Fourier Transform
+(DFT)-based detection methods using several evaluation criteria. Convertini et al. fre-
+quency component analysis provided exceptional results, 99.94% F1 scores using Support
+Vector Machine (SVM) classifiers (99% accuracy) and 97.21% accuracy using Random For-
+est classifiers against StyleGAN and StyleGAN2 manipulations. The high performance
+of different classifiers means that it possesses strong frequency domain discrimination
+performance [70].
+Figure 9 presents a sophisticated cross-modal fusion framework for audio visual
+deepfake detection which is a typical example of the architectural principles that can be
+employed by multimodal approaches to achieve a better performance compared to uni-
+modal methods by exploiting the inter-modal dependencies and inconsistency patterns.
+This framework is the cutting-edge paradigm of deepfake detectors, achieving a limita-
+tion solved in the past to analyze visual-only or audio-only, because deepfake mimics
+cross-modality manipulation artifacts that are very common to detect content of synthetic
+generation. The work the architecture provides is the demonstration of how complementary
+pieces of information from different modalities can be used to integrate parts systemati-
+cally to achieve robust detection of even scarcity of subtle and difficult to perceive traces
+of manipulation.
+The framework works on four hierarchical levels of processing for progressively
+extracting, fusing, analyzing multimodal information. The parallel feature extraction stage
+involves processing video frames by a spatiotemporal encoder which captures the visual
+features (facial expressions, temporal consistency, blending phenomena) in parallel with
+processes related to the audio by an acoustic feature extractor which identifies the spectral
+anomalies, prosodic anomalies and voice quality degradation. This parallel processing
+allows for efficient processing with modality specific feature specialisation. The multimodal
+joint decoder is the key innovation in the framework, by using bidirectional cross attention
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 29 ---
+
+AI 2026, 7, 68
+29 of 42
+mechanisms, allowing the features of each modality to focus on relevant patterns in the
+complementary modality. For example, visual lip movement features may pay attention
+to corresponding phoneme representations in the audio stream and allow to detect lip
+sync inconsistencies that characterize face-swapping and facial re-enactment deepfakes.
+These cross attention operations learn complex dependencies between the modalities
+that would not be accessible by processing each modality separately. The alignment and
+inconsistency detection modules use the cross-modal attention patterns in order to detect
+specific classes of audio-visual discrepancies: temporal misalignments, in which audio and
+visual events are desynchronized, phoneme/viseme mismatches, in which mouth shapes
+are incompatible with speech sounds, and prosodic expression inconsistencies, in which
+vocal emotional cues are inconsistent with facial expressions. Finally, the multimodal
+classification output combines the context of evidence originating from visual features,
+audio features, cross-modal attention patterns and also detected inconsistencies to get a
+holistic authenticity rating.
+Figure 9. Cross-Modal Fusion Framework for Audio-Visual Deepfake Detection. The diagram shows
+the processing pipeline with arrows indicating data flow directions and different colored components
+representing distinct processing stages.
+The effectiveness of this cross-modal approach is empirically validated by measures
+such as AVoiD-DF reaching 91.2% accuracy in the case of DefakeAVMIT and 92.3% in the
+case of the standard dataset (FakeAVCeleb), there being a substantial improvement over
+the approaches that analyse the visual or audio stream separately. However, as discussed
+in Section 4, multimodal frameworks introduce a large amount of computational overhead
+(60 ms inference time for AVoiD-DF vs. 8 ms for CNN-only methods) and the need for
+complete audio-visual data availability to work, which restricts the use of these technologies
+for scenarios involving visual only content such as static deepfake images or muted videos.
+Future research must therefore focus on unified architectures that keep the multimodal
+performance advantages when there is full modality information and recursively degrade to
+robust unimodal operation in the event of only partial modality information possibly using
+modality-agnostic attentionics or self-supervised pretraining using a variety of modality
+combinations. The framework illustrates that the best practice of deepfake detection
+should be to transcend single modality and towards the integrated approaches exploiting
+fundamental physical and semantic constraints of authentic audio-visual correspondence.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 30 ---
+
+AI 2026, 7, 68
+30 of 42
+Ni et al. developed a study that developed a biologically-inspired detection method
+based on the remote photoplethysmography (rPPG) signal extraction. Their approach,
+which processes rPPG signals by using Fast Fourier Transform (FFT) to create Matrix Visu-
+alization Heatmaps (MVHM) that are used as inputs for the image classification networks.
+This biological signal analysis technique achieved 99.22% detection accuracy, showing how
+the physiological signal analysis technique is effective in deepfake detection [71].
+Biswas et al. came up with a hybrid detection paradigm where 3D XceptionNet com-
+bined with Discrete Fourier Transform (DFT)-based classification is used. Their approach
+emphasizes the use of frequency domain feature analysis to detect the high frequency
+inconsistencies and achieves an accuracy of 90.29% on the Celeb-DF dataset. Despite its
+efficacy, the method has significant computational needs which clinker the way it could
+well be properly implemented [72].
+3.5.4. Edge Detection
+Zhang et al. [73] through benchmark analysis showed that their proposed Cross-
+Attention Edge Learning (CAEL) framework was able to detect facial inconsistencies via
+Sobel edge detection with higher performance comparing to Canny and Laplacian edge de-
+tection methods. The Appearance-Edge Cross-Attention (AECA) This mechanism combines
+edge features with facial appearance information, which improves results by a comparative
+4% improvement in AUC and shows better results in cross dataset generalization than
+appearance only features [73].
+3.5.5. Fourier Transform & Wavelet Analysis
+Implementations of Fourier Transform Wavelet Analysis (FTWA) combine wavelet
+and frequency-domain analysis for thorough deepfake detection, showing better results
+for some forms of manipulation. The summative study reveals that wavelet analysis has
+benefits over the traditional Fourier approaches to artifacts specific to deepfakes.
+A comparative analysis conducted by Wolter et al. through the spatial and frequency
+analysis has shown that wavelet packet works better on CelebA and FFHQ dataset compar-
+isons with the Fourier methods. The lightweight classifier method demonstrates the robust-
+ness of wavelet transforms as an approach for forensic analysis to traditional frequency-
+domain methods [74].
+Younus et al. propose a deepfake detection approach utilizing artifacts in the frequency
+domain using Haar Discrete Wavelet Transform (HDWT) to capture edge inconsistency
+that is specific to GAN generated artificial faces. Their approach takes advantage of the fact
+that the algorithms that generate deepfakes produce faces with a low resolution to make
+them fit the context of the background and are thus subject to distortion and blur, which
+introduces exclusive inconsistencies of blur which can be detected by looking at edge pixels
+in the wavelet domain, which allows to obtain effective manipulation fraud detection of
+manipulated facial content [75].
+Uddin et al.
+propose a framework by combining multi-level Discrete Wavelet
+Transform (DWT) technology and vision transformers, for robust deepfake detection by
+frequency-spatial feature combination. By extracting multi-level features of frequencies
+using DWT and learning global inconsistencies across local areas of faces using the vision
+transformer architecture, their method exposed discriminative details and frequency in-
+formation that are missed by simply using spatial-based detection methods, achieving
+state-of-the-art accuracy of 99.86% and 99.92% for FaceForensics++ and Celeb-DF bench-
+marks respectively [76].
+Khan et al. propose a new neurological paradigm for detecting deepfakes by ex-
+ploring human brain neural signatures of the brain using electroencephalography (EEG)
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 31 ---
+
+AI 2026, 7, 68
+31 of 42
+recordings of subjects viewing videos of either the real world or a faked video. Applying
+Fast Fourier Transform (FFT) to EEG data using k-Nearest Neighbors classification shows
+98.25% detection accuracy which is much higher than Wavelet Packet Decomposition with
+Support Vector Machines (94.16%) which suggests that human neural responses contain
+implicit cues towards authenticity which may be missed by computational models open-
+ing interesting venues for passive biometric-based deepfake detection based on cognitive
+neuroscience [77].
+Wang et al. and Miao et al. [78,79] show the superior performance of Frequency-Time-
+Wavelet Analysis (FTWA) methods against classical Fourier-based and traditional wavelet
+methods, especially when combined with state-of-the-art attention mechanism and vision
+transforms. FTWA’s strength includes the strong frequency domain characterization of
+the manipulation artifacts to achieve multi-scale manipulation while retaining the spatial
+localization to achieve accurate tampered region identification, which makes it very robust
+against the sophisticated state-of-the-art manipulation tools striving to evade spatial-only
+detection, yet computation complexity caused by the multi-scale wavelet decomposition is
+practical for real-time deployment scenarios [78,79].
+Deep learning dominance assumptions confronted by systematic comparison. Random
+Forest gives 99.64% accuracy for DFDC with 2 ms inference-15× faster than transformers
+(30–45 ms). The method of traditional methods (DFT 99.94%, Wavelet 99.86%) is competitive
+when zero training data are used. Traditional approaches have some key benefits, such
+as high interpretability for forensic applications, low computational needs for mobile
+deployment, and low data needs for applications with high resource constraints. These
+results confirm the plausibility of RQ3: traditional methods provide acceptable alternatives
+in situations where efficiency, interpretability, or availability of data is more important
+than accuracy.
+4. Performance Analysis and Comparative Evaluation
+Having elaborated in a systematic way deep learning architectures (Section 2) and
+machine learning with traditional means (Section 3), we now perform careful comparative
+performance analysis in a wide number of benchmark data sets in order to assess detection
+accuracy, computation efficiency, and cross-datasets generalization. This multi-dimensional
+analysis directly answers our research questions based on quantification of fundamental
+trade-offs that go into determining where and when the deployment will be practical
+outside of the laboratory. The systematic comparison provides critical information about
+challenging conventional assumptions in methodological superiority and about basic
+limitations that require paradigm shifts in approaches for detection.
+Our evaluation framework uses three main benchmark datasets which have varying
+characteristics of manipulation and complex level. FaceForensics++ (FF++) is the most
+widely used benchmark consisting of 1000 original videos manipulated using five different
+generation methods (Deepfakes, Face2Face, FaceSwap, NeuralTextures and FaceShifter)
+with multiple compression levels providing the ability to control the evaluation of the
+method-specific detection capabilities. The DeepFake Detection Challenge (DFDC) dataset
+provides large-scale, realistic evaluation with 128,154 videos involving diverse actors
+and wide lighting conditions with realistic compression effects to provide more difficult
+assessment conditions that are close to the real world. Celeb-DF is a collection of high-
+quality celebrity deepfakes using advanced generation techniques that look very similar
+to the original video, which is a very hard test of cross-dataset generalization, where
+the methods must detect manipulations that are quite different from those used to train
+them. Together, the combination of these datasets allows for an looks at the detection
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 32 ---
+
+AI 2026, 7, 68
+32 of 42
+robustness given variable manipulate high-quality including the dataset dimensions and
+the distribution shift.
+We structure our comparative analysis around four related subsections into areas
+of complementary performance. First, Section 4.1 provides an in benchmark analysis of
+within-dataset performance on FaceForensics++ (Table 1) setting a base-line performance
+under controlled conditions and picking architectural approaches with state-of-the-art
+performance under the most common benchmark in the community. Second, Section 4.2
+evaluates the performance of a DFDC (in Table 2 using scalability and robustness tests to
+realistic variations and to complement the performance evaluation, e.g., compression arti-
+fact, lighting changes, subject characteristics. Third, Section 4.3 deals with the cross-dataset
+generalization (Table 3) to some extent as a means of quantifying the performance degrada-
+tion when methods are challenged with an unseen data distribution (that is, the critical test
+on whether the detectors have learned generalizable deepfake characteristics, or datasets
+specific artifacts). Fourth, Section 4.4 is a comparison of the computational efficiency (Table
+to append to the Table 4), the inferring time and parameter overhead, so to determine if
+accuracy ap reflects a good trade off vs. complications of parameters boolean “(part of
+group ware set)”. scenarios.
+Table 4. Computational Efficiency Comparison.
+Method
+Params (M)
+Time (ms)
+Accuracy
+Efficiency
+XceptionNet
+23
+15
+95.00%
+High
+ADT
+86
+45
+96.00%
+Medium
+AVoiD-DF
+120
+60
+91.00%
+Low
+Random Forest
+0.01
+2
+99.00%
+Very High
+One of the main results that has emerged from this type of analysis is the systematic
+performance degradation that occurs during cross-dataset evaluation scenarios. Most
+methods lose 10–15% accuracy when tested on different data distribution from training data.
+This applies across a variety of transformer-based, CNN-based and traditional methods.
+This steady pattern of degradation indicates that there is a fundamental limitation in
+that current methods of detection have a tendency of learning dataset-specific results of
+compression artifacts and manipulation boundaries and generation signatures as opposed
+to generalizable characteristics that are, as, synthetic media. This understanding has vast
+implications in the real world of application where, to be useful weapons, systems for
+detection must be able to continue robust performance as techniques for the deepfake image
+generation continue to develop. The analysis therefore shows that benchmark saturation
+(achieving > 99% accuracy on FaceForensics++) can disguise practical limitations and
+perhaps cross-detection should be the most critical measure for detection capability.
+4.1. FaceForensics++ Benchmark Results
+Table 1 shows performance comparison on the FaceForensics++ dataset, showing
+the potency of current approaches for detection and the shortcomings of this saturated
+benchmark for state-of-the-art detection methods. The table shows that the results of recent
+methods keep achieving more than 99% accuracy, which is the performance ceiling for
+transformer-based methods (ADT, DFDT), advanced CNN architecture (MCX-API, 3D-
+CNN) and specialized frequency-domain approach (DFT-MF) reaching this lower bound.
+This saturation hints either at a lack of discriminative power for contemporary detection
+methods by FF++, or, at the level of the dataset, a controlled manipulation of the dataset
+and a consistent compression artifact allows relatively simple detection methods to be
+almost perfect in accuracy.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 33 ---
+
+AI 2026, 7, 68
+33 of 42
+4.2. DFDC Performance Analysis
+Table 2 shows the detection accuracy result on the DFDC dataset that has greatly
+more performance variance than FaceForensics++ because the combined effect of its more
+realistic and challenging characteristics. Unlike the controlled conditions of FF++, the DFDC
+contains a diverse manipulation quality, diverse compression artifacts and in the wild
+recording conditions, which are closer to real-world deployment scenarios. The distribution
+of performance is revealing of important information regarding the robustness of the
+methodologies and the relationship between the sophistication of architecture and its
+usefulness in the field.
+4.3. Cross-Dataset Generalization Assessment
+Table 3 quantifies this critical dimension of cross-dataset generalization of showing the
+systematic degradation of performance when testing for detection methods on data different
+from training data. This analysis specifically addresses RQ2 (cross-dataset generalization
+patterns), and it can provide empirical evidence as to whether methods currently learn
+when they learn about deepfake characteristics, as generalizable or specific to datasets.
+The consequences of the results show that generalization failure is not a singular case but a
+systematic deficiency for all types of methodology.
+4.4. Computational Efficiency Comparison
+Table 4 does the analysis of the computational overhead by comparing the infer-
+ence time and number of parameters for Bartlett of representative methods from each
+architecture’s category. This dimension relates to RQ1 and RQ3 by showing whether and
+how improvements in accuracy at the margin on computationally expensive methods
+are justified where the implementation cost in terms computation resources is signifi-
+cant, and whether traditional methods indeed provide a feasible efficiency tradeoff for
+application-level implementation constraints. The offered analysis shows that the cost of
+computation versus the accuracy of the detection is not linear, and will reach a point of
+diminishing return as the architectural complexity grows.
+5. Discussion
+5.1. Principal Findings and Novel Contributions
+This systematic review diabetes of 74 deepfake detection studies published at
+2018–2025 supply four key contributions to the literature examining ways to advance
+deepfake detection beyond what currently exists. First, the use of our multi-dimensional
+evaluation framework reveals basic trade-offs between detection accuracy and computa-
+tional efficiency and generalization across data are data streams that have been systemati-
+cally understudied in previous surveys. While some existing reviews covered the aspect
+of architectural categorization and the within-dataset accuracy, our deployment-centric
+analysis proved that the methodological superiority depends on the context rather than
+the methods themselves: transformer architectures show substantial benefit in later cross-
+dataset scenarios where they have 3–5× higher computational costs and convolutional or
+traditional ml shows high enough accuracy on specific deployment scenarios where the
+resource consumption is minimal.
+Several studies that present various all-encompassing surveys published in 2023–2024
+in IEEE, Springer and Elsevier, as well as in MDPI, ACM, and Wiley support our systematic
+results pertaining to major issues with detection. The IEEE literature has a focus on media
+forensics principles and benchmarking specifications compatible with our cross dataset
+evaluation focus. The state-of-the-art problems and the generalization failures that we
+report are recorded independently in Springer and Elsevier reviews and are corroborated
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 34 ---
+
+AI 2026, 7, 68
+34 of 42
+by MDPI and Wiley analyses which indicate our results on competitiveness of traditional
+methods [10,11,15,36]. The reliability-oriented survey of ACM [9] also gives us a com-
+plementary view of legitimizing our deployment-oriented model. The homogeneity of
+results between numerous independent leading publications provides our arguments on
+the necessity of assessment systems on accuracy, efficiency and generalization as opposed
+to maximisation of individual-data set performance indicators [9,12,13,37].
+Second, we question the current assumptions regarding the relative superiority of
+deep learning over traditional methods by showing that Random Forest can achieve with
+99.64% DFDC accuracy in 2 ms inference time, compared with multimodal deep learning
+approaches that take 60 ms to achieve 91.4% of accuracy. This finding contrasts the tacit
+assumption in the recent literature that architectural complexity is a guarantee of good
+performance, and finds that intelligent feature engineering methods can compete well with
+learned representations, in situations with limited resources.
+Third, our systematic cross-data sets find generalizable degradation across all types of
+methodologies 10–15% of an average is generalization failure wherein users learn dataset
+specific artifacts rather than deepfake generalizations. This is an extension of observations
+by Le et al. [31] and offers empirical evidence for generalisation challenges that have been
+mentioned at the theoretical level by [34].
+Fourth, we present full-scale computational efficiency analysis that shows that even
+marginal improvements in accuracy are often disproportionately costly computationally—for
+example, a architecture improvement from 1% accuracy—ADT—which is 4× the computa-
+tional cost of XceptionNet—ADT, is analyses of this sort allow one to make evidence-driven
+architecture choices for specific deployment scenarios.
+5.2. Comparison with Existing Review Literature
+Our results both support and add to past deepfake detecting reviews while expose
+critical weaknesses of existing syntheses. [35] provide comprehensive architectural taxon-
+omy of detection methods but do not systematically test how computationally efficient or
+cross-dataset generalizable they are–dimensions that we show are important to test when
+developing practical methods for assessing deployment Their review classifies approaches
+by generation and detection methods but does not quantitatively compare the tradeoffs
+between accuracy, efficiency and generalization and hence practitioners find it difficult to
+choose appropriate approaches to impairment rate under particular operational constraints.
+Ref. [4] identify chronological incompatibilities, lack of generalization, and data scarcity as
+major challenges but lack systematic quantification of degradation patterns of performance
+that our Table 3 provides. Their qualitative assessment of generalization difficulties is useful
+but not sufficient for helping to uncover the magnitude and consistency of cross-dataset
+failures.
+Ref. [31] introduce a five-stage concept of acquisition, pre-processing, detection, post-
+processing, decision for detector evaluation and Stem importance of model architecture and
+data diversity. Our review goes beyond this approach by adding computational efficiency
+as a dimension for algorithm evaluation that holds equal importance with accuracy and
+generalization, and uncovers trade-offs that were not present in their analysis. In addition,
+that [31] found only 30% of reviewed models are open-source, which makes reproducibility
+difficult, we show that this reproducibility crisis is worse for performance claims—too often
+10–15% degradation is removed from the model when cross dataset evaluation is performed,
+which is not reported in original publications focused on in dataset optimization. Rana
+and Sung classify methods as Digital Media Forensics, Face Manipulation, and Machine
+Learning approaches but as a result, they focus on architectural difference, as opposed to
+performance tradeoff. Our deployment-centric view complements such taxonomies, so as
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 35 ---
+
+AI 2026, 7, 68
+35 of 42
+to provide a measure of the scenarios where traditional methods have practical advantages
+over deep learning despite simplicity in terms of their architecture.
+Unlike previous reviews where cross-dataset generalization was defined as either a
+success or a failure, our systematic quantification of cross-dataset generalization indicates
+that generalization degradation has surprising correlations with the complexity of the
+algorithm (from which the transformer architectures are derived), transformer architectures
+have held up better in terms of relative performance (11.33% decline) although the absolute
+accuracy is often lower than for simpler methods on specific datasets. This nuanced finding
+implies that architectural sophistication facilitates learning of more transferable features
+even though they may not maximise within-dataset accuracy which breaks assumptions
+that if one has the highest measure of benchmark performance, this will result in optimal
+ability to transfer that performance to new data.
+5.3. Limitations of Current Detection Methods
+Our systematic analysis shows five basic, pervasive, fundamental limitations that
+affect all detection methodologies limiting the effectiveness of their deployment in the real
+world necessitating paradigm shifts over incremental improvements.
+Dataset Overfitting and Artifact Learning. The regular 10–15% degradation in cross-
+dataset performance shows that existing ones majorly learn the dataset-specific compression
+type, boundary of the facial region, and signature of the manipulation, and not general-
+izeable deepfake features. This limitation is even seen with transformer architectures
+intentionally designed for generalization (ADT: 11.33% decline and is a fundamental chal-
+lenge for which new training paradigms need to be considered. Methods achieving >
+99 of within readiness on datasets years hearty razorback-target attack linked business
+interpretative limit 1 (significance p < 0.001) on unseen data (Table 3), performing a main
+total to a scaling benched that isn’t a goal? I study a overlapping total. The acuity for this
+pattern by methodological category suggests that easiness current supervised learning
+paradigms optimizing for dataset specific accuracy approximating with the goal of finding
+features in an invariant of manipulation.
+Computational Scalability Requirements. While transformer-based methods have
+established their superior performance in terms of cross-dataset generalization, the 3–5×
+computational burden they impose when compared to CNNs imposes deployment con-
+straints for real-time applications, devices constrained in resources, and for large-scale
+applications performing content moderation. The marginal increase in accuracy (1–2% in
+average) compared to computational increases therefore difference reliquary the viability
+of architectural complexity as a universal solution. This trade-off, insofar as its underexplo-
+ration in the literature in favor of maximizing accuracy and no context of deployment, is the
+case. For example, multimodal approaches such as AVoiD-DF take 60 ms inference time and
+are not feasible to accept in real-time video processing (requires < 33 ms per frame when
+processing 30 fps videos) although the accuracy score is higher on benchmark datasets.
+Temporal Consistency Modeling Shortcomings Research Problems: Despite the LSTM
+and spatiotemporal approaches, there are existing approaches that fail to suitably represent
+the temporal artifacts of longer video sequences. The excellent performance of the semantic
+temporal analysis by [48] that achieved 100% DFDC accuracy by detecting emotional conti-
+nuity, seems to indicate superiority of explicit temporal modelling over frame-independent
+or short-sequence approaches. However, computational costs of dense temporal processing
+across full video sequences place a limit on scale and a trade-off is created between temporal
+robustness and efficiency.
+Adversarial Vulnerability: As known from the work of Cao and Gong, existing detec-
+tors suffer from adversarial attacks of such mechanisms as Gaussian noise perturbations,
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 36 ---
+
+AI 2026, 7, 68
+36 of 42
+backdoor attacks, and targeted adversarial examples. Our review shows very little regard
+to adversarial robustness in methods evaluated, with only 3 out of 74 performed this adver-
+sarial training/evaluation. This gap makes deployed systems against human adversarial
+manipulation between organic deepfake generation a great security vulnerability.
+Multimodal Integration Challenges: While multimodal approaches are shown to
+provide performance improvements taking advantage of the existence of audio-visual in-
+consistencies, they come with synchronization needs, computational overhead and depend
+on the completeness of the multimodal data available. There are many real-world scenarios
+involving visual only content (static images, muted videos), which limit the use of multi-
+modal detectors although they perform better on audio-visual benchmarks. The field does
+not have unified frameworks to ensure the advantages of multimodal when complete data
+exists and graceful degradation to strong unimodal operation when modalities are missing.
+5.4. Adversarial Attacks on Deepfake Detectors
+As the technology for detection has improved, assaults on the detectors have become
+an important security issue. Attackers can make deepfakes undetectable through a number
+of different methods. Gaussian Noise: The noise perturbations in the form of perceptible
+random variations added to degrade the detector accuracy without deteriorating the
+visual quality. Backdoor attacks in which known or unknown attackers intentionally
+insert disruptive triggers in training data, so that that the detectors misclassify particular
+manipulated samples. Adaptive adversarial examples are crafted with the sole purpose of
+exploiting detection architectures weaknesses.
+Our analysis shows that of the 74 reviewed studies, only 3 studies (4%) explicitly
+address adversarial robustness before the significant gap in a magazine’s literature. Cao and
+Gong showed that detectors that perform 94–99% accurately under controlled conditions
+that would be subject to adversarial attacks, which shows that there is a difference between
+the benchmark performance and actual security. This vulnerability is especially worrying
+when it comes to use in applications that are security critical and where attackers are
+actively working to circumvent the detection systems.
+Future research will need to focus on the robustness to adversarial attacks as well as
+the accuracy. Promising directions include certified defense mechanisms offering provable
+bounds of robustness, adversarial training against various kinds of attacks, and ensem-
+ble approaches adding upsetting principles for easier attacks to be made. Standardized
+methods of evaluation in an adversarial way must become the standard for the detection
+method validation.
+5.5. Future Research Directions and Recommendations
+Based on limitations identified and performance gaps identified, we propose 7 critical
+research directions for improving deepfake detection capabilities in order to make them
+practically deployable.
+1. Generalization-Focused Training Paradigms: The cross-dataset degradation must
+be performed in a systematic way, so that the training methodologies needed to be specifi-
+cally geared toward generalization instead of in-dataset accuracy. Promising approaches
+are: (a) meta-learning frameworks where training is done on distribution shifts, not
+on fixed datasets, learning to adapt these into previously unseen manipulation types;
+(b) domain adaptation approaches which make use of unlabeled target domain data,
+and bridge distribution gaps; (c) disentangled representation learning for separating
+content-specific features from manipulation artifacts in order to learn invariant charac-
+teristics; and (d) contrastive learning which enforces that each manipulation method is
+consistent. Future work should therefore focus optimizing cross dataset AUC rather than
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 37 ---
+
+AI 2026, 7, 68
+37 of 42
+within dataset accuracy as the main optimization goal, with benchmarks that provide
+advantages for consistent performance under various conditions for evaluation.
+2. Computational Efficiency through Neural Architecture Search: The transformer
+accuracy efficiency trade-off requires systematic search of architecture design space of
+performance and computational cost. Neural architecture search (NAS) specifically focused
+on the deployment constraints (inference time < 10 ms, parameters < 50 M) could help
+find Pareto-optimal architectures not suitable for manual design. The Mixture-of-Experts
+approach shows that selective computation can preserve the benefits of transformers while
+mitigating the overhead, it is worth further research on the conditional computation and
+adaptive inference mechanism.
+3. Temporal Consistency Modeling the Scale: Superior performance of semantic
+temporal analysis points to possibilities in explicit temporal consistency modeling. Research
+should explore the following: (a) efficient temporal attention mechanisms that cover the
+full video sequence and not on the short clips; (b) hierarchical temporal modeling at
+different timescales (frame, shot, scene) modeling both local and global inconsistencies; and
+(c) enforcement of physical constraints according to facial biomechanics, audio-visual
+physics and lighting consistency. Lightweight temporal encoder would be able to offer
+temporal robustness without LSTM Cmp cost.
+4. Unified Multimodal-Unimodal Frameworks: Current multimodal approaches work
+well with audio-visual data but are unable to handle visual-only data. Future architectures
+should degrade gracefully if modalities are absent, so that they provide reasonable dys-
+functionality with unimodal inputs and superior accuracy if complete multimodal data is
+made available. Self-supervised pre-training with a some of diverse modality combinations
+might help to develop flexible deployment for different data availability cases.
+5. Adversarial Robustness With the Power of Defensibility: Critical security appli-
+cations need adversarial robustness guarantees that are currently lacking in detection
+techniques. Research objectives should consider: (a) certified defense mechanisms with
+provable robustness bounds against worst case perturbations; (b) adversarial learning
+adversarial have learned from diverse kinds of attacks such as noise perturbations, back
+door, and adaptive adversarial examples; and (c) ensemble approaches are approaches that
+combine detection principles that are complementary to each other rendering the attack
+more difficult.Standardized adversarial evaluation benchmarks would be available for
+systematic evaluation of robustness for methods.
+6. Interpretable detection and explainable detection: Forensic and legal applications
+require interpretable detections in addition to binary classification scores Attention Visual-
+ization Attribution methods Counterfactual explanations identifying specific. manipulation
+regions add trust and allow for human verification; Research should create explanation
+methods keeping the balance between the two points: maintaining accuracy and providing
+actionable forensic evidence, (potentially including the use of interpretability integrated
+into architecture, rather than explainability methods post-hoc).
+7. Standardized Evaluation Protocol(s): Inconsistent evaluation protocols make it
+difficult to compare study results from one study to another. Standardized evaluation
+should include and impose: (a) mandatory cross-dataset testing of the models on Face-
+Forensics++, DFDC and Celeb-DF with consistent splits and preprocessing; (b) reporting of
+inference time, number of parameters and computation requirements as well as accuracy
+metrics; (c) evaluation for adversarial robustness against standardized attack protocols;
+(d) testing for statistical significance instead of reporting the performance of one run, cur-
+rently done in only 30%; and (e) code and model release for publication in order to allow for
+reproducibility, currently done in only 30%. Benchmark committees could set and enforce
+such standards in the form of publication requirements.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 38 ---
+
+AI 2026, 7, 68
+38 of 42
+By addressing these directions of research in a systematic manner, the research di-
+rection could advance toward developing detection systems with the combined goals of
+high detection accuracy, cross-dataset generalization, computational efficiency, adversarial
+robustness, and interpretability required for the reliable deployment in the real world.
+The movement from optimizing accuracy to all-around assessment of dimensions of this
+kind is the paradigm shift required for impacting practical use.
+6. Conclusions
+This summary of all studies published between 2018–2025 on deepfake detection indi-
+cates the existence of fundamental trade-offs between detection accuracy, computational
+efficiency and cross-dataset generalization determining the validity of the practical imple-
+mentation. While transformer-based architectures have a better tendency for cross-dataset
+generalization (11.33% drop in performance compared to CNNs > 15%) they ask for the
+price of 3–5× more. Challenging the assumptions of deep learning, older machine learning
+algorithms such as Random Forest achieve comparable results to deep learning algorithms
+(99.64% accuracy on DFDC) with very few computational demands. However, systematic
+performance deformation across different methodologies by 10–15% suggests systematic
+large-scale result for approach. may indicate that the effective approaches are learning to
+dataset specific artefacts, rather generalizable deepfake characteristics.
+The second thing that the field needs to move toward is not just pure optimization of
+accuracy, but going towards evaluation framework that really covers the generalization ca-
+pabilities, the computational limitations, the adversarial aspects, and what kind of practical
+constraint is involved with deployment. Future research In future, future studies should
+focus on: (1) Generalization-focused training paradigm using meta-learning and domain-
+adaptation; (2) Neural architecture searching based on deployment restrictions; (3) Efficient
+temporal consistence modeling at scale; (4) Unified multi-modal unimodal frameworks;
+(5) Proper adversarial-robustness through defensive design; (6) Interpretable possibility
+detection for forensic applications; and (7) Different cross-dataset evaluation protocol.
+Combating deepfakes effectively requires multidisciplinary collaboration that goes be-
+yond what the technical solutions available to combat deepfakes can deliver, encompassing
+regulation and media literacy programmes as well as guidelines on the ethics of their use.
+Only through coordinated work on the part of researchers, policymakers, and technology
+practitioners, can we start to build strong defenses against the wrongful use of generative
+AI technologies and leave normative ways of using generative AI technologies standing-
+by keeping some of these generative AI technologies out of our lives. The way forward
+requires being balanced between innovation in areas of detection capability and the reality
+of deployment and ensuring that research advancements result in real-world deployments
+to protect digital media authenticity reliably.
+Author Contributions: This work presents, A.R., A.B. and A.A. conceived the initial idea. M.I.M.
+and Z.A.A. established the methodological strategy. U.F., M.I.M. and Z.A.A. formulated the software
+component. A.R. and A.B. oversaw the validation process. A.B. and A.R. prepared the initial draft.
+U.F., A.A., Z.A.A. and T.A.J. contributed to revisions and edits. Z.A.A. and M.I.M. overall supervision.
+All authors have reviewed and approved the final manuscript for publication.
+Funding: This research received no external funding.
+Institutional Review Board Statement: Not applicable.
+Informed Consent Statement: Not applicable.
+Data Availability Statement: As this is our review paper. No dataset has been used, as it is a
+comprehensive review of previous techniques.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 39 ---
+
+AI 2026, 7, 68
+39 of 42
+Conflicts of Interest: The authors declare no conflicts of interest.
+References
+1.
+Seow, J.; Lim, M.; Phan, R.; Liu, J. A comprehensive overview of Deepfake: Generation, detection, datasets, and opportunities.
+Neurocomputing 2022, 513, 351–371. [CrossRef]
+2.
+Mirsky, Y.; Lee, W. The creation and detection of deepfakes: A survey. ACM Comput. Surv. (CSUR) 2021, 54, 7. [CrossRef]
+3.
+Hadi, W.; Kadhem, S.; Abbas, A. A survey of deepfakes in terms of deep learning and multimedia forensics. Int. J. Electr. Comput.
+Eng. (IJECE) 2022, 12, 4408–4414. [CrossRef]
+4.
+Malik, A.; Kuribayashi, M.; Abdullahi, S.; Khan, A. DeepFake detection for human face images and videos: A survey. IEEE Access
+2022, 10, 18757–18775. [CrossRef]
+5.
+Tolosana, R.; Romero-Tapiador, S.; Fierrez, J.; Vera-Rodriguez, R. Deepfakes evolution: Analysis of facial regions and fake
+detection performance. In Proceedings of the International Conference on Pattern Recognition, Shanghai, China, 15–17 October
+2021; pp. 442–456.
+6.
+Alanazi, S.; Asif, S. Exploring deepfake technology: Creation, consequences and countermeasures. Hum.-Intell. Syst. Integr. 2024,
+6, 49–60. [CrossRef]
+7.
+Lyu, S. DeepFake the menace: Mitigating the negative impacts of AI-generated content. Organ. Cybersecur. J. Pract. Process People
+2024, 4, 1–18. [CrossRef]
+8.
+Naitali, A.; Ridouani, M.; Salahdine, F.; Kaabouch, N. Deepfake attacks: Generation, detection, datasets, challenges, and research
+directions. Computers 2023, 12, 216. [CrossRef]
+9.
+Wang, T.; Liao, X.; Chow, K.; Lin, X.; Wang, Y. Deepfake detection: A comprehensive survey from the reliability perspective.
+ACM Comput. Surv. 2024, 57, 58. [CrossRef]
+10.
+Heidari, A.; Jafari Navimipour, N.; Dag, H.; Unal, M. Deepfake detection using deep learning methods: A systematic and
+comprehensive review. Wiley Interdiscip. Rev. Data Min. Knowl. Discov. 2024, 14, e1520. [CrossRef]
+11.
+Abbas, F.; Taeihagh, A. Unmasking deepfakes: A systematic review of deepfake detection and generation techniques using
+artificial intelligence. Expert Syst. Appl. 2024, 252, 124260. [CrossRef]
+12.
+Gupta, G.; Raja, K.; Gupta, M.; Jan, T.; Whiteside, S.; Prasad, M. A comprehensive review of deepfake detection using advanced
+machine learning and fusion methods. Electronics 2023, 13, 95. [CrossRef]
+13.
+Deng, J.; Lin, C.; Hu, P.; Shen, C.; Wang, Q.; Li, Q.; Li, Q. Towards benchmarking and evaluating deepfake detection. IEEE Trans.
+Dependable Secur. Comput. 2024, 21, 5112–5127. [CrossRef]
+14.
+Rana, M.S.; Nobi, M.N.; Murali, B.; Sung, A.H. Deepfake Detection: A Systematic Literature Review. IEEE Access 2022,
+10, 25494–25513. [CrossRef]
+15.
+Verdoliva, L. Media forensics and deepfakes: An overview. IEEE J. Sel. Top. Signal Process. 2020, 14, 910–932. [CrossRef]
+16.
+Li, Y.; Yang, X.; Sun, P.; Qi, H.; Lyu, S. Celeb-DF: A large-scale challenging dataset for deepfake forensics. In Proceedings of the
+IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), Seattle, WA, USA, 14–19 June 2020; pp. 3207–3216.
+17.
+Dolhansky, B.; Bitton, J.; Pflaum, B.; Lu, J.; Howes, R.; Wang, M.; Ferrer, C. The deepfake detection challenge (dfdc) dataset.
+arXiv 2020, arXiv:2006.07397. [CrossRef]
+18.
+Wang, P.; Liu, K.; Zhou, W.; Zhou, H.; Liu, H.; Zhang, W.; Yu, N. ADT: Anti-deepfake transformer. In Proceedings of the ICASSP
+2022—2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), Singapore, 22–27 May 2022;
+pp. 2899–2903.
+19.
+Khormali, A.; Yuan, J. DFDT: An end-to-end deepfake detection framework using vision transformer. Appl. Sci. 2022, 12, 2953.
+[CrossRef]
+20.
+Nirkin, Y.; Wolf, L.; Keller, Y.; Hassner, T. Deepfake detection based on discrepancies between faces and their context. IEEE Trans.
+Pattern Anal. Mach. Intell. 2021, 44, 6111–6121. [CrossRef]
+21.
+Guo, Z.; Jia, Z.; Wang, L.; Wang, D.; Yang, G.; Kasabov, N. Constructing new backbone networks via space-frequency interactive
+convolution for deepfake detection. IEEE Trans. Inf. Forensics Secur. 2023, 19, 401–413. [CrossRef]
+22.
+Wang, T.; Cheng, H.; Chow, K.; Nie, L. Deep convolutional pooling transformer for deepfake detection. ACM Trans. Multimed.
+Comput. Commun. Appl. 2023, 19, 1–20. [CrossRef]
+23.
+Zhao, H.; Zhou, W.; Chen, D.; Wei, T.; Zhang, W.; Yu, N. Multi-attentional deepfake detection. In Proceedings of the IEEE/CVF
+Conference on Computer Vision and Pattern Recognition (CVPR), Nashville, TN, USA, 19–25 June 2021; pp. 2185–2194.
+24.
+Yang, W.; Zhou, X.; Chen, Z.; Guo, B.; Ba, Z.; Xia, Z.; Cao, X.; Ren, K. Avoid-df: Audio-visual joint learning for detecting deepfake.
+IEEE Trans. Inf. Forensics Secur. 2023, 18, 2015–2029. [CrossRef]
+25.
+Waseem, S.; Abu-Bakar, S.; Omar, Z.; Ahmed, B.; Baloch, S. A multi-color spatio-temporal approach for detecting deepfake. In
+Proceedings of the 2022 12th International Conference on Pattern Recognition Systems (ICPRS), Saint-Etienne, France, 7–10 June
+2022; pp. 1–5.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 40 ---
+
+AI 2026, 7, 68
+40 of 42
+26.
+Rossler, A.; Cozzolino, D.; Verdoliva, L.; Riess, C.; Thies, J.; Nießner, M. FaceForensics++: Learning to detect manipulated facial
+images. In Proceedings of the IEEE International Conference on Computer Vision (ICCV), Seoul, Republic of Korea, 27 October–2
+November 2019; pp. 1–11.
+27.
+Jayakumar, K.; Skandhakumar, N. A visually interpretable forensic deepfake detection tool using anchors. In Proceedings of
+the 2022 7th International Conference on Information Technology Research (ICITR), Moratuwa, Sri Lanka, 7–8 December 2022;
+pp. 1–6.
+28.
+Zou, M.; Yu, B.; Zhan, Y.; Lyu, S.; Ma, K. Semantics-oriented multitask learning for DeepFake detection: A joint embedding
+approach. IEEE Trans. Circuits Syst. Video Technol. 2025, 35, 9950–9963. [CrossRef]
+29.
+Cozzolino, D.; Pianese, A.; Nießner, M.; Verdoliva, L. Audio-visual person-of-interest deepfake detection. In Proceedings of the
+IEEE/CVF Conference on Computer Vision and Pattern Recognition, Vancouver, BC, Canada, 18–22 June 2023; pp. 943–952.
+30.
+Pham, M.; Huynh, T.; Nguyen, T.; Nguyen, T.; Nguyen, T.; Jo, J.; Yin, H.; Hung Nguyen, Q. A dual benchmarking study of facial
+forgery and facial forensics. CAAI Trans. Intell. Technol. 2024, 9, 1377–1397. [CrossRef]
+31.
+Le, B.; Kim, J.; Woo, S.; Moore, K.; Abuadbba, A.; Tariq, S. SoK: Systematization and Benchmarking of Deepfake Detectors in a
+Unified Framework. arXiv 2024, arXiv:2401.04364.
+32.
+Shahzad, S.; Hashmi, A.; Peng, Y.; Tsao, Y.; Wang, H. How good is ChatGPT at audiovisual deepfake detection: A comparative
+study of ChatGPT, AI models and human perception. arXiv 2024, arXiv:2411.09266. [CrossRef]
+33.
+Rana, M.; Sung, A. Deepfake detection: A tutorial. In Proceedings of the 9th ACM International Workshop on Security and
+Privacy Analytics, Charlotte, NC, USA, 26 April 2023; pp. 55–56.
+34.
+Cao, X.; Gong, N. Understanding the security of deepfake detection. In Proceedings of the International Conference on Digital
+Forensics and Cyber Crime, Singapore, 7–9 December 2021; pp. 360–378.
+35.
+Tolosana, R.; Vera-Rodriguez, R.; Fierrez, J.; Morales, A.; Ortega-Garcia, J. Deepfakes and beyond: A survey of face manipulation
+and fake detection. Inf. Fusion 2020, 64, 131–148. [CrossRef]
+36.
+Masood, M.; Nawaz, M.; Malik, K.M.; Javed, A.; Irtaza, A.; Malik, H. Deepfakes generation and detection: State-of-the-art, open
+challenges, countermeasures, and way forward. Appl. Intell. 2023, 53, 3974–4026. [CrossRef]
+37.
+Kaur, A.; Noori Hoshyar, A.; Saikrishna, V.; Firmin, S.; Xia, F. Deepfake video detection: Challenges and opportunities. Artif. Intell.
+Rev. 2024, 57, 159. [CrossRef]
+38.
+Coccomini, D.; Caldelli, R.; Falchi, F.; Gennaro, C.; Amato, G. Cross-forgery analysis of vision transformers and cnns for deepfake
+image detection. In Proceedings of the 1st International Workshop on Multimedia AI Against Disinformation, Newark, NJ, USA,
+27–30 June 2022; pp. 52–58.
+39.
+Dong, X.; Bao, J.; Chen, D.; Zhang, T.; Zhang, W.; Yu, N.; Chen, D.; Wen, F.; Guo, B. Protecting celebrities from deepfake with
+identity consistency transformer. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition,
+New Orleans, LA, USA, 18–24 June 2022; pp. 9468–9478.
+40.
+Salvi, D.; Liu, H.; Mandelli, S.; Bestagini, P.; Zhou, W.; Zhang, W.; Tubaro, S. A robust approach to multimodal deepfake detection.
+J. Imaging 2023, 9, 122. [CrossRef]
+41.
+Mathews, S.; Trivedi, S.; House, A.; Povolny, S.; Fralick, C. An explainable deepfake detection framework on a novel unconstrained
+dataset. Complex Intell. Syst. 2023, 9, 4425–4437. [CrossRef]
+42.
+Amin, M.; Hu, Y.; She, H.; Li, J.; Guan, Y.; Amin, M. Exposing deepfake frames through spectral analysis of color channels in
+frequency domain. In Proceedings of the 2023 11th International Workshop on Biometrics and Forensics (IWBF), Barcelona, Spain,
+19–20 April 2023; pp. 1–6.
+43.
+Groh, M.; Epstein, Z.; Firestone, C.; Picard, R. Deepfake detection by human crowds, machines, and machine-informed crowds.
+Proc. Natl. Acad. Sci. USA 2022, 119, e2110013119. [CrossRef]
+44.
+Nguyen, H.H.; Fang, F.; Yamagishi, J.; Echizen, I. Multi-task learning for detecting and segmenting manipulated facial images
+and videos. In Proceedings of the IEEE International Conference on Biometrics Theory, Applications and Systems (BTAS), Tampa,
+FL, USA, 23–26 September 2019; pp. 1–8.
+45.
+Sandotra, N.; Arora, B. A comprehensive evaluation of feature-based AI techniques for deepfake detection. Neural Comput. Appl.
+2024, 36, 3859–3887. [CrossRef]
+46.
+Khalil, S.; Youssef, S.; Saleh, S. A multi-layer capsule-based forensics model for fake detection of digital visual media. In
+Proceedings of the 2020 International Conference on Communications, Signal Processing, and Their Applications (ICCSPA),
+Sharjah, United Arab Emirates, 16–18 March 2021; pp. 1–6.
+47.
+Castillo Camacho, I.; Wang, K. A comprehensive review of deep-learning-based methods for image forensics. J. Imaging 2021, 7, 69.
+[CrossRef]
+48.
+Hosler, B.; Salvi, D.; Murray, A.; Antonacci, F.; Bestagini, P.; Tubaro, S.; Stamm, M. Do deepfakes feel emotions? A semantic
+approach to detecting deepfakes via emotional inconsistencies. In Proceedings of the IEEE/CVF Conference on Computer Vision
+and Pattern Recognition, Nashville, TN, USA, 19–25 June 2021; pp. 1013–1022.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 41 ---
+
+AI 2026, 7, 68
+41 of 42
+49.
+Ritter, P.; Lucian, D.; Chowanda, A. Others Comparative Analysis and Evaluation of CNN Models for Deepfake Detection. In
+Proceedings of the 2023 4th International Conference on Artificial Intelligence and Data Sciences (AiDAS), Ipoh, Malaysia, 6–7
+September 2023; pp. 250–255.
+50.
+Nguyen, H.; Yamagishi, J.; Echizen, I. Exploring self-supervised vision transformers for deepfake detection: A comparative
+analysis. In Proceedings of the 2024 IEEE International Joint Conference on Biometrics (IJCB), Buffalo, NY, USA, 15–18 September
+2024; pp. 1–10.
+51.
+Tran, V.; Kwon, S.; Lee, S.; Le, H.; Kwon, K. Generalization of forgery detection with meta deepfake detection model. IEEE Access
+2022, 11, 535–546. [CrossRef]
+52.
+Chollet, F. Xception: Deep learning with depthwise separable convolutions. In Proceedings of the IEEE Conference on Computer
+Vision and Pattern Recognition, Honolulu, HI, USA, 21–26 July 2017; pp. 1251–1258.
+53.
+Xu, Y.; Raja, K.; Verdoliva, L.; Pedersen, M. Learning pairwise interaction for generalizable deepfake detection. In Proceedings of
+the IEEE/CVF Winter Conference on Applications of Computer Vision, Waikoloa, HI, USA, 3–7 January 2023; pp. 672–682.
+54.
+Thing, V. Deepfake detection with deep learning: Convolutional neural networks versus transformers. In Proceedings of the 2023
+IEEE International Conference on Cyber Security and Resilience (CSR), Venice, Italy, 31 July–2 August 2023; pp. 246–253.
+55.
+Kamat, S.; Agarwal, S.; Darrell, T.; Rohrbach, A. Revisiting generalizability in deepfake detection: Improving metrics and
+stabilizing transfer. In Proceedings of the IEEE/CVF International Conference on Computer Vision, Paris, France, 4–6 October
+2023; pp. 426–435.
+56.
+¸Stefan, L.; Stanciu, D.; Dogariu, M.; Constantin, M.; Jitaru, A.; Ionescu, B. Deepfake Sentry: Harnessing Ensemble Intelligence for
+Resilient Detection and Generalisation. arXiv 2024, arXiv:2404.00114. [CrossRef]
+57.
+Korshunov, P.; Marcel, S. Deepfakes: A New Threat to Face Recognition? Assessment and Detection. arXiv 2018, arXiv:1812.08685.
+[CrossRef]
+58.
+Méreur, A.; Mallet, A.; Cogranne, R.; Kuribayashi, M. Forensics Analysis of Residual Noise Texture in Digital Images for Detection
+of Deepfake. In Proceedings of the 2025 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP),
+Hyderabad, India, 6–11 April 2025; pp. 1–5.
+59.
+Almutairi, Z.; Elgibreen, H. A Review of Modern Audio Deepfake Detection Methods: Challenges and Future Directions.
+Algorithms 2022, 15, 155. [CrossRef]
+60.
+Setyaningrum, A.; Saputro, A. Deepfake Video Classification Using Random Forest and Stochastic Gradient Descent with Triplet
+Loss Approach Algorithm. In Proceedings of the 2024 12th International Conference on Cyber And IT Service Management
+(CITSM), Batam, Indonesia, 3–4 October 2024; pp. 1–6.
+61.
+Giatsoglou, N.; Papadopoulos, S.; Kompatsiaris, I. Investigation of Ensemble Methods for the Detection of Deepfake Face
+Manipulations. arXiv 2023, arXiv:2304.07395. [CrossRef]
+62.
+Mohan, C.; Prabhakar, P.; Karthik, N.; Kumar, P.; Rithwik, K.; Prabhas, M. Enhanced Deepfake Detection on Social Media:
+Applying CountVectorizer and Random Forest for Optimal Tweet Classification. Int. J. Res. Eng. IT Soc. Sci. 2024, 14, 124–132.
+63.
+Gujjar, M.; Munir, K.; Amjad, M.; Rehman, A.; Bermak, A. Unmasking the Fake: Machine Learning Approach for Deepfake Voice
+Detection. IEEE Access 2024, 12, 197442–197453. [CrossRef]
+64.
+Alzurfi, N.; Altaei, M. A Hybrid Model of Deep Learning and Machine Learning Methods to Detect Deepfake Videos. Iraqi J. Sci.
+2025, 66, 736–750. [CrossRef]
+65.
+Vashistha, M.; Jain, S.; Pandey, S.; Pradhan, A.; Tarwani, S. A Comparative Analysis of Machine Learning and Deep Learning
+Approaches in Deepfake Detection. In Proceedings of the 2024 IEEE Region 10 Symposium (TENSYMP), New Delhi, India, 27–29
+September 2024; pp. 1–8.
+66.
+Atas, S.; Karakose, M. A New Approach to in Ensemble Method for Deepfake Detection. In Proceedings of the 2023 4th
+International Conference on Data Analytics for Business And Industry (ICDABI), Virtual, 25–26 October 2023; pp. 201–204.
+67.
+Yang, M.; Qi, B.; Ma, R.; Xian, Y.; Ma, B. HashShield: A Robust DeepFake Forensic Framework with Separable Perceptual Hashing.
+IEEE Signal Process. Lett. 2025, 32, 1186–1190. [CrossRef]
+68.
+Guarnera, L.; Giudice, O.; Battiato, S. Deepfake detection by analyzing convolutional traces. In Proceedings of the IEEE/CVF
+Conference on Computer Vision and Pattern Recognition Workshops, Seattle, WA, USA, 14–19 June 2020; pp. 666–667.
+69.
+Li, G.; Zhao, X.; Cao, Y.; Pei, P.; Li, J.; Zhang, Z. FMFCC-V: An Asian large-scale challenging dataset for deepfake detection. In
+Proceedings of the 2022 ACM Workshop on Information Hiding and Multimedia Security, San Jose, CA, USA, 27–28 June 2022;
+pp. 7–18.
+70.
+Convertini, V.; Impedovo, D.; Lopez, U.; Pirlo, G.; Sterlicchio, G. Discrete Fourier Transform in Unmasking Deepfake Images: A
+Comparative Study of StyleGAN Creations. Information 2024, 15, 711. [CrossRef]
+71.
+Ni, Y.; Zeng, W.; Xia, P.; Tan, R. A Deepfake Detection Algorithm Based on Fourier Transform of Biological Signal. Comput. Mater.
+Contin. 2024, 79, 5295. [CrossRef]
+72.
+Biswas, A.; Bhattacharya, D.; Kumar, K. Others Deepfake detection using 3d-xception net with discrete fourier transformation.
+J. Inf. Syst. Telecommun. (JIST) 2021, 3, 161.
+https://doi.org/10.3390/ai7020068
+
+
+--- PAGE 42 ---
+
+AI 2026, 7, 68
+42 of 42
+73.
+Zhang, Y.; Yu, Z.; Wang, T.; Huang, X.; Shen, L.; Gao, Z.; Ren, J. Genface: A large-scale fine-grained face forgery benchmark and
+cross appearance-edge learning. IEEE Trans. Inf. Forensics Secur. 2024, 19, 8559–8572.
+74.
+Wolter, M.; Blanke, F.; Heese, R.; Garcke, J. Wavelet-packets for deepfake image analysis and detection. Mach. Learn. 2022,
+111, 4295–4327. [CrossRef]
+75.
+Younus, M.; Hasan, T. Effective and fast deepfake detection method based on haar wavelet transform. In Proceedings of the 2020
+International Conference on Computer Science and Software Engineering (CSASE), Duhok, Iraq, 16–18 April 2020; pp. 186–190.
+76.
+Uddin, M.; Fu, Z.; Zhang, X. Deepfake face detection via multi-level discrete wavelet transform and vision transformer. Vis.
+Comput. 2025, 41, 7049–7061. [CrossRef]
+77.
+Khan, M.; Mir, H.; Al Shargie, F.; Tariq, U.; Dhall, A.; Naeem, S.; Khan, M.; Al Nashash, H. Discrimination of Real and Deep Fake
+Videos using EEG Signals. In Proceedings of the 2024 46th Annual International Conference of the IEEE Engineering in Medicine
+and Biology Society (EMBC), Orlando, FL, USA, 15–19 July 2024; pp. 1–4.
+78.
+Li, L.; Dong, F.; Zhang, S. Manifold regularized deep canonical variate analysis with interpretable attribute guidance for
+three-phase flow process monitoring. Expert Syst. Appl. 2024, 251, 124015. [CrossRef]
+79.
+Miao, C.; Tan, Z.; Chu, Q.; Liu, H.; Hu, H.; Yu, N. F 2 trans: High-frequency fine-grained transformer for face forgery detection.
+IEEE Trans. Inf. Forensics Secur. 2023, 18, 1039–1051. [CrossRef]
+Disclaimer/Publisher’s Note: The statements, opinions and data contained in all publications are solely those of the individual
+author(s) and contributor(s) and not of MDPI and/or the editor(s). MDPI and/or the editor(s) disclaim responsibility for any injury to
+people or property resulting from any ideas, methods, instructions or products referred to in the content.
+https://doi.org/10.3390/ai7020068

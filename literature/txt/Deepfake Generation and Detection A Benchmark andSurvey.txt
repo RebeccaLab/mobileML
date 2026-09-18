@@ -1,0 +1,3806 @@
+
+
+--- PAGE 1 ---
+
+Deepfake Generation and Detection: A Benchmark and
+Survey
+GAN PEI, School of Communication and Electronic Engineering, East China Normal University, Shanghai,
+China
+JIANGNING ZHANG, Zhejiang University, Hangzhou, China
+MENGHAN HU, School of Communication And Electronic Engineering, East China Normal University,
+Shanghai, China
+ZHENYU ZHANG, Nanjing University, suzhou, China
+CHENGJIE WANG, Youtu Lab, Tencent, Shanghai, China
+YUNSHENG WU, Youtu Lab, Tencent, Shanghai, China
+GUANGTAO ZHAI, Shanghai Jiao Tong University, Shanghai, China
+JIAN YANG, Nanjing University, suzhou, China
+DACHENG TAO, Generative AI Lab, College of Computing and Data Science, Nanyang Technological
+University, Singapore, Singapore
+Deepfake technology aims to synthesize highly realistic facial images and videos, with broad application
+potential in entertainment, film production, and digital human modeling. Deep learning has driven major
+progress in generative modeling, from VAEs and GANs to the recent rise of diffusion models. The latter
+have sparked a renewed wave of research through their superior generation quality. In addition to deepfake
+generation, corresponding detection technologies continuously evolve to regulate the potential misuse of
+deepfakes, such as privacy invasion and phishing attacks. This survey comprehensively reviews the latest
+developments in deepfake generation and detection, summarizing and analyzing current state-of-the-arts in
+this rapidly evolving field. First, we unify task definitions, comprehensively introduce datasets and metrics,
+and summarize the underlying technologies. Then, we review the development of several related sub-fields and
+examine four representative deepfake research fields: face swapping, face reenactment, talking-face generation,
+and facial attribute editing, as well as forgery detection. Subsequently, we benchmark representative methods
+on widely adopted datasets to provide a comprehensive and up-to-date evaluation of the most influential
+Gan Pei and Jiangning Zhan contributed equally to this research.
+This work is supported by the National Natural Science Foundation of China under Grant 62371189; the Open Research
+Fund of Key Laboratory of Advanced Theory and Application in Statistics and Data Science-MOE, ECNU; the STCSM under
+Grant 22DZ2229005. Dr Tao’s research is partially supported by NTU RSR and Start Up Grants.
+Authors’ Contact Information: Gan Pei, School of Communication and Electronic Engineering, East China Normal University,
+Shanghai, China; e-mail: 52295904023@stu.ecnu.edu.cn; Jiangning Zhang, Zhejiang University, Hangzhou, Zhejiang, China;
+e-mail: 186368@zju.edu.cn; Menghan Hu (corresponding author), School of Communication And Electronic Engineering,
+East China Normal University, Shanghai, China; e-mail: mhhu@ce.ecnu.edu.cn; Zhenyu Zhang, Nanjing University, suzhou,
+Jiangsu, China; e-mail: zhenyuzhang@nju.edu.cn; Chengjie Wang, Youtu Lab, Tencent, Shanghai, China; e-mail: jason-
+cjwang@tencent.com; Yunsheng Wu, Youtu Lab, Tencent, Shanghai, China; e-mail: simonwu@tencent.com; Guangtao Zhai,
+Shanghai Jiao Tong University, Shanghai, China; e-mail: zhaiguangtao@sjtu.edu.cn; Jian Yang, Nanjing University, suzhou,
+China; e-mail: csjianyang@gmail.com; Dacheng Tao, Generative AI Lab, College of Computing and Data Science, Nanyang
+Technological University, Singapore, Singapore, Singapore; e-mail: dacheng.tao@gmail.com.
+This work is licensed under a Creative Commons Attribution 4.0 International License.
+© 2026 Copyright held by the owner/author(s).
+ACM 0360-0300/2026/04-ART273
+https://doi.org/10.1145/3801962
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 2 ---
+
+273:2
+G. Pei et al.
+published works. Finally, we discuss the key challenges and outline future research directions for the field. We
+closely follow the latest developments in this project.
+CCS Concepts: • General and reference →Surveys and overviews; • Computing methodologies →
+Computer vision; • Security and privacy →Human and societal aspects of security and privacy;
+Additional Key Words and Phrases: Deepfake generation, face swapping, face reenactment, talking face
+generation, facial attribute editing, forgery detection, survey.
+ACM Reference Format:
+Gan Pei, Jiangning Zhang, Menghan Hu, Zhenyu Zhang, Chengjie Wang, Yunsheng Wu, Guangtao Zhai, Jian
+Yang, and Dacheng Tao. 2026. Deepfake Generation and Detection: A Benchmark and Survey. ACM Comput.
+Surv. 58, 11, Article 273 (April 2026), 41 pages. https://doi.org/10.1145/3801962
+1
+Introduction
+Artificial Intelligence Generated Content (AIGC) garners considerable attention [1] in academia
+and industry. Deepfake generation, as one of the important technologies in the generative domain,
+gains significant attention due to its ability to create highly realistic facial media content. This tech-
+nique transitions from traditional graphics-based methods to deep learning-based approaches. Early
+methods employ advanced Variational Autoencoder [2–4] (VAE) and Generative Adversarial
+Network (GAN) [5, 6] techniques, enabling seemingly realistic image generation, but their perfor-
+mance is still unsatisfactory, which limits practical applications. Recently, the diffusion structure
+[7–9] has greatly enhanced the generation capability of images and videos. Benefiting from this new
+wave of research, deepfake technology demonstrates potential value for practical applications and
+can generate content indistinguishable from real ones, which has further attracted attention and
+is widely applied in numerous fields [10], including entertainment, movie production, and so on.
+Deepfake generation can generally be divided into four mainstream research fields: (1) Face
+swapping [11–13] is dedicated to executing identity exchanges between two person images; (2)
+Face reenactment [14, 15] emphasizes transferring source movements and poses; (3) Talking face
+generation [16, 17] focuses on achieving natural matching of mouth movements to textual content
+in character generation, and (4) Facial attribute editing [18–20] aims to modify specific facial
+attributes of the target image. The development of related foundational technologies has gradually
+shifted from single forward GAN models [5, 21] to multi-step diffusion models [7, 22, 23] with
+higher quality generation capabilities, and the generated content has also gradually transitioned
+from single-frame images to temporal video modeling [8]. In addition, NeRF [24, 25] has been
+frequently incorporated into modeling to improve multi-view consistency capabilities [26, 27].
+While enjoying the novelty and convenience of this technology, its unethical use has raised
+serious societal and ethical concerns. In practice, deepfake content has been used to generate non-
+consensual explicit videos targeting individuals. Moreover, there have been instances where videos
+of deceased public figures were synthetically recreated and disseminated without the consent of their
+families, causing emotional distress and raising serious moral and legal questions. These incidents
+illustrate substantial risks of privacy invasion, identity impersonation, and large-scale dissemination
+of misleading or harmful content. Consequently, there is an urgent need for effective forgery
+detection systems to mitigate malicious misuse and safeguard information security [28, 29]. From
+the earliest handcrafted feature-based methods [30, 31] to deep learning-based methods [32, 33],
+and the recent hybrid detection techniques [34], forgery detection has undergone substantial
+technological advancements along with the development of generative technologies. The data
+modality has also transitioned from the spatial and frequent domains [35, 36] to the more challenging
+temporal domain [37, 38]. Considering that current generative technologies have a higher level of
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 3 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:3
+interest, develop faster, and can generate indistinguishable content from reality [39], corresponding
+detection technologies need continuous evolution.
+Overall, despite notable progress in both directions, existing methods still face limitations in
+visual authenticity and generative accuracy under challenging scenarios [40]. These issues continue
+to draw research attention and raise questions about their practical deployment. However, prior
+surveys cover only parts of the deepfake landscape and overlook emerging technologies [1, 39, 41],
+particularly diffusion-based image and video generation. This survey provides a comprehensive
+overview of these areas and related sub-fields while also tracking the latest developments.
+— Contribution. In this survey, we comprehensively explore the key technologies and latest
+advancements in Deepfakes generation and forgery detection. We first unify the task defini-
+tions (Section 2.1), provide a comprehensive comparison of datasets and metrics (Section 2.3),
+and discuss the development of related technologies. Then, we investigate four mainstream
+deepfake fields, as well as forgery detection (Section 3). We also analyze the benchmarks and
+settings for each domain, thoroughly evaluating the latest and influential works published
+in top-tier conferences/journals (Section 4), especially recent diffusion-based approaches.
+Additionally, we discuss closely related fields, including head swapping, face super-resolution,
+face reconstruction, face inpainting, body animation, portrait style transfer, makeup transfer,
+and adversarial sample detection.
+— Scope. This survey primarily focuses on four mainstream face-related tasks and forgery
+detection. We also cover some related domain tasks in Section 2.4 and detail specific popular
+sub-tasks in Section 3.3. Considering the large number of articles (including published and
+preprints), we mainly include representative and attention-grabbing works. In addition,
+we compare this investigation with recent surveys. Sha et al. [1] only discuss character
+generation while we cover a more comprehensive range of tasks. Compared to works [39,
+41, 42], our study encompasses a broader range of technical models, particularly the more
+powerful diffusion-based methods. Additionally, we thoroughly discuss the related sub-fields
+of deepfake generation and detection.
+— Survey Methods. To conduct an effective literature review, we systematically searched
+major academic databases, including IEEE Xplore, ACM Digital Library, Springer, and
+ScienceDirect, and screened technical articles that met our inclusion criteria. Specifically, we
+focused on studies published between 2020 and 2025, while grouping research published prior
+to 2020 into a separate category. For each research topic, we combined relevant technical
+keywords and application-oriented keywords to perform targeted searches. The technical
+keywords included GANs, GAN variants, diffusion models, autoencoders, and Neural
+Radiance Fields (NeRF), among others. The application keywords included deepfake
+generation, deepfake detection, face swapping, face replacement, face reenactment, talking
+face, talking head, and forgery detection. The retrieved results were manually deduplicated
+and categorized according to application domains. Representative works for each research
+topic were selected based on publication venue quality, citation count, and technical novelty.
+— Survey Pipeline. Figure 1 illustrates the overall structure of this survey. Section 2 introduces
+the essential background, including task definitions, datasets, evaluation metrics, and related
+research areas. It also outlines key applications of deepfake technologies and discusses
+their ethical implications. Section 3 presents a technical review of the four major deepfake
+tasks, organized from the perspective of methodological categorization and technological
+evolution. Section 4 summarizes and compares the performance of representative methods
+on widely used benchmarks to provide a fair and comprehensive evaluation. Section 5
+critically examines remaining challenges and highlights potential directions for future
+research. Finally, Section 6 provides a concise summary of the survey.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 4 ---
+
+273:4
+G. Pei et al.
+§1 Introduction
+§2 Background
+§3 Deepfake Inspections
+§2.1 Problem Definition
+§2.2 Technological History and Roadmap
+§2.3 Datasets, Metrics, and Losses
+§2.4 Related Research Domains
+§2.5 Applications of Deepfake Detection
+§2.6 Ethical and Societal Considerations
+§3.1.1 Face Swapping
+Traditional Graphics
+GAN-based
+Diffusion-based
+Alternative Techniques
+§3.3
+Specific Related Domains
+Face Super-resolution
+Portrait Style Transfer
+Body Animation
+Makeup Transfer 
+§3.1.2 Face Reenactment
+3DMM-based
+Landmark Matching
+Feature Decoupling
+Self-supervised Learning
+§3.1.3 Talking Face Generation
+Audio/Text Driven
+Multimodal Conditioned
+Diffusion-based
+3D-model Technologies
+§3.1.4 Facial Attribute Editing
+Comprehensive Editing
+Irrelevant-attribute Retained
+Diffusion-based
+Text Driven
+§3.2
+Forgery Detection
+Space Domain
+Time Domain
+Frequency Domain
+Data Driven
+§4 Benchmark
+§4.1 Metrics
+§4.2 Benchmark Protocol
+§4.3 Main Results on Deepfake Generation
+§4.4 Main Results on Forgery Detection
+§5 Prospects
+§6 Conclusion
+Face Swapping
+Face Reenactment
+Talking Face Generation
+Facial Attribute Editing
+Forgery Detection
+Discussion
+Fig. 1. Time diagram that reflects the survey pipeline. Zoom in for a better holistic perception of this work.
+We have now reached the 
+tipping point of generative AI
+𝐼!
+𝐶
+Face Swapping
+Face Reenactment
+Talking Face Generation
+Age Editing
+Gender Change
+Mouth Editing …
+Facial Attribute Editing
+Forgery Detection
+∅#
+Real
+or
+Fake
+∅$
+𝐼%
+§3.1.1
+§3.1.2
+§3.1.3
+§3.1.4
+§3.2
+Identity Preservation
+Head Pose / Movement
+Temporal Continuity
+Multiple Attribute Editing
+𝑆%
+Fig. 2. Top: Illustration of different deepfake generation and detection tasks that are discussed in this survey.
+Bottom: Specific facial attribute modification of each task. Data from NVIDIA Keynote at COMPUTEX 2023.
+2
+Background
+In this section, we first introduce the conceptual definitions of the discussed mainstream fields.
+Figure 2 illustrates the intuitive objectives for each task and shows the distinctions among tasks in
+terms of manipulated facial components. Then, we review the developmental history of commonly
+used neural networks, highlighting several representative ones. Next, we summarize popular
+datasets, metrics, and loss functions. Subsequently, we comprehensively discuss several relevant
+domains. Finally, we introduce some application and discussion about there ethical considerations.
+2.1
+Problem Definition
+— Unified Formulation of Studied Problems. Figure 2 intuitively displays the various
+deepfakes generation and detection tasks studied in this article. For the former, different
+tasks can essentially be expressed as controlled content generation problems under specific
+conditions, such as images, audio, text, specific attributes, and so on. Given the target image
+𝐼𝑡to be manipulated and the condition information 𝐶= {Image, Audio, Text, … }, the content
+generation process can be represented as
+𝐼𝑜= 𝝓𝐆(𝐼𝑡, 𝐶),
+(1)
+where 𝜙𝐺abstracts the specific generation network and 𝐼𝑜= {𝐼0𝑡, 𝐼1𝑡, … , 𝐼𝑁−1
+𝑡
+} represents
+generated contents. 𝑁is the total frame number for the generated video, which is set to 1 by
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 5 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:5
+default). The latter task can be viewed as an image-level or pixel-level classification problem
+as practical application needs, which can be represented as
+𝑆𝑜= 𝝓𝐃(𝐼𝑜),
+(2)
+where 𝜙𝐷abstracts the detection network and 𝑆𝑜represents the fake score for generated
+content 𝐼𝑜.
+— Face Swapping. This task replaces the identity of the target face 𝐼𝑡with that of the source
+face 𝐼𝑠, while maintaining target-specific, ID-irrelevant attributes such as skin tone and
+expressions.
+— Face Reenactment. This task transfers the facial movements from a driving image or video
+to a target image 𝐼𝑡, while keeping the target’s identity and attributes unchanged. It commonly
+relies on facial motion capture techniques, including tracking or deep-learning-based motion
+prediction.
+— Talking Face Generation. This task generates a talking video 𝐼𝑜for the character in a target
+image 𝐼𝑡, driven by text, audio, video, or multimodal inputs. The output should accurately
+reflect the driving information, including lip motion, facial pose, emotions, and spoken
+content.
+— Facial Attribute Editing. This task modifies semantic attributes of a target face 𝐼𝑡(e.g.,
+age, expression, or skin tone) in a controlled way according to user intent. Methods fall
+into single-attribute and multi-attribute editing, with the latter being the main focus of this
+survey.
+— Forgery Detection. This task detects and localizes tampering or forged regions in images or
+videos using an anomaly score 𝑆𝑜. It is important for information security and multimedia
+forensics.
+2.2
+Technological History and Roadmap
+— Generative Framework. VAEs [2–4], GANs [5, 6, 21], and Diffusion [22, 23, 43] have played
+pivotal roles in the developmental history of generative models.
+(1) VAE [2] emerged in 2013, altering the relationship between latent features and linear
+mappings in autoencoder latent spaces. It introduces feature distributions like the Gaussian
+distribution and achieves the generation of new entities through interpolation. To enhance
+generation capabilities under specific conditions, CVAE [3] introduces conditional input.
+VQ-VAE [4] introduces the concept of vector quantization to improve the learning of latent
+representations.
+(2) GANs [21] generate realistic data through an adversarial process between two networks: a
+generator and a discriminator. This relationship can be likened to a boxing match in which
+the generator acts as the challenger, attempting to produce increasingly convincing fake
+samples, while the discriminator serves as the defending champion, distinguishing real
+from generated content. As the two opponents improve through continual competition,
+the quality of generated outputs steadily increases. Built upon this adversarial paradigm,
+GAN-based methods have rapidly expanded and remain central to many deepfake tasks.
+Extensions can be viewed as introducing new strategies to this “match.” CGAN [44]
+conditions both networks on auxiliary information, making the competition more guided.
+Pix2Pix [45] specializes in the framework for image-to-image translation, akin to training
+the challenger for specific techniques. StyleGAN [5] introduces style-based controls for
+fine-grained feature manipulation, and StyleGAN2 [6] further stabilizes training to enhance
+quality and controllability. Hybrid models such as CVAE-GAN [46] enrich the generator’s
+latent modeling by integrating VAE-based representations with adversarial learning.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 6 ---
+
+273:6
+G. Pei et al.
+2019-2023
+After 2023
+Before 2019
+Pix2Pix
+(ICCV’17)
+GAN
+(arxiv’14)
+CVAE
+(NIPS’15)
+VAE
+(Stat’14)
+Diffusion
+(ICML’15)
+CGAN
+(ICCV’17)
+CVAE-GAN
+(ICCV’17)
+VQ-VAE
+(NIPS’17)
+RealForensics 
+(CVPR’22)
+M2TR
+(ICMR’22)
+RECCE
+(CVPR’22)
+SBIs
+(CVPR’22)
+MRL
+(T INF FOREN 
+SEC’23
+NoiseDF
+(AAAI’23)
+Guo et al.
+(T INF FOREN 
+SEC’23)
+Guo et al.
+(ICCV’23)
+AVoiD-DF
+(T INF FOREN 
+SEC’23
+Feng et al.
+(CVPR’23)
+Lgrad
+(CVPR’23)
+HiFi-Net
+(CVPR’23)
+DDIM
+(ICML’20)
+StyleGAN3
+(NIPS’21)
+StyleGAN
+(CVPR’19)
+VQ-VAE2
+(NIPS’19)
+LDM
+(CVPR’22)
+DDPM
+(NIPS’20)
+StyleGAN2
+(CVPR’22)
+CycleGAN
+(CVPR’19)
+Animatediff 
+(arXiv’23)
+SVD
+(arXiv’23)
+Collaborative-Diff
+(CVPR’23)
+LDGM
+(CVPR’23)
+AVoiD-DF
+(T INF FOREN 
+SEC’23
+Feng et al.
+(CVPR’23)
+Lgrad
+(CVPR’23)
+HiFi-Net
+(CVPR’23)
+Cat4d
+(CVPR’25)
+SinDiffusion
+(TPAMI’25)
+EMDM
+(ECCV’24)
+Lumiere
+(SIGGRAPH’24)
+Fig. 3. Development timeline of three mainstream
+generative modals, i.e., VAE, GAN, and Diffusion.
+0
+20
+40
+60
+80
+100
+120
+140
+160
+Before 2020
+2020
+2021
+2022
+2023
+2024
+2025
+Face Swap
+Face Reenactment
+Talking Face Generation
+Face Attribute Editing
+Forgery Detection
+Fig. 4. Works summarization on different directions
+per year. Data is obtained on 2025/11/20.
+(3) Diffusion models [43] treat data generation as a gradual denoising process. Starting from
+near-random noise, the model learns to reverse the corruption step by step, eventually
+recovering a clean and realistic image. DDPM [22] popularizes this paradigm by achieving
+outstanding generative performance, particularly on large-scale and high-resolution
+images. LDM [23] improves efficiency and flexibility by performing the denoising process
+in a compact latent space, similar to restoring the compressed negative of an image rather
+than the full-resolution photograph. SVD [7] fine-tunes a base text-to-video model for
+image-to-video conversion, akin to extending a single frame into a coherent sequence.
+AnimateDiff [8] attaches a motion modeling module to a frozen text-to-image backbone
+and trains it on short video clips.
+— Discriminative Neural Network. Convolutional Neural Networks (CNNs) [47–52]
+have played a pivotal role in the history of deep learning. LeNet [47], as the pioneer of
+CNNs, showcased the charm of machine learning. AlexNet [48] and ResNet [49] made deep
+learning feasible. Recently, ConvNeXt [50] has achieved excellent results, surpassing those
+of Swin-Transformer [53]. The Transformer architecture was initially proposed [54] in 2017.
+The core idea involves using self-attention mechanisms to capture dependencies between
+different positions in the input sequence, enabling global modeling of sequences. ViT [55]
+demonstrates that using Transformer in the field of computer vision can still achieve excellent
+performance. In addition, Swin-Transformer [53] addresses the limitations of Transformer in
+handling high-resolution image processing tasks. Swin-Transformer V2 [56] further improves
+the model’s efficiency and the resolution of manageable inputs.
+— NeRF. NeRF, introduced in 2020 [24], leverages volume rendering and implicit neural fields
+to represent and reconstruct the geometry and illumination of 3D scenes [25]. Compared to
+traditional 3D methods, it exhibits higher visual quality and is currently widely applied in tasks
+such as 3D geometry enhancement [57, 58], segmentation [59], and 6D pose estimation [60].
+In addition, some notable works [61, 62] combining NeRF as a supplement to 3D information
+and generation models are particularly prominent at present.
+— Work Summary. The evolution of mainstream generative models is depicted chronologically
+in Figure 3. This survey delves into four categories of generation tasks along with the forgery
+detection task, and the publication years distribution of the surveyed articles is shown in
+Figure 4.
+2.3
+Datasets, Metrics, and Losses
+— Dataset. Given the various datasets in surveyed fields, we use numerical labels to save post-
+textual space. (1) Commonly used deepfake generation datasets include LFW [63], CelebA
+[64], CelebA-HQ [65], VGGFace [66], VGGFace2 [67], FFHQ [5], Multi-PIE [68], VoxCeleb1
+[69], VoxCeleb2 [70], MEAD [71], MM CelebA-HQ [72], CelebAText-HQ [73], CelebV-HQ
+[74], TalkingHead-1KH [75], LRS2 [76], LRS3 [77], and so on. (2) Commonly used forgery
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 7 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:7
+detection datasets include UADFV [78], DeepfakeTIMIT [79], FF++ [80], Deeperforensics-1.0
+[81], DFDCP [82], DFDC [83], Celeb-DF [84], Celeb-DFv2 [84], FakeAVCeleb [85], DFD [86],
+WildDeepfake [87], KoDF [88], UADFV [89], Deephy [90], DF-Platter [91], and so on. We
+summarize popular datasets in Table 1.
+— Metric. (1) For deepfake generation tasks, commonly used metrics include: Peak Signal-
+to-Noise Ratio (PSNR) [92], Structured Similarity (SSIM) [93], Learned Perceptual
+Image Patch Similarity (LPIPS) [94], Fréchet Inception Distance (FID) [95], Ker-
+nel Inception Distance (KID) [96], Cosine Similarity (CSIM) [75], Identity Retrieval
+Rate (ID Ret) [97], Expression Error [98], Pose Error [99], Landmark Distance (LMD)
+around the mouths [100], Lip-sync Confidence (LSE-C) [101], Lip-sync Distance (LSE-
+D) [101], and so on. (2) For forgery generation commonly uses: Area Under the ROC
+Curve (AUC) [102], Accuracy (ACC) [103], Equal Error Rate (EER) [104], Average
+Precision (AP) [105], F1-Score [106], and so on. Detailed definitions are explained in
+Section 4.1.
+— Loss Function. VAE-based approaches generally employ reconstruction loss and KL diver-
+gence loss [2]. Commonly used reconstruction loss functions include Mean Squared Error,
+Cross-Entropy, LPIPS [94], and perceptual [107] losses. GAN-based methods further introduce
+adversarial loss [21] to increase image authenticity, while diffusion-based works introduce a
+denoising loss function [22].
+2.4
+Related Research Domains
+— Head Swapping. This task replaces the entire head region of a target image, including facial
+contours and hairstyle, with that of a source image [108]. Despite the larger replacement
+area, only identity-related attributes are transferred, while other facial attributes remain un-
+changed. Recently, diffusion-based methods [109] have emerged and demonstrated promising
+performance.
+— Face Super-resolution. This task enhances low-resolution images to produce high-resolution
+outputs [110, 111]. It is closely related to many deepfake sub-tasks. Early methods in
+Face Swapping [112, 113] and Talking Face Generation [114, 115] often suffered from low-
+resolution outputs in synthesized images and videos. This limitation has been alleviated by
+integrating face super-resolution modules into generative pipelines [16, 116], significantly
+improving visual quality. Technically, face super-resolution approaches can be categorized
+into CNNs [117–119], GANs [120, 121], reinforcement learning [122], and ensemble learning
+[123].
+— Face Reconstruction. This task refers to reconstructing the three-dimensional facial struc-
+ture of an individual from one or multiple 2D images [124, 125]. Facial reconstruction often
+serves as an intermediate step in various deepfake sub-tasks. In Face Swapping and Face
+Reenactment, 3DMM are widely used to recover facial parameters, enabling controllable
+identity or expression manipulation. Reconstructing a 3D facial model also helps mitigate
+artifacts that occur in synthesized videos under large pose variations. Technical approaches
+to face reconstruction include 3DMM [126, 127], epipolar-geometry [128], one-shot learning
+[129, 130], shadow shape reconstruction [131, 132], and hybrid learning-based reconstruction
+[133, 134].
+— Face Inpainting. This task aims to reconstruct missing regions in face images caused by
+external factors such as occlusion and lighting while preserving facial texture information
+is crucial in this process [135]. This task is a crucial sub-task of image inpainting, and the
+current methods are mostly based on deep learning that can be roughly divided into two
+categories: GAN-based [136, 137] and Diffusion-based [138, 139].
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 8 ---
+
+273:8
+G. Pei et al.
+Table 1. Overview of Commonly Used Datasets
+Dataset
+Type
+Scale
+Highlight
+Deepfake Generation
+LFW [63]
+Image
+10K
+Facial images captured under various lighting conditions, poses,
+expressions, and occlusions at 250×250 resolution.
+CelebA [64]
+Image
+200K
+The dataset includes over 200K facial images from more than 10K
+individuals, each with 40 attribute labels.
+VGGFace [66]
+Image
+2,600K
+A super-large-scale facial dataset involving a staggering 26K
+participants, encompassing a total of 2600K facial images.
+VoxCeleb1 [69]
+Video
+100K voices A large scale audio-visual dataset of human speech, the audio
+includes noisy background interference.
+CelebA-HQ [65]
+Image
+30K
+A high-resolution facial dataset consisting of 30K face images,
+each with a resolution of 1024×1024 resolution.
+VGGFace2 [67]
+Image
+3000K
+A large-scale facial dataset, expanded with greater diversity in
+terms of ethnicity and pose compared to VGGFace.
+VoxCeleb2 [70]
+Video
+2K hours
+A dataset that is five times larger in scale than VoxCeleb1 and
+improves racial diversity.
+FFHQ [5]
+Image
+70K
+The dataset with over 70K high-resolution (1024×1024) facial
+images, showcasing diverse ethnicity, age, and backgrounds.
+MEAD [71]
+Video
+40 hours
+An emotional audiovisual dataset provides facial expression
+information during conversations with various emotional labels.
+CelebV-HQ [74]
+Video
+35K videos The dataset’s video clips have a resolution of more than 512×512
+resolution and are annotated with rich attribute labels.
+Forgery Detection
+DeepfakeTIMIT [79] Audio-Video
+640 videos
+The dataset is evenly divided into two versions: LQ (64×64) and
+HQ (128×128), with all videos using face swapping forgery.
+FF++ [80]
+Video
+6K videos
+Comprising 1K original videos and manipulated videos generated
+using five different forgery methods.
+DFDCP [82]
+Audio-Video
+5K videos
+The preliminary dataset for The Deepfake Detection Challenge
+includes two face-swapping methods.
+DFD [86]
+Video
+3K videos
+The dataset comprises 3K deepfake videos generated using five
+forgery methods.
+Deeperforensics [81]
+Video
+60K videos The videos feature faces with diverse skin tones, and rich
+environmental diversity was considered during the filming
+process.
+DFDC [83]
+Audio-Video 128K videos The official dataset for The Deepfake Detection Challenge and
+contain a substantial amount of interference information.
+Celeb-DF [84]
+Video
+1K videos
+Comprising 408 genuine videos from diverse age groups,
+ethnicities, and genders, along with 795 DeepFake videos.
+Celeb-DFv2 [84]
+Video
+6K videos
+An expanded version of Celeb-DFv1, this dataset not only
+increases in quantity but also the diversity.
+FakeAVCeleb [85]
+Audio-Video 20K videos A novel audio-visual multimodal deepfake detection dataset,
+deepfake videos generated using four forgery methods.
+Orange-marked are selected to evaluate different methods.
+— Body Animation. This task aims to alter the entire bodily pose while unchanging the overall
+body information [140]. The goal is to achieve a modification of the target image’s entire
+body posture using an optional driving image or video, aligning the body of the target image
+with the information from the driving signal. The mainstream implementation path for body
+animation is based on GANs [141, 142] and Diffusion [143–146].
+— Portrait Style Transfer. This task aims to reconstruct the style of a target image to match
+that of a source image by learning the stylistic features of the source image [147, 148]. The
+goal is to preserve the content information of the target image while adapting its style to that
+of the source image [149]. Common applications include image cross-domain style transfer,
+such as transforming real face images into animated face styles [150, 151]. Methods based on
+GANs [152–154] and Diffusion [155, 156] have achieved high-quality performance in this
+task.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 9 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:9
+— Makeup Transfer. This task aims to achieve style transfer learning from a source image
+to a target image [157, 158]. Existing models have achieved initial success in applying and
+removing makeup on target images [158–161], allowing for quantitative control over the
+intensity of makeup. However, they perform poorly in transferring extreme styles [162–164].
+Existing mainstream methods are based on GANs [157, 165].
+— Adversarial Sample Detection. This task focuses on identifying whether the input data is
+an adversarial sample [166]. If recognized as such, the model can refuse to provide services
+for it, such as throwing an error or not producing an output [167]. Current deepfake detection
+models often rely on a single cue from the generation process as the basis for detection,
+making them vulnerable to specific adversarial samples. Furthermore, relatively little work
+has focused on adversarial sample testing in terms of model generalization capability and
+detection evaluation.
+2.5
+Applications of Deepfake Detection
+Deepfake detection is essential for ensuring the integrity and security of digital media as synthetic
+content becomes increasingly realistic. Several major institutions have deployed detection tools in
+practical settings. Youtube incorporates automated deepfake classifiers into its content moderation
+pipeline to identify manipulated media before large-scale dissemination [168]. Financial institutions
+such as the Bank of China [169] employ deepfake-oriented liveness detection to prevent video-
+based impersonation fraud. These real-world deployments highlight the essential role of deepfake
+detection in protecting individuals, financial systems, and public information integrity.
+2.6
+Ethical and Societal Considerations
+The rapid development of deepfake technologies has raised major ethical and societal concerns,
+particularly regarding privacy invasion, identity misuse, and the spread of manipulated content.
+In response, several countries and regions have introduced regulatory frameworks for synthetic
+media. The European Union incorporates transparency requirements into the AI Act [170] and the
+Digital Services Act [171], mandating clear labeling of manipulated content and stricter platform
+obligations. China’s “Provisions on the Administration of Deep Synthesis Internet Information
+Services” establishes comprehensive rules on watermarking, traceability, identity verification, and
+platform accountability [172]. These policies illustrate a global movement toward responsible
+governance of synthetic media, emphasizing transparency and protection against misuse.
+3
+Deepfake Inspections: A Survey
+3.1
+Deepfake Generation
+3.1.1
+Face Swapping. In this section, we review face swapping methods from the perspective of
+basic architecture, which can be mainly divided into four categories and summarized in Table 2.
+— Traditional Graphics. As representative early implementations, traditional graphics meth-
+ods in the implementation path can be divided into two categories: (1) Key information
+matching and fusion. Methods [174, 175, 182] ground in critical information matching and
+fusion are geared towards substituting corresponding regions by aligning key points within
+facial regions of interest (ROIs), such as the mouth, eyes, nose, and mouth, between the
+source and target images. Following this, additional procedures such as boundary blending
+and lighting adjustments are executed to produce the resulting image. Bitouk et al. [174]
+accomplish automated face replacement by constructing a substantial face database to locate
+faces with akin poses and lighting conditions for substitution. Meanwhile, Nirkin et al. [182]
+enhance keypoint matching and segmentation accuracy by incorporating a Fully Convolu-
+tional Network (FCN) into their method. (2) The construction of a 3D prior model for facial
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 10 ---
+
+273:10
+G. Pei et al.
+Table 2. Overview of Representative Face Swapping Methods
+Method
+Venue
+Dataset
+Categorize
+Limitation
+Highlight
+Traditional Graphics
+Blanz et al. [173]
+EG.’04
+
+3DMM
+Manual intervention,
+unnatural output.
+Early face-swapping efforts simplified manual interaction steps.
+Bitouk et al. [174]
+SIG.’08
+
+SI.
+Manual intervention,
+attribute loss.
+A three-phase implementation framework with the help of a pre-constructed
+face database to match faces that are similar to the source face in terms of
+posture and lighting.
+Sunkavalli et al. [175]
+TOG’10
+
+SI.
+Poor generalizability,
+frequent artifacts.
+Early work on face exchange was realized using image processing methods
+such as smooth histogram matching technique.
+Dale et al. [176]
+SIG.’11
+
+3DMM
+Poor generalizability and
+output quality.
+Early work on face exchange, proposing an improved Poisson mixing
+approach to achieve face swapping in video through frame-by-frame face
+replacement.
+Lin et al. [177]
+ICME’12
+[178]
+3DMM
+Poor generalizability,
+frequent artifacts.
+An attempt to construct a personalized 3D head model to solve the artifact
+problem occurring in face swapping in large poses.
+Mosaddegh et al. [179]
+ACCV’14
+[180][181]
+SI.
+Poor generalizability and
+output quality.
+A diverse form of face swapping where facial components can be targeted for
+replacement.
+Nirkin et al. [182]
+FG’18
+[183]
+SI.
+Poor generalization ability
+and resolution.
+Transfer of expressions and poses by building some 3D variable models and
+training facial segmentation networks to maintain target facial occlusion.
+Generative Adversarial Network
+IPGAN [184]
+CVPR’18
+[185]
+G.+V.
+Poor output image quality,
+frequent artifacts.
+Using two encoders to encode facial identity and attribute information
+separately for facial information decoupling and swapping.
+RSGAN [112]
+SIG.’18
+
+G.+V.
+Loss of lighting information.
+Using two independent VAE modules to represent the latent spaces of the
+face and hair regions, respecti-vely, with the replacement of identity
+information in the latent space implemented.
+Sun et al. [113]
+ECCV’18
+[186]
+G.+3DMM Poor ability to preserve face
+feature attributes.
+Implementing in two stages: the first stage involves replacing the identity
+information of the face reg-ion, while the second stage achieves complete
+facial rendering.
+FSGAN [187]
+ICCV’19
+[188]
+G.
+Poor ability to preserve face
+feature attributes.
+Two novel loss functions are introduced to refine the stitching in the face
+fusion phase following the swapping process.
+FaceShifter [189]
+CVPR’20
+
+G.
+Poor ability to preserve face
+feature attributes.
+Face swapping is realized in two stages, the firstly AEI-Net improves the
+output image quality level, and the second HEAR-Net is targeted to focus on
+abnormal regions for image recovery.
+Zhu et al. [190]
+AAAI’20
+
+G.+V.
+Inability to process facial
+contour information.
+First show of the applicability of deepfake to keypoint invariant
+de-identification work.
+SimSwap [191]
+MM’20
+
+G.+V.
+Poor ability to preserve face
+feature attributes.
+ID modules and weak feature matching loss functions are proposed to find a
+balance between identity information replacement and attribute information
+retention.
+MegaFS [192]
+CVPR’21
+
+G.
+Poor ability to preserve face
+feature attributes.
+The first method allows for face swapping on images with a resolution of one
+million pixels.
+HifiFace [193]
+IJCAI’21
+
+G.+3DMM Uses a large number of
+parameters.
+A 3D shape-aware identity extractor is proposed to achieve better retention
+of attribute information such as facial shape.
+FSGANv2 [194]
+TPAMI’22
+ [188]
+G.
+Unable to process posture
+differences effectively.
+An extension of the FSGAN method that combines Poisson optimization with
+perceptual loss enhances the output image facial details.
+FSLSD [116]
+CVPR’22
+
+G.
+Poor ability to preserve face
+feature attributes.
+Potential semantic de-entanglement is realized to obtain facial structural
+attributes and appearance attributes in a hierarchical manner.
+Kim et al. [195]
+CVPR’22
+
+G.
+Unable to process posture
+differences effectively.
+An identity embedder is proposed to enhance the training speed under
+supervision.
+3DSwap [196]
+CVPR’23
+
+G.+3DMM Unable to process posture
+differences effectively.
+A 3d-aware approach to the face-swapping task, de-entangling identity and
+attribute features in latent space to achieve identity replacement and attribute
+feature retention.
+BlendFace [13]
+ICCV’23
+
+G.
+Unable to handle occlusion
+and extreme lighting.
+The identity features obtained from the de-entanglement are fed to the
+generator as an identity loss function, which guides the generator to generate
+an image to fit the source image identity information.
+FlowFace [197]
+AAAI’23
+
+G.+3DMM Altered target image lighting
+details.
+It consists of face reshaping network and face exchange network, which
+better solves the influence of the difference between source and target face
+contours on the face exchange work.
+S2Swap [198]
+MM’23
+
+G.+3D
+Poor ability to preserve face
+feature attributes.
+Achieving high-fidelity face swapping through semantic disentanglement and
+structural enhancement.
+StableSwap [199]
+TMM’24
+
+G.+3D
+Unable to handle extreme
+skin color differences.
+Utilizing a multi-stage identity injection mechanism effectively combines
+facial features from both the source and target to produce high-fidelity face
+swapping.
+Difussion
+DiffSwap [200]
+CVPR’23
+
+D.
+Poor ability to handle facial
+occlusion.
+Reenvisioning face swapping as conditional inpainting to harness the power
+of the diffusion model.
+Liu et al. [9]
+CVPR’24
+
+D.
+Poor ability to preserve face
+feature attributes.
+Conditional diffusion model introduces identity and expression encoders
+components, achieving a balance between identity replacement and attribute
+preservation during the generation process.
+DiffFace [201]
+PR’25
+
+D.
+Facial lighting attributes are
+altered.
+Claims to be the first diffusion model-based face exchange framework.
+Baliah et al. [202]
+WACV’25
+
+D.
+Unable to handle extreme
+pose and expressions.
+Achieve improvements in identity fidelity, pose consistency, and model
+generalization capability.
+PixSwap [203]
+WACV’25
+
+D.
+Unable to handle extreme
+pose and eyes control.
+Achieve accurately reflecting the source identity and generating more
+high-quality images.
+Alternative
+Cui et al. [204]
+CVPR’23
+
+Other
+Altered target image lighting
+details.
+Introducing a multiscale transformer network focusing on high-quality
+semantically aware correspondences between source and target faces.
+TransFS [205]
+FG’23
+
+Other
+Unable to process posture
+differences effectively.
+The identity generator is designed to reconstruct high-resolution images of
+specific identities, and an attention mechanism is utilized to enhance the
+retention of identity information.
+Wang et al. [206]
+TMM’24
+
+Other
+Poor ability to handle facial
+occlusion.
+A Global Residual Attribute-Preserving Encoder (GRAPE) is proposed, and a
+network flow considering the facial landmarks of the target face was
+introduced, achieving high-quality face swapping.
+CanonSwap [207]
+ICCV’25
+
+other
+Poor ability to preserve face
+feature attributes.
+Disentangles motion and appearance for video face swapping, enabling
+precise identity transfer with pre- served temporal dynamics.
+Notations:  Self-build,  CelebA-HQ,  FFHQ,  VGGFace2,  VGGFace,  CelebV,  CelebA,  VoxCeleb2, 
+LFW,  KoDF. Abbreviations: SIGGRAPH (SIG.), EUROGRAPHICS (EG.), GANs (G.), VAEs (V.), Diffusion (D.), Split-up
+and Integration (SI.).
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 11 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:11
+parameterization. Methods [173, 176] based on constructing a 3D prior and introducing a
+facial parameter model often involve building a facial parameter model using 3DMM tech-
+nology based on a pre-collected face database. After matching the facial information of the
+source image with the constructed face model, specific modifications are made to the relevant
+parameters of the facial parameter model to generate a completely new face. Dale et al. [176]
+utilize 3DMM to track facial expressions in two videos, enabling face swapping in videos.
+Some methods [177, 208] explore scenarios involving significant pose differences between
+the source and target images. Lin et al. [177] construct a 3D face model from frontal faces,
+renderable in any pose. Guo et al. [208] utilize plane parameterization and affine transforma-
+tion to establish a one-to-one dense mapping between 2D graphics. Traditional computer
+graphics methods solve basic face-swapping problems, exploring full automation to enhance
+generalization. However, these methods are constrained by the need for similarities in pose
+and lighting between source and target images. They also face challenges like low image
+resolution, modification of target attributes, and poor performance in extreme lighting and
+occlusion scenarios.
+— GAN. GAN-based methods can be classified into seven categories:
+(1) Early GAN-based methods [46, 190, 209, 210] address issues related to the similarity of
+pose and lighting between source and target images. DepthNets [209] combines GANs with
+3DMM to map the source face to any target geometry, not limited to the geometric shape
+of the target template. This allows it to be less affected by differences in pose between the
+source and target faces. However, they face challenges in generalizing the trained model to
+unknown faces.
+(2) Improved Generalizability. To improve the model’s generalization, many efforts [113, 187,
+191] are made to explore solutions. Combining GANs with VAEs, the model [112, 184]
+encodes and processes different facial regions separately. FSGAN [187] integrates face
+reenactment with face swap, designing a facial blending network to mix two faces seam-
+lessly. SimSwap [191] introduces an identity injection module to avoid integrating identity
+information into the decoder. These methods remain limited by low resolution, attribute
+degradation, and poor handling of facial occlusions.
+(3) Resolution Upgrading. Some methods [192, 211, 212] aim to improve the resolution of
+generated faces. MegaFS [192] introduces the first single-lens face swapping method at the
+million-pixel level. The encoder no longer compresses facial information but represents it in
+layers, achieving more detailed preservation. StyleIPSB [212] constrains semantic attribute
+codes within the subspace of StyleGAN, thereby fixing semantic information during face
+swapping to preserve pore-level details.
+(4) Geometric Detail Preservation. To capture and reproduce more facial geometric details,
+some methods [193, 197, 213, 214] introduce 3DMM into GANs, enabling the incorporation
+of 3D priors. HifiFace [193] introduces a novel 3D shape-aware identity extractor, replacing
+traditional face recognition networks to generate identity vectors that include precise
+shape information. FlowFace [197] introduces a two-stage framework based on semantic
+guidance to achieve shape-aware face swapping. FlowFace++ [214] improves upon FlowFace
+by utilizing a pre-trained Mask Autoencoder to convert face images into a fine-grained
+representation space shared between the target and source faces. It further enhances feature
+fusion for both source and target by introducing a cross-attention fusion module. However,
+most of the aforementioned methods often struggle to effectively handle occlusion issues.
+(5) Facial Masking Artifacts. Some methods [187, 189, 215, 216] have partially alleviated the
+artifacts caused by facial occlusion. FSGAN [187] designs a restoration network to estimate
+missing pixels. E4S [215] redefines the face-swapping problem as a mask-exchanging
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 12 ---
+
+273:12
+G. Pei et al.
+problem for specific information. It utilizes a mask-guided injection module to perform face
+swapping in the latent space of StyleGAN. However, overall, the methods above have not
+thoroughly addressed the issue of artifacts in generated images under extreme occlusion
+conditions.
+(6) Tradeoffs between Identity-replacement and Attribute-retention. In addition to the oc-
+clusion issues that need further handling, researchers [13, 217] discover that the balance
+between identity replacement and attribute preservation in generated images seems akin
+to a seesaw. Many methods [195, 198, 218] explore the equilibrium between identity re-
+placement and attribute retention. StyleSwap [218] introduces a novel swapping guidance
+strategy, the ID reversal, to enhance the similarity of facial identity in the output. Shiohara
+et al. [13] propose BlendFace, using an identity encoder that extracts identity features from
+the source image and uses it as identity distance loss, guiding the generator to produce
+facial exchange results.
+(7) Model Light-weighting is also an important topic with profound implications for the
+widespread application of models. FastSwap [219] achieves this by innovating a decoder
+block called Triple Adaptive Normalization (TAN), effectively integrating identity
+information from the source image and pose information from the target image. XimSwap
+[12] modifies the design of convolutional blocks and the identity injection mechanism,
+successfully deploying on STM32H743.
+— Diffusion-based. The latest studies [9, 109, 200, 201] in this area produce promising genera-
+tion results. DiffSwaps [200] redefines the face swapping problem as a conditional inpainting
+task. Liu et al. [9] introduce a multi-modal face generation framework and achieved this by
+introducing components such as balanced identity and expression encoders to the conditional
+diffusion model, striking a balance between identity replacement and attribute preservation
+during the generation process. As a novel facial generalist model, FaceX [109] can achieve
+various facial tasks, including face swapping and editing. Leveraging the pre-trained Sta-
+bleDiffusion [7] has significantly improved the quality and model training speed. Baliah et
+al. [202] achieve improved identity fidelity, pose consistency, and generalization through
+self-supervised inpainting, DDIM multi-step sampling, CLIP-based feature disentanglement,
+and mask shuffling.
+— Alternative Techniques. Some methods stand independently from the above classifications
+that are discussed here collectively. Fast Face-swap [220] views the identity swap task as a
+style transfer task, achieving its goals based on VGG-Net. However, this method has poor
+generalization. Some methods [204, 205] apply the Transformer architecture to face swapping
+tasks. Leveraging a facial encoder based on the Swin Transformer [53], TransFS [205] obtains
+rich facial features, enabling facial swapping in high-resolution images. CanonSwap [207]
+introduces a motion–appearance disentangled video face swapping framework that enables
+accurate identity transfer while preserving fine-grained temporal dynamics.
+3.1.2
+Face Reenactment. This section reviews current methods from four points: 3DMM-based,
+landmark matching, face feature decoupling, and self-supervised learning. We summarize them
+in Table 3.
+— 3DMM-based. Some methods [224, 225] utilize 3DMM to construct a facial parameter model
+as an intermediary for transferring information between the source and target. In particular,
+Face2Face𝜌[224], based on 3DMM, consists of a u-shaped rendering network driven by head
+pose and facial motion fields and a hierarchical coarse-to-fine motion network guided by
+landmarks at different scales. However, some methods [221, 222, 244] exhibit visible artifacts
+in the background when dealing with significant head movements in the input images. To
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 13 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:13
+Table 3. Overview of Face Reenactment Methods
+Method
+Venue
+Controllable object Dataset
+Highlight
+Based on 3DMM
+Kim et al. [221]
+TOG’18
+Exp, Pose, Blink
+
+Using synthesized rendering images of a parameterized face model
+as input, creating lifelike video frames for the target actor.
+Kim et al. [222]
+TOG’19
+Lip,Exp, Pose
+
+Built on a recurrent GAN, it employs a hierarchical neural face
+renderer to synthesize realistic video frames.
+HeadGAN [223]
+ECCV’21
+Exp, Pose
+
+Using 3DMM for facial modeling provides a 3D prior to the GAN,
+effectively guiding the generator to accurately recover pose and
+expression from the target frame.
+Face2Face𝜌[224]
+ECCV’22
+Exp, Pose
+
+Decoupling the actor’s facial appearance and motion information
+with two separate encodings allows the network to learn facial
+appearance and motion priors.
+PECHead [225]
+CVPR’23
+Lip, Exp, Pose
+
+A novel multi-scale feature alignment module for motion perception
+is proposed to minimize distortion during motion transmission.
+Maskrenderer [226]
+PR’25
+Lip, Exp, Pose
+
+The framework is robust to occlusion and large mismatches between
+Source and Driving facial structures.
+Based on Landmark Matching
+Zakharov et al. [227] ICCV’19
+Exp, Pose
+
+Proposed a meta-learning framework for adversarial generative
+models, reducing the required training data size.
+FReeNet [228]
+CVPR’20
+Exp, Pose
+[68]
+A new triple perceptual loss is proposed to richly reproduce facial
+details of the face.
+DG [14]
+CVPR’22
+Exp, Pose
+
+A proposed dual generator model network for large pose face
+reproduction.
+Doukas et al. [229]
+TPAMI’23 Exp, Pose, Gaze
+[230][231] Eye gaze control in the generated video is implemented to further
+enhance visual realism.
+MetaPortrait [232]
+CVPR’23
+Exp, Pose
+
+By establishing dense facial keypoint matching, accurate
+deformation field prediction is achieved, and the model training is
+expedited based on the meta-learning philosophy.
+Yang et al. [233]
+AAAI’24
+Exp, Pose
+
+The facial tri-plane is represented by canonical tri-plane, identity
+deformation, and motion components, achieving face reenactment
+without the need for 3D parameter model priors.
+FSRT [234]
+CVPR’24
+Exp, Pose
+
+The Transformer-based encoder-decoder effectively encodes
+attributes and improves action transmission quality.
+DiffusionAct [235]
+FG’25
+Exp, Pose
+
+The nethod allows one-shot, self, and cross-subject reenactment,
+without requiring subject-specific fine-tuning.
+Based on Face Feature Decopling
+HiDe-NeRF [236]
+CVPR’23
+Lip, Exp, Pose
+
+High-fidelity and free-viewing talking head synthesis using
+deformable neural radiation fields.
+HyperReenact [15]
+ICCV’23
+Exp, Pose
+
+Exploiting the effectiveness of hypernetworks in real image
+inversion tasks and extending them to real image manipulation.
+Stylemask [237]
+FG’23
+Exp, Pose
+
+This work optimizes a Mask Network and combines it with
+StyleGAN2’s style potential space S in order to achieve the
+separation of facial pose and expression of the target image from the
+identity features of the source image.
+Bounareli et al. [238] IJCV’24
+Exp, Pose
+
+In GANs’ latent space, head pose and expression changes are
+decoupled, achieving near-real outputs through real image
+embedding.
+Chang et al. [239]
+AAAI’25
+Exp, Pose
+ [240]
+Introduce a StyleGAN2-based end-to-end framework for
+high-fidelity one-shot video reenactment at 1024 resolution, with
+conditional disentanglement and feature-space refinement
+improving accuracy and fine-detail preservation
+Based on Self-supervised
+ICface [241]
+WACV’20 Exp, Pose
+
+The model is decoupled and driven by interpretable control signals
+that can be obtained from multiple sources such as external driving
+videos and manual controls.
+Oorloff et al. [242]
+ICCV’23
+Lip, Exp, Pose
+
+Identity and attribute decomposition are realized in StyleGAN2’s
+latent space, and a cyclic manifold adjustment technique enhances
+facial reconstruction results.
+Xue et al. [243]
+TOMM’23 Exp, Pose
+
+High-fidelity facial generation is achieved by using information-rich
+Projected Normalized Coordinate Code (PNCC) and eye maps,
+replacing sparse facial landmark representations.
+Notations:  Voxceleb,  Self-build,  Voxceleb2,  TalkingHead-1KH,  CelebV-HQ,  VFHQ,  RaFD,  VGGFace,
+ CelebV, FFHQ. Expression (Exp).
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 14 ---
+
+273:14
+G. Pei et al.
+address issues such as incomplete attribute decoupling in facial reproduction tasks, PECHead
+[225] models facial expressions and pose movements. It combines self-supervised learning of
+landmarks with 3D facial landmarks and introduces a new motion-aware multi-scale feature
+alignment module to eliminate artifacts that may arise from facial motion.
+— Landmark Matching. These kinds of methods [14, 229, 245–247] aim to establish a mapping
+relationship between semantic objects in the facial regions of the driving source and the target
+source through landmarks. Based on this mapping relationship [227, 228], the transfer of
+facial movement information is achieved. To address the challenge of reproducing large head
+poses in facial reenactment, Xu et al. [14] propose a dual-generator network incorporating a
+3D landmark detector into the model. Free-headgan [229] comprises a 3D keypoint estimator,
+an eye gaze estimator, and a generator built on the HeadGAN architecture. The 3D keypoint
+estimator addresses the regression of deformations related to 3D poses and expressions. The
+eye gaze estimator controls eye movement in videos, providing finer details. MetaPortrait
+[232] achieves accurate distortion field prediction through dense facial keypoint matching
+and accelerates model training based on meta-learning principles, delivering excellent results
+on limited datasets.
+— Feature Decoupling. The latent feature decoupling and driving methods [15, 233, 236–238]
+aim to disentangle facial features in the latent space of the driving video, replacing or
+mapping the corresponding latent information to achieve high-fidelity facial reproduction
+under specific conditions. HyperReenact [15] uses attribute decoupling, employing a hyper-
+network to refine source identity features and modify facial poses. StyleMask [237] separates
+facial pose and expression from the identity information of the source image by learning
+masks and blending corresponding channels in the pre-trained style space S of StyleGAN2.
+HiDe-NeRF [236] employs a deformable neural radiance field to represent a 3D scene, with a
+lightweight deformation module explicitly decoupling facial pose and expression attributes.
+— Self-supervised Learning. Self-supervised learning employs supervisory signals inferred
+from the intrinsic structure of the data, reducing the reliance on external data labels
+[241, 242, 278, 279]. Oorloff et al. [242] employ self-supervised methods to train an en-
+coder, disentangling identity and facial attribute information of portrait images within the
+pre-defined latent space itself of a pre-trained StyleGAN2. Zhang et al. [279] utilize 3DMM
+to provide geometric guidance, employ pre-computed optical flow to guide motion field
+estimation, and rely on pre-computed occlusion maps to guide the perception and repair of
+occluded areas.
+3.1.3
+Talking Face Generation. In this section, we review current methods from three perspec-
+tives: audio/text-driven, multimodal conditioned, diffusion-based, and 3D-model Technologies. We
+also summarize them in Table 4.
+— Audio/Text Driven. Early methods [100, 114] perform poorly in terms of generalization and
+training complexity. After training, the models struggled to generalize to new individuals,
+requiring extensive conversational data for training new characters. Researchers [101, 115]
+propose their solutions from various perspectives. However, Most of these methods prioritize
+generating lip movements aligned with semantic information, overlooking essential aspects
+like identity and style, such as head pose changes and movement control, which are crucial
+in natural videos. To address this, MakeItTalk [251] decouples input audio information
+by predicting facial landmarks based on audio and obtaining semantic details on facial
+expressions and poses from audio signals. SadTalker [254] extracts 3D motion coefficients
+for constructing a 3DMM from audio and uses this to modulate a new 3D perceptual facial
+rendering for generating head poses in talking videos. Additionally, some methods [92,
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 15 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:15
+Table 4. Overview of Representative Talking Face Generation Methods
+Method
+Venue
+Dataset
+Limitation
+Highlight
+Audio / Text - Driven
+Chen et al. [100]
+ECCV’18
+[248][249] Poor resolution, inability to
+control pose and emotional.
+Proposed a novel generator network and a comprehensive model with four
+complementary losses, as well as a new audio-visual related loss function to
+guide video generation.
+Zhou et al. [250]
+AAAI’19
+
+Inability to control pose and
+emotional variations.
+Generate high-quality talking face videos by disentangling audio-visual
+representations.
+Chen et al. [115]
+CVPR’19
+
+Inability to control pose and
+emotional variations.
+Proposed a cascaded approach, using facial landmarks as an intermediate
+high-level representation.
+Wav2Lip [101]
+ICMR’20
+
+Poor resolution, inability to
+control pose and emotional.
+A new evaluation framework and a dataset for training mouth synchronization
+are proposed.
+MakeItTalk [251]
+TOG’20
+
+Uable to control pose and
+emotional variations well.
+Separating content information and identity information from audio signals,
+combining LSTM and self-attention mechanism to enhance head movement
+coherence.
+Ji et al. [252]
+CVPR’21
+
+Inability to control pose and
+emotional variations.
+By breaking down the input audio sample into content and emotion
+embeddings, cross-reconstruction of emotional disentanglement creates facial
+landmarks with nuanced emotional content.
+SPACE [253]
+ICCV’23
+
+Lack emotional and other latent
+attributes control
+Constructed a novel facial intermediate representation, achieving control
+overhead pose, blinking, and gaze direction.
+SadTalker [254]
+CVPR’23
+
+Lack emotional and other latent
+attributes control.
+Based on the idea of 3DMM and conditional VAE, 3D coefficients controlling
+facial motion and expression are generated from audio to realize the
+reproduction of accurate faces from audio.
+EmoTalk [255]
+ICCV’23
+
+Poor real-time performance and
+expression details.
+An emotion-entangled encoder and emotion-guided decoder enable emotion
+injection, with outputs generated using Blendshape and FLAME model
+rendering.
+TalkLip [256]
+CVPR’23
+
+Inability to control pose and
+emotional variations.
+Pre-trained lip-reading experts are employed to penalize incorrect lip-reading
+predictions in the synthesized videos.
+DR2 [17]
+WACV’24
+
+Lack emotional and other latent
+attributes control.
+The model explored effective strategies for reducing the training workload.
+RADIO [257]
+WACV’24
+
+Lack emotional and other latent
+attributes control.
+Introducing StyleGAN2 style modulation to adapt to human identity and
+utilizes ViT blocks to focus on facial attributes in the reference image.
+FT2TF [258]
+WACV’25
+
+Lack controllable emotional
+intensity regulation.
+A one-stage pipeline that generates realistic talking faces by integrating visual
+and textual input.
+Talkclip [259]
+TMM’25
+
+Insufficient control over the
+intensity of emotional output.
+The method can use text to modulate expression intensity and edit expressions.
+Multimodal
+PC-AVS [260]
+CVPR’21
+
+Lack emotional and other latent
+attributes control.
+Introduction of pose-source video drive compensation to generate head motion
+in video.
+GC-AVT [261]
+CVPR’22
+
+Poor resolution, unable to handl
+complex backgrounds.
+In addition to the source image, a gesture source, an expression source, and
+audio are introduced to drive the talking head generation.
+Yu et al. [262]
+TMM’22
+
+Lack emotional and other latent
+attributes control.
+Fusion of audio and text inputs for more accurate lip movement and chin
+posture prediction.
+Xu et al. [263]
+CVPR’23
+
+Insufficient control over the
+intensity of emotional output.
+Embedding textual, visual, and auditory emotional modalities into a unified
+space.
+LipFormer [264]
+CVPR’23
+
+Poor ability to preserve face
+feature attributes.
+Propose retaining high-quality facial details obtained from pre-training in a
+codebook format and reproducing them by driving the encoded mapping
+relationship between audio and lip movements.
+Wang et al. [265]
+TPAMI’24
+
+Unable to delicately control
+emotions.
+Using 3DMM as an intermediate variable to convey facial expressions and head
+movements, and introducing additional reference videos to extract the desired
+speaking style.
+Diffusion
+DAE-Talker [266]
+MM’23
+
+High model complexity.
+It replaces traditional manually crafted intermediate representations with
+data-driven latent representations obtained from a DAE.
+Yu et al. [267]
+ICCV’23
+
+Poor resolution, high model
+complexity.
+Building a corresponding mapping between audio and non-lip representations
+and training using the diffusion model.
+Stypułkowski [268]
+WACV’24
+
+High model complexity, short
+video generation duration.
+The model incorporates motion frame and audio embedding information to
+capture past movements and future expressions, with an emphasis on the
+mouth region through an additional lip sync loss.
+EmoTalker [269]
+ICASSP’24
+
+High model complexity.
+It achieves emotion-editable talking face generation based on a conditional
+diffusion model.
+VASA-1 [270]
+NIPS’24
+
+High model complexity.
+Expressive and well-decoupled facial latent space has been constructed, and
+highly controllable, high-quality generation effects have been achieved based
+on the Diffusion Transformer.
+EmotiveTalk [271]
+CVPR’25
+ 
+High model complexity.
+Enhances long-duration talking-face generation by introducing a visual-guided
+audio–expression disentanglement strategy and an expressive diffusion
+backbone, enabling controllable emotional expression.
+3D-Model
+AD-NeRF [272]
+ICCV’21
+
+Inadequate control of emotions
+and latent attributes.
+The NeRF based approach achieves accurate reproduction of detailed facial
+components and generates the upper body region.
+DFRF [273]
+ECCV’22
+
+Lack of emotional and other
+latent attributes control.
+Combining audio with 3D perceptual features and proposing an facial
+deformation module.
+AE-NeRF [274]
+AAAI’24
+
+Lack emotional and other latent
+attributes control.
+Facial modeling is divided into NeRF related to audio and unrelated to audio to
+enhance audio-visual lip synchronization and facial detail.
+SyncTalk [275]
+CVPR’24
+
+Lack controllable emotional
+intensity regulation.
+The facial sync controller boosts component coordination, and a portrait
+generator corrects artifacts, enhancing video details.
+Ye et al. [276]
+ICLR’24
+[74]
+Lack emotional control and
+occasional artifacts.
+Facial and audio information is separately represented using tri-plane, followed
+by rendering. The generated results are further optimized based on the
+super-resolution network.
+Tang et al. [277]
+IJCV’25
+[272][273]
+Lack controllable emotional
+intensity regulation.
+This framework enhances reenactment fidelity by decomposing portrait
+representations into low dimensional feature grids, enabling coherent
+audio-driven head motion and efficient torso modeling.
+Notations:  LRW,  VoxCeleb2,  MEAD,  Self-build,  LRS2,  HDTF,  LRS3,  CREMA-D,  VoxCeleb,  FFHQ.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 16 ---
+
+273:16
+G. Pei et al.
+257, 280, 281] propose their improvement methods, and these will not be detailed one by
+one. In addition, the emotional expression varies for different texts during a conversation,
+and vivid emotions are an essential part of real talking face videos [282, 283]. Recently,
+some methods [253, 284, 285] extend their previous approaches by incorporating matching
+between the driving information and corresponding emotions. EMMN [284] establishes an
+organic relationship between emotions and lip movements by extracting emotion embeddings
+from the audio signal, synthesizing overall facial expressions in talking faces rather than
+focusing solely on audio for facial expression synthesis. AMIGO [285] employs a sequence-
+to-sequence cross-modal emotion landmark generation network to generate vivid landmarks
+aided by audio information, ensuring that lips and emotions in the output image sequence
+are synchronized with the input audio. However, existing methods still lack effective control
+over the intensity of emotions. In addition, TalkCLIP [259] introduces style parameters,
+expanding the style categories for text-guided talking video generation. Zhong et al. [286]
+propose a two-stage framework, incorporating appearance priors during the generation
+process to enhance the model’s ability to preserve attributes of the target face. DR2 [17]
+explores practical strategies for reducing the training workload.
+— Multimodal Conditioned. To generate more realistic talking videos, some methods [260,
+261, 263, 264] introduce additional modal information on top of audio-driven methods to guide
+facial pose and expression. GC-AVT [261] generates realistic talking videos by independently
+controlling head pose, audio information, and facial expressions. This approach introduces
+an expression source video, providing emotional information during the speech and the pose
+source video. However, the video quality falls below expectations, and it struggles to handle
+complex background changes. Xu et al. [263] integrate text, image, and audio-emotional
+modalities into a unified space to complement emotional content in textual information.
+Multimodal approaches have significantly enhanced the vividness of generated videos, but
+there is still room for exploration of organically combining information driven by different
+sources and modalities.
+— Diffusion-based. Recently, some methods [16, 266, 269] apply the Diffusion model to the
+task of talking face generation. For fine-grained talking video generation, DAE-Talker [266]
+replaces manually crafted intermediate representations, such as facial landmarks and 3DMM
+coefficients, with data-driven latent representations obtained from a Diffusion Autoen-
+coder (DAE). The image decoder generates video frames based on predicted latent variables.
+EmoTalker [269] utilizes a conditional diffusion model for emotion-editable talking face gen-
+eration. It introduces emotion intensity blocks and the FED dataset to enhance the model’s
+understanding of complex emotions. Very recently, diffusion models have gained prominence
+in talking face generation tasks [268, 287] and video generation tasks [143, 288]. Emo [287] di-
+rectly predicts video from audio without the need for intermediate 3D components, achieving
+excellent results. However, the lack of explicit control signals may easily lead to unnecessary
+artifacts. Based on the Diffusion Transformer architecture, VASA-1 [270] finely encodes and
+reconstructs facial details, constructing an expressive and well-decoupled facial latent space.
+— 3D-model Technologies. 3D models, exemplified by NeRF, are gaining traction in talking
+face generation [272–274]. AD-NeRF [272] directly feeds features from the input audio signal
+into a conditional implicit function to generate a dynamic NeRF. AE-NeRF [274] employs
+a dual NeRF framework to separately model audio-related regions and audio-independent
+regions. Furthermore, some methods [275, 276] adopt Tri-Plane to represent facial and
+audio attributes. Synctalk [275] models and renders head motion using a tri-plane hash
+representation, and then further enhances the output quality using a portrait synchronization
+generator. Very recently, 3D Gaussian Splatting [289] has also been widely applied to this
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 17 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:17
+task. Some methods [312, 313] introduce 3DGS to achieve more refined facial reconstruction
+and motion details, aiming to address the issue of insufficient pose and expression control
+caused by NeRF’s implicit representation.
+3.1.4
+Facial Attribute Editing. In this section, we review current methods chronologically, fol-
+lowing the progression in overcoming technical challenges. Finally, we summarize methods in
+Table 5.
+— Comprehensive Editing. Early facial attribute editing models [290, 314] often achieve
+editing for a single attribute through data-driven training. For instance, Shen et al. [314]
+propose learning the difference between pre-/post-operation images, represented as residual
+images, to achieve attribute-specific operations. However, single-attribute editing falls short
+of meeting expectations, and compression steps in the process often lead to a significant
+loss of image resolution, a common issue in early methods. The fundamental challenge in
+comprehensive editing and unrelated attribute modification is achieving complete attribute
+disentanglement. Many approaches [293–295, 299] have explored this. E.g., HifaFace [295]
+identifies cycle consistency issues as the cause of facial attribute information loss that proposes
+a wavelet-based method for high-fidelity face editing, while TransEditor [299] introduces a
+dual-space GAN structure based on the transformer framework that improves image quality
+and attribute editing flexibility.
+— Irrelevant-attribute Retained. Another critical aspect of face editing is retaining as much
+target image information as possible in the generated images [19, 294, 298]. GuidedStyle [298]
+leverages attention mechanisms in StyleGAN [5] for the adaptive selection of style modifica-
+tions for different image layers. IA-FaceS [19] embeds the face image to be edited into two
+branches of the model, where one branch calculates high-dimensional component-invariant
+content embedding to capture facial details, and the other branch provides low-dimensional
+component-specific embedding for component operations. Additionally, some approaches
+[26, 27, 297, 302] combine GANs with NeRF [24] for enhanced spatial awareness capabilities.
+Specifically, FENeRF [297] uses two decoupled latent codes to generate corresponding facial
+semantics and textures in a 3D volume with spatial alignment sharing the same geometry.
+CIPS-3D++ [302] enhances the model’s training efficiency with a NeRF-based shallow 3D
+shape encoder and an MLP-based deep 2D image decoder.
+— Text Driven. Text driven facial attribute editing is a crucial application scenario and a recent
+hot topic in academic research [18, 303, 304, 315]. TextFace [315] introduces text-to-style
+mapping, directly encoding text descriptions into the latent space of pre-trained StyleGAN.
+TG-3DFace [304] introduces two text-to-face cross-modal alignment techniques, including
+global contrastive learning and fine-grained alignment modules, to enhance the high semantic
+consistency.
+— Diffusion-based. Diffusion-based models have been introduced into facial attribute editing
+[296, 300, 306, 307] and achieve excellent results. Huang et al. [300] propose a collaborative
+diffusion framework, utilizing multiple pre-trained unimodal diffusion models together for
+multimodal face generation and editing. DiffusionRig [306] conditions the initial 3D face
+model, which helps preserve facial identity information during personalized editing of facial
+appearance.
+3.2
+Forgery Detection
+In this section, we review current forgery detection techniques based on the type of detection cues,
+categorizing them into three: Space Domain, Time Domain, Frequency Domain, and Data-Driven.
+We also summarize the detailed information about popular methods in Table 6.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 18 ---
+
+273:18
+G. Pei et al.
+Table 5. Overview of Facial Attribute Editing Methods
+Method
+Venue
+Categorize Dataset
+Highlight
+GeneGAN [290]
+BMVC’17
+G.
+
+In early attribute editing, separate models were trained for specific
+attributes. The key idea was to reassemble attribute vectors in the
+latent space, achieving successful editing.
+SC-FEGAN [291]
+ICCV’19
+G.
+
+Users can generate high-quality edited output images by freely
+sketching parts of the source image.
+AttGAN [292]
+TIP’19
+G.
+
+Applying attribute classification constraints to generated images has
+validated the drawbacks of enforcing stringent attribute independence
+constraints in latent representations.
+Shen et al. [293]
+CVPR’20
+G.
+
+Thoroughly investigated how to encode different semantics in the
+latent space and explored the disentanglement between various
+semantics to achieve precise control over facial attributes.
+Yao et al. [294]
+ICCV’21
+G.+T.
+
+By integrating explicit decoupling terms and identity-consistent terms
+into the loss function, the preservation of facial identity information is
+improved, resulting in high-quality face editing in videos.
+HifaFace [295]
+CVPR’21
+G.
+
+Proposed a solution based on wavelet transform to address the issue of
+partial loss of attribute information when generating edited results due
+to “cyclic consistency” problems.
+Preechakul et al. [296]
+CVPR’22
+D.
+
+When encoding images, it is divided into semantically meaningful
+parts and parts that represent the details of the image.
+FENeRF [297]
+CVPR’22
+G.+NeRF
+
+The introduction of semantic masks into the conditional radiance field
+enables finer image textures.
+GuidedStyle [298]
+NN’22
+G.
+
+Generating faces after face editing is guided based on facial attribute
+classification. The introduction of a sparse attention mechanism
+enhances the manipulation of individual attribute styles.
+FDNeRF [27]
+SIG.’22
+G.+NeRF
+
+The introduction of the Conditional Feature Warping (CFW) module
+addresses the issue of temporal inconsistency caused by dynamic
+information in the process of face editing in videos.
+AnyFace [18]
+CVPR’22
+G.
+
+Proposed a dual-branch framework for text-driven facial editing, with
+coordination achieved between the two branches through a
+Cross-Modal Distillation (CMD) module.
+TransEditor [299]
+CVPR’22
+G.
+
+Emphasizing dual-space GAN interaction’s importance, a transformer
+architecture is introduced for improved interaction.
+Huang et al. [300]
+CVPR’23
+D.
+
+Proposed the concept of assisted diffusion, integrating individual
+multimodalities to explore the complementarity between different
+modalities.
+Ozkan et al. [301]
+ICCV’23
+G.
+
+The entangled attribute space is decomposed into conceptual and
+hierarchical latent spaces, and transformer network encoders are
+employed to modify information in the latent space.
+CIPS-3D++ [302]
+TPAMI’23
+G.+NeRF
+
+Replaced the convolutional architecture with an MLP (Multi-Layer
+Perceptron) architecture to achieve faster rendering speeds.
+ClipFace [303]
+SIG.’23
+G.+3DMM
+
+Learned texture generation from large-scale datasets, enhancing
+generator performance through generative adversarial training.
+TG-3DFace [304]
+ICCV’23
+G.
+
+For different scenarios, two sets of text-to-face cross-modal alignment
+methods were designed with specific focuses.
+VecGAN++ [305]
+TPAMI’23
+G.
+
+Orthogonal constraint and disentanglement loss are used to decouple
+attribute vectors in the latent space.
+DiffusionRig [306]
+CVPR’23
+D.
+
+3DMM and diffusion model integration propose a two-stage method
+for learning personalized facial details.
+Kim et al. [307]
+CVPR’23
+D.
+
+Proposed a method for facial editing in videos based on the diffusion
+model.
+SDGAN et al. [308]
+AAAI’24
+G.
+
+SDGAN introduces a semantic separation generator and a semantic
+mask alignment strategy, achieving satisfactory preservation of
+irrelevant details and precise attribute manipulation.
+FaceDNeRF [309]
+NIPS’24
+D.+NeRF
+
+Creating and editing facial NeRFs with single-view images, text
+prompts, and target lighting.
+NeRFFaceEditing [310] TPAMI’25
+G.+NeRF
+
+Disentangling geometry and appearance within a tri-plane NeRF
+through statistical tri-plane features and 3D semantic masks.
+M-LMPF [311]
+PR’25
+G.
+
+M-LMPF achieving controllable attribute modification with strong
+privacy protection and superior editing fidelity.
+Notations:  FFHQ,  CelebA,  CelebA-HQ,  CelebAMask-HQ,  VoxCeleb,  CelebAText-HQ,  LFW,  MM
+CelebA-HQ,  CARLA,  Multi-PIE. In addition, abbreviations are used in the table: SIGGRAPH (SIG.), GANs (G.),
+Diffusion (D.), Transformer (T.).
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 19 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:19
+Table 6. Overview of Representative Forgery Detection Methods
+Method
+Venue
+Train
+Test
+Highlight
+Space Domain
+Gram-Net [316]
+CVPR’20
+
+
+The method posits that genuine faces and fake faces exhibit inconsistencies in
+texture details.
+Face X-ray [317]
+CVPR’20
+
+
+Focusing on boundary artifacts of face fusion for forgery detection.
+Zhao et al. [318]
+CVPR’21
+
+
+A texture enhancement module, an attention generation module, and a bilinear
+attention pooling module are proposed to focus on texture details.
+Nirkin et al. [319]
+TPAMI’21 
+
+Detecting swapped faces by comparing the facial region with its context
+(non-facial area).
+SBIs [320]
+CVPR’22
+
+
+The belief that the more difficult to detect forged faces typically contain more
+generalized traces of forgery can encourage the model to learn a feature
+representation with greater generalization ability.
+LGrad [105]
+CVPR’23
+
+
+The gradient is utilized to present generalized artifacts that are fed into the
+classifier to determine the truth of the image.
+NoiseDF [321]
+AAAI’23
+
+
+Extracting noise traces and features from cropped faces and background
+squares in video frames.
+Ba et al. [322]
+AAAI’24
+
+
+Multiple non-overlapping local representations are extracted from the image
+for forgery detection. A local information loss function, based on information
+bottleneck theory, is proposed for constraint.
+UNITE [323]
+CVPR’25
+ 
+Leveraging domain-agnostic features, attention-diversity regularization, and
+mixed-domain training, achieving great performance on both facial and fully
+synthetic manipulations.
+Time Domain
+FTCN [324]
+ICCV’21
+
+[189] It is believed that most face video forgeries are generated frame by frame. As
+each altered face is independently generated, this inevitably leads to noticeable
+flickering and discontinuity.
+LipForensics [325] CVPR’21
+
+
+Concern about temporal inconsistency of mouth movements in videos.
+M2TR [103]
+ICMR’22
+
+
+Capturing local inconsistencies at different scales for forgery detection using a
+multiscale transformer.
+Gu et al. [326]
+AAAI’22
+
+[87]
+By densely sampling adjacent frames to pay attention to the inter-frame image
+inconsistency.
+Yang et al. [33]
+TIFS’23
+
+
+Treating detection as a graph classification problem and focusing on the
+relationship between the local image features across different frames.
+AVoiD-DF [38]
+TIFS’23
+[85] [85]
+Multimodal forgery detection using audiovisual inconsistency.
+Choi et al. [327]
+CVPR’24
+
+
+Focus on the inconsistency of the style latent vectors between frames.
+Xu et al. [328]
+IJCV’24
+ 
+Forgery detection is conducted by converting video clips into thumbnails
+containing both spatial and temporal information.
+Peng et al. [329]
+TIFS’24
+
+
+Focuse on inter-frame gaze angles, extracting gaze informations and
+employing spatio-temporal feature aggregation to combine temporal, spatial,
+and texture features for detection and classification.
+Frequency
+FDFL [36]
+CVPR’21
+
+
+Propose an adaptive frequency feature generation module to extract
+differential features from different frequency bands in a learnable manner.
+HFI-Net [330]
+TIFS’22
+
+[79]
+Notice that the forgery flaws used to distinguish between real and fake faces
+are concentrated in the mid- and high-frequency spectrum.
+Guo et al. [331]
+TIFS’23
+
+
+Designing a backbone network for Deepfake detection with space-frequency
+interaction convolution.
+Tan et al. [332]
+AAAI’24
+
+
+A lightweight frequency-domain learning network is proposed to constrain
+classifier operation within the frequency domain.
+WMamba [333]
+MM’25
+
+
+Introduces a Mamba-based wavelet feature extractor that leverages dynamic
+contour convolution and efficient long-range modeling to capture fine-grained,
+globally distributed forgery cues.
+WaveDIF [334]
+CVPR’25
+
+
+A lightweight frequency-domain detector that leverages DFT-based denoising
+and wavelet subband energy analysis to achieve competitive accuracy on both
+intra- and cross-dataset evaluations.
+Data Driven
+Dang et al. [335]
+CVPR’20
+
+
+Utilizing attention mechanisms to handle the feature maps of the detection
+model.
+Zhao et al. [336]
+ICCV’21
+
+
+Proposes pairwise self-consistent learning for training CNN to extract these
+source features and detect deep vacation images.
+Finfer [337]
+AAAI’22
+
+[87]
+Based on an autoregressive model, using the facial representation of the
+current frame to predict the facial representation of future frames.
+Huang et al. [104] CVPR’23
+
+[189] A new implicit identity-driven face exchange detection framework is proposed.
+HiFi-Net [338]
+CVPR’23
+
+
+Converting forgery detection and localization into a hierarchical fine-grained
+classification problem.
+Zhai et al. [339]
+ICCV’23
+[340]
+[341][342]
+Weakly supervised image processing detection is proposed such that only
+binary image level labels (real or tampered) are required for training.
+Notations:  FF++,  DFDC,  Celeb-DF,  Deeperforensics,  Self-build,  UADFV,  Celeb-HQ,  DFDCp,  FFHQ,
+ DFD.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 20 ---
+
+273:20
+G. Pei et al.
+3.2.1
+Space Domain.
+— Image-level Inconsistency. The generation process of forged images often involves partial
+alterations rather than global generation, leading to common local differences in non-globally
+generated forgery methods. Therefore, some methods focus on differences in image spatial
+details as criteria for determining whether an image is forged, such as color [30], saturation
+[343], artifacts [318, 320, 344], gradient variations [105], and so on. Specifically, RECCE [344]
+considers shadow generation from a training perspective, utilizing the learned representations
+on actual samples to identify image reconstruction differences. LGrad [105] utilizes a pre-
+trained transformation model, converting images to gradients to visualize general artifacts
+and subsequently classifying based on these representations. In addition, some works focus
+on detection based on differences in facial and non-facial regions [319], as well as the fine-
+grained details of image textures [316, 345]. Recently, Ba et al. [322] focuse not only on the
+discordance in a single image region but also on the detection of fused local representation
+information from multiple non-overlapping areas.
+— Local Noise Inconsistency. Image forgery may involve adding, modifying, or removing
+content in the image, potentially altering the noise distribution in the image. Detection
+methods based on noise aim to identify such local or even global differences in the image.
+Zhou et al. [31] propose a dual-stream structure, combining GoogleNet with a triplet network
+to focus on tampering artifacts and local noise in images. NoiseDF [321] specializes in
+identifying underlying noise traces left behind in Deepfake videos, introducing an efficient
+and novel Multi-Head Relative Interaction with depth-wise separable convolutions to enhance
+detection performance.
+3.2.2
+Time Domain.
+— Abnormal Physiological Information. Forgery videos often overlook the authentic physi-
+ological features of humans, failing to achieve overall consistency with authentic individuals.
+Therefore, some methods focus on assessing the plausibility of the physiological features of
+the generated faces in videos. Li et al. [78] detect blinking and blink frequency in videos as
+criteria for determining the video’s authenticity. Yang et al. [89] focuses on the inconsistency
+of head poses in videos, comparing the differences between head poses estimated using all
+facial landmarks and those estimated using only the landmarks in the central region. Peng et
+al. [329] focus on inter-frame gaze angles, obtaining gaze characteristics of each video frame,
+and using a spatio-temporal feature aggregator to combine temporal gaze features, spatial
+attribute features, and spatial texture features as the basis for detection and classification.
+— Inter-Frame Inconsistency. Methods [32, 33, 324, 326–328] based on inter-frame inconsis-
+tency for forgery detection aim to uncover differences in images between adjacent frames or
+frames with specific temporal spans. Gu et al. [326] focus on inter-frame image inconsistency
+by densely sampling adjacent frames, while Yin et al. [32] design a Dynamic Fine-grained
+Difference Capturing module and a Multi-Scale Spatio-Temporal Aggregation module to coop-
+eratively model spatio-temporal inconsistencies. Yang et al. [33] approach forgery detection
+as a graph classification problem, emphasizing the relationship information between facial
+regions to capture the relationships among local features across different frames. Choi et
+al. [327] discover that the style variables in each frame of Deepfake work change. Based on
+this, they developed a style attention module to focus on the inconsistency of the style latent
+variables between frames.
+— Multimodal Inconsistency. The core idea behind multimodal detection algorithms is to
+make judgments based on the flow of prior information from multiple attributes rather
+than solely considering the image or audio differences of individual characteristics in each
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 21 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:21
+frame. The consideration of audio-visual modal inconsistency has received extensive research
+in various methods [37, 38, 346]. POI-Forensics [346] proposes a deep forgery detection
+method based on audio-visual authentication, utilizing contrastive learning to learn the most
+distinctive embeddings for each identity in moving facial and audio segments. AVoiD-DF [38]
+embeds spatiotemporal information in a spatiotemporal encoder and employs a multimodal
+joint decoder to fuse multimodal features and learn their inherent relationships. Subsequently,
+a cross-modal classifier is applied to detect disharmonious operations within and between
+modalities. Agarwal et al. [347] describe a forensic technique for detecting fake faces using
+static and dynamic auditory ear characteristics. Indeed, multimodal detection methods are
+currently a hotspot in forgery detection research.
+3.2.3
+Frequency Domain. Frequency domain-based forgery detection methods transform image
+time-domain information into the frequency domain. Works [35, 36, 330, 332, 348] utilize statistical
+measures of periodic features, frequency components, and frequency characteristic distributions,
+either globally or in local regions, as evaluation metrics for forgery detection. Specifically, F3-Net
+[35] proposes a dual-branch framework. One frequency-aware branch utilizes Frequency-aware
+Image Decomposition (FAD) to learn subtle forgery patterns in suspicious images. In contrast,
+the other branch aims to extract high-level semantics from Local Frequency Statistics (LFS)
+to describe the frequency-aware statistical differences between real and forged faces. HFI-Net
+[330] consists of a dual-branch network and four Global-Local Interaction (GLI) modules. It
+effectively explores multi-level frequency artifacts, obtaining frequency-related forgery clues for
+face detection. Tan et al. [332] introduce a novel frequency-aware approach called FreqNet, which
+focuses on the high-frequency information of images and combines it with a frequency-domain
+learning module to learn source-independent features. Furthermore, some approaches combine
+spatial, temporal, and frequency domains for joint consideration [331, 349], and Guo et al. [331]
+design a spatial-frequency interaction convolution to construct a novel backbone network for
+Deepfake detection.
+3.2.4
+Data Driven. Data-driven forgery detection [335, 337, 338, 350] focuses on learning specific
+patterns and features from extensive image or video datasets to distinguish between genuine and
+potentially manipulated images. Some methods [351, 352] believe that images generated by specific
+models possess unique model fingerprints. Based on this belief, forgery detection can be achieved
+by focusing on the model’s training. In addition, FakeSpotter [352] introduces the Neuron Coverage
+Criterion to capture layer-wise neuron activation behavior. It monitors the neural behavior of a
+deep face recognition system through a binary classifier to detect fake faces. There are also methods
+[104, 336] that attempt to classify the sources of different components in an image. For instance,
+Huang et al. [104] think that the difference between explicit and implicit identity helps detect face
+swapping.
+3.3
+Specific Related Domains
+3.3.1
+Face Super-resolution.
+— CNNs. Early works [118, 353, 354] on facial super-resolution based on CNNs aim to leverage
+the powerful representational capabilities of CNNs to learn the mapping relationship between
+low-resolution and high-resolution images from training samples. Depending on whether
+they focus on local details of the image, they can be divided into global methods [117, 118],
+local methods [353], and mixed methods [354].
+— GAN. GAN aims to achieve the optimal output result through an adversarial process between
+the generator and the discriminator. This type of method [355, 356] currently dominates the
+field for flexible and efficient architecture.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 22 ---
+
+273:22
+G. Pei et al.
+3.3.2
+Portrait Style Transfer.
+— GAN. The most mature style transfer algorithm is the GAN-based approach [152–154].
+However, due to the relatively poor stability of GANs, it is common for the generated images
+to contain artifacts and unreasonable components. 3DAvatarGAN [152] bridges the pre-
+trained 3D-GAN in the source domain with the 2D-GAN trained on an artistic dataset to
+achieve cross-domain generation. Scenimefy [154] utilizes semantic constraints provided by
+text models like CLIP to guide StyleGAN generation and applies patch-based contrastive
+style loss to enhance stylization and fine details further.
+— Diffusion-based. Diffusion-based methods [155, 156, 357] represent the generative process
+of cross-domain image transfer using diffusion processes. DiffusionGAN3D [357] combines
+3DGAN with a diffusion model from text to graphics, introducing relative distance loss and
+learnable tri-planes for specific scenarios to further enhance cross-domain transformation
+accuracy.
+3.3.3
+Body Animation.
+— GAN. GAN-based approaches [141, 142] aim to train a model to generate images whose
+conditional distribution resembles the target domain, thus transferring information from
+reference images to target images. CASD [141] is based on a style distribution module using
+a cross-attention mechanism, facilitating pose transfer between source semantic styles and
+target poses. However, existing methods still rely considerably on training samples and
+exhibit decreased performance when dealing with actions in rare poses.
+— Diffusion-based. The task of body animation using diffusion models aims to utilize diffusion
+processes to generate the propagation and interaction of movements between body parts
+based on a reference source. This approach [143, 144] represents a current hot topic in research
+and implementation. LEO [143] focuses on the spatiotemporal continuity between generated
+actions, employing the Latent Motion Diffusion Model to represent motion as a series of flow
+graphs during the generation process.
+3.3.4
+Makeup Transfer.
+— Graphics-based Approaches. Before the advent of neural networks, traditional computer
+graphics methods [358, 359] relied on image-gradient editing and physics-based operations
+to interpret makeup semantics. These approaches decomposed an input image into multiple
+layers and warped the reference makeup image onto the target using facial landmarks.
+However, the reliance on manually designed operators often led to unnatural results, including
+visible artifacts and unintended alterations to background regions.
+— GAN. Early deep learning-based methods [160] aim at fully automatic makeup transfer.
+However, these methods [159, 360] exhibit poor performance when faced with significant
+differences in pose and expression between the source and target faces and are unable to
+handle extreme makeup scenarios well. Some methods [157, 161, 162] propose their solutions,
+PSGAN++ [161] comprises the Makeup Distillation Network, Attentive Makeup Morphing
+module, Style Transfer Network, and Identity Extraction Network, further enhancing the abil-
+ity of PSGAN [157] to perform targeted makeup transfer with detail preservation. ELeGANt
+[163], CUMTGAN [165], and HT-ASE [158] explore the preservation of detailed information.
+4
+Benchmark
+We introduce the evaluation metrics commonly used for each deepfake task, followed by a summary
+of the performance of representative methods on widely adopted datasets based on the results
+reported in their original articles. Given the variations in testing setups, and evaluation criteria
+across different approaches, we strive to present fair and consistent comparisons in each table.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 23 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:23
+4.1
+Metrics
+— Face Swapping. The most commonly used objective evaluation metrics for face swapping
+include ID Ret, Expression Error, Pose Error, and FID. ID Ret is calculated by a pre-trained face
+recognition model [97], measuring the Euclidean distance between the generated face and the
+source face. A higher ID Ret indicates better preservation of identity information. Expression
+and pose errors quantify the differences in expression and pose between the generated face
+and the source face. These metrics are evaluated using a pose estimator [99] and a 3D facial
+model [361], extracting expression and pose vectors for the generated and source faces.
+Lower values for expression error and pose error indicate higher facial expression and pose
+similarity between the swapped face and the source face. FID [95] is used to assess image
+quality, with lower FID values indicating that the generated images closely resemble authentic
+facial images in appearance.
+— Face Reenactment. Face reenactment commonly uses consistent evaluation metrics, in-
+cluding CSIM, SSIM [93], PSNR, LPIPS [94], LMD [100], and FID. CSIM describes the cosine
+similarity between the generated and source faces, calculated by ArcFace [362], with higher
+values indicating better performance. SSIM, PSNR, LPIPS, and FID are used to measure the
+quality of synthesized images. SSIM measures the structural similarity between two images,
+with higher values indicating a closer resemblance to natural images. PSNR quantifies the
+ratio between a signal’s maximum possible power and noise’s power, indicating higher quality
+for higher values. LPIPS assesses reconstruction fidelity using a pre-trained AlexNet [48]
+to extract feature maps for similarity score computation. As mentioned earlier, FID is used
+to evaluate image quality. LMD assesses the accuracy of lip shape in generated images or
+videos, with lower values indicating better model performance.
+— Talking Face Generation. Expanding upon face reenactment metrics, talking face generation
+incorporates additional metrics, including M/F-LMD, Sync, LSE-C, and LSE-D. The LSE-C and
+LSE-D are usually used to measure lip synchronization effectiveness [101]. The landmark
+distances on the mouth (M-LMD) [115] and the confidence score of SyncNet (Sync) measure
+synchronization between the generated lip motion and the input audio. F-LMD computes the
+difference in the average distance of all landmarks between predictions and ground truth
+(GT) as a measure to assess the generated expression. In addition, there are some meaningful
+metrics, such as LSE-C and LSE-D for measuring lip synchronization effectiveness [101], AVD
+[236] for evaluating identity preservation performance, AUCON [247] for assessing facial
+pose and expression jointly, and AGD [229] for evaluating eye gaze changes. These newly
+proposed evaluation metrics enrich the performance assessment system by targeting various
+aspects of the model’s performance.
+— Facial Attribute Editing. The standard evaluation metrics used in face attribute manip-
+ulation are FID, LPIPS [94], KID [96], PSNR, and SSIM. KID is one of the image quality
+assessment metrics commonly used in face editing work and other generative modeling tasks
+to quantify the difference in distribution between the generated image and the actual image,
+with lower KID values indicating better model performance. Some text-guide work will
+also use the CLIP Score to measure the consistency between the output image and the text,
+calculated as the CSIM between the normalized image and the text embedding. Higher values
+of CLIP Score indicate better consistency of the generated image with the corresponding text
+sentence.
+4.2
+Benchmark Protocol
+In the absence of a unified benchmark, this survey adopts commonly used datasets and evaluation
+metrics for each task to establish a reference benchmarking protocol. All reported results are drawn
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 24 ---
+
+273:24
+G. Pei et al.
+Table 7. Results of Representative Face Swapping
+Methods on FF++
+Methods
+Train
+Test: FF++
+ID Ret.(%)↑Exp Err.↓Pose Err.↓FID↓
+FaceShifter [189]
+
+97.38
+2.06
+2.96
+-
+SimSwap [191]
+
+92.83
+-
+1.53
+-
+HifiFace [193]
+
+98.48
+-
+2.63
+-
+RAFSwap [11]
+
+96.70
+2.92
+2.53
+-
+Xu et al. [116]
+
+90.05
+2.79
+2.46
+-
+DiffSwap [200]
+
+98.54
+5.35
+2.45
+2.16
+FlowFace [197]
+
+99.26
+-
+2.66
+-
+StyleIPSB [212]
+
+95.05
+2.23
+3.58
+-
+StyleSwap [218]
+
+97.05
+5.28
+1.56
+2.72
+WSC-Swap [213] 
+99.88
+5.01
+1.51
+-
+DiffFace [201]
+
+-
+2.71
+2.35
+-
+CanonSwap [207]
+
+99.78
+-
+1.59
+-
+Notations:  CelebA-HQ,  FFHQ,  VGGFace,
+ VGGFace2,  VoxCeleb2.
+Table 8. Results of Representative Face
+Reenactment Methods on VoxCeleb for the
+Self-Reenactment
+Methods
+Train
+Test: VoxCeleb
+CSIM↑PSNR↑LPIPIS↓FID↓SSIM↑
+HyperReenact [15]
+
+0.710
+-
+0.230
+27.10
+-
+DG [14]
+
+0.831
+-
+-
+22.10 0.761
+AVFR-GAN [363]
+
+-
+32.20
+-
+8.48 0.824
+Free-HeadGAN [229] 
+0.810
+22.16
+0.100
+35.40
+-
+HiDe-NeRF [236]
+
+0.931
+21.90
+0.084
+-
+0.862
+DiffusionAct [235]
+
+0.690
+19.70
+0.240
+-
+0.830
+Notations:  VoxCeleb,  VoxCeleb2,  ETH-Xgaze,
+ Gaze360 [230],  MPIIGaze [231],  TalkingHead-1KH.
+In addition, we use gray to represent data that is partially
+uncertain.
+directly from the original publications; therefore, the benchmark is intended for performance
+presentation rather than strict comparative evaluation.
+— Face Swapping. This task is primarily evaluated on the FF++ [80] dataset. A test set is
+constructed by uniformly sampling 10 frames from each of 1,000 videos (10,000 images in
+total), and performance is measured using ID Retention, Expression Error, Pose Error, and FID.
+However, differences in training datasets may affect result comparability. In this survey, we
+follow this evaluation protocol and explicitly report experimental settings that may impact
+fairness. Table 7 summarizes the results reported in the original publications and documents
+training data differences. Notably, RAFSwap [11] and Xu et al. [116] adopted the MegaFS
+[192] preprocessing protocol for FF++, while SimSwap [191] and CanonSwap [207] applied
+pixel-threshold filtering to improve data quality.
+— Face Reenactment. This task is evaluated under three settings: self-reenactment, cross-
+identity reenactment, and quality assessment. VoxCeleb [69] is used for self- and cross-identity
+reenactment, while VoxCeleb2 [70] is adopted for quality assessment. For self-reenactment,
+the first frame of each VoxCeleb test video serves as the source image and the remaining frames
+as driving images. For cross-identity reenactment, 35 video pairs with different identities
+are randomly selected from the VoxCeleb test set. Self-reenactment is evaluated using CSIM,
+PSNR, LPIPS, FID, and SSIM; cross-identity reenactment uses CSIM, AVD, AUCON, FID, and
+AGD; and quality assessment adopts CSIM, PSNR, LMD, FID, and SSIM. Tables 8–10 report
+the original results and document differences in training datasets.
+— Talking Face Generation. Since the MEAD [71] dataset provides explicit emotion anno-
+tations, it is commonly adopted as the benchmark for this task. As shown in Table 11, this
+survey follows this protocol and uses MEAD as the benchmark dataset. The evaluation metrics
+include CSIM, LMD, M/F-LMD, Sync, FID, PSNR, and SSIM. We report the results from the
+original publications of the selected methods and document their corresponding training
+dataset configurations. It is worth noting that the selected methods differ in their use of the
+MEAD dataset, and the validation set splits are not standardized across studies.
+— Facial Attribute Editing. This task is typically evaluated in terms of facial reconstruction ca-
+pability and FID, yet lacks a unified evaluation protocol. Therefore, as shown in Tables 12 and
+13, this survey does not impose fixed training or validation splits; instead, it reports represen-
+tative methods’ PSNR, LPIPS, SSIM, and FID results as presented in the original publications.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 25 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:25
+Table 9. Results of Representative Face Reenactment
+Methods on VoxCeleb for the Cross-Identity
+Reenactment
+Methods
+Train
+Test : VoxCeleb
+CSIM↑AVD↓AUCON↑FID↓AGD↓
+HyperReenact [15]
+
+0.680
+-
+-
+-
+-
+AVFR-GAN [363]
+
+-
+-
+-
+9.05
+-
+Free-HeadGAN [229] 
+0.789
+-
+-
+53.90
+13.1
+HiDe-NeRF [236]
+
+0.786
+0.012
+0.971
+57.00
+-
+DiffusionAct [235]
+
+0.600
+-
+-
+-
+-
+Notations:  VoxCeleb,  VoxCeleb2,  ETH-Xgaze,
+ Gaze360 [230],  MPIIGaze [231],  TalkingHead-1KH.
+Table 10. Results of Representative Face
+Reenactment Methods on VoxCeleb2 for Quality
+Assessment
+Methods
+Train
+Test: VoxCeleb2
+CSIM↑PSNR↑LMD↓FID↓SSIM↑
+PC-AVS [260]
+
+-
+-
+6.880
+-
+0.886
+GC-AVT [261]
+
+-
+-
+2.757
+-
+0.739
+Wang et al. [92]
+
+-
+28.92
+1.830
+-
+0.830
+PECHead [225]
+
+1.590
+-
+23.05
+-
+DG [14]
+
+0.721
+-
+-
+51.79 0.540
+HiDe-NeRF [236]
+
+0.787
+-
+-
+61.00
+-
+Notations:  VoxCeleb,  VoxCeleb2,  LRW,
+ CelebV-HQ,  TalkingHead-1KH.
+— Forgery Detection. This task requires evaluation under both self-dataset and cross-dataset
+settings, with AUC and ACC as the commonly used metrics. In this survey, self-dataset
+performance is evaluated on the FF++ dataset, with results separately reported for FF++ (HQ)
+and FF++ (LQ) in terms of AUC and ACC, as shown in Table 14. For cross-dataset evaluation,
+four representative datasets—DFDC, Celeb-DF, Celeb-DFv2, and DeeperForensics-1.0—are
+selected, and the corresponding AUC results are reported in Table 15.
+4.3
+Main Results on Deepfake Generation
+— Results on Face Swapping. Table 7 displays the performance evaluation results of some
+representative models on the Face Swapping task using the FF++ [80] dataset. WSC-Swap
+[213] captures external facial attribute information and internal identity features through two
+independent encoders, enabling strong identity preservation and stable facial pose retention.
+However, it shows sub-optimal performance on facial expression error metrics. In addition, the
+method has been reported to suffer from certain attribute loss during facial attribute transfer.
+— Results on Face Reenactment. Tables 8 and 9 show the performance evaluation results on
+the VoxCeleb [69] dataset for self-reenactment and cross-subject reenactment, respectively.
+AVFR-GAN [363] achieves better performance by using the multimodal modeling. Table 10
+presents quality assessment results on the VoxCeleb2 dataset. HiDe-NeRF [236] represents
+3D scenes using canonical appearance fields and implicit deformation fields. It achieves
+accurate facial attribute modeling by explicitly decoupling facial pose and expression
+attributes using a deformation module.
+— Results on Talking Face Generation. Table 11 displays the performance results of various
+talking face generation approaches on the MEAD [71] dataset since 2023. AMIGO [285]
+achieves promising results, which utilizes seq2seq to generate facial landmarks for emotion
+tagging, matching mouth movements with emotional features. Additionally, it employs a
+landmark-to-image translation network to create facial images with fine textures.
+— Results on Facial Attribute Editing. Table 12 evaluates the quality level of generated
+images using FID, and Table 13 assesses facial reconstruction capabilities using PSNR, LPIPS,
+and SSIM. Due to different training and testing datasets, quantitative fair comparisons are
+not possible that just serve as performance demonstrations.
+4.4
+Main Results on Forgery Detection
+Table 14 presents the ACC and AUC metrics for some detection models trained on FF++ [80] and
+tested on FF++ (HQ) and FF++ (LQ). LipForensics [325] exhibits robust performance on the strongly
+compressed FF++ (LQ), while Guo et al. [350] perform best on FF++ (HQ). Table 15 shows the
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 26 ---
+
+273:26
+G. Pei et al.
+Table 11. Evaluation Results of the Models Involved
+in Talking Face Generation on the MEAD Dataset
+Method
+Train
+Test: MEAD
+CSIM↑LMD↓M/F-LMD↓Sync↑FID↓PSNR/SSIM↑
+Xu et al. [263]
+
+0.83
+2.36
+-
+3.500 15.91 30.09/0.850
+EMMN [284]
+
+-
+-
+2.780/2.870 3.570
+-
+29.38/0.660
+AMIGO [285]
+
+-
+2.44
+2.140/2.440
+-
+19.59 30.29/0.820
+SLIGO [282]
+
+0.88
+1.83
+-
+3.690
+-
+-/0.790
+Gan et al. [283] 
+-
+-
+2.250/2.470
+-
+19.69 21.75/0.680
+SPACE [253]
+
+-
+-
+-
+3.610 11.68
+-
+TalkCLIP [259]
+
+-
+-
+3.601/2.415 3.773
+-
+-/0.829
+MTHM [364]
+
+-
+-
+-
+-
+22.38 21.38/0.660
+Notations:  MEAD,  LRW,  VoxCeleb2,  HDTF.
+Table 12. Results of Facial Reconstruction
+Capabilities in Representative Facial Attribute
+Editing Work
+Methods
+Type
+Train Test PSNR↑LPIPS↓SSIM↑
+Konpat et al. [296]
+Difussion
+
+
+-
+0.0110 0.991
+Kim et al. [307]
+Difussion
+
+
+-
+0.0450 0.922
+FDNeRF [27]
+GANs+NeRF
+
+
+-
+0.1420 0.821
+HairNeRF [365]
+GANs+NeRF
+
+
+31.84
+0.1060 0.827
+IA-FaceS [19]
+GANs
+
+
+22.34
+0.2240 0.642
+IA-FaceS [19]
+GANs
+
+
+22.43
+0.0384 0.659
+r-FaceS [366]
+GANs
+
+
+30.69
+0.0220
+-
+Notations:  FFHQ,  VoxCeleb,  VoxCeleb2,
+ CelebA-HQ.
+Table 13. FID Evaluation of Different Methods
+Methods
+Type
+Train
+Test
+FID↓
+FENeRF [297]
+GANs+NeRF
+
+
+12.10
+FENeRF [297]
+GANs+NeRF
+
+
+28.20
+AnyFace [18]
+GANs
+
+
+56.75
+AnyFace [18]
+GANs
+
+
+50.56
+TextFace [315]
+GANs
+
+
+22.81
+TG-3DFace [304]
+GANs
+
+
+52.21
+TG-3DFace [304]
+GANs
+
+
+39.02
+HifaFace [295]
+GANs
+
+
+4.04
+GuidedStyle [298]
+GANs
+
+
+41.79
+NeRFFaceEditing [310]
+GANs
+
+
+6.00
+Notations:  FFHQ,  CelebA-HQ,  MM
+CelebA-HQ,  CelebA,  CelebAText-HQ,
+ Self-build.
+Table 14. Results of the Self-Dataset
+Performance on FF++
+Methods
+Train
+FF++ (LQ)
+FF++ (HQ)
+ACC(%)
+AUC(%)
+ACC(%)
+AUC(%)
+F3-Net [35]
+FF++
+93.02
+95.80
+98.95
+99.30
+Masi et al. [349]
+FF++
+86.34
+-
+96.43
+-
+Zhao et al. [318]
+FF++
+88.69
+90.40
+97.60
+99.29
+FDFL [36]
+FF++
+89.00
+92.40
+96.69
+99.30
+LipForensics [325]
+FF++
+94.20
+98.10
+98.80
+99.70
+RECCE [344]
+FF++
+91.03
+95.02
+97.06
+99.32
+Guo et al. [350]
+FF++
+92.76
+96.85
+99.24
+99.75
+MRL [33]
+FF++
+91.81
+96.18
+93.82
+98.27
+HQ (Mild compression), LQ (Heavy compression).
+cross-dataset evaluation. AVoiD-DF [38] and Zhao et al. [336] demonstrate excellent generalization
+ability, but there is still significant room for improvement in these datasets. However, overall, there
+is room for improvement in the evaluation performance of forgery detection models on the DFDC.
+5
+Future Prospects
+— Face Swapping. Generalization is a significant issue in face swapping models. While many
+models demonstrate excellent performance on their training sets, there is often noticeable per-
+formance degradation when applied to different datasets during testing. In addition, beyond
+the common evaluation metrics, various face swapping works employ different evaluation
+metric systems, lacking a unified evaluation protocol. This absence hinders researchers from
+intuitively assessing model performance. Therefore, establishing comprehensive experimental
+and evaluation frameworks is crucial for fair comparisons and driving progress in the field.
+— Face Reenactment. Existing methods have room for improvement, facing three main
+challenges: convenience, authenticity, and security. Many approaches struggle to balance
+lightweight deployment and generating high-quality reenactment effects, hindering the wide-
+spread adoption of facial reenactment technology in industries. Moreover, several methods
+claim to achieve high-quality facial reenactment, but they exhibit visible degradation in
+output during rapid pose changes or extreme lighting conditions in driving videos. Addition-
+ally, the computational complexity, consuming significant time and system resources, poses
+substantial challenges for practical applications.
+— Talking Face Generation. Current methods aim to improve the realism of generated
+conversational videos, yet they still lack fine-grained control over emotional dynamics. The
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 27 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:27
+Table 15. Results of Cross-Dataset Performance Evaluation on Four Datasets
+DFDC, Celeb-DF (CDF), Celeb-DFv2 (CDFv2), and DeeperForensics-1.0 (DFo)
+Methods
+Train
+DFDC
+CDF
+CDFv2
+DFo
+Face X-ray [317]
+
+80.92
+80.58
+-
+-
+Zhao et al. [336]
+
+67.52
+98.30
+90.03
+99.41
+Zheng et al. [324]
+
+74.00
+-
+86.90
+98.80
+LipForensics [325]
+
+73.50
+-
+82.40
+97.60
+M2TR [103]
+
+-
+82.10
+-
+-
+M2TR [103]
+
+-
+68.20
+-
+-
+RECCE [344]
+
+69.06
+68.71
+-
+-
+SBIs [320]
+
+-
+-
+90.79
+-
+SBIs [320]
+
+72.42
+-
+93.18
+-
+RealForensics [37]
+
+75.90
+-
+86.90
+99.30
+Guo et al. [350]
+
+81.65
+84.97
+-
+-
+Yin et al. [32]
+
+73.08
+71.36
+-
+-
+MRL [33]
+
+71.53
+83.58
+-
+-
+AVoiD-DF [38]
+
+80.60
+-
+-
+-
+WMamba [333]
+
+82.97
+96.29
+-
+-
+Evaluation indicator is AUC. Notations:  FF++,  FF++(Real),  FF++(HQ),  FF++(LQ),
+ Self-build,  SR-DF [103],  DFDCp,  FakeAVCeleb,  DefakeAVMiT.
+alignment between emotional intonation and audio–semantic content remains imprecise,
+and the modulation of emotional intensity is overly coarse. Moreover, the realistic coupling
+between head pose and facial expression is often under-modeled. Finally, for text or audio
+conveying strong emotions, existing approaches still produce noticeable artifacts in head
+motion.
+— Facial Attribute Editing. Currently, mainstream facial attribute editing employs the de-
+coupling concept based on GANs and diffusion models are gradually being introduced into
+this field. The primary challenge is effectively separating the facial attributes to prevent
+unintended processing of other facial features during attribute editing. Additionally, there
+needs to be a universally accepted benchmark dataset and evaluation framework for fair
+assessments of facial editing.
+— Forgery Detection. With the rapid development of facial forgery techniques, the central
+challenge in face forgery detection technology is accurately identifying various forgery
+methods using a single detection model. Simultaneously, ensuring that the model exhibits
+robustness when detecting forgeries in the presence of disturbances such as compression is
+crucial. Most detection models follow a generic approach targeting common operational steps
+of a specific forgery method, such as the integration phase in face swapping or assessing
+temporal inconsistencies, but this manner limits the model’s generalization capabilities.
+Moreover, as forgery techniques evolve, forged videos may evade detection by introducing
+interference during the detection process.
+— Discussion. Future development of deepfake generation and detection technologies will
+move toward more robust, adaptive, and multimodal systems. For generation, integrating
+visual, auditory, and textual cues can strengthen semantic consistency, and identity preserva-
+tion, while larger and higher-quality datasets will support better cross-domain generalization.
+Reinforcement learning and feedback-driven optimization may further enhance visual fi-
+delity and temporal coherence. Detection research is expected to benefit from multimodal
+evidence aggregation and finer temporal modeling, leveraging cues such as audio–video
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 28 ---
+
+273:28
+G. Pei et al.
+synchronization, speech semantics, and physiological signals. Self-supervised and weakly
+supervised learning will also help reduce dependence on extensive annotations as new ma-
+nipulation types continue to emerge. Deepfake generation and detection will expand into
+applications including digital humans, telepresence, assistive media creation, and privacy-
+preserving data synthesis. As adoption grows, ethical risks related to identity misuse, privacy
+violations, and unauthorized content generation become more pressing. Incorporating trans-
+parency mechanisms such as watermarking and provenance metadata, along with strong
+misuse detection and clear governance guidelines, will be essential for ensuring the safe and
+responsible deployment of deepfake technologies.
+6
+Conclusion
+This survey comprehensively reviews the latest developments in the field of deepfake generation
+and detection, which is the first to cover a variety of related fields thoroughly and discusses the
+latest technologies such as diffusion. Specifically, this article covers an overview of basic background
+knowledge, including concepts of research tasks, the development of generative models and neural
+networks, and other information from closely related fields. Subsequently, we summarize the
+technical approaches adopted by different methods in the mainstream four generation and one
+detection fields, and classify and discuss the methods from a technical perspective. In addition,
+we strive to fairly organize and benchmark the representative methods in each field. Finally, we
+summarize the current challenges and future research directions for each field.
+References
+[1] Tong Sha, Wei Zhang, Tong Shen, Zhoujun Li, and Tao Mei. 2023. Deep person generation: A survey from the
+perspective of face, pose, and cloth synthesis. ACM Computing Surveys 55, 12 (2023), 1–37.
+[2] Diederik P. Kingma and Max Welling. 2014. Auto-encoding variational bayes. stat 1050 (2014), 1.
+[3] Kihyuk Sohn, Honglak Lee, and Xinchen Yan. 2015. Learning structured output representation using deep conditional
+generative models. In NeurIPS.
+[4] Aaron Van Den Oord, Oriol Vinyals. 2017. Neural discrete representation learning. Advances in Neural Information
+Processing Systems. 30.
+[5] Tero Karras, Samuli Laine, and Timo Aila. 2019. A style-based generator architecture for generative adversarial
+networks. In CVPR.
+[6] Tero Karras, Samuli Laine, Miika Aittala, Janne Hellsten, Jaakko Lehtinen, and Timo Aila. 2020. Analyzing and
+improving the image quality of stylegan. In CVPR.
+[7] Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, Yam Levi,
+Zion English, Vikram Voleti, Adam Letts, et al. 2023. Stable video diffusion: Scaling latent video diffusion models to
+large datasets. arXiv (2023).
+[8] Yuwei Guo, Ceyuan Yang, Anyi Rao, Yaohui Wang, Yu Qiao, Dahua Lin, and Bo Dai. 2024. Animatediff: Animate your
+personalized text-to-image diffusion models without specific tuning. In ICLR.
+[9] Renshuai Liu, Bowen Ma, Wei Zhang, Zhipeng Hu, Changjie Fan, Tangjie Lv, Yu Ding, and Xuan Cheng. 2024. Towards
+a simultaneous and granular identity-expression control in personalized face generation. In CVPR.
+[10] Simone Barattin, Christos Tzelepis, Ioannis Patras, and Nicu Sebe. 2023. Attribute-preserving Face Dataset Anonymiza-
+tion via Latent Code Optimization. In CVPR.
+[11] Chao Xu, Jiangning Zhang, Miao Hua, Qian He, Zili Yi, and Yong Liu. 2022. Region-aware face swapping. In CVPR.
+[12] Alberto Ancilotto, Francesco Paissan, and Elisabetta Farella. 2024. Ximswap: Many-to-many face swapping for tinyml.
+ACM Transactions on Embedded Computing Systems 23, 3 (2024), 1–16.
+[13] Kaede Shiohara, Xingchao Yang, and Takafumi Taketomi. 2023. BlendFace: Re-designing identity encoders for
+face-swapping. In ICCV.
+[14] Gee-Sern Hsu, Chun-Hung Tsai, and Hung-Yi Wu. 2022. Dual-generator face reenactment. In CVPR.
+[15] Stella Bounareli, Christos Tzelepis, Vasileios Argyriou, Ioannis Patras, and Georgios Tzimiropoulos. 2023. HyperReen-
+act: One-shot reenactment via jointly learning to refine and retarget faces. In ICCV.
+[16] Aaron Mir, Eduardo Alonso, and Esther Mondragón. 2024. DiT-head: High-resolution talking head synthesis using
+diffusion transformers. In ICAART.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 29 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:29
+[17] Chenxu Zhang, Chao Wang, Yifan Zhao, Shuo Cheng, Linjie Luo, and Xiaohu Guo. 2024. DR2: Disentangled recurrent
+representation learning for data-efficient speech video synthesis. In WACV.
+[18] Jianxin Sun, Qiyao Deng, Qi Li, Muyi Sun, Min Ren, and Zhenan Sun. 2022. Anyface: Free-style text-to-face synthesis
+and manipulation. In CVPR.
+[19] Wenjing Huang, Shikui Tu, and Lei Xu. 2023. IA-FaceS: A bidirectional method for semantic face editing. Neural
+Networks 158 (2023), 272–292.
+[20] Youxin Pang, Yong Zhang, Weize Quan, Yanbo Fan, Xiaodong Cun, Ying Shan, and Dong-ming Yan. 2023. Dpe:
+Disentanglement of pose and expression for general video portrait editing. In CVPR.
+[21] Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, and
+Yoshua Bengio. 2014. Generative adversarial nets. In NeurIPS.
+[22] Jonathan Ho, Ajay Jain, and Pieter Abbeel. 2020. Denoising diffusion probabilistic models. In NeurIPS.
+[23] Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. 2022. High-resolution image
+synthesis with latent diffusion models. In CVPR.
+[24] B. Mildenhall, P. P. Srinivasan, M. Tancik, J. T. Barron, R. Ramamoorthi, and R. Ng. 2020. Nerf: Representing scenes as
+neural radiance fields for view synthesis. In ECCV.
+[25] Kyle Gao, Yina Gao, Hongjie He, Dening Lu, Linlin Xu, and Jonathan Li. 2022. Nerf: Neural radiance field in 3d vision,
+a comprehensive review. arXiv (2022).
+[26] Kaiwen Jiang, Shu-Yu Chen, Feng-Lin Liu, Hongbo Fu, and Lin Gao. 2022. NeRFFaceEditing: Disentangled face editing
+in neural radiance fields. In SIGGRAPH.
+[27] Jingbo Zhang, Xiaoyu Li, Ziyu Wan, Can Wang, and Jing Liao. 2022. Fdnerf: Few-shot dynamic neural radiance fields
+for face reconstruction and expression editing. In SIGGRAPH.
+[28] Shuaibo Li, Shibiao Xu, Wei Ma, and Qiu Zong. 2021. Image manipulation localization using attentional cross-domain
+CNN features. IEEE Transactions on Neural Networks and Learning Systems 34, 9 (2021), 5614–5628.
+[29] Shuaibo Li, Wei Ma, Jianwei Guo, Shibiao Xu, Benchong Li, and Xiaopeng Zhang. 2024. Unionformer: Unified-learning
+transformer with multi-view representation for image manipulation detection and localization. In CVPR.
+[30] Peisong He, Haoliang Li, and Hongxia Wang. 2019. Detection of fake images via the ensemble of deep representations
+from multi color spaces. In ICIP.
+[31] Peng Zhou, Xintong Han, Vlad I. Morariu, and Larry S. Davis. 2017. Two-stream neural networks for tampered face
+detection. In CVPRW.
+[32] Qilin Yin, Wei Lu, Bin Li, and Jiwu Huang. 2023. Dynamic difference learning with spatiotemporal correlation for
+deepfake video detection. IEEE Transactions on Information Forensics and Security 18 (2023), 4046–4058.
+[33] Ziming Yang, Jian Liang, Yuting Xu, Xiao-Yu Zhang, and Ran He. 2023. Masked relation learning for deepfake detection.
+IEEE Transactions on Information Forensics and Security 18 (2023), 1696–1708.
+[34] Hafsa Ilyas, Ali Javed, and Khalid Mahmood Malik. 2023. AVFakeNet: A unified end-to-end Dense Swin Transformer
+deep learning model for audiovisual deepfakes detection. Applied Soft Computing 136 (2023), 110124.
+[35] Yuyang Qian, Guojun Yin, Lu Sheng, Zixuan Chen, and Jing Shao. 2020. Thinking in frequency: Face forgery detection
+by mining frequency-aware clues. In ECCV.
+[36] Jiaming Li, Hongtao Xie, Jiahong Li, Zhongyuan Wang, and Yongdong Zhang. 2021. Frequency-aware discriminative
+feature learning supervised by single-center loss for face forgery detection. In CVPR.
+[37] Alexandros Haliassos, Rodrigo Mira, Stavros Petridis, and Maja Pantic. 2022. Leveraging real talking faces via
+self-supervision for robust forgery detection. In CVPR.
+[38] Wenyuan Yang, Xiaoyu Zhou, Zhikai Chen, Bofei Guo, Zhongjie Ba, Zhihua Xia, Xiaochun Cao, and Kui Ren. 2023.
+AVoiD-DF: Audio-visual joint learning for detecting deepfake. IEEE Transactions on Information Forensics and Security
+18 (2023), 2015–2029.
+[39] Yisroel Mirsky and Wenke Lee. 2021. The creation and detection of deepfakes: A survey. ACM Computing Surveys
+(CSUR) 54, 1 (2021), 1–41.
+[40] Kishan Vyas, Preksha Pareek, Ruchi Jayaswal, and Shruti Patil. 2024. Analysing the landscape of deep fake detection:
+A survey. International Journal of Intelligent Systems and Applications in Engineering 12, 11s (2024), 40–55.
+[41] Yunfan Liu, Qi Li, Qiyao Deng, Zhenan Sun, and Ming-Hsuan Yang. 2023. Gan-based facial attribute manipulation.
+IEEE Transactions on Pattern Analysis and Machine Intelligence 45, 12 (2023), 14590–14610.
+[42] Andrew Melnik, Maksim Miasayedzenkau, Dzianis Makaravets, Dzianis Pirshtuk, Eren Akbulut, Dennis Holzmann,
+Tarek Renusch, Gustav Reichert, and Helge Ritter. 2024. Face generation and editing with stylegan: A survey. IEEE
+Transactions on Pattern Analysis and Machine Intelligence 46, 5 (2024), 3557–3576.
+[43] Jascha Sohl-Dickstein, Eric Weiss, Niru Maheswaranathan, and Surya Ganguli. 2015. Deep unsupervised learning
+using nonequilibrium thermodynamics. In ICML.
+[44] Mehdi Mirza and Simon Osindero. 2014. Conditional generative adversarial nets. arXiv (2014).
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 30 ---
+
+273:30
+G. Pei et al.
+[45] Phillip Isola, Jun-Yan Zhu, Tinghui Zhou, and Alexei A. Efros. 2017. Image-to-image translation with conditional
+adversarial networks. In ICCV.
+[46] Jianmin Bao, Dong Chen, Fang Wen, Houqiang Li, and Gang Hua. 2017. CVAE-GAN: Fine-grained image generation
+through asymmetric training. In ICCV.
+[47] Y. Lecun, L. Bottou, Y. Bengio, and P. Haffner. 1998. Gradient-based learning applied to document recognition. In
+Proceedings of the IEEE 86, 11 (1998), 2278–2324.
+[48] Alex Krizhevsky, Ilya Sutskever, and Geoffrey E. Hinton. 2012. Imagenet classification with deep convolutional neural
+networks. In NeurIPS.
+[49] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. 2016. Deep residual learning for image recognition. In
+CVPR.
+[50] Zhuang Liu, Hanzi Mao, Chao-Yuan Wu, Christoph Feichtenhofer, Trevor Darrell, and Saining Xie. 2022. A convnet
+for the 2020s. In CVPR.
+[51] Jiangning Zhang, Xiangtai Li, Jian Li, Liang Liu, Zhucun Xue, Boshen Zhang, Zhengkai Jiang, Tianxin Huang, Yabiao
+Wang, and Chengjie Wang. 2023. Rethinking mobile block for efficient attention-based models. In ICCV.
+[52] Jiangning Zhang, Xiangtai Li, Yabiao Wang, Chengjie Wang, Yibo Yang, Yong Liu, and Dacheng Tao. 2024. Eatformer:
+Improving vision transformer inspired by evolutionary algorithm. In International Journal of Computer Vision 132, 9
+(2024), 3509–3536.
+[53] Ze Liu, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin, and Baining Guo. 2021. Swin transformer:
+Hierarchical vision transformer using shifted windows. In ICCV.
+[54] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser, and Illia
+Polosukhin. 2017. Attention is all you need. In NeurIPS.
+[55] Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner,
+Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, et al. 2021. An image is worth 16x16 words:
+Transformers for image recognition at scale. In ICLR.
+[56] Ze Liu, Han Hu, Yutong Lin, Zhuliang Yao, Zhenda Xie, Yixuan Wei, Jia Ning, Yue Cao, Zheng Zhang, Li Dong, et al.
+2022. Swin transformer v2: Scaling up capacity and resolution. In CVPR.
+[57] Prafull Sharma, Ayush Tewari, Yilun Du, Sergey Zakharov, Rares Andrei Ambrus, Adrien Gaidon, William T. Freeman,
+Frédo Durand, Joshua B. Tenenbaum, and Vincent Sitzmann. 2023. Neural groundplans: Persistent neural scene
+representations from a single image. In ICLR.
+[58] Muhammad Zubair Irshad, Sergey Zakharov, Katherine Liu, Vitor Guizilini, Thomas Kollar, Adrien Gaidon, Zsolt Kira,
+and Rares Ambrus. 2023. Neo 360: Neural fields for sparse view synthesis of outdoor scenes. In ICCV.
+[59] Yichen Liu, Benran Hu, Junkai Huang, Yu-Wing Tai, and Chi-Keung Tang. 2023. Instance neural radiance field. In
+ICCV.
+[60] Zhixiang Min, Bingbing Zhuang, Samuel Schulter, Buyu Liu, Enrique Dunn, and Manmohan Chandraker. 2023.
+NeurOCS: Neural NOCS supervision for monocular 3D object localization. In CVPR.
+[61] Sungwon Hwang, Junha Hyung, Daejin Kim, Min-Jung Kim, and Jaegul Choo. 2023. FaceCLIPNeRF: Text-driven 3D
+face manipulation using deformable neural radiance fields. In ICCV.
+[62] Yuanbo Yang, Yifei Yang, Hanlei Guo, Rong Xiong, Yue Wang, and Yiyi Liao. 2023. UrbanGIRAFFE: Representing
+urban scenes as compositional generative neural feature fields. In ICCV.
+[63] Gary B. Huang, Marwan Mattar, Tamara Berg, and Eric Learned-Miller. 2008. Labeled faces in the wild: A database
+forstudying face recognition in unconstrained environments. In Workshop on Faces in’Real-Life’Images: Detection,
+Alignment, and Recognition.
+[64] Ziwei Liu, Ping Luo, Xiaogang Wang, and Xiaoou Tang. 2015. Deep learning face attributes in the wild. In ICCV.
+[65] Tero Karras, Timo Aila, Samuli Laine, and Jaakko Lehtinen. 2018. Progressive growing of GANs for improved quality,
+stability, and variation. In ICLR.
+[66] Omkar Parkhi, Andrea Vedaldi, and Andrew Zisserman. 2015. Deep face recognition. In BMVC.
+[67] Qiong Cao, Li Shen, Weidi Xie, Omkar M. Parkhi, and Andrew Zisserman. 2018. Vggface2: A dataset for recognising
+faces across pose and age. In FG.
+[68] Stephen Moore and Richard Bowden. 2010. Multi-view pose and facial expression recognition. In BMVC.
+[69] Arsha Nagrani, Joon Son Chung, and Andrew Zisserman. 2017. Voxceleb: A large-scale speaker identification dataset.
+In Interspecch.
+[70] Joon Son Chung, Arsha Nagrani, and Andrew Zisserman. 2018. Voxceleb2: Deep speaker recognition. In Interspecch.
+[71] Kaisiyuan Wang, Qianyi Wu, Linsen Song, Zhuoqian Yang, Wayne Wu, Chen Qian, Ran He, Yu Qiao, and Chen Change
+Loy. 2020. Mead: A large-scale audio-visual dataset for emotional talking-face generation. In ECCV.
+[72] Weihao Xia, Yujiu Yang, Jing-Hao Xue, and Baoyuan Wu. 2021. Tedigan: Text-guided diverse face image generation
+and manipulation. In CVPR.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 31 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:31
+[73] Jianxin Sun, Qi Li, Weining Wang, Jian Zhao, and Zhenan Sun. 2021. Multi-caption text-to-face synthesis: Dataset
+and algorithm. In ACM MM.
+[74] Hao Zhu, Wayne Wu, Wentao Zhu, Liming Jiang, Siwei Tang, Li Zhang, Ziwei Liu, and Chen Change Loy. 2022.
+CelebV-HQ: A large-scale video facial attributes dataset. In ECCV.
+[75] Ting-Chun Wang, Arun Mallya, and Ming-Yu Liu. 2021. One-shot free-view neural talking-head synthesis for video
+conferencing. In CVPR.
+[76] Triantafyllos Afouras, Joon Son Chung, Andrew Senior, Oriol Vinyals, and Andrew Zisserman. 2018. Deep audio-visual
+speech recognition. IEEE Transactions on Pattern Analysis and Machine Intelligence 44, 12 (2018), 8717–8727.
+[77] Triantafyllos Afouras, Joon Son Chung, and Andrew Zisserman. 2018. LRS3-TED: A large-scale dataset for visual
+speech recognition. arXiv (2018).
+[78] Yuezun Li, Ming-Ching Chang, and Siwei Lyu. 2018. In Ictu Oculi: Exposing AI generated fake face videos by detecting
+eye blinking. In WIFS.
+[79] Pavel Korshunov and Sébastien Marcel. 2018. Deepfakes: A new threat to face recognition? assessment and detection.
+arXiv (2018).
+[80] Andreas Rossler, Davide Cozzolino, Luisa Verdoliva, Christian Riess, Justus Thies, and Matthias Nießner. 2019.
+Faceforensics++: Learning to detect manipulated facial images. In ICCV.
+[81] Liming Jiang, Ren Li, Wayne Wu, Chen Qian, and Chen Change Loy. 2020. Deeperforensics-1.0: A large-scale dataset
+for real-world face forgery detection. In CVPR.
+[82] Brian Dolhansky, Russ Howes, Ben Pflaum, Nicole Baram, and Cristian Canton Ferrer. 2019. The deepfake detection
+challenge (dfdc) preview dataset. arXiv (2019).
+[83] Brian Dolhansky, Joanna Bitton, Ben Pflaum, Jikuo Lu, Russ Howes, Menglin Wang, and Cristian Canton Ferrer. 2020.
+The deepfake detection challenge (dfdc) dataset. arXiv (2020).
+[84] Yuezun Li, Xin Yang, Pu Sun, Honggang Qi, and Siwei Lyu. 2020. Celeb-df: A large-scale challenging dataset for
+deepfake forensics. In CVPR.
+[85] Hasam Khalid, Shahroz Tariq, Minha Kim, and Simon S. Woo. 2021. FakeAVCeleb: A novel audio-video multimodal
+deepfake dataset. NeurIPS (2021).
+[86] DFD. 2019. DFD. Retrieved March 24, 2026 from https://blog.research.google/2019/09/contributing-data-to-deepfake-
+detection.html
+[87] Bojia Zi, Minghao Chang, Jingjing Chen, Xingjun Ma, and Yu-Gang Jiang. 2020. Wilddeepfake: A challenging
+real-world dataset for deepfake detection. In ACM MM.
+[88] Patrick Kwon, Jaeseong You, Gyuhyeon Nam, Sungwoo Park, and Gyeongsu Chae. 2021. Kodf: A large-scale korean
+deepfake detection dataset. In ICCV.
+[89] Xin Yang, Yuezun Li, and Siwei Lyu. 2019. Exposing deep fakes using inconsistent head poses. In ICASSP.
+[90] Kartik Narayan, Harsh Agarwal, Kartik Thakral, Surbhi Mittal, Mayank Vatsa, and Richa Singh. 2022. Deephy: On
+deepfake phylogeny. In IJCB.
+[91] Kartik Narayan, Harsh Agarwal, Kartik Thakral, Surbhi Mittal, Mayank Vatsa, and Richa Singh. 2023. DF-Platter:
+Multi-face heterogeneous deepfake dataset. In CVPR.
+[92] Jianrong Wang, Yaxin Zhao, Hongkai Fan, Tianyi Xu, Qi Li, Sen Li, and Li Liu. 2023. Memory-augmented contrastive
+learning for talking head generation. In ICASSP.
+[93] Zhou Wang, Alan C. Bovik, Hamid R. Sheikh, and Eero P. Simoncelli. 2004. Image quality assessment: from error
+visibility to structural similarity. IEEE Transactions on Image Processing 13, 4 (2004), 600–612.
+[94] Richard Zhang, Phillip Isola, Alexei A. Efros, Eli Shechtman, and Oliver Wang. 2018. The unreasonable effectiveness
+of deep features as a perceptual metric. In CVPR.
+[95] Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, Bernhard Nessler, and Sepp Hochreiter. 2017. Gans trained by
+a two time-scale update rule converge to a local nash equilibrium. In NeurIPS.
+[96] Mikołaj Bińkowski, Danica J. Sutherland, Michael Arbel, and Arthur Gretton. 2018. Demystifying MMD GANs. In
+ICLR.
+[97] Hao Wang, Yitong Wang, Zheng Zhou, Xing Ji, Dihong Gong, Jingchao Zhou, Zhifeng Li, and Wei Liu. 2018. Cosface:
+Large margin cosine loss for deep face recognition. In CVPR.
+[98] Bindita Chaudhuri, Noranart Vesdapunt, and Baoyuan Wang. 2019. Joint face detection and facial motion retargeting
+for multiple faces. In CVPR.
+[99] Nataniel Ruiz, Eunji Chong, and James M. Rehg. 2018. Fine-grained head pose estimation without keypoints. In CVPR.
+[100] Lele Chen, Zhiheng Li, Ross K. Maddox, Zhiyao Duan, and Chenliang Xu. 2018. Lip movements generation at a glance.
+In ECCV.
+[101] K. R. Prajwal, Rudrabha Mukhopadhyay, Vinay P. Namboodiri, and C. V. Jawahar. 2020. A lip sync expert is all you
+need for speech to lip generation in the wild. In ACM MM.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 32 ---
+
+273:32
+G. Pei et al.
+[102] Binh M. Le and Simon S. Woo. 2023. Quality-agnostic deepfake detection with intra-model collaborative learning. In
+ICCV.
+[103] Junke Wang, Zuxuan Wu, Wenhao Ouyang, Xintong Han, Jingjing Chen, Yu-Gang Jiang, and Ser-Nam Li. 2022. M2tr:
+Multi-modal multi-scale transformers for deepfake detection. In ICML.
+[104] Baojin Huang, Zhongyuan Wang, Jifan Yang, Jiaxin Ai, Qin Zou, Qian Wang, and Dengpan Ye. 2023. Implicit identity
+driven deepfake face swapping detection. In CVPR.
+[105] Chuangchuang Tan, Yao Zhao, Shikui Wei, Guanghua Gu, and Yunchao Wei. 2023. Learning on gradients: Generalized
+artifacts representation for GAN-generated images detection. In CVPR.
+[106] Xinru Chen, Chengbo Dong, Jiaqi Ji, Juan Cao, and Xirong Li. 2021. Image manipulation detection by multi-view
+multi-scale supervision. In ICCV.
+[107] Justin Johnson, Alexandre Alahi, and Li Fei-Fei. 2016. Perceptual losses for real-time style transfer and super-resolution.
+In ECCV.
+[108] Changyong Shu, Hemao Wu, Hang Zhou, Jiaming Liu, Zhibin Hong, Changxing Ding, Junyu Han, Jingtuo Liu, Errui
+Ding, and Jingdong Wang. 2022. Few-shot head swapping in the wild. In CVPR.
+[109] Yue Han, Jiangning Zhang, Junwei Zhu, Xiangtai Li, Yanhao Ge, Wei Li, Chengjie Wang, Yong Liu, Xiaoming Liu, and
+Ying Tai. 2023. A generalist facex via learning unified facial representation. arXiv (2023).
+[110] Jiangning Zhang, Chao Xu, Jian Li, Yue Han, Yabiao Wang, Ying Tai, and Yong Liu. 2022. Scsnet: An efficient paradigm
+for learning simultaneously image colorization and super-resolution. In AAAI.
+[111] Brian B. Moser, Federico Raue, Stanislav Frolov, Sebastian Palacio, Jörn Hees, and Andreas Dengel. 2023. Hitchhiker’s
+guide to super-resolution: Introduction and recent advances. IEEE Transactions on Pattern Analysis and Machine
+Intelligence 45, 8 (2023), 9862–9882.
+[112] Ryota Natsume and Yatagawa. 2018. Rsgan: Face swapping and editing using face and hair representation in latent
+spaces. In SIGGRAPH.
+[113] Qianru Sun, Ayush Tewari, Weipeng Xu, Mario Fritz, Christian Theobalt, and Bernt Schiele. 2018. A hybrid model for
+identity obfuscation by face replacement. In ECCV.
+[114] Bo Fan, Lijuan Wang, and Frank K. Soong. 2015. Photo-real talking head with deep bidirectional LSTM. In ICASSP.
+[115] Lele Chen, Ross K. Maddox, Zhiyao Duan, and Chenliang Xu. 2019. Hierarchical cross-modal talking face generation
+with dynamic pixel-wise loss. In CVPR.
+[116] Yangyang Xu, Bailin Deng, Junle Wang, Yanqing Jing, Jia Pan, and Shengfeng He. 2022. High-resolution face swapping
+via latent semantics disentanglement. In CVPR.
+[117] Huaibo Huang, Ran He, Zhenan Sun, and Tieniu Tan. 2017. Wavelet-srnet: A wavelet-based cnn for multi-scale face
+super resolution. In ICCV.
+[118] Zhibo Chen, Jianxin Lin, Tiankuang Zhou, and Feng Wu. 2019. Sequential gating ensemble network for noise robust
+multiscale face restoration. IEEE Transactions on Cybernetics 51, 1 (2019), 451–461.
+[119] Chaofeng Chen, Dihong Gong, Hao Wang, Zhifeng Li, and Kwan-Yee K. Wong. 2020. Learning spatial attention for
+face super-resolution. IEEE Transactions on Image Processing 30 (2020), 1219–1231.
+[120] Shanlei Ko and Bi-Ru Dai. 2021. Multi-laplacian GAN with edge enhancement for face super resolution. In ICPR.
+[121] Brian B. Moser, Arundhati S. Shanbhag, Federico Raue, Stanislav Frolov, Sebastian Palacio, and Andreas Dengel. 2024.
+Diffusion models, image super-resolution and everything: A survey. In AAAI.
+[122] Yukai Shi, Guanbin Li, Qingxing Cao, Keze Wang, and Liang Lin. 2019. Face hallucination by attentive sequence
+optimization with reinforcement learning. IEEE Transactions on Pattern Analysis and Machine Intelligence 42, 11 (2019),
+2809–2824.
+[123] Kui Jiang, Zhongyuan Wang, Peng Yi, Guangcheng Wang, Ke Gu, and Junjun Jiang. 2019. ATMFN: Adaptive-threshold-
+based multi-model fusion network for compressed face hallucination. IEEE Transactions on Multimedia 22, 10 (2019),
+2734–2747.
+[124] Araceli Morales, Gemma Piella, and Federico M. Sukno. 2021. Survey on 3D face reconstruction from uncalibrated
+images. Computer Science Review 40 (2021), 100400.
+[125] Sahil Sharma and Vijay Kumar. 2022. 3d face reconstruction in deep learning era: A survey. Archives of Computational
+Methods in Engineering 29, 5 (2022), 3475–3507.
+[126] Fabio Maninchedda, Martin R. Oswald, and Marc Pollefeys. 2017. Fast 3d reconstruction of faces with glasses. In
+CVPR.
+[127] Jiangke Lin, Yi Yuan, Tianjia Shao, and Kun Zhou. 2020. Towards high-fidelity 3d face reconstruction from in-the-wild
+images using graph convolutional networks. In CVPR.
+[128] Mingtao Feng, Syed Zulqarnain Gilani, Yaonan Wang, and Ajmal Mian. 2018. 3d face reconstruction from light field
+images: A model-free approach. In ECCV.
+[129] Shubham Tulsiani, Tinghui Zhou, Alexei A. Efros, and Jitendra Malik. 2017. Multi-view supervision for single-view
+reconstruction via differentiable ray consistency. In CVPR.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 33 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:33
+[130] Yifan Xing, Rahul Tewari, and Paulo Mendonca. 2019. A self-supervised bootstrap method for single-image 3D face
+reconstruction. In WACV.
+[131] Ira Kemelmacher-Shlizerman and Ronen Basri. 2010. 3D face reconstruction from a single image using a single
+reference face shape. IEEE Transactions on Pattern Analysis and Machine Intelligence 33, 2 (2010), 394–405.
+[132] Luo Jiang, Juyong Zhang, Bailin Deng, Hao Li, and Ligang Liu. 2018. 3D face reconstruction with geometry details
+from a single image. IEEE Transactions on Image Processing 27, 10 (2018), 4756–4770.
+[133] Pengfei Dou, Shishir K. Shah, and Ioannis A. Kakadiaris. 2017. End-to-end 3D face reconstruction with deep neural
+networks. In CVPR.
+[134] Bindita Chaudhuri, Noranart Vesdapunt, Linda Shapiro, and Baoyuan Wang. 2020. Personalized face modeling for
+improved face reconstruction and motion retargeting. In ECCV.
+[135] Xiaobo Zhang, Donghai Zhai, Tianrui Li, Yuxin Zhou, and Yang Lin. 2023. Image inpainting based on deep learning:
+A review. Information Fusion 90 (2023), 74–94.
+[136] Ahmet Burak Yildirim, Hamza Pehlivan, Bahri Batuhan Bilecen, and Aysegul Dundar. 2023. Diverse inpainting and
+editing with gan inversion. In ICCV.
+[137] Meili Zhou, Xiangzhen Liu, Tingting Yi, Zongwen Bai, and Pei Zhang. 2023. A superior image inpainting scheme
+using Transformer-based self-supervised attention GAN model. Expert Systems with Applications 233 (2023), 120906.
+[138] Jianjin Xu, Saman Motamed, Praneetha Vaddamanu, Chen Henry Wu, Christian Haene, Jean-Charles Bazin, and
+Fernando De la Torre. 2024. Personalized face inpainting with diffusion models by parallel visual attention. In WACV.
+[139] Peiqing Yang, Shangchen Zhou, Qingyi Tao, and Chen Change Loy. 2024. PGDiff: Guiding diffusion models for
+versatile face restoration via partial guidance. In NeurIPS.
+[140] Wing-Yin Yu, Lai-Man Po, Ray C. C. Cheung, Yuzhi Zhao, Yu Xue, and Kun Li. 2023. Bidirectionally deformable
+motion modulation for video-based human pose transfer. In ICCV.
+[141] Xinyue Zhou, Mingyu Yin, Xinyuan Chen, Li Sun, Changxin Gao, and Qingli Li. 2022. Cross attention based style
+distribution for controllable person image synthesis. In ECCV.
+[142] Jian Zhao and Hui Zhang. 2022. Thin-plate spline motion model for image animation. In CVPR.
+[143] Yaohui Wang, Xin Ma, Xinyuan Chen, Cunjian Chen, Antitza Dantcheva, Bo Dai, and Yu Qiao. 2025. Leo: Generative
+latent image animator for human video synthesis. In International Journal of Computer Vision 133, 3 (2025), 1277–1289.
+[144] Yue Ma, Yingqing He, Xiaodong Cun, Xintao Wang, Ying Shan, Xiu Li, and Qifeng Chen. 2024. Follow your pose:
+Pose-guided text-to-video generation using pose-free videos. In AAAI.
+[145] Tan Wang, Linjie Li, Kevin Lin, Chung-Ching Lin, Zhengyuan Yang, Hanwang Zhang, Zicheng Liu, and Lijuan Wang.
+2024. Disco: Disentangled control for referring human dance generation in real world. In CVPR.
+[146] Zhongcong Xu, Jianfeng Zhang, Jun Hao Liew, Hanshu Yan, Jia-Wei Liu, Chenxu Zhang, Jiashi Feng, and Mike Zheng
+Shou. 2024. Magicanimate: Temporally consistent human image animation using diffusion model. In CVPR.
+[147] Shuai Yang, Liming Jiang, Ziwei Liu, and Chen Change Loy. 2022. Vtoonify: Controllable high-resolution portrait
+video style transfer. ACM Transactions on Graphics (TOG) 41, 6 (2022), 1–15.
+[148] Xu Peng, Junwei Zhu, Boyuan Jiang, Ying Tai, Donghao Luo, Jiangning Zhang, Wei Lin, Taisong Jin, Chengjie Wang,
+and Rongrong Ji. 2024. PortraitBooth: A versatile portrait model for fast identity-preserved personalization. In CVPR.
+[149] Qiang Cai, Mengxu Ma, Chen Wang, and Haisheng Li. 2023. Image neural style transfer: A review. Computers and
+Electrical Engineering 108 (2023), 108723.
+[150] Juan C. Pérez, Thu Nguyen-Phuoc, Chen Cao, Artsiom Sanakoyeu, Tomas Simon, Pablo Arbeláez, Bernard Ghanem,
+Ali Thabet, and Albert Pumarola. 2024. StyleAvatar: Stylizing animatable head avatars. In WACV.
+[151] Jianwei Feng and Prateek Singhal. 2024. 3D face style transfer with a hybrid solution of NeRF and mesh rasterization.
+In WACV.
+[152] Rameen Abdal, Hsin-Ying Lee, Peihao Zhu, Menglei Chai, Aliaksandr Siarohin, Peter Wonka, and Sergey Tulyakov.
+2023. 3davatargan: Bridging domains for personalized editable avatars. In CVPR.
+[153] Shiyao Xu, Lingzhi Li, Li Shen, Yifang Men, and Zhouhui Lian. 2022. Your3dEmoji: Creating personalized emojis via
+one-shot 3D-aware cartoon avatar synthesis. In SIGGRAPH.
+[154] Yuxin Jiang, Liming Jiang, Shuai Yang, and Chen Change Loy. 2023. Scenimefy: Learning to craft anime scene via
+semi-supervised image-to-image translation. In ICCV.
+[155] Jin Liu, Huaibo Huang, Chao Jin, and Ran He. 2023. Portrait diffusion: Training-free face stylization with chain-of-
+painting. arXiv (2023).
+[156] Jiwan Hur, Jaehyun Choi, Gyojin Han, Dong-Jae Lee, and Junmo Kim. 2024. Expanding expressiveness of diffusion
+models with limited data via self-distillation based fine-tuning. In WACV.
+[157] Wentao Jiang, Si Liu, Chen Gao, Jie Cao, Ran He, Jiashi Feng, and Shuicheng Yan. 2020. Psgan: Pose and expression
+robust spatial-aware gan for customizable makeup transfer. In CVPR.
+[158] Mingxiu Li, Wei Yu, Qinglin Liu, Zonglin Li, Ru Li, Bineng Zhong, and Shengping Zhang. 2023. Hybrid transformers
+with attention-guided spatial embeddings for makeup transfer and removal. IEEE Transactions on Circuits and Systems
+for Video Technology 34, 4 (2023), 2876–2890.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 34 ---
+
+273:34
+G. Pei et al.
+[159] Huiwen Chang, Jingwan Lu, Fisher Yu, and Adam Finkelstein. 2018. Pairedcyclegan: Asymmetric style transfer for
+applying and removing makeup. In CVPR.
+[160] Qiao Gu, Guanzhi Wang, Mang Tik Chiu, Yu-Wing Tai, and Chi-Keung Tang. 2019. Ladn: Local adversarial disentan-
+gling network for facial makeup and de-makeup. In ICCV.
+[161] Si Liu, Wentao Jiang, Chen Gao, Ran He, Jiashi Feng, Bo Li, and Shuicheng Yan. 2021. Psgan++: Robust detail-preserving
+makeup transfer and removal. IEEE Transactions on Pattern Analysis and Machine Intelligence 44, 11 (2021), 8538–8551.
+[162] Xiaojing Zhong, Xinyi Huang, Zhonghua Wu, Guosheng Lin, and Qingyao Wu. 2023. SARA: Controllable makeup
+transfer with spatial alignment and region-adaptive normalization. arXiv (2023).
+[163] Chenyu Yang, Wanrong He, Yingqing Xu, and Yang Gao. 2022. Elegant: Exquisite and locally editable gan for makeup
+transfer. In ECCV.
+[164] Qixin Yan, Chunle Guo, Jixin Zhao, Yuekun Dai, Chen Change Loy, and Chongyi Li. 2023. BeautyREC: Robust, efficient,
+and component-specific makeup transfer. In CVPR.
+[165] Miao Hao, Guanghua Gu, Hao Fu, Chang Liu, and Dong Cui. 2022. CUMTGAN: An instance-level controllable U-Net
+GAN for facial makeup transfer. Knowledge-Based Systems 249 (2022), 108996.
+[166] Sicong Han, Chenhao Lin, Chao Shen, Qian Wang, and Xiaohong Guan. 2023. Interpreting adversarial examples in
+deep learning: A review. ACM Computing Surveys 55, 14s (2023), 1–38.
+[167] Chaoran Yuan, Xiaobin Liu, and Zhengyuan Zhang. 2021. The current status and progress of adversarial examples
+attacks. In CISCE.
+[168] Retrieved November 19, 2025 from https://blog.youtube/inside-youtube/
+[169] Retrieved November 19, 2025 from https://baijiahao.baidu.com/s?id=1810168520550712093&wfr=spider&for=pc
+[170] Retrieved November 19, 2025 from https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
+[171] Retrieved November 19, 2025 from https://digital-strategy.ec.europa.eu/en/policies/digital-services-act-package
+[172] Retrieved November 19, 2025 from https://www.cac.gov.cn/2022-12/11/c_1672221949354811.htm
+[173] Volker Blanz, Kristina Scherbaum, Thomas Vetter, and Hans-Peter Seidel. 2004. Exchanging faces in images. In
+Computer Graphics Forum. 669–676.
+[174] Dmitri Bitouk, Neeraj Kumar, Samreen Dhillon, Peter Belhumeur, and Shree K. Nayar. 2008. Face swapping: automati-
+cally replacing faces in photographs. In SIGGRAPH.
+[175] Kalyan Sunkavalli, Micah K Johnson, Wojciech Matusik, and Hanspeter Pfister. 2010. Multi-scale image harmonization.
+ACM Transactions on Graphics (TOG) 29, 4 (2010), 1–10.
+[176] Kevin Dale, Kalyan Sunkavalli, Micah K. Johnson, Daniel Vlasic, Wojciech Matusik, and Hanspeter Pfister. 2011. Video
+face replacement. In SIGGRAPH.
+[177] Yuan Lin, Shengjin Wang, Qian Lin, and Feng Tang. 2012. Face swapping under large pose variations: A 3D model
+based approach. In ICME.
+[178] Jianke Zhu, Luc Van Gool, and Steven C. H. Hoi. 2009. Unsupervised face alignment by robust nonrigid mapping. In
+ICCV.
+[179] Saleh Mosaddegh, Loic Simon, and Frédéric Jurie. 2015. Photorealistic face de-identification by aggregating donors’
+face components. In ACCV.
+[180] Ralph Gross, Iain Matthews, Jeffrey Cohn, Takeo Kanade, and Simon Baker. 2008. In 8th IEEE International Conference
+on Automatic Face & Gesture Recognition.
+[181] Stephen Milborrow, John Morkel, and Fred Nicolls. 2010. The MUCT landmarked face database. Pattern Recognition
+Association of South Africa 201, 0 (2010), 535.
+[182] Yuval Nirkin, Iacopo Masi, Anh Tran Tuan, Tal Hassner, and Gerard Medioni. 2018. On face segmentation, face
+swapping, and face perception. In FG.
+[183] Xavier P. Burgos-Artizzu, Pietro Perona, and Piotr Dollár. 2013. Robust face landmark estimation under occlusion. In
+ICCV.
+[184] Jianmin Bao, Dong Chen, Fang Wen, Houqiang Li, and Gang Hua. 2018. Towards open-set identity preserving face
+synthesis. In CVPR.
+[185] Yandong Guo, Lei Zhang, Yuxiao Hu, Xiaodong He, and Jianfeng Gao. 2016. Ms-celeb-1m: A dataset and benchmark
+for large-scale face recognition. In ECCV.
+[186] Ning Zhang, Manohar Paluri, Yaniv Taigman, Rob Fergus, and Lubomir Bourdev. 2015. Beyond frontal faces: Improving
+person recognition using multiple cues. In CVPR.
+[187] Yuval Nirkin, Yosi Keller, and Tal Hassner. 2019. Fsgan: Subject agnostic face swapping and reenactment. In ICCV.
+[188] Brianna Maze, Jocelyn Adams, James A. Duncan, Nathan Kalka, Tim Miller, Charles Otto, Anil K. Jain, W. Tyler
+Niggel, Janet Anderson, Jordan Cheney, et al. 2018. Iarpa janus benchmark-c: Face dataset and protocol. In ICB.
+[189] Lingzhi Li, Jianmin Bao, Hao Yang, Dong Chen, and Fang Wen. 2020. Faceshifter: Towards high fidelity and occlusion
+aware face swapping. CVPR (2020).
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 35 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:35
+[190] Bingquan Zhu, Hao Fang, Yanan Sui, and Luming Li. 2020. Deepfakes for medical video de-identification: Privacy
+protection and diagnostic information preservation. In AAAI.
+[191] Renwang Chen, Xuanhong Chen, Bingbing Ni, and Yanhao Ge. 2020. Simswap: An efficient framework for high
+fidelity face swapping. In ACM MM.
+[192] Yuhao Zhu, Qi Li, Jian Wang, Cheng-Zhong Xu, and Zhenan Sun. 2021. One shot face swapping on megapixels. In
+CVPR.
+[193] Yuhan Wang, Xu Chen, Junwei Zhu, Wenqing Chu, Ying Tai, Chengjie Wang, Jilin Li, Yongjian Wu, Feiyue Huang,
+and Rongrong Ji. 2021. Hififace: 3d shape and semantic prior guided high fidelity face swapping. In IJCAI.
+[194] Yuval Nirkin, Yosi Keller, and Tal Hassner. 2023. FSGANv2: Improved subject agnostic face swapping and reenactment.
+IEEE Trans. Pattern Anal. Mach. Intell. 45 (2023), 560–575.
+[195] Jiseob Kim, Jihoon Lee, and Byoung-Tak Zhang. 2022. Smooth-swap: A simple enhancement for face-swapping with
+smoothness. In CVPR.
+[196] Yixuan Li, Chao Ma, Yichao Yan, Wenhan Zhu, and Xiaokang Yang. 2023. 3D-Aware Face Swapping. In CVPR.
+[197] Hao Zeng, Wei Zhang, Changjie Fan, Tangjie Lv, Suzhen Wang, Zhimeng Zhang, Bowen Ma, Lincheng Li, Yu Ding,
+and Xin Yu. 2023. Flowface: Semantic flow-guided shape-aware face swapping. In AAAI.
+[198] Fengyuan Liu, Lingyun Yu, Hongtao Xie, Chuanbin Liu, Zhiguo Ding, Quanwei Yang, and Yongdong Zhang. 2023.
+High fidelity face swapping via semantics disentanglement and structure enhancement. In ACM MM.
+[199] Yixuan Zhu, Wenliang Zhao, Yansong Tang, Yongming Rao, Jie Zhou, and Jiwen Lu. 2024. Stableswap: Stable face
+swapping in a shared and controllable latent space. IEEE Transactions on Multimedia 26 (2024), 7594–7607.
+[200] Wenliang Zhao, Yongming Rao, Weikang Shi, Zuyan Liu, Jie Zhou, and Jiwen Lu. 2023. DiffSwap: High-fidelity and
+controllable face swapping via 3D-aware masked diffusion. In CVPR.
+[201] Kihong Kim, Yunho Kim, Seokju Cho, Junyoung Seo, Jisu Nam, Kychul Lee, Seungryong Kim, and KwangHee Lee.
+2025. Diffface: Diffusion-based face swapping with facial guidance. Pattern Recognition 163 (2025), 111451.
+[202] Sanoojan Baliah, Qinliang Lin, Shengcai Liao, Xiaodan Liang, and Muhammad Haris Khan. 2025. Realistic and efficient
+face swapping: A unified approach with diffusion models. In WACV.
+[203] Taewoo Kim, Geonsu Lee, Hyukgi Lee, Seongtae Kim, and Younggun Lee. 2025. PixSwap: High-resolution face
+swapping for effective reflection of identity via pixel-level supervision with synthetic paired dataset. In WACV.
+[204] Kaiwen Cui, Rongliang Wu, Fangneng Zhan, and Shijian Lu. 2023. Face transformer: Towards high fidelity and
+accurate face swapping. In CVPR.
+[205] Wei Cao, Tianyi Wang, Anming Dong, and Minglei Shu. 2023. TransFS: Face swapping using transformer. In FG.
+[206] Tianyi Wang, Zian Li, Ruixia Liu, Yinglong Wang, and Liqiang Nie. 2024. An efficient attribute-preserving framework
+for face swapping. IEEE Transactions on Multimedia 26 (2024), 6554–6565.
+[207] Xiangyang Luo, Ye Zhu, Yunfei Liu, Lijian Lin, Cong Wan, Zijian Cai, Yu Li, and Shao-Lun Huang. 2025. CanonSwap:
+High-fidelity and consistent video face swapping via canonical space modulation. In ICCV.
+[208] Han Guo, Dongmei Niu, and Xiangyu Kong. 2019. Face replacement based on 2D dense mapping. In ICIGP.
+[209] Joel Ruben Antony Moniz, Christopher Beckham, Simon Rajotte, Sina Honari, and Chris Pal. 2018. Unsupervised
+depth estimation, 3d face rotation and replacement. In NeurIPS.
+[210] Kunlin Liu, Ivan Perov, Daiheng Gao, Nikolay Chervoniy, Wenbo Zhou, and Weiming Zhang. 2023. Deepfacelab:
+Integrated, flexible and extensible face-swapping framework. Pattern Recognition 141 (2023), 109628.
+[211] Chao Xu, Jiangning Zhang, Yue Han, Guanzhong Tian, Xianfang Zeng, Ying Tai, Yabiao Wang, Chengjie Wang, and
+Yong Liu. 2022. Designing one unified framework for high-fidelity face reenactment and swapping. In ECCV.
+[212] Diqiong Jiang, Dan Song, Ruofeng Tong, and Min Tang. 2023. StyleIPSB: Identity-preserving semantic basis of
+StyleGAN for high fidelity face swapping. In CVPR.
+[213] Xiaohang Ren, Xingyu Chen, Pengfei Yao, Heung-Yeung Shum, and Baoyuan Wang. 2023. Reinforced disentanglement
+for face swapping without skip connection. In ICCV.
+[214] Yu Zhang, Hao Zeng, Bowen Ma, Wei Zhang, Zhimeng Zhang, Yu Ding, Tangjie Lv, and Changjie Fan. 2023. FlowFace++:
+Explicit semantic flow-supervised end-to-end face swapping. arXiv (2023).
+[215] Zhian Liu, Maomao Li, Yong Zhang, Cairong Wang, Qi Zhang, Jue Wang, and Yongwei Nie. 2023. Fine-grained face
+swapping via regional GAN inversion. In CVPR.
+[216] Felix Rosberg, Eren Erdal Aksoy, Fernando Alonso-Fernandez, and Cristofer Englund. 2023. FaceDancer: Pose-and
+occlusion-aware high fidelity face swapping. In WACV.
+[217] Gege Gao, Huaibo Huang, Chaoyou Fu, Zhaoyang Li, and Ran He. 2021. Information bottleneck disentanglement for
+identity swapping. In CVPR.
+[218] Zhiliang Xu, Hang Zhou, Zhibin Hong, Ziwei Liu, Jiaming Liu, Zhizhi Guo, Junyu Han, Jingtuo Liu, Errui Ding, and
+Jingdong Wang. 2022. Styleswap: Style-based generator empowers robust face swapping. In ECCV.
+[219] Sahng-Min Yoo, Tae-Min Choi, Jae-Woo Choi, and Jong-Hwan Kim. 2023. FastSwap: A lightweight one-stage frame-
+work for real-time face swapping. In WACV.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 36 ---
+
+273:36
+G. Pei et al.
+[220] Iryna Korshunova, Wenzhe Shi, Joni Dambre, and Lucas Theis. 2017. Fast face-swap using convolutional neural
+networks. In ICCV.
+[221] Hyeongwoo Kim, Pablo Garrido, Ayush Tewari, Weipeng Xu, Justus Thies, Matthias Niessner, Patrick Pérez, Christian
+Richardt, Michael Zollhöfer, and Christian Theobalt. 2018. Deep video portraits. ACM Transactions on Graphics (TOG)
+37, 4 (2018), 1–14.
+[222] Hyeongwoo Kim, Mohamed Elgharib, Michael Zollhöfer, Hans-Peter Seidel, Thabo Beeler, Christian Richardt, and
+Christian Theobalt. 2019. Neural style-preserving visual dubbing. ACM Transactions on Graphics (TOG) 38, 6 (2019),
+1–13.
+[223] Michail Christos Doukas, Stefanos Zafeiriou, and Viktoriia Sharmanska. 2021. Headgan: One-shot neural head
+synthesis and editing. In ICCV.
+[224] Kewei Yang, Kang Chen, Daoliang Guo, Song-Hai Zhang, Yuan-Chen Guo, and Weidong Zhang. 2022. Face2Face 𝜌:
+Real-time high-resolution one-shot face reenactment. In ECCV.
+[225] Yue Gao, Yuan Zhou, Jinglu Wang, Xiao Li, Xiang Ming, and Yan Lu. 2023. High-fidelity and freely controllable talking
+head video generation. In CVPR.
+[226] Tina Behrouzi, Atefeh Shahroudnejad, and Payam Mousavi. 2025. Maskrenderer: 3D-infused multi-mask realistic face
+reenactment. Pattern Recognition 157 (2025), 110891.
+[227] Egor Zakharov, Aliaksandra Shysheya, Egor Burkov, and Victor Lempitsky. 2019. Few-shot adversarial learning of
+realistic neural talking head models. In CVPR.
+[228] Jiangning Zhang, Xianfang Zeng, Mengmeng Wang, Yusu Pan, Liang Liu, Yong Liu, Yu Ding, and Fan. 2020. Freenet:
+Multi-identity face reenactment. In CVPR.
+[229] Michail Christos Doukas, Evangelos Ververas, Viktoriia Sharmanska, and Stefanos Zafeiriou. 2023. Free-headgan:
+Neural talking head synthesis with explicit gaze control. IEEE Transactions on Pattern Analysis and Machine Intelligence
+45, 8 (2023), 9743–9756.
+[230] Petr Kellnhofer, Adria Recasens, Simon Stent, Wojciech Matusik, and Antonio Torralba. 2019. Gaze360: Physically
+unconstrained gaze estimation in the wild. In ICCV.
+[231] Xucong Zhang, Yusuke Sugano, Mario Fritz, and Andreas Bulling. 2015. Appearance-based gaze estimation in the
+wild. In CVPR.
+[232] Bowen Zhang, Chenyang Qi, Pan Zhang, Bo Zhang, HsiangTao Wu, Dong Chen, Qifeng Chen, Yong Wang, and Fang
+Wen. 2023. Metaportrait: Identity-preserving talking head generation with fast personalized adaptation. In CVPR.
+[233] Songlin Yang, Wei Wang, Yushi Lan, Xiangyu Fan, Bo Peng, Lei Yang, and Jing Dong. 2024. Learning dense correspon-
+dence for nerf-based face reenactment. In AAAI.
+[234] Andre Rochow, Max Schwarz, and Sven Behnke. 2024. FSRT: Facial scene representation transformer for face
+reenactment from factorized appearance, head-pose, and facial expression features. In CVPR.
+[235] Stella Bounareli, Christos Tzelepis, Vasileios Argyriou, Ioannis Patras, and Georgios Tzimiropoulos. 2025. Diffusionact:
+Controllable diffusion autoencoder for one-shot face reenactment. In FG.
+[236] Weichuang Li, Longhao Zhang, Dong Wang, Bin Zhao, Zhigang Wang, Mulin Chen, Bang Zhang, Zhongjian Wang,
+Liefeng Bo, and Xuelong Li. 2023. One-shot high-fidelity talking-head synthesis with deformable neural radiance
+field. In CVPR.
+[237] Stella Bounareli, Christos Tzelepis, Vasileios Argyriou, Ioannis Patras, and Georgios Tzimiropoulos. 2023. Stylemask:
+Disentangling the style space of stylegan2 for neural face reenactment. In FG.
+[238] Stella Bounareli, Christos Tzelepis, Vasileios Argyriou, Ioannis Patras, and Georgios Tzimiropoulos. 2024. One-shot
+neural face reenactment via finding directions in gan’s latent space. International Journal of Computer Vision 132, 8
+(2024), 3324–3354.
+[239] Qing Chang, Yao-Xiang Ding, and Kun Zhou. 2025. Enhancing identity-deformation disentanglement in StyleGAN
+for one-shot face video re-enactment. In AAAI.
+[240] Zhimeng Zhang, Lincheng Li, Yu Ding, and Changjie Fan. 2021. Flow-guided one-shot talking face generation with a
+high-resolution audio-visual dataset. In CVPR.
+[241] Soumya Tripathy, Juho Kannala, and Esa Rahtu. 2020. Icface: Interpretable and controllable face reenactment using
+gans. In WACV.
+[242] Trevine Oorloff and Yaser Yacoob. 2023. Robust one-shot face video re-enactment using hybrid latent spaces of
+stylegan2. In ICCV.
+[243] Han Xue, Jun Ling, Anni Tang, Li Song, Rong Xie, and Wenjun Zhang. 2023. High-fidelity face reenactment via identity-
+matched correspondence learning. ACM Transactions on Multimedia Computing, Communications and Applications 19,
+3 (2023), 1–23.
+[244] Justus Thies, Michael Zollhofer, Marc Stamminger, Christian Theobalt, and Matthias Nießner. 2016. Face2face: Real-
+time face capture and reenactment of rgb videos. In CVPR.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 37 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:37
+[245] Olivia Wiles, A Koepke, and Andrew Zisserman. 2018. X2face: A network for controlling face generation using images,
+audio, and pose codes. In ECCV.
+[246] Egor Zakharov, Aleksei Ivakhnenko, Aliaksandra Shysheya, and Victor Lempitsky. 2020. Fast bi-layer neural synthesis
+of one-shot realistic head avatars. In ECCV.
+[247] Sungjoo Ha, Martin Kersner, Beomsu Kim, Seokjun Seo, and Dongyoung Kim. 2020. Marionette: Few-shot face
+reenactment preserving identity of unseen targets. In AAAI.
+[248] Martin Cooke, Jon Barker, Stuart Cunningham, and Xu Shao. 2006. An audio-visual corpus for speech perception and
+automatic speech recognition. The Journal of the Acoustical Society of America 120, 5 (2006), 2421–2424.
+[249] Carolyn Richie, Sarah Warburton, and Megan Carter. 2009. Audiovisual Database of Spoken American English. Linguistic
+Data Consortium.
+[250] Hang Zhou, Yu Liu, Ziwei Liu, Ping Luo, and Xiaogang Wang. 2019. Talking face generation by adversarially
+disentangled audio-visual representation. In AAAI.
+[251] Yang Zhou, Xintong Han, Eli Shechtman, Jose Echevarria, Evangelos Kalogerakis, and Dingzeyu Li. 2020. Makelttalk:
+speaker-aware talking-head animation. ACM Transactions on Graphics (TOG) 39, 6 (2020), 1–15.
+[252] Xinya Ji, Hang Zhou, Kaisiyuan Wang, Wayne Wu, Chen Change Loy, Xun Cao, and Feng Xu. 2021. Audio-driven
+emotional video portraits. In CVPR.
+[253] Siddharth Gururani, Arun Mallya, Ting-Chun Wang, Rafael Valle, and Ming-Yu Liu. 2023. Space: Speech-driven
+portrait animation with controllable expression. In ICCV.
+[254] Wenxuan Zhang, Xiaodong Cun, Xuan Wang, Yong Zhang, Xi Shen, Yu Guo, Ying Shan, and Fei Wang. 2023. SadTalker:
+Learning realistic 3D motion coefficients for stylized audio-driven single image talking face animation. In CVPR.
+[255] Ziqiao Peng, Haoyu Wu, Zhenbo Song, Hao Xu, Xiangyu Zhu, Jun He, Hongyan Liu, and Zhaoxin Fan. 2023. Emotalk:
+Speech-driven emotional disentanglement for 3d face animation. In ICCV.
+[256] Jiadong Wang, Xinyuan Qian, Malu Zhang, Robby T. Tan, and Haizhou Li. 2023. Seeing what you said: Talking face
+generation guided by a lip reading expert. In CVPR.
+[257] Dongyeun Lee, Chaewon Kim, Sangjoon Yu, Jaejun Yoo, and Gyeong-Moon Park. 2024. RADIO: Reference-agnostic
+dubbing video synthesis. In WACV.
+[258] Xingjian Diao, Ming Cheng, Wayner Barrios, and SouYoung Jin. 2025. Ft2tf: First-person statement text-to-talking
+face generation. In WACV.
+[259] Yifeng Ma, Suzhen Wang, Yu Ding, Bowen Ma, Tangjie Lv, Changjie Fan, Zhipeng Hu, Zhidong Deng, and Xin Yu.
+2025. Talkclip: Talking head generation with text-guided expressive speaking styles. IEEE Transactions on Multimedia.
+[260] Hang Zhou, Yasheng Sun, Wayne Wu, Chen Change Loy, Xiaogang Wang, and Ziwei Liu. 2021. Pose-controllable
+talking face generation by implicitly modularized audio-visual representation. In CVPR.
+[261] Borong Liang, Yan Pan, Zhizhi Guo, Hang Zhou, Zhibin Hong, Xiaoguang Han, Junyu Han, Jingtuo Liu, Errui Ding,
+and Jingdong Wang. 2022. Expressive talking head generation with granular audio-visual control. In CVPR.
+[262] Lingyun Yu, Hongtao Xie, and Yongdong Zhang. 2021. Multimodal learning for temporally coherent talking face
+generation with articulator synergy. IEEE Transactions on Multimedia 24 (2021), 2950–2962.
+[263] Chao Xu, Junwei Zhu, Jiangning Zhang, Yue Han, Wenqing Chu, Ying Tai, Chengjie Wang, Zhifeng Xie, and Yong Liu.
+2023. High-fidelity generalized emotional talking face generation with multi-modal emotion space learning. In CVPR.
+[264] Jiayu Wang, Kang Zhao, Shiwei Zhang, Yingya Zhang, Yujun Shen, Deli Zhao, and Jingren Zhou. 2023. LipFormer:
+High-fidelity and generalizable talking face generation with a pre-learned facial codebook. In CVPR.
+[265] Suzhen Wang, Yifeng Ma, Yu Ding, Zhipeng Hu, Changjie Fan, Tangjie Lv, Zhidong Deng, and Xin Yu. 2024. Styletalk++:
+A unified framework for controlling the speaking styles of talking heads. IEEE Transactions on Pattern Analysis and
+Machine Intelligence 46, 6 (2024), 4331–4347.
+[266] Chenpeng Du, Qi Chen, Tianyu He, Xu Tan, Xie Chen, Kai Yu, Sheng Zhao, and Jiang Bian. 2023. Dae-talker: High
+fidelity speech-driven talking face generation with diffusion autoencoder. In ACM MM.
+[267] Zhentao Yu, Zixin Yin, Deyu Zhou, Duomin Wang, Finn Wong, and Baoyuan Wang. 2023. Talking head generation
+with probabilistic audio-to-visual diffusion priors. In ICCV.
+[268] Michał Stypułkowski, Konstantinos Vougioukas, Sen He, Maciej Zięba, Stavros Petridis, and Maja Pantic. 2024.
+Diffused heads: Diffusion models beat gans on talking-face generation. In WACV.
+[269] Bingyuan Zhang, Xulong Zhang, Ning Cheng, Jun Yu, Jing Xiao, and Jianzong Wang. 2024. EmoTalker: Emotionally
+editable talking face generation via diffusion model. In ICASSP.
+[270] Sicheng Xu, Guojun Chen, Yu-Xiao Guo, Jiaolong Yang, Chong Li, Zhenyu Zang, Yizhong Zhang, Xin Tong, and
+Baining Guo. 2024. Vasa-1: Lifelike audio-driven talking faces generated in real time. In NeurIPS.
+[271] Haotian Wang, Yuzhe Weng, Yueyan Li, Zilu Guo, Jun Du, Shutong Niu, Jiefeng Ma, Shan He, Xiaoyan Wu, Qiming
+Hu, et al. 2025. Emotivetalk: Expressive talking head generation through audio information decoupling and emotional
+video diffusion. In CVPR.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 38 ---
+
+273:38
+G. Pei et al.
+[272] Yudong Guo, Keyu Chen, Sen Liang, Yong-Jin Liu, Hujun Bao, and Juyong Zhang. 2021. Ad-nerf: Audio driven neural
+radiance fields for talking head synthesis. In ICCV.
+[273] Shuai Shen, Wanhua Li, Zheng Zhu, Yueqi Duan, Jie Zhou, and Jiwen Lu. 2022. Learning dynamic facial radiance
+fields for few-shot talking head synthesis. In ECCV.
+[274] Dongze Li, Kang Zhao, Wei Wang, Bo Peng, Yingya Zhang, Jing Dong, and Tieniu Tan. 2024. AE-NeRF: Audio
+enhanced neural radiance field for few shot talking head synthesis. In AAAI.
+[275] Ziqiao Peng, Wentao Hu, Yue Shi, Xiangyu Zhu, Xiaomei Zhang, Hao Zhao, Jun He, Hongyan Liu, and Zhaoxin Fan.
+2024. SyncTalk: The devil is in the synchronization for talking head synthesis. In CVPR’24.
+[276] Zhenhui Ye, Tianyun Zhong, Yi Ren, Jiaqi Yang, Weichuang Li, Jiawei Huang, Ziyue Jiang, Jinzheng He, Rongjie
+Huang, Jinglin Liu, et al. 2024. Real3d-portrait: One-shot realistic 3d talking portrait synthesis. In ICLR.
+[277] Jiaxiang Tang, Kaisiyuan Wang, Hang Zhou, Xiaokang Chen, Dongliang He, Tianshu Hu, Jingtuo Liu, Ziwei Liu, Gang
+Zeng, and Jingdong Wang. 2025. Real-time neural radiance talking portrait synthesis via audio-spatial decomposition.
+In International Journal of Computer Vision 133, 9 (2025), 6362–6373.
+[278] Xianfang Zeng, Yusu Pan, Mengmeng Wang, Jiangning Zhang, and Yong Liu. 2020. Realistic face reenactment via
+self-supervised disentangling of identity and pose. In AAAI.
+[279] Huayu Zhang, Yurui Ren, Yuanqi Chen, Ge Li, and Thomas H. Li. 2023. Exploiting multiple guidance from 3dmm for
+face reenactment. In AAAIW.
+[280] Xiuzhe Wu, Pengfei Hu, Yang Wu, Xiaoyang Lyu, Yan-Pei Cao, Ying Shan, Wenming Yang, Zhongqian Sun, and
+Xiaojuan Qi. 2023. Speech2Lip: High-fidelity Speech to Lip Generation by Learning from a Short Video. In ICCV.
+[281] Hui Fu, Zeqing Wang, Ke Gong, Keze Wang, Tianshui Chen, Haojie Li, Haifeng Zeng, and Wenxiong Kang. 2024.
+Mimic: Speaking style disentanglement for speech-driven 3D facial animation. In AAAI.
+[282] Zhicheng Sheng, Liqiang Nie, Min Zhang, Xiaojun Chang, and Yan Yan. 2023. Stochastic latent talking face generation
+toward emotional expressions and head poses. IEEE Transactions on Circuits and Systems for Video Technology 34, 4
+(2023), 2734–2748.
+[283] Yuan Gan, Zongxin Yang, Xihang Yue, Lingyun Sun, and Yi Yang. 2023. Efficient emotional adaptation for audio-driven
+talking-head generation. In ICCV.
+[284] Shuai Tan, Bin Ji, and Ye Pan. 2023. Emmn: Emotional motion memory network for audio-driven emotional talking
+face generation. In ICCV.
+[285] Shuyan Zhai, Meng Liu, Yongqiang Li, Zan Gao, Lei Zhu, and Liqiang Nie. 2023. Talking face generation with
+audio-deduced emotional landmarks. IEEE Transactions on Neural Networks and Learning Systems 35, 10 (2023),
+14099–14111.
+[286] Weizhi Zhong, Chaowei Fang, Yinqi Cai, Pengxu Wei, Gangming Zhao, Liang Lin, and Guanbin Li. 2023. Identity-
+preserving talking face generation with landmark and appearance priors. In CVPR.
+[287] Linrui Tian, Qi Wang, Bang Zhang, and Liefeng Bo. 2024. EMO: Emote portrait alive-generating expressive portrait
+videos with audio2video diffusion model under weak conditions. In ECCV.
+[288] Johanna Karras, Aleksander Holynski, Ting-Chun Wang, and Ira Kemelmacher-Shlizerman. 2023. Dreampose: Fashion
+image-to-video synthesis via stable diffusion. In ICCV.
+[289] Bernhard Kerbl, Georgios Kopanas, Thomas Leimkühler, George Drettakis, et al. 2023. 3D gaussian splatting for
+real-time radiance field rendering. ACM Trans. Graph 42, 4 (2023), 139–1.
+[290] Shuchang Zhou, Taihong Xiao, Yi Yang, Dieqiao Feng, Qinyao He, and Weiran He. 2017. Genegan: Learning object
+transfiguration and attribute subspace from unpaired data. In BMVC.
+[291] Youngjoo Jo and Jongyoul Park. 2019. Sc-fegan: Face editing generative adversarial network with user’s sketch and
+color. In ICCV.
+[292] Zhenliang He, Wangmeng Zuo, Meina Kan, Shiguang Shan, and Xilin Chen. 2019. Attgan: Facial attribute editing by
+only changing what you want. IEEE Transactions on Image Processing 28, 11 (2019), 5464–5478.
+[293] Yujun Shen, Jinjin Gu, Xiaoou Tang, and Bolei Zhou. 2020. Interpreting the latent space of gans for semantic face
+editing. In CVPR.
+[294] Xu Yao, Alasdair Newson, Yann Gousseau, and Pierre Hellier. 2021. A latent transformer for disentangled face editing
+in images and videos. In ICCV.
+[295] Yue Gao, Fangyun Wei, Jianmin Bao, Shuyang Gu, Dong Chen, Fang Wen, and Zhouhui Lian. 2021. High-fidelity and
+arbitrary face editing. In CVPR.
+[296] Konpat Preechakul, Nattanat Chatthee, Suttisak Wizadwongsa, and Supasorn Suwajanakorn. 2022. Diffusion autoen-
+coders: Toward a meaningful and decodable representation. In CVPR.
+[297] Jingxiang Sun, Xuan Wang, Yong Zhang, Xiaoyu Li, Qi Zhang, Yebin Liu, and Jue Wang. 2022. Fenerf: Face editing in
+neural radiance fields. In CVPR.
+[298] Xianxu Hou, Xiaokang Zhang, Hanbang Liang, Linlin Shen, Zhihui Lai, and Jun Wan. 2022. Guidedstyle: Attribute
+knowledge guided style manipulation for semantic face editing. Neural Networks 145 (2022), 209–220.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 39 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:39
+[299] Yanbo Xu, Yueqin Yin, Liming Jiang, Qianyi Wu, Chengyao Zheng, Chen Change Loy, Bo Dai, and Wayne Wu. 2022.
+Transeditor: Transformer-based dual-space gan for highly controllable facial editing. In CVPR.
+[300] Ziqi Huang, Kelvin C. K. Chan, Yuming Jiang, and Ziwei Liu. 2023. Collaborative diffusion for multi-modal face
+generation and editing. In CVPR.
+[301] Savas Ozkan, Mete Ozay, and Tom Robinson. 2023. Conceptual and hierarchical latent space decomposition for face
+editing. In ICCV.
+[302] Peng Zhou, Lingxi Xie, Bingbing Ni, and Qi Tian. 2023. Cips-3d++: End-to-end real-time high-resolution 3d-aware
+gans for gan inversion and stylization. IEEE Transactions on Pattern Analysis and Machine Intelligence 45, 10 (2023),
+11502–11520.
+[303] Shivangi Aneja, Justus Thies, Angela Dai, and Matthias Nießner. 2023. Clipface: Text-guided editing of textured 3d
+morphable models. In SIGGRAPH.
+[304] Cuican Yu, Guansong Lu, Yihan Zeng, Jian Sun, Xiaodan Liang, Huibin Li, Zongben Xu, Songcen Xu, Wei Zhang, and
+Hang Xu. 2023. Towards high-fidelity text-guided 3D face generation and manipulation using only images. In ICCV.
+[305] Yusuf Dalva, Said Fahri Altındiş, and Aysegul Dundar. 2022. Vecgan: Image-to-image translation with interpretable
+latent directions. In ECCV.
+[306] Zheng Ding, Xuaner Zhang, Zhihao Xia, Lars Jebe, Zhuowen Tu, and Xiuming Zhang. 2023. DiffusionRig: Learning
+personalized priors for facial appearance editing. In CVPR.
+[307] Gyeongman Kim, Hajin Shim, Hyunsu Kim, Yunjey Choi, Junho Kim, and Eunho Yang. 2023. Diffusion video
+autoencoders: Toward temporally consistent face video editing via disentangled video encoding. In CVPR.
+[308] Weiqi Luo Wenmin Huang and Xiaochun Cao Jiwu Huang. 2024. SDGAN: Disentangling semantic manipulation for
+facial attribute editing. In AAAI.
+[309] Hao Zhang, Tianyuan DAI, Yanbo Xu, Yu-Wing Tai, and Chi-Keung Tang. 2024. FaceDNeRF: Semantics-driven face
+reconstruction, prompt editing and relighting with diffusion models. In NeurIPS.
+[310] Kaiwen Jiang, Shu-Yu Chen, Feng-Lin Liu, Hongbo Fu, and Lin Gao. 2025. Towards high-quality and disentangled
+face editing in a 3d gan. IEEE Transactions on Pattern Analysis and Machine Intelligence 47, 4 (2025), 2533–2544.
+[311] Yating Zeng, Xinpeng Zhang, and Guorui Feng. 2025. Secure reversible privacy protection for face multiple attribute
+editing. Pattern Recognition 166 (2025), 111662.
+[312] Bo Chen, Shoukang Hu, Qi Chen, Chenpeng Du, Ran Yi, Yanmin Qian, and Xie Chen. 2024. GSTalker: Real-time
+audio-driven talking face generation via deformable gaussian splatting. arXiv (2024).
+[313] Jiahe Li, Jiawei Zhang, Xiao Bai, Jin Zheng, Xin Ning, Jun Zhou, and Lin Gu. 2024. TalkingGaussian: Structure-
+persistent 3D talking head synthesis via gaussian splatting. In ECCV.
+[314] Wei Shen and Rujie Liu. 2017. Learning residual images for face attribute manipulation. In CVPR.
+[315] Xianxu Hou, Xiaokang Zhang, Yudong Li, and Linlin Shen. 2022. Textface: Text-to-style mapping based face generation
+and manipulation. IEEE Transactions on Multimedia 25 (2022), 3409–3419.
+[316] Zhengzhe Liu, Xiaojuan Qi, and Philip H. S. Torr. 2020. Global texture enhancement for fake face detection in the
+wild. In CVPR.
+[317] Lingzhi Li, Jianmin Bao, Ting Zhang, Hao Yang, Dong Chen, Fang Wen, and Baining Guo. 2020. Face x-ray for more
+general face forgery detection. In CVPR.
+[318] Hanqing Zhao, Wenbo Zhou, Dongdong Chen, Tianyi Wei, Weiming Zhang, and Nenghai Yu. 2021. Multi-attentional
+deepfake detection. In CVPR.
+[319] Yuval Nirkin, Lior Wolf, Yosi Keller, and Tal Hassner. 2021. Deepfake detection based on discrepancies between faces
+and their context. IEEE Transactions on Pattern Analysis and Machine Intelligence 44, 10 (2021), 6111–6121.
+[320] Kaede Shiohara and Toshihiko Yamasaki. 2022. Detecting deepfakes with self-blended images. In CVPR.
+[321] Tianyi Wang and Kam Pui Chow. 2023. Noise based deepfake detection via multi-head relative-interaction. In AAAI.
+[322] Zhongjie Ba, Qingyu Liu, Zhenguang Liu, Shuang Wu, Feng Lin, Li Lu, and Kui Ren. 2024. Exposing the deception:
+Uncovering more forgery clues for deepfake detection. In AAAI.
+[323] Rohit Kundu, Hao Xiong, Vishal Mohanty, Athula Balachandran, and Amit K. Roy-Chowdhury. 2025. Towards a
+universal synthetic video detector: From face or background manipulations to fully ai-generated content. In CVPR.
+[324] Yinglin Zheng, Jianmin Bao, Dong Chen, Ming Zeng, and Fang Wen. 2021. Exploring temporal coherence for more
+general video face forgery detection. In ICCV.
+[325] Alexandros Haliassos, Konstantinos Vougioukas, Stavros Petridis, and Maja Pantic. 2021. Lips don’t lie: A generalisable
+and robust approach to face forgery detection. In CVPR.
+[326] Zhihao Gu, Yang Chen, Taiping Yao, Shouhong Ding, Jilin Li, and Lizhuang Ma. 2022. Delving into the local: Dynamic
+inconsistency learning for deepfake video detection. In AAAI.
+[327] Jongwook Choi, Taehoon Kim, Yonghyun Jeong, Seungryul Baek, and Jongwon Choi. 2024. Exploiting style latent
+flows for generalizing deepfake detection video detection. In CVPR.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 40 ---
+
+273:40
+G. Pei et al.
+[328] Yuting Xu, Jian Liang, Lijun Sheng, and Xiao-Yu Zhang. 2024. Learning spatiotemporal inconsistency via thumbnail
+layout for face deepfake detection. In International Journal of Computer Vision 132, 12 (2024), 5663–5680.
+[329] Chunlei Peng, Zimin Miao, Decheng Liu, Nannan Wang, Ruimin Hu, and Xinbo Gao. 2024. Where deepfakes gaze
+at? Spatialtemporal gaze inconsistency analysis for video face forgery detection. IEEE Transactions on Information
+Forensics and Security 19 (2024), 4507–4517.
+[330] Changtao Miao, Zichang Tan, Qi Chu, Nenghai Yu, and Guodong Guo. 2022. Hierarchical frequency-assisted interactive
+networks for face manipulation detection. IEEE Transactions on Information Forensics and Security 17 (2022), 3008–3021.
+[331] Zhiqing Guo, Zhenhong Jia, Liejun Wang, Dewang Wang, Gaobo Yang, and Nikola Kasabov. 2023. Constructing
+new backbone networks via space-frequency interactive convolution for deepfake detection. IEEE Transactions on
+Information Forensics and Security 19 (2023), 401–413.
+[332] Chuangchuang Tan, Yao Zhao, Shikui Wei, Guanghua Gu, Ping Liu, and Yunchao Wei. 2024. Frequency-aware deepfake
+detection: Improving generalizability through frequency space domain learning. In AAAI.
+[333] Siran Peng, Tianshuo Zhang, Li Gao, Xiangyu Zhu, Haoyuan Zhang, Kai Pang, and Zhen Lei. 2025. Wmamba:
+Wavelet-based mamba for face forgery detection. In MM.
+[334] Anurag Dutta, Arnab Kumar Das, Ruchira Naskar, and Rajat Subhra Chakraborty. 2025. WaveDIF: Wavelet sub-band
+based Deepfake Identification in Frequency Domain. In CVPR.
+[335] Hao Dang, Feng Liu, Joel Stehouwer, Xiaoming Liu, and Anil K. Jain. 2020. On the detection of digital face manipulation.
+In CVPR.
+[336] Tianchen Zhao, Xiang Xu, Mingze Xu, Hui Ding, Yuanjun Xiong, and Wei Xia. 2021. Learning self-consistency for
+deepfake detection. In ICCV.
+[337] Juan Hu, Xin Liao, Jinwen Liang, Wenbo Zhou, and Zheng Qin. 2022. Finfer: Frame inference-based deepfake detection
+for high-visual-quality videos. In AAAI.
+[338] Xiao Guo, Xiaohong Liu, Zhiyuan Ren, Steven Grosz, Iacopo Masi, and Xiaoming Liu. 2023. Hierarchical fine-grained
+image forgery detection and localization. In CVPR.
+[339] Yuanhao Zhai, Tianyu Luan, David Doermann, and Junsong Yuan. 2023. Towards generic image manipulation
+detection with weakly-supervised self-consistency learning. In ICCV.
+[340] Jing Dong, Wei Wang, and Tieniu Tan. 2013. Casia image tampering detection evaluation database. In ChinaSIP.
+[341] Yu-Feng Hsu and Shih-Fu Chang. 2006. Detecting image splicing using geometry invariants and camera characteristics
+consistency. In ICME.
+[342] Bihan Wen, Ye Zhu, Ramanathan Subramanian, Tian-Tsong Ng, Xuanjing Shen, and Stefan Winkler. 2016. COVERAGE–
+A novel database for copy-move forgery detection. In ICIP.
+[343] Scott McCloskey and Michael Albright. 2019. Detecting GAN-generated imagery using saturation cues. In ICIP.
+[344] Junyi Cao, Chao Ma, Taiping Yao, Shen Chen, Shouhong Ding, and Xiaokang Yang. 2022. End-to-end reconstruction-
+classification learning for face forgery detection. In CVPR.
+[345] Lucy Chai, David Bau, Ser-Nam Lim, and Phillip Isola. 2020. What makes fake images detectable? understanding
+properties that generalize. In ECCV.
+[346] Davide Cozzolino, Alessandro Pianese, Matthias Nießner, and Luisa Verdoliva. 2023. Audio-visual person-of-interest
+deepfake detection. In CVPR.
+[347] Shruti Agarwal and Hany Farid. 2021. Detecting deep-fake videos from aural and oral dynamics. In CVPR.
+[348] Joel Frank, Thorsten Eisenhofer, Lea Schönherr, Asja Fischer, Dorothea Kolossa, and Thorsten Holz. 2020. Leveraging
+frequency analysis for deep fake image recognition. In ICML.
+[349] Iacopo Masi, Aditya Killekar, Royston Marian Mascarenhas, Shenoy Pratik Gurudatt, and Wael AbdAlmageed. 2020.
+Two-branch recurrent network for isolating deepfakes in videos. In ECCV.
+[350] Ying Guo and Cheng Zhen. 2023. Controllable guide-space for generalizable face forgery detection. In ICCV.
+[351] Chih-Chung Hsu, Chia-Yen Lee, and Yi-Xiu Zhuang. 2018. Learning to detect fake face images in the wild. In IS3C.
+[352] Run Wang, Felix Juefei-Xu, Lei Ma, Xiaofei Xie, Yihao Huang, Jian Wang, and Yang Liu. 2021. FakeSpotter: A simple
+yet robust baseline for spotting AI-synthesized fake faces. In IJCAI.
+[353] Xiao Hu, Peirong Ma, Zhuohao Mai, Shaohu Peng, Zhao Yang, and Li Wang. 2019. Face hallucination from low quality
+images using definition-scalable inference. Pattern Recognition 94 (2019), 110–121.
+[354] Tao Lu, Jiaming Wang, Junjun Jiang, and Yanduo Zhang. 2020. Global-local fusion network for face super-resolution.
+Neurocomputing 387 (2020), 309–320.
+[355] Wenlong Zhang, Yihao Liu, Chao Dong, and Yu Qiao. 2019. Ranksrgan: Generative adversarial networks with ranker
+for image super-resolution. In ICCV.
+[356] Yuecheng Pan, Jin Tang, and Tardi Tjahjadi. 2024. LPSRGAN: Generative adversarial networks for super-resolution of
+license plate image. Neurocomputing 580 (2024), 127426.
+[357] Biwen Lei, Kai Yu, Mengyang Feng, Miaomiao Cui, and Xuansong Xie. 2024. DiffusionGAN3D: Boosting text-guided
+3D generation and domain adaption by combining 3D GANs and diffusion priors. In CVPR.
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.
+
+
+--- PAGE 41 ---
+
+Deepfake Generation and Detection: A Benchmark and Survey
+273:41
+[358] Dong Guo and Terence Sim. 2009. Digital face makeup by example. In CVPR.
+[359] Chen Li, Kun Zhou, and Stephen Lin. 2015. Simulating makeup through physics-based manipulation of intrinsic
+image layers. In CVPR.
+[360] Hung-Jen Chen, Ka-Ming Hui, Szu-Yu Wang, Li-Wu Tsao, Hong-Han Shuai, and Wen-Huang Cheng. 2019. Beautyglow:
+On-demand makeup transfer framework with reversible generative network. In CVPR.
+[361] Yu Deng, Jiaolong Yang, Sicheng Xu, Dong Chen, Yunde Jia, and Xin Tong. 2019. Accurate 3d face reconstruction
+with weakly-supervised learning: From single image to image set. In CVPR.
+[362] Jiankang Deng, Jia Guo, Niannan Xue, and Stefanos Zafeiriou. 2019. Arcface: Additive angular margin loss for deep
+face recognition. In CVPR.
+[363] Madhav Agarwal, Rudrabha Mukhopadhyay, Vinay P. Namboodiri, and CV Jawahar. 2023. Audio-visual face reenact-
+ment. In WACV.
+[364] Peng Tang, Huihuang Zhao, Weiliang Meng, and Yaonan Wang. 2026. One-shot motion talking head generation with
+audio-driven model. Expert Systems with Applications 297, Part B (2026), 129344.
+[365] Seunggyu Chang, Gihoon Kim, and Hayeon Kim. 2023. HairNeRF: Geometry-aware image synthesis for hairstyle
+transfer. In ICCV.
+[366] Qiyao Deng, Jie Cao, Yunfan Liu, Qi Li, and Zhenan Sun. 2024. r-FACE: Reference guided face component editing.
+Pattern Recognition 152 (2024), 110425.
+Received 10 October 2024; revised 25 February 2026; accepted 8 March 2026
+ACM Comput. Surv., Vol. 58, No. 11, Article 273. Publication date: April 2026.

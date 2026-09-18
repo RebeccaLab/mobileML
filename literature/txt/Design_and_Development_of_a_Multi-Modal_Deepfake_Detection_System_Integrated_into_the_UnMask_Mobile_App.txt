@@ -1,0 +1,618 @@
+
+
+--- PAGE 1 ---
+
+2025 28th International Conference on Computer and Information Technology (ICCIT)
+19–21 December 2025, Cox’s Bazar, Bangladesh
+Design and Development of a Multi-Modal
+Deepfake Detection System Integrated into the
+UnMask Mobile App
+Anonno Singha Ray
+Department of Mechatronics Engineering
+Rajshahi University of Engineering and Technology (RUET)
+Rajshahi, Bangladesh
+singharayanonno@gmail.com
+Md. Raihanul Haque
+Department of Mechatronics Engineering
+Rajshahi University of Engineering and Technology (RUET)
+Rajshahi, Bangladesh
+raihanulhaque007@gmail.com
+F. M. Rezwan Parvez
+Department of Mechatronics Engineering
+Rajshahi University of Engineering and Technology (RUET)
+Rajshahi, Bangladesh
+rezwanparvez67@gmail.com
+Md. Manirul Islam
+Department of Mechatronics Engineering
+Rajshahi University of Engineering and Technology (RUET)
+Rajshahi, Bangladesh
+manirul@mte.ruet.ac.bd
+Abstract—The rapid advancement of deep learning has made
+it possible for the generation of hyper-realistic synthetic me-
+dia, commonly known as deepfakes, which pose significant
+threats to privacy, security, and digital trust. Most existing
+detection approaches available are computationally expensive
+and unsuitable for real-time use on mobile platforms. This
+paper presents UnMask, which is a lightweight and scalable
+multi-modal real-time deepfake detection application capable of
+processing image, audio, and video inputs with high accuracy.
+The proposed framework integrates optimized deep learning
+models such as DenseNet121 for image classification, a CNN-
+based architecture for audio analysis, and an EfficientNet-B0
+with BiLSTM and attention mechanism for video detection into
+a FastAPI-powered backend. A corresponding lightweight mobile
+application, ”UnMask,” was developed using dart programming
+language and Flutter, which enables both prerecorded and live
+media verification using those models. Companion website was
+also build for the users to get to know about the app’s features
+and download the app on mobile devices. Experimental results
+demonstrate strong performance, achieving accuracy scores of
+99% for images and audio and 73% for video detection on
+benchmark datasets. These findings highlight the effectiveness of
+the proposed approach and its potential for real-time deployment
+on resource-constrained mobile devices to enhance digital media
+integrity.
+Index Terms—Deepfake Detection, Multi-Modal System, Mo-
+bile Application, Deep Learning, CNN.
+I. INTRODUCTION
+The fast progress of artificial intelligence (AI) and deep
+learning has allowed the development of hyper-realistic syn-
+thetic media, which are also referred to as deepfakes. These
+fake images, produced mainly by generative adversarial net-
+works (GANs) and analogous structures, are capable of con-
+vincingly emulating human faces, voices and even more com-
+plex gestures [1]. Although these technologies can be applied
+legitimately in the entertainment, education and online com-
+munication sectors, they have also created significant threats to
+privacy, security and confidence to the masses. Deepfakes are
+now commonly used in disinformation campaigns, monetary
+fraud and identity theft, as well as cyber harassment, which
+threatens digital integrity and social stability [2]–[4].
+These risks are increased by the increased dependency on
+mobile devices to consume content. Regardless of the advances
+in research, it is important to note that the majority of the
+current detection systems are still resource-intensive, cloud-
+based or limited to forensic and institutional applications,
+which makes them inappropriate to be deployed on smart-
+phones [5], [6]. This poses a vital weakness because regular
+users who are the most vulnerable to deepfake content do not
+have readily available, real-time, verification tools. Besides,
+the complexity of multi-modal deepfakes, which can change
+audio, video and image streams at the same time, renders
+the old unimodal detection strategies ineffective [1], [7]. It
+is necessary to resolve these issues using not only the correct
+models of detection, but also the lightweight model, scalable,
+and easy to use by the non-technical population.
+To resolve this challenges we have designed and developed
+UnMask, a lightweight and scalable multi-modal deepfake de-
+tection system for mobile deployment. The main contributions
+are as follows: (1) optimized deep learning models for image,
+audio, and video deepfake detection with low computational
+overhead; (2) integration of these models into a FastAPI back-
+end for real-time inference on resource-constrained devices;
+(3) development of a user-friendly mobile application and
+companion website for broad accessibility; and (4) extensive
+experimental evaluation demonstrating high accuracy and gen-
+eralizability across benchmark datasets.
+The remainder of this paper is organized as follows. Section
+II reviews the related work and existing approaches in deep-
+979-8-3315-7867-1/25/$31.00 © 2025 IEEE
+2010
+2025 28th International Conference on Computer and Information Technology (ICCIT) | 979-8-3315-7867-1/25/$31.00 ©2025 IEEE | DOI: 10.1109/ICCIT68739.2025.11491707
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:40:07 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 2 ---
+
+fake detection. Section III describes the methodology, includ-
+ing dataset acquisition, preprocessing, model development,
+backend integration, and application deployment. Section IV
+presents the experimental results and performance evaluation.
+Finally, Section V concludes the paper and highlights potential
+future directions.
+II. LITERATURE REVIEW
+Initial attempts at detecting a deepfake image were based
+on the human eye or rule-based detection, which detected
+artifacts, including unnatural lighting, irregular blinking, and
+inaccurate lip-synchronization [8]. Nonetheless, with the matu-
+ration of deepfake generation approaches, such hand methods
+have become more and more ineffective [9]. Deep learning
+has since become the paradigm. Convolutional Neural Net-
+works (CNNs) are best at identifying visual discrepancies in
+images and video frames, whereas Recurrent Neural Networks
+(RNNs), especially Long Short-Term Memory(LSTM) models
+show the ability to model temporal relationships in audio
+and video streams [10]. Improved robustness is achieved
+by hybrid CNN-RNN methods which are a combination of
+spatial and temporal analysis [11]. More recent developments
+also involve attention mechanisms, which improve detection
+through specializing in small areas of manipulation with less
+computational overhead, which are also potentially useful in
+mobile applications [12], [13].
+Adversarial training has contributed to robustness, exposing
+detection models to adversarially generated manipulations
+during training, and thus improving generalization to unseen
+forgeries [14], [15]. Also, multi-modal detection systems that
+share the analysis of visual, auditory, and temporal information
+have been effective in detecting cross-modal anomalies like
+discrepant lip movements and speech timing [14], [16].
+Lightweight optimization methods, including model prun-
+ing, quantization, and knowledge distillation have become
+essential enablers of real-time deployment because of the con-
+straints of mobile platforms [10], [17]. A range of optimized
+architectures, such as InceptionResNetV2, ResNet-50 and the
+hybrid CNN-LSTM models, have demonstrated detection rates
+of over 95% on test datasets, including FaceForensics++,
+Celeb-DF, and the Deepfake Detection Challenge (DFDC)
+[18]–[20]. There are additional new techniques, including
+ensemble learning based on biological signals [21], detection
+of lighting inconsistencies [18], and watermarking schemes
+[22], which enlarge the detection space. Despite these advance-
+ments, challenges remain in dataset diversity, cross-dataset
+generalization, and deployment on resource-constrained mo-
+bile devices. Most existing methods are either modality-
+specific or computationally heavy, leaving a gap in lightweight,
+real-time, multi-modal detection systems optimized for mobile
+platforms. This research seeks to bridge that gap by developing
+Unmask, a scalable, mobile-based solution that integrates deep
+learning models with a user-centric design to strengthen digital
+media integrity in the face of synthetic manipulation.
+III. METHODOLOGY
+This section outlines the datasets, preprocessing techniques,
+model architectures, backend integration, mobile app imple-
+mentation, and website development, detailing the complete
+pipeline of the proposed multi-modal deepfake detection sys-
+tem. Fig. 1 shows the workflow diagram of our Unmask mobile
+application.
+A. Dataset acquisition and preprocessing
+For image deepfake detection, we used a dataset of 140k
+real and fake faces. This dataset consists of 70,000 fake
+faces selected from 1 million synthetic faces produced by
+StyleGAN which was supplied by Bojan, and also 70000
+real faces taken from the Flickr-Faces-HQ (FFHQ) dataset
+that was gathered by Nvidia. Training images were resized
+to 256×256, randomly flipped for augmentation, converted to
+tensors, and normalized using ImageNet statistics. Validation
+and test sets followed the same pipeline without flipping. Data
+were organized with ImageFolder and loaded via PyTorch
+DataLoader with shuffling (training only) and a batch size of
+64 for efficient processing.
+We used an open-source dataset “In the wild” for training
+our audio deepfake detection model. The dataset basically
+consist of audio deepfakes for a set of politicians and other
+public figures, collected from publicly available sources such
+as social networks and video streaming platforms. For the
+number of 58 celebrities and politicians, the dataset has a
+collection of 20.8 hours of real and 17.2 hours of fake audio.
+It consists of 19963 real audio samples and 11816 fake audio
+samples of short durations. All input audio samples were
+standardized to a sampling rate of 22.05 kHz with a fixed
+duration of 2 seconds. To ensure uniformity, shorter clips were
+zero-padded while longer clips were trimmed. Each waveform
+x(t) was transformed into a Mel-spectrogram representation
+using the Short-Time Fourier Transform (STFT), defined as:
+S(m, k) =
+N−1
+X
+n=0
+x[n] · w[n −m] · e−j2πkn/N,
+(1)
+where w[n] is the windowing function, m is the frame index,
+and k denotes the frequency bin. A Mel filter bank and loga-
+rithmic scaling were applied to enhance perceptual relevance.
+Fig.2 shows the Mel spectrogram of real and fake images,
+respectively.
+Video data were collected from the FaceForensics++
+dataset, excluding the official test split to prevent leakage. An
+80/20 stratified division maintained class balance. From each
+clip, 20 evenly spaced frames were extracted using OpenCV,
+resized to 224×224, and padded with repeated or zero frames
+if necessary to ensure uniform length. For training, frames
+underwent random horizontal flipping and color jittering, while
+validation and test sets used only resizing and normalization
+(ImageNet mean and standard deviation). Each video was
+represented as a tensor of shape (20, 3, 224, 224). Data loading
+was handled via a custom PyTorch Dataset with a weighted
+sampler to address class imbalance.
+2011
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:40:07 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 3 ---
+
+Fig. 1. Workflow diagram of Unmask
+Fig. 2. Real and Fake Mel spectrogram (MFCC)
+B. Model Development
+1) Deepfake Image Detection: For image-based deepfake
+detection, we employed a transfer learning approach using
+DenseNet121 as the backbone. The final classification layer of
+DenseNet121 was replaced with a custom fully connected head
+consisting of a linear layer (1024 →512), ReLU activation,
+batch normalization, dropout, and a final sigmoid output neu-
+ron. This allowed the model to map high-dimensional feature
+embeddings into a binary output space, distinguishing between
+real and fake faces.
+Given an input image I, DenseNet121 extracted a feature
+vector x as:
+x = DenseNet121(I)
+(2)
+The classification output was obtained as:
+ˆy = σ(Wx + b)
+(3)
+The model was optimized using Binary Cross-Entropy
+(BCE) loss and the Adam optimizer with a learning rate of
+0.001 was employed along with a learning rate scheduler
+to dynamically adjust learning rates when validation loss
+plateaued. Dropout with a rate of 0.3 was used for regular-
+ization.
+2) Deepfake Audio detection: The proposed classifier is
+a Convolutional Neural Network (CNN) designed to capture
+both spectral and temporal cues from the Mel-spectrograms.
+The architecture consists of three convolutional blocks and two
+fully connected layers. The convolutional operation is defined
+as:
+y(l)
+i,j = σ
+ C
+X
+c=1
+(x(l−1)
+c
+∗w(l)
+c )i,j + b(l)
+!
+,
+(4)
+where x(l−1) is the input feature map, w(l)
+c
+is the convolutional
+kernel, b(l) is the bias term, and σ(·) denotes the ReLU
+activation.
+The network was trained using the binary cross-entropy loss
+function:
+L = −1
+N
+N
+X
+i=1
+[yi log(ˆyi) + (1 −yi) log(1 −ˆyi)] ,
+(5)
+where yi ∈{0, 1} denotes the ground-truth label (fake = 0,
+real = 1), and ˆyi is the predicted probability. Optimization was
+performed using the Adam optimizer with a learning rate of
+1×10−3 and weight decay regularization. Dropout was applied
+before the final classification layer to mitigate overfitting.
+3) Deepfake Video Detection: Each video was represented
+by 20 uniformly sampled frames, resized to 224×224 and nor-
+malized. EfficientNet-B0 extracted spatial embeddings from
+each frame:
+xt = EfficientNetB0(Ft)
+(6)
+2012
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:40:07 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 4 ---
+
+The sequence {x1, x2, . . . , xT } was passed to a BiLSTM
+to capture temporal dependencies. An attention mechanism
+assigned weights to highlight forgery-relevant frames:
+H =
+T
+X
+t=1
+αtht,
+αt =
+exp(w⊤ht)
+PT
+k=1 exp(w⊤hk)
+(7)
+where ht is the BiLSTM hidden state at time t, w is a learned
+attention vector used to score each ht, αt is the normalized
+attention weight for time t defined by the softmax, and T is
+the total number of frames.
+The aggregated representation H was classified using a
+sigmoid layer:
+ˆy = σ(WfcH + bfc)
+(8)
+where Wfc and bfc are the final classification weight ma-
+trix and bias. Focal loss was employed during training to
+address class imbalance and emphasize harder samples. This
+combination of CNN-based spatial features, BiLSTM temporal
+modeling, and attention weighting enabled accurate detection
+of manipulated videos.
+C. FastAPI-Based Multi-Modal Backend
+The UnMask system employs a FastAPI-based backend to
+support multi-modal deepfake detection on images, audio, and
+video. The service handles API requests, preprocesses inputs,
+forwards them to pretrained models, and returns predictions
+in real time. Hardware optimization enables automatic device
+selection (CUDA, MPS, or CPU), ensuring efficiency across
+platforms. The backend is started with the Uvicorn ASGI
+server to allow access to the device’s frontend. It is basically
+configured to bind to all interfaces (0.0.0.0) on port 8082. It
+helps mobile and other devices out on the same local network
+to access the backend services by reaching the IP address of
+the host machine. Fig. 3 shows the API endpoints for client
+uploads (image, audio, video).
+Fig. 3. API endpoints
+D. Mobile App Development
+The ’Unmask’ app aims to provide a user-friendly and
+powerful tool for detecting deepfakes, which enables users
+to conduct media analysis on their mobile phones. We used
+dart programming language and flutter-an open-source frame-
+work made by Google, for building the app. Simulation and
+coding was done on Android Studio. We used Supabase as
+the backend-as-a-service (BaaS) platform that handles user
+authentication, session management, and secure data storage
+on the backend of our app.
+After uploading an image, audio, or video, the app performs
+rapid analysis and provides an authenticity prediction with a
+confidence score. This real-time feedback is crucial for users
+requiring immediate results. Beyond pre-recorded media, the
+app also supports live capture of photos, videos, and audio
+recordings, enabling on-the-spot verification. Fig. 4 shows the
+user interface of the UnMask application.
+Fig. 4. User interface of the UnMask app.
+E. Website Development
+The main goal of our website is to create a simple yet
+engaging platform where users can easily learn more about our
+deepfake detection app, get to know about the app’s features,
+and download the app on mobile. Fig. 5 shows the interface
+of the website.
+Fig. 5. Website of our system
+The website has been developed using TypeScript and
+React, which comes with strong development tools and type
+safety. CSS Grid and Flexbox has been used for make content
+2013
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:40:07 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 5 ---
+
+fluid on different screen sizes. We also used Tailwind CSS
+for fast, consistent styling and shadcn/ui for ready-made
+accessible components. The website also uses day and night
+mode for enhanced user accessibility and comfort. It’s hosted
+on lovable.
+IV. RESULTS
+The deepfake image classification model achieved strong
+performance, with a test accuracy of 99%, precision of
+99.78%, recall of 96.42%, and an F1-score of 98.07%. Train-
+ing and validation accuracy curves in Fig. 6 indicate stable
+learning with minimal overfitting. These results confirm the
+model’s high reliability in distinguishing real and fake images
+across diverse test samples.
+Fig. 6. Training vs validation accuracy of image deepfake detection model
+Grad-CAM generates heatmaps by computing gradients of
+class scores with respect to convolutional feature maps, high-
+lighting critical image regions influencing predictions, where
+deeper layers capture progressively important discriminative
+features. In Fig. 7, one of the three different convolutional
+layers is compared to show how deeper layers find important
+features. The lowest value in the ”jet” colormap is deep blue,
+and the highest value is deep red.
+Fig. 7. GradCam Visualization
+The deepfake audio classification model demonstrated ex-
+cellent performance, achieving an accuracy of 99.67%, preci-
+sion of 99.48%, recall of 100%, and an F1-score of 99.74%.
+Fig.8 shows training and validation curves that show rapid
+convergence with minimal loss and near-perfect accuracy,
+Fig. 8. Training vs validation loss and accuracy of audio deepfake detection
+model
+TABLE I
+PERFORMANCE METRICS OF DEEPFAKE DETECTION MODELS
+Model
+Acc.
+Prec.
+Rec.
+F1
+Image
+98.10
+99.78
+96.42
+98.07
+Audio
+99.67
+99.48
+100.00
+99.74
+Video
+73.75
+82.76
+60.00
+69.70
+confirming the model’s robustness and its ability to accurately
+differentiate between real and fake audio samples.
+The proposed EfficientNet-B0 + BiLSTM + attention model
+showed strong performance in deepfake video detection. The
+model achieved a training loss of 0.0403 with 80.0% training
+accuracy, while the validation loss was 0.1155 with a vali-
+dation accuracy of 73.75%. The precision reached 82.76%,
+indicating strong reliability in correctly identifying deepfakes,
+although the recall was comparatively lower at 60.0%, reflect-
+ing missed detections. The area under the ROC curve (AUC)
+of 0.7794 further suggests a fairly robust discriminative ability,
+though improvements are needed for better generalization.
+Fig. 9. Training vs validation loss and accuracy of video deepfake detection
+model
+The confusion matrices in Fig. 10 highlight the performance
+of the proposed deepfake detection models across image,
+audio, and video modalities. The image model achieved near-
+perfect classification with minimal misclassifications, while
+the audio model demonstrated high reliability with almost no
+false positives. In contrast, video detection showed relatively
+lower accuracy due to temporal and compression artifacts.
+These results emphasize that while image and audio detection
+perform robustly, video deepfake detection requires further
+optimization.
+2014
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:40:07 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 6 ---
+
+Fig. 10. Confusion matrices a) image deepfake detection b) audio deepfake
+detection c) video deepfake detection
+V. CONCLUSION
+This work introduced UnMask, a practical and scalable
+multi-modal deepfake detection system tailored for real-time
+use on mobile platforms. By combining lightweight deep
+learning models for image, audio, and video analysis with
+an efficient FastAPI backend and user-friendly interfaces, the
+system bridges the gap between high-performance detection
+and accessibility for everyday users. Experimental results re-
+vealed near-perfect accuracy for image and audio detection and
+competitive performance for video classification, highlighting
+both the strengths and areas for refinement. Looking ahead,
+we aim to further enhance the robustness of video detection
+by addressing temporal inconsistencies and improving cross-
+dataset generalization. Additionally, future developments will
+focus on expanding support for newly emerging deepfake
+modalities while keeping the system lightweight and user-
+centric. We believe that UnMask provides a strong step
+toward safeguarding digital trust and empowering users with
+accessible tools to counteract synthetic media threats.
+REFERENCES
+[1] N. Chakravarty and M. Dua, “A lightweight feature extraction tech-
+nique for deepfake audio detection,” Multimedia Tools and Ap-
+plications,
+vol.
+83,
+no.
+26,
+pp.
+67443–67467,
+Jan.
+2024,
+doi:
+https://doi.org/10.1007/s11042-024-18217-9.
+[2] F. Zafar, T. A. Khan, S. Akbar, M. T. Ubaid, S. Javaid, and K. A. Kadir,
+“A Hybrid Deep Learning Framework for Deepfake Detection Using
+Temporal and Spatial Features,” IEEE Access, vol. 13, pp. 79560–79570,
+Jan. 2025, doi: https://doi.org/10.1109/access.2025.3566008.
+[3] B. Zhang, H. Cui, V. Nguyen, and M. Whitty, “Audio Deepfake Detec-
+tion: What Has Been Achieved and What Lies Ahead,” Sensors, vol. 25,
+no. 7, p. 1989, Mar. 2025, doi: https://doi.org/10.3390/s25071989.
+[4] H. H. Nguyen, J. Yamagishi, and I. Echizen, “Capsule-Forensics
+Networks
+for
+Deepfake
+Detection,”
+Advances
+in
+Computer
+Vi-
+sion
+and
+Pattern
+Recognition,
+pp.
+275–301,
+Jan.
+2022,
+doi:
+https://doi.org/10.1007/978-3-030-87664-7 13.
+[5] A. Malik, M. Kuribayashi, S. M. Abdullahi, and A. N. Khan,
+“DeepFake Detection for Human Face Images and Videos: A Sur-
+vey,” IEEE Access, vol. 10, pp. 18757–18775, Jan. 2022, doi:
+https://doi.org/10.1109/access.2022.3151186.
+[6] S. Agarwal, H. Farid, Y. Gu, M. He, and K. Nagano, “Detecting deep-
+fake videos from phoneme-viseme mismatches,” in Proc. IEEE/CVF
+Conf. Computer Vision and Pattern Recognition (CVPR), 2020, pp.
+6596–6605.
+[7] I. Masi, Y. Wu, T. Hassner, and P. Natarajan, “Two-branch recurrent
+network for isolating deepfakes in videos,” in Proc. Eur. Conf. Computer
+Vision (ECCV), 2020, pp. 667–684.
+[8] A. Malik, M. Kuribayashi, S. M. Abdullahi, and A. N. Khan,
+“DeepFake Detection for Human Face Images and Videos: A Sur-
+vey,” IEEE Access, vol. 10, pp. 18757–18775, Jan. 2022, doi:
+https://doi.org/10.1109/access.2022.3151186.
+[9] D. Sabareshwar, S. Raghul, S. Ravi, M. Varalakshmi, and Mohamed,
+“A Lightweight CNN for Efficient Deepfake Detection of Low-
+resolution Images in Frequency Domain,” pp. 1–6, Feb. 2024, doi:
+https://doi.org/10.1109/ic-etite58242.2024.10493406.
+[10] A. Khormali and J.-S. Yuan, “ADD: Attention-Based DeepFake Detec-
+tion Approach,” Big Data and Cognitive Computing, vol. 5, no. 4, p.
+49, Sep. 2021, doi: https://doi.org/10.3390/bdcc5040049.
+[11] M.
+P.
+Kumar,
+V.
+V.
+Kumari,
+and
+L.
+Durga,
+“Deepfake
+Video
+Detection
+Using
+Inception
+Resnet
+V2:
+A
+Convolutional
+Neural
+Network
+Approach,”
+pp.
+595–601,
+Dec.
+2024,
+doi:
+https://doi.org/10.1109/cicn63059.2024.10847574.
+[12] G. Chen, C. Du, Y. Yu, H. Hu, H. Duan, and H. Zhu, “A
+Deepfake Image Detection Method Based on a Multi-Graph Atten-
+tion Network,” Electronics, vol. 14, no. 3, p. 482, Jan. 2025, doi:
+https://doi.org/10.3390/electronics14030482.
+[13] C. Lu, B. Liu, W. Zhou, Q. Chu, and N. Yu, “Deepfake Video Detec-
+tion Using 3D-Attentional Inception Convolutional Neural Network,”
+in Proc. IEEE Int. Conf. Image Processing (ICIP), Sep. 2021, pp.
+3572–3576, doi: https://doi.org/10.1109/icip42928.2021.9506381.
+[14] S. Lei, J. Song, F. Feng, Z. Yan, and A. Wang, “Deepfake Face
+Detection and Adversarial Attack Defense Method Based on Multi-
+Feature Decision Fusion,” Applied Sciences, vol. 15, no. 12, p. 6588,
+Jun. 2025, doi: https://doi.org/10.3390/app15126588.
+[15] S. Khan, J.-C. Chen, W.-H. Liao, and C.-S. Chen, “Adversarially
+Robust Deepfake Detection via Adversarial Feature Similarity Learn-
+ing,” Lecture Notes in Computer Science, pp. 503–516, 2024, doi:
+https://doi.org/10.1007/978-3-031-53311-2 37.
+[16] S. Waseem, A. Rahman, Z. Omar, B. A. Ahmed, S. Baloch, and
+A. Hafeezallah, “Multi-attention-based approach for deepfake face
+and expression swap detection and localization,” EURASIP J. Im-
+age and Video Processing, vol. 2023, no. 1, Aug. 2023, doi:
+https://doi.org/10.1186/s13640-023-00614-z.
+[17] J. K and A. M, “Safeguarding media integrity: A hybrid opti-
+mized deep feature fusion based deepfake detection in videos,”
+Computers
+Security,
+vol.
+142,
+p.
+103860,
+Jul.
+2024,
+doi:
+https://doi.org/10.1016/j.cose.2024.103860.
+[18] A. Qadir, R. Mahum, M. A. El-Meligy, A. E. Ragab, A. AlSalman,
+and H. Hassan, “An efficient deepfake video detection using robust
+deep learning,” Heliyon, vol. 10, no. 5, pp. e25757, Feb. 2024, doi:
+https://doi.org/10.1016/j.heliyon.2024.e25757.
+[19] A. V. Nadimpalli and A. Rattani, “ProActive DeepFake Detection using
+GAN-based VisibleWatermarking,” ACM Trans. Multimedia Comput-
+ing, Communications, and Applications, vol. 20, no. 11, pp. 1–27, Sep.
+2024, doi: https://doi.org/10.1145/3625547.
+[20] O. P. Singh, K. N. Singh, A. K. Singh, and A. K. Agrawal, “Deep
+learning-based image encryption techniques: Fundamentals, current
+trends, challenges and future directions,” Neurocomputing, vol. 612, p.
+128714, Jan. 2025, doi: https://doi.org/10.1016/j.neucom.2024.128714.
+[21] R. Sunil, P. Mer, A. Diwan, R. Mahadeva, and A. Sharma, “Exploring
+Autonomous Methods for Deepfake Detection: A Detailed Survey
+on Techniques and Evaluation,” Heliyon, p. e42273, Jan. 2025, doi:
+https://doi.org/10.1016/j.heliyon.2025.e42273.
+[22] B. Guo, H. Tai, G. Luo, and Y. Zhu, “AVSecure: An Audio-Visual
+Watermarking Framework for Proactive Deepfake Detection,” pp. 1–4,
+May 2024, doi: https://doi.org/10.1109/iceiec61773.2024.10561738.
+2015
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:40:07 UTC from IEEE Xplore.  Restrictions apply. 

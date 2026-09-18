@@ -1,0 +1,1111 @@
+
+
+--- PAGE 1 ---
+
+Image and Vision Computing 154 (2025) 105418
+Available online 23 January 2025
+0262-8856/© 2025 Elsevier B.V. All rights are reserved, including those for text and data mining, AI training, and similar technologies.
+Contents lists available at ScienceDirect
+Image and Vision Computing
+journal homepage: www.elsevier.com/locate/imavis
+FSBI: Deepfake detection with frequency enhanced self-blended images
+Ahmed Abul Hasanaath a, Hamzah Luqman a,b
+,∗, Raed Katib a, Saeed Anwar a,b
+a Information and Computer Science Department, King Fahd University of Petroleum & Minerals, Dhahran, 31261, Saudi Arabia
+b SDAIA-KFUPM Joint Research Center for Artificial Intelligence, KFUPM, Saudi Arabia
+A R T I C L E
+I N F O
+MSC:
+68T07
+68U10
+68T45
+Keywords:
+Deepfake
+DeepFake detection
+Deepfake generation
+Fake images
+Generative ai
+Self-Blended images
+A B S T R A C T
+Advances in deepfake research have led to the creation of almost perfect image manipulations that are
+undetectable to the human eye and some deepfake detection tools. Recently, several techniques have been
+proposed to differentiate deepfakes from real images and videos. This study introduces a frequency enhanced
+self-blended images (FSBI) approach for deepfake detection. This proposed approach utilizes discrete wavelet
+transforms (DWT) to extract discriminative features from self-blended images (SBI). The features are then used
+to train a convolutional network architecture model. SBIs blend the image with itself by introducing several
+forgery artifacts in a copy of the image before blending it. This prevents the classifier from overfitting specific
+artifacts by learning more generic representations. These blended images are then fed into the frequency
+feature extractor to detect artifacts that could not be detected easily in the time domain. The proposed
+approach was evaluated on FF++ and Celeb-DF datasets, and the obtained results outperformed state-of-the-
+art techniques using the cross-dataset evaluation protocol, achieving an AUC of 95.49% on Celeb-DF dataset.
+It also achieved competitive performance in the within-dataset evaluation setup. These results highlight the
+robustness and effectiveness of our method in addressing the challenging generalization problem inherent in
+deepfake detection. The code is available at https://github.com/gufranSabri/FSBI.
+1. Introduction
+The rise of deepfake technology has introduced a new era of digital
+manipulation, posing severe threats to the authenticity and integrity
+of multimedia content. Deepfakes, which are artificially generated me-
+dia convincingly mimicking real individuals or events, present several
+critical challenges. One major concern is their potential to spread
+misinformation on an unprecedented scale, undermining public trust
+in digital content and traditional media. They can be weaponized
+to create fake news, manipulate public opinion, and interfere with
+political processes, such as elections or policy decisions. Deepfakes
+also enable malicious content creation, such as non-consensual explicit
+videos or fraudulent communications, which can lead to reputational
+damage, emotional distress, and legal complications for victims. More-
+over, deepfake technology threatens privacy and security by facilitating
+identity theft and impersonation in financial fraud or cyberattacks.
+These multifaceted challenges underscore the urgent need for robust
+detection methods to mitigate the risks posed by this rapidly evolving
+technology.
+Several techniques have been proposed in the literature for generat-
+ing fake images that can be synthesized entirely or partially. Artificial
+neural networks [1], auto-encoding variations [2,3], and generative ad-
+versarial networks (GAN) [4] play significant roles in the development
+∗Corresponding author at: Information and Computer Science Department, King Fahd University of Petroleum & Minerals, Dhahran, 31261, Saudi Arabia.
+E-mail address: hluqman@kfupm.edu.sa (H. Luqman).
+and creation of modified and fake images. More realistic fake images
+have been created using GAN variants [5], such as Progressive GAN [6],
+StyleGAN [7], and SNGAN [8]. Techniques such as Face Swap [9],
+Neural Textures [10], and Face2Face [11] have been proposed for
+real-time face manipulations.
+The detection of deceptive digital creation is a complex and press-
+ing challenge. This complexity arises from the rapid advancements in
+generative models, which produce content that is increasingly indistin-
+guishable from authentic media. Furthermore, the diversity of manip-
+ulation techniques and the availability of tools for creating deepfakes
+make it difficult to develop universally effective detection strategies.
+Traditional methods for identifying deepfakes have become increas-
+ingly ineffective as the sophistication of generative models and manip-
+ulation techniques continues to evolve. In this context, innovative and
+robust deepfake detection mechanisms are imperative for safeguarding
+the credibility of digital media and maintaining public trust.
+In the dynamic field of deepfake detection, diverse techniques
+that combine traditional methods with cutting-edge deep learning
+approaches have emerged. Traditional techniques depend on the exam-
+ination of facial expressions, eye movements, and lip synchronizations
+to detect inconsistencies. In addition, visual facial artifacts such as eyes
+lacking realistic reflections and vibrance or teeth appearing as white
+https://doi.org/10.1016/j.imavis.2025.105418
+Received 23 July 2024; Received in revised form 8 December 2024; Accepted 8 January 2025
+
+
+--- PAGE 2 ---
+
+Image and Vision Computing 154 (2025) 105418
+2
+A.A. Hasanaath et al.
+Fig. 1. Examples of the artifact regions detected by the proposed FSBI approach on
+samples from (a) Celeb-DF and (b) FF++ datasets.
+blobs, have been exploited for detection [12–15]. These artifacts can
+be easily captured in high-resolution images; however, downsampling
+the image size to meet computational constraints usually creates diffi-
+culties in capturing these artifacts and sometimes introduces resolution
+inconsistencies. Therefore, some researchers have used preprocessing
+techniques to address this issue and enhance the generalization of
+the model by capturing a range of visual artifacts [16,17]. However,
+traditional deepfake detection techniques are less effective for deep-
+fake generation algorithms. Recently, researchers have leveraged deep
+learning techniques to scrutinize patterns in facial features, lighting,
+and background elements to detect deepfakes. Zhao et al. proposed
+a multi-attentional deepfake detection network that incorporated re-
+gional independence loss and attention-guided data augmentation [18].
+Sun et al. [19] incorporated LRNet as a novel deepfake detection
+approach, whereas Zhao et al. [20] improved accuracy by integrating
+anti-deepfake labels into facial identity features. Recent works incorpo-
+rated deep learning with feature enhancement for deepfake detection.
+Wang et al. [21] used a Wavelet-guided AutoEncoder and Texture-
+Content Attention Maps Learning to enhance forgery detection with
+high-frequency details. Zheng et al. [22] introduced DT-TransUNet,
+a dual-task network that performs both detection and segmentation.
+The proposed approach utilizes a Multi-Scale Spatial Frequency Feature
+(MSSFF) module with Stationary Wavelet Transform (SWT) to improve
+texture feature extraction.
+Shiohara et al. [23] proposed deepfake data synthesized using a
+self-blended images (SBIs) approach. The pseudo-source and target
+images were generated for each original image by applying several
+transformations. These images were blended to create SBIs used for
+deepfake detection. This study proposes an enhancement to the ap-
+proach proposed in et al. [23]. We propose a frequency-enhanced SBIs
+(FSBIs) approach for deepfake detection. This approach extends the SBI
+method by extracting features from the SBIs in the frequency domain
+to develop a more generic and robust detector. Each channel of the
+blended images resulting from the SBI was fed into discrete wavelet
+transforms (DWT). The resulting features were combined and fed into
+a Convolutional Neural Network (CNN) model to learn the artifacts in
+deepfake images. We used within-dataset and cross-dataset evaluation
+protocols to evaluate the proposed approach and new state-of-the-
+art results were obtained using the FF++ and Celeb-DF datasets. The
+proposed approach showed a good capability for detecting the artifacts
+on the deepfake images, as shown in Fig. 1. This study makes the
+following contributions:
+• Proposing an innovative approach for deepfake detection.
+• Discussing the efficiency of frequency-based transforms for detect-
+ing artifacts on deepfake images.
+• Evaluating the generalization of the proposed approach by per-
+forming cross-dataset evaluation.
+• Reporting a new state-of-the-art performance in the Celeb-DF
+dataset.
+The remainder of this paper is organized as follows: Section 2
+surveys the literature on deepfake detection and Section 3 presents the
+framework of the proposed approach. Section 4 presents the study’s ex-
+periments and results along with comparisons and discussions. Finally,
+Section 5 concludes the study.
+2. Related works
+Several techniques have been proposed for deepfake detection.
+These techniques vary from simple computer vision algorithms to
+complex deep-learning neural networks. Therefore, we classified these
+techniques into traditional and deep-learning approaches.
+Traditional Techniques. These techniques depend mainly on classic
+computer vision operations for artifact detection. Although the term
+‘‘traditional techniques’’ may suggest that these techniques are out-
+dated, they are still being used for deepfake detection. Jeong et al. [24]
+employed bilateral high-pass filters to detect amplification effects on
+fake images. Similarly, Liu et al. proposed by a deepfake detector that
+utilizes temporal identity inconsistencies between human faces in video
+frames [25]. Although these techniques accurately detect deepfakes,
+significant advances in deepfake generation have motivated researchers
+to search for alternative deep learning techniques [26].
+Deep Learning Techniques. Most recent deepfake detection tech-
+niques depend on neural networks [27]. The majority of these tech-
+niques [28–33] utilize CNNs for learning and classifying images into
+real and fake classes. Most of these CNN models do not undergo end-
+to-end training; instead, they rely on pre-trained models for feature
+extraction. EfficientNet models are the dominant pre-trained models
+used in most CNN-based deepfake detection techniques [34–36]. To
+boost the accuracy of these techniques, several researchers have utilized
+CNNs with transformer models [23,34–38]. Wodajo et al. [38] used a
+CNN to extract spatial features and fed them into a vision transformer
+(ViT) model that used an attention mechanism to categorize them
+into real or fake images. Similarly, CNNs have been combined with
+ViT by other researchers [35–37,39] and good results were obtained.
+Chen et al. [40] proposed a face forgery detection method that learns
+local features and detects inconsistencies. To address the generalizabil-
+ity of current deepfake detection methods, Chen et al. [41] employed
+a self-supervised learning-based method. The model employs a pool of
+forgery configurations and synthesized augmented forgeries to detect
+forgeries in images and videos. Lee et al. [42] presented a digital
+forensic tool for detecting different types of deepfakes. The proposed
+tool learns features using an AE-based model.
+The generalization of deepfake detection techniques is essential for
+the development of real-time systems. Therefore, researchers typically
+perform cross-dataset evaluations with their proposed deepfake de-
+tection approaches [5,29–32,35,43]. In this setting, the technique is
+evaluated on a dataset different from that used for model training. For
+example, Coccomini et al. [35] performed cross-forgery analysis using
+ViT to detect deepfakes in various datasets. Luo et al. [30] used high-
+frequency features and CNNs to generalize the detection methods. The
+MCX-API [31] method employs pairwise learning to improve model
+generalization. Deepfake Disrupter [43] was used with the help of hu-
+man input and deepfake detection tools to identify deepfakes. However,
+most proposed techniques cannot detect deepfakes that are not present
+in the training model [26].
+Recent deep learning advancements in deepfake detection have fo-
+cused on tackling spatio-temporal inconsistencies and dynamic motion
+
+
+--- PAGE 3 ---
+
+Image and Vision Computing 154 (2025) 105418
+3
+A.A. Hasanaath et al.
+Fig. 2. Framework of the FSBI model. This SBI is then decomposed into R, G, and B channels by the FFG. DWTs are computed for each channel individually, and the approximate
+coefficients are obtained. These approximate coefficients are then combined with the original channel through a simple averaging operation. The channels are stacked channel-wise
+to form the final FSBI image. The resulting FSBIs are used to train a CNN classifier to recognize real and fake images.
+analysis. Dynamic Difference Learning (DDL) utilizes long and short-
+range inter-frame motion analysis with modules like DFDC and MSA
+to distinguish facial motion from manipulation artifacts and model
+spatiotemporal inconsistencies [44]. Complementary Dynamic Interac-
+tion Networks (CDIN) analyze global and local dynamics, particularly
+in the mouth region, using a Complementary Cross Dynamics Fusion
+Module (CCDFM) to enhance generalization to unseen forgery tech-
+niques [45]. Head Pose Estimation (HPE) patterns have demonstrated
+robust detection across various datasets by analyzing temporal pose
+patterns [46]. Further advancements in feature enhancement include
+Wang et al. [21], who introduced a Wavelet-guided AutoEncoder and
+Texture-Content Attention Maps to improve high-frequency detail de-
+tection, and Zheng et al. [22], who proposed DT-TransUNet, a dual-task
+network employing a Multi-Scale Spatial Frequency Feature (MSSFF)
+module and Stationary Wavelet Transform (SWT) for improved texture
+feature extraction.
+Addressing the challenges of generalization and fairness, recent
+works have emphasized overcoming biases in detection accuracy across
+demographic groups. Fairness-aware loss functions and disentangle-
+ment learning approaches have been introduced to ensure demographic
+and domain-agnostic detection, enabling more equitable performance
+across diverse datasets [47,48]. Additionally, Xu et al. [49] tackled gen-
+eralization issues by proposing a reconstruction-classification network
+that learns facial content and gradients separately, fuses these features,
+and categorizes forged faces using a Bi-Directional attention module for
+reconstruction disparity.
+3. Frequency enhanced self-blended images (FSBI)
+We propose an FSBI approach for deepfake detection, and its frame-
+work is given in Fig. 2. The proposed approach comprises three mod-
+ules: an SBI generator, a frequency feature generator (FFG), and a CNN
+classifier. The original image is fed into the SBI generator component
+to create a blended image with artifacts. The FFG applies a series of
+DWT wavelets to the resulting blended image to extract features in
+the frequency domain. The features are then fused and fed into a CNN
+classifier trained with an EfficientNet-B5 pre-trained model to learn and
+classify images as real or fake.
+3.1. Self-blended image (SBI)
+SBIs are generated when an image is blended with itself. It was
+proposed by Shiohara et al. and creates deepfakes by blending a face
+with its mask, which is generated by applying several transformations
+SBI [23]. The SBI method uses three primary stages to generate deep-
+fakes from an original image. First, a source-target generator (STG)
+component takes an image as an input and generates pseudo-source
+(𝐼𝑠) and target (𝐼𝑡) images. These images are generated by performing
+random image transformations to the original image. These transfor-
+mations involve manipulating the values of RGB and HSV channels and
+changing the brightness and contrast of the image. Additional augmen-
+tation operations involve downsampling and translation is applied to
+the source image to create landmark mismatches.
+In the second stage, the SBI uses a mask generator (MG) to create a
+gray-scale mask image that blends both the source and target images.
+The MG generates a mask by detecting the landmarks of the facial
+region and calculating the convex hull from these detected landmarks.
+For this process, the SBI method adopts the FaceXray BI [50] to perform
+landmark detection followed by elastic deformation [31]. The masks
+are smoothed twice using two Gaussian filters and eroded after the first
+filter is applied.
+Finally, the SBI blends the source and target images using the
+generated mask. The blended image is created by eroding the source
+image with the mask generated by the MG module. The resulting
+eroded image is then combined with the eroded target image, using
+the inverse of the mask, to produce the final SBI. The steps were as
+follows:
+ISBI = Is ⊙M + It ⊙(1 − M),
+(1)
+where 𝐼𝑠is the source image, 𝐼𝑡is the target image, and 𝑀is the
+generated mask.
+3.2. Frequency features generator (FFG)
+The blended image obtained from the SBI module was fed into the
+FFG module. This module leverages DWT to extract more discrimina-
+tive features from blended images, aiding in the detection of artifacts
+in deepfake images. DWT is a signal- and image-processing technique
+that decomposes a signal into different frequency components by
+iteratively applying filters to the signal, dividing it into approximate
+and detailed coefficients at various resolutions. This process provides
+multiresolution analysis that captures both global and local features
+within the image.
+DWT families, such as Haar, Daubechies, Symlet, Biorthogonal, and
+Coiflet, offer different properties suitable for various applications. Haar
+is computationally efficient but does not perform well for complex
+structures. Daubechies, with varying orders, are effective for fine de-
+tails and compression. Symlet balances smoothness and oscillations,
+making it suitable for signals with both smooth and abrupt changes.
+Biorthogonal offers flexibility with separate sets for decomposition and
+reconstruction, while Coiflet, which has improved regularity, is suitable
+for applications requiring smoother wavelets. The choice between these
+families depends on the specific characteristics of the deepfake images
+and the requirements of the detection task. In this study, we evalu-
+ated the Haar, Symlet, and Biorthogonal wavelet types for deepfake
+detection and obtained the best results using the Symlet wavelet type.
+Additionally, several signal extension modes can be applied to
+reduce artifacts resulting from signal extrapolation when computing
+the DWT. These extension modes include symmetric, reflective, and
+
+
+--- PAGE 4 ---
+
+Image and Vision Computing 154 (2025) 105418
+4
+A.A. Hasanaath et al.
+antireflective modes. We explored all these modes in this study and
+achieved the highest score using the reflective mode.
+The RGB channels of the SBI were decomposed into three channels
+(R, G, and B), and the DWT coefficient was computed for each channel.
+The computed approximate coefficient for each channel was resized
+to match the original images and averaged with the corresponding
+SBI channel. The resulting coefficients were concatenated depthwise
+to create a three-channel DWT image, referred to as FSBI. This image
+highlights all the possible artifacts introduced into the deepfake image
+during its generation.
+3.3. CNN model
+The final component of the proposed FSBI approach is a CNN
+model trained to detect artifacts in the FSBIs and classify images as
+real or fake. This model was trained on FSBIs, which encode the
+SBI using frequency features extracted from each channel. We fine-
+tuned the EfficientNet-B5 [51] pre-trained on ImageNet, for this task.
+EfficientNet-B5, a member of the EfficientNet family, features com-
+pound scaling, where width, depth, and resolution are uniformly scaled
+to balance model capacity and computational cost. This design pri-
+oritizes state-of-the-art accuracy in image classification tasks, such as
+those on ImageNet, while using fewer parameters compared to other
+models with similar performance.
+4. Experiments
+4.1. Experimental setup
+Datasets. We employed two prominent datasets to evaluate the pro-
+posed approach: FF++ [52] and Celeb-DF [53]. The FF++ dataset
+consists of 1,000 videos with approximately 500,000 frames. This
+dataset has fake images created using deepfake (DF) [54], face swap
+(FS) [55], neural textures (NT) [56], and Face2Face (F2F) [57] meth-
+ods. From the 1,000 real videos, FF++ constructed over 1.8 million
+images derived from 4,000 fake videos. Due to the large size of the
+FF++ dataset, we used the compressed c23 version of the FF++ dataset
+(FF++(LQ)) in this work. We also used the Celeb-DF (version 2) dataset,
+which comprises large-scale deepfake videos generated using special-
+ized synthesis methods. The dataset comprises 5,639 high-quality deep-
+fake videos featuring celebrities, which amount to approximately two
+million frames.
+Implementation Details. The model was trained and evaluated using
+an Ubuntu 22.04 LTS machine equipped with an NVIDIA RTX A5000
+GPU with 48 GB of memory. The PyTorch framework was used to im-
+plement the proposed approach. The proposed model was trained using
+an early stopping technique to avoid overfitting. However, to obtain a
+valid comparison with the baseline model, the SBI method [23], we
+used the same number of epochs (100) to train the SBI method.
+Preprocessing. The preprocessing pipeline applies a range of aug-
+mentations to enhance model robustness. For source images, trans-
+formations like RGB shift, hue, saturation, brightness, and contrast
+adjustments are applied, along with downscaling and sharpening. Addi-
+tional augmentations, including image compression, are applied to both
+source and target images. These transformations simulate real-world
+variations and improve the model’s generalization.
+Training. For the CNN model, we fine-tuned the EfficientNet-B5 model
+that was pre-trained on ImageNet. We employed the Sharpness-Aware
+Minimization (SAM) optimizer to optimize the training process. We set
+the momentum for the optimizer to 0.9 and the learning rate to 0.001.
+The learning rate linearly decays after 75 epochs. We train the model
+on a batch size of 16. The size of the image is set to 380 × 380.
+Inference. During the inference stage, a set consisting of 32 frames was
+extracted from each video. If the frame contains two or more faces,
+Table 1
+The AUC of the FSBI approach with within- and cross-dataset evaluations.
+Evaluation
+Train
+Test
+Manipulation
+Average
+DF
+FS
+F2F
+NT
+Within-dataset
+FF++
+FF++
+99.45
+97.09
+95.37
+88.59
+95.13
+Celeb-DF
+Celeb-DF
+95.40
+Cross-dataset
+Celeb-DF
+FF++
+96.76
+95.43
+87.62
+78.07
+89.47
+FF++
+Celeb-DF
+95.49
+the classifier assessed each face, and the confidence associated with
+the highest fakeness was considered the predicted confidence for that
+frame. After obtaining the predictions for all the frames, we calculated
+the average to determine the video’s overall predictions. To ensure a
+fair comparison, we evaluated all videos in the test sets, setting the
+confidence to 0.5 for videos when no faces were detected in any frame.
+4.2. Results
+In this section, we present the evaluation results of the proposed
+FSBI approach for deepfake detection. Two settings were used to eval-
+uate the proposed approach: within-dataset and cross-dataset. The Area
+Under the Curve (AUC) metric was used in both settings.
+Within-dataset Evaluation. In this evaluation, the performance of the
+FSBI was evaluated using the same dataset on which it was trained.
+Table 1 presents the results obtained using the FF++ and Celeb-DF
+datasets. Deepfake images of the FF++ dataset are available in four
+formats based on the deepfake generation technique (DF, FS, F2F,
+and NT), as discussed in Section 4.1. We evaluated the performance
+of FSBI on all versions of FF++. Our model reported high AUC for
+both datasets, as indicated at the top of Table 1. For FF++, the FSBI
+approach can recognize deepfakes generated using almost all manipu-
+lation methods. A high AUC was obtained for the FF++ dataset when
+deepfake images were generated using the DF method. In contrast, a
+low AUC was obtained when the NT manipulation technique was used.
+This could be attributed to the fact that the NT method introduces a
+novel paradigm for image synthesis. NTs are learned feature maps that
+store high-dimensional information on 3D mesh proxies, which differ
+significantly from the traditional textures used in other deepfake gen-
+eration techniques. This unique representation presents challenges for
+deepfake detection models, reducing their effectiveness. In addition, the
+compressed videos of the FF++ dataset (FF++(LQ)) had low resolution.
+Detecting deepfakes in low-resolution images is more challenging than
+that in raw high-resolution images. For the Celeb-DF dataset, a high
+AUC value was obtained when the approach was trained and evaluated
+using samples from the same dataset.
+Cross-dataset Evaluation. A crucial aspect of assessing the generaliz-
+ability of our approach is to evaluate its performance across different
+data distributions and manipulation techniques. This type of evaluation
+is called a cross-dataset evaluation and serves as a robust test to gauge
+the effectiveness and adaptability of any deepfake detection approach.
+In this evaluation, the dataset used to test the model differed from
+that used for training. We evaluated the FSBI using the evaluation
+settings, and the results are presented in Table 1. Notably, when the
+model was trained on the FF++ dataset and tested on the Celeb-DF
+dataset, it outperformed related methods, achieving an impressive AUC
+of 95.49%. Furthermore, training the model on the Celeb-DF dataset
+yielded satisfactory results when evaluated using the FF++ dataset. The
+model was evaluated on the FF++ dataset using various manipulation
+techniques. The table shows that FSBI achieved a high AUC for the
+deepfakes generated using the DF and FS methods. However, the AUC
+scores for the FSBI model using the F2F and NT methods were relatively
+low. The results with NT manipulations aligned with those obtained in
+the within-dataset evaluation.
+
+
+--- PAGE 5 ---
+
+Image and Vision Computing 154 (2025) 105418
+5
+A.A. Hasanaath et al.
+Table 2
+Our FSBI method demonstrates higher performance compared to other deepfake
+detection approaches. This is evident when we train and test on the same dataset
+(Within-DS: Within-dataset) and when trained on one dataset and evaluated on a
+different dataset (Cross-DS: Cross-dataset).
+Eval.
+Method
+Train
+Test Dataset
+FF++
+Celeb-DF
+Within-DS
+Jevnisek et al. [58]
+FF++
+75.57
+–
+HPE [46]
+FF++
+86.25
+–
+ViT [59]
+FF++
+95.10
+–
+MCX-API [60]
+FF++
+99.6
+CNN+ViT [61]
+FF++
+91.50
+–
+CDIN [45]
+FF++
+97.80
+–
+DFDC+MSA [44]
+FF++
+96.65
+–
+FSBI (ours)
+FF++
+95.13
+–
+Cross-DS
+MCX-API [60]
+Multiple
+90.87
+FRDM [62]
+Multiple
+–
+79.40
+PCL + I2G [63]
+Multiple
+–
+90.03
+LRL [18]
+Multiple
+–
+78.26
+DFDC+MSA [44]
+FF++
+–
+71.36
+LipForensics [64]
+FF++
+–
+82.40
+FTCN [65]
+FF++
+–
+86.90
+SBI (FF++(HQ)) [23]
+FF++
+–
+93.18
+SBI (FF++(LQ)) [23]
+FF++
+–
+92.87
+RLGC [49]
+FF++
+–
+91.20
+CDIN [45]
+FF++
+–
+85.80
+FSBI (ours)
+FF++
+–
+95.49
+Fig. 3. Deepfake samples from the Celeb-DF dataset. The first row contains samples
+that were deepfakes that were correctly detected by the FSBI approach and not detected
+by the SBI approach. The second row contains samples that were not detected by both
+approaches.
+4.3. Ablation study
+Ablation studies were conducted to verify the effectiveness of the
+proposed FSBI. We systematically varied the key components and hy-
+perparameters in our deepfake detection pipeline to understand their
+impact on performance while optimizing the accuracy of the proposed
+model. The components and hyperparameters were FFG and DWT
+type and mode, image size, and a pre-trained model, respectively. We
+conducted ablation studies in the cross-dataset evaluation setting using
+the FF++ and Celeb-DF datasets for training and testing, respectively.
+FFG Component. Our approach consists of three components: the SBI,
+FFG, and CNN. A specific training procedure was implemented to evalu-
+ate the effectiveness of the first two components. The model was trained
+for 75 epochs on one component and fine-tuned for 25 epochs on the
+other. We also trained and fine-tuned the model on both components,
+as shown in Table 3, where half of the images were generated using
+SBI, and the other half contained images generated using FSBI. The
+objective is to evaluate the performance of the proposed approach
+with and without an FFG module. The table shows that training and
+fine-tuning the model solely on the FSBI resulted in the highest AUC
+score of 95.49%. The results indicate an overall enhancement in model
+performance when trained on FSBI compared to SBI alone or when
+images generated by SBI are used in either training or fine-tuning the
+Table 3
+Results from experimenting with the effectiveness of the framework components.
+Model was trained for 75 epochs and finetuned for 25 epochs.
+Training
+Fine-tuning
+AUC (%)
+SBI
+FSBI
+SBI
+FSBI
+✓
+✗
+✓
+✗
+94.66
+✓
+✗
+✗
+✓
+94.78
+✗
+✓
+✓
+✗
+94.01
+✗
+✓
+✗
+✓
+95.49
+✓
+✓
+✓
+✗
+94.21
+✓
+✓
+✗
+✓
+94.07
+✓
+✓
+✓
+✓
+94.90
+Table 4
+The performance of the FSBI with different
+image sizes.
+Image size (px)
+AUC
+170 × 170
+88.55
+230 × 230
+92.55
+380 × 380
+95.49
+512 × 512
+91.59
+model. This improvement can be attributed to the nature of the FFG,
+which employs DWT to amplify the frequency of information in the SBI
+images. Training the model on images generated using the FSBI focuses
+on the frequency artifacts present in deepfakes. Additionally, DWT
+introduces texture analysis-based features that are crucial for detecting
+deepfake artifacts resulting from sharp intensity changes during the
+generation process.
+DWT Variables. DWT plays a crucial role in the FSBI approach for
+representing and extracting features from SBI images in the frequency
+domain. Three main wavelet types are available for DWT: Biorthogonal,
+Symlet, and Haar, and the choice among them depends on the down-
+stream task. Additionally, three signal extension modes—Symmetric,
+Reflective, and Antireflective—can be applied to reduce artifacts result-
+ing from signal extrapolation during DWT computation. To evaluate
+the impact of wavelet type and signal extension modes on FSBI per-
+formance, we conducted a cross-dataset evaluation, and the results
+are shown in Table 5. The results reveal that the choice of DWT
+variables significantly influences the model’s performance, with the
+best configuration being the Symlet wavelet and Reflective mode (M5
+model), achieving an AUC of 95.49%. This underscores the importance
+of carefully selecting DWT parameters to optimize the model’s ability to
+detect deepfake images. Notably, all DWT configurations outperformed
+the state-of-the-art results on the Celeb-DF dataset, supporting our
+hypothesis about the effectiveness of DWT for deepfake detection.
+Image Size Selection. The choice of image size is crucial for FSBI
+performance. We experimented with four image sizes: 170×170, 230 ×
+230, 380×380, and 512 × 512. As shown in Table 4, notable differences
+in AUC scores were observed with varying image resolutions. Perfor-
+mance improved with larger image sizes, as expected, due to more
+visible artifacts. However, the model’s performance deteriorated with
+the largest image size of 512 × 512 pixels, likely due to information
+loss during interpolation from 256 × 256 to 512 × 512.
+Choice of the pretrained Model.While the CNN model used the
+pre-trained EfficientNet-B5 in the FSBI framework, we also evaluated
+other network architectures. Our experiments included EfficientNet-
+B4 [51], EfficientNet-B5, ResNet50 [66], and MobileNetV2 [67]. We
+also present standard SBI results using these models. As shown in
+Table 6, EfficientNet-based models consistently outperformed ResNet50
+and MobileNetV2 across various configurations. EfficientNet-B5 im-
+proved the performance of SBI and FSBI by more than 1% compared to
+EfficientNet-B4, demonstrating that selecting the appropriate network
+architecture is vital for enhancing deepfake detection accuracy.
+
+
+--- PAGE 6 ---
+
+Image and Vision Computing 154 (2025) 105418
+6
+A.A. Hasanaath et al.
+Table 5
+Ablation study results with different DWT wavelet types and modes.
+Model
+Wavelet
+Mode
+AUC
+Biorthogonal
+Symlet
+Haar
+Symmetric
+Reflect
+Antireflect
+𝑀1
+✓
+✗
+✗
+✓
+✗
+✗
+93.42
+𝑀2
+✓
+✗
+✗
+✗
+✓
+✗
+93.97
+𝑀3
+✓
+✗
+✗
+✗
+✗
+✓
+93.97
+𝑀4
+✗
+✓
+✗
+✓
+✗
+✗
+94.87
+𝑀5
+✗
+✓
+✗
+✗
+✓
+✗
+95.49
+𝑀6
+✗
+✓
+✗
+✗
+✗
+✓
+95.21
+𝑀7
+✗
+✗
+✓
+✓
+✗
+✗
+94.65
+𝑀8
+✗
+✗
+✓
+✗
+✓
+✗
+94.65
+𝑀9
+✗
+✗
+✓
+✗
+✗
+✓
+94.65
+Table 6
+The performance of SBI and FSBI with different pre-trained models. Our proposed model consistently
+outperformed SBI for each pre-trained model.
+Models
+ResNet-50
+MobileNet-V2
+EfficientNet-B4
+EfficientNet-B5
+AUC
+SBI [23]
+✓
+✗
+✗
+✗
+83.04
+FSBI (Ours)
+✓
+✗
+✗
+✗
+84.68
+SBI [23]
+✗
+✓
+✗
+✗
+78.36
+FSBI (Ours)
+✗
+✓
+✗
+✗
+81.72
+SBI [23]
+✗
+✗
+✓
+✗
+93.10
+FSBI (Ours)
+✗
+✗
+✓
+✗
+94.29
+SBI [23]
+✗
+✗
+✗
+✓
+94.66
+FSBI (Ours)
+✗
+✗
+✗
+✓
+95.49
+4.4. Comparisons
+This section compares our FSBI approach with SOTA deepfake
+detection techniques. In this comparison, two evaluation settings were
+used: within-dataset and cross-dataset, as shown in Table 2. For within-
+dataset evaluation, FF++ was used to train and test the models. Most
+deepfake detection techniques use this dataset for within-dataset eval-
+uations. To the best of our knowledge, the Celeb-DF dataset has been
+used in the literature for cross-dataset evaluation.
+We also conducted a cross-dataset evaluation using Celeb-DF as
+the testing dataset. Unlike approaches that use multiple datasets for
+training [18,60,62,63], our approach uses only the FF++ dataset. To
+ensure a fair comparison with the SBI approach [23], we reproduced
+their results using the compressed c23 version (FF++(LQ)) of the FF++
+dataset. As shown in Table 2, the proposed approach significantly
+outperformed all other techniques. In addition, it outperformed the
+approaches trained on multiple datasets.
+To visualize the qualitative differences between the proposed FSBI
+approach and the SBI method [23], t-SNE was applied to the feature
+vectors from the last layer of both models. Fig. 4 illustrates the feature
+space visualizations of the FSBI and SBI methods when trained on the
+FF++ and Celeb-DF datasets. As shown in the feature visualization plot,
+the FSBI method generated a distinct boundary between the clusters
+of the two classes for the FF++ dataset. In contrast, the SBI method
+exhibited less well-defined boundaries between the two classes. For the
+Celeb-DF dataset, the FSBI method demonstrated significantly reduced
+overlap between the two clusters compared to the SBI method. Fig. 3
+shows some deepfake samples that were correctly detected by our
+approach, whereas the SBI method failed to detect them. The figure
+also includes other samples that were challenging for both methods.
+5. Conclusion
+In this work, we present a novel deepfake detection method, ESBI,
+which significantly outperforms existing methodologies. Our approach
+leverages the synergy of SBI and DWT, enabling our model to detect
+subtle artifacts in manipulated content. Through extensive experiments
+and ablation studies, we demonstrate the effectiveness of our pro-
+posed method, achieving a remarkable AUC of 95.49%. The strategic
+combination of FSBI with the EfficientNet-B5 architecture showcases
+the potential for enhanced generalization and adaptability. Our results
+establish a new benchmark in cross-dataset evaluation, underscoring
+the efficacy of our approach in combating deepfake threats across
+diverse datasets.
+Despite these advancements, several directions for future research
+remain. First, enhancing the robustness of FSBI against adversarially
+generated deepfakes warrants exploration, as attackers continually
+evolve techniques to bypass detection methods. Second, investigating
+the integration of temporal features from video data could further
+improve detection accuracy by capturing inconsistencies over time.
+Additionally, extending the framework to handle emerging modalities,
+such as audio–visual deepfakes or 3D manipulations, could broaden its
+applicability.
+CRediT authorship contribution statement
+Ahmed Abul Hasanaath: Writing – original draft, Validation,
+Methodology, Formal analysis, Data curation, Conceptualization.
+Hamzah Luqman: Writing – review & editing, Writing – original
+draft, Supervision, Methodology, Formal analysis.
+Raed Katib:
+Writing – original draft, Validation, Methodology. Saeed Anwar:
+Writing – review & editing, Supervision, Methodology.
+Declaration of competing interest
+The authors declare that they have no known competing financial
+interests or personal relationships that could have appeared to
+influence the work reported in this paper.
+Acknowledgments
+The authors would like to acknowledge the support received from
+the Saudi Data and AI Authority (SDAIA) and King Fahd University
+of Petroleum and Minerals (KFUPM) under the SDAIA-KFUPM Joint
+Research Center for Artificial Intelligence Grant no. JRC-AI-RFP-14.
+Data availability
+I have shared the link to my code in the attached article.
+
+
+--- PAGE 7 ---
+
+Image and Vision Computing 154 (2025) 105418
+7
+A.A. Hasanaath et al.
+Fig. 4. Feature space visualization of FSBI (first column) and SBI (second column) trained on (a) FF++ and (b) Celeb-DF datasets.
+References
+[1] M.S. Rana, M.N. Nobi, B. Murali, A.H. Sung, Deepfake detection: A systematic
+literature review, IEEE Access 10 (2022) 25494–25513, Conference Name: IEEE
+Access.
+[2] D.P. Kingma, M. Welling, Auto-encoding variational bayes, 2013, arXiv preprint
+arXiv:1312.6114.
+[3] D.P. Kingma, M. Welling, An introduction to variational autoencoders, Found.
+Trends® Mach. Learn. 12 (4) (2019) 307–392, http://arxiv.org/abs/1906.02691
+[cs, stat], arXiv:1906.02691
+[cs, stat].
+[4] I. Goodfellow, J. Pouget-Abadie, M. Mirza, B. Xu, D. Warde-Farley, S. Ozair,
+A. Courville, Y. Bengio, Generative adversarial nets, in: Advances in Neural
+Information Processing Systems, vol. 27, Curran Associates, Inc., 2014.
+[5] R. Tolosana, R. Vera-Rodriguez, J. Fierrez, A. Morales, J. Ortega-Garcia, Deep-
+fakes and beyond: A survey of face manipulation and fake detection, Inf. Fusion
+64 (2020) 131–148.
+[6] T. Karras, T. Aila, S. Laine, J. Lehtinen, Progressive growing of gans for improved
+quality, stability, and variation, 2017, arXiv preprint arXiv:1710.10196.
+[7] T. Karras, S. Laine, T. Aila, A style-based generator architecture for generative
+adversarial networks, in: Proceedings of the IEEE/CVF Conference on Computer
+Vision and Pattern Recognition, 2019, pp. 4401–4410.
+[8] T. Miyato, T. Kataoka, M. Koyama, Y. Yoshida, Spectral normalization for
+generative adversarial networks, 2018, arXiv preprint arXiv:1802.05957.
+[9] deepfakes, Faceswap, 2023-02-22, URL https://github.com/deepfakes/faceswap,
+original-date: 2017-12-19T09:44:13Z.
+[10] J. Thies, M. Zollhöfer, M. Nießner, Deferred neural rendering: Image synthesis
+using neural textures, Acm Trans. Graph. ( TOG) 38 (4) (2019) 1–12.
+[11] J. Thies, M. Zollhöfer, M. Stamminger, C. Theobalt, M. Nießner, Face2Face:
+Real-time face capture and reenactment of RGB videos, 2020-07-29, arXiv:
+2007.14808, http://arxiv.org/abs/2007.14808
+[cs], arXiv:2007.14808
+[cs].
+[12] Y. Li, S. Lyu, Exposing deepfake videos by detecting face warping artifacts, 2018,
+arXiv preprint arXiv:1811.00656.
+[13] M. Sahla Habeeba, A. Lijiya, A.M. Chacko, Detection of deepfakes using visual
+artifacts and neural network classifier, in: Innovations in Electrical and Electronic
+Engineering: Proceedings of ICEEE 2020, Springer, 2021, pp. 411–422.
+[14] F. Matern, C. Riess, M. Stamminger, Exploiting visual artifacts to expose deep-
+fakes and face manipulations, in: 2019 IEEE Winter Applications of Computer
+Vision Workshops, WACVW, IEEE, 2019, pp. 83–92.
+[15] X. Yang, Y. Li, S. Lyu, Exposing deep fakes using inconsistent head poses,
+in: ICASSP 2019-2019 IEEE International Conference on Acoustics, Speech and
+Signal Processing, ICASSP, IEEE, 2019, pp. 8261–8265.
+[16] D. Cozzolino, J. Thies, A. Rössler, C. Riess, M. Nießner, L. Verdoliva, Forensic-
+transfer: Weakly-supervised domain adaptation for forgery detection, 2018, arXiv
+preprint arXiv:1812.02510.
+[17] X. Xuan, B. Peng, W. Wang, J. Dong, On the generalization of GAN image
+forensics, in: Chinese Conference on Biometric Recognition, Springer, 2019, pp.
+134–141.
+[18] H. Zhao, W. Zhou, D. Chen, T. Wei, W. Zhang, N. Yu, Multi-attentional deepfake
+detection, in: Proceedings of the IEEE/CVF Conference on Computer Vision and
+Pattern Recognition, 2021, pp. 2185–2194.
+[19] Z. Sun, Y. Han, Z. Hua, N. Ruan, W. Jia, Improving the efficiency and robustness
+of deepfakes detection through precise geometric features, in: Proceedings of the
+IEEE/CVF Conference on Computer Vision and Pattern Recognition, 2021, pp.
+3609–3618.
+[20] Y. Zhao, B. Liu, M. Ding, B. Liu, T. Zhu, X. Yu, Proactive deepfake defence via
+identity watermarking, in: Proceedings of the IEEE/CVF Winter Conference on
+Applications of Computer Vision, 2023, pp. 4602–4611.
+[21] Y. Wang, C. Chen, N. Zhang, X. Hu, WATCHER: Wavelet-guided texture-content
+hierarchical relation learning for deepfake detection, Int. J. Comput. Vis. (2024)
+1–22.
+[22] J. Zheng, Y. Zhou, X. Hu, Z. Tang, DT-TransUNet: A dual-task model for deepfake
+detection and segmentation, in: Chinese Conference on Pattern Recognition and
+Computer Vision, PRCV, Springer, 2023, pp. 244–255.
+[23] K. Shiohara, T. Yamasaki, Detecting deepfakes with self-blended images, in:
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern
+Recognition, 2022, pp. 18720–18729.
+[24] Y. Jeong, D. Kim, S. Min, S. Joe, Y. Gwon, J. Choi, BiHPF: Bilateral high-pass
+filters for robust deepfake detection, in: Proceedings of the IEEE/CVF Winter
+Conference on Applications of Computer Vision, 2022, pp. 48–57.
+
+
+--- PAGE 8 ---
+
+Image and Vision Computing 154 (2025) 105418
+8
+A.A. Hasanaath et al.
+[25] B. Liu, B. Liu, M. Ding, T. Zhu, X. Yu, TI2Net: Temporal identity inconsis-
+tency network for deepfake detection, in: Proceedings of the IEEE/CVF Winter
+Conference on Applications of Computer Vision, 2023, pp. 4691–4700.
+[26] L. Verdoliva, Media forensics and deepfakes: an overview, IEEE J. Sel. Top. Sign.
+Proces. 14 (5) (2020) 910–932.
+[27] T.T. Nguyen, Q.V.H. Nguyen, D.T. Nguyen, D.T. Nguyen, T. Huynh-The, S.
+Nahavandi, T.T. Nguyen, Q.-V. Pham, C.M. Nguyen, Deep learning for deepfakes
+creation and detection: A survey, Comput. Vis. Image Underst. 223 (2022)
+103525.
+[28] İ. İlhan, E. Balı, M. Karaköse, An improved DeepFake detection approach with
+NASNetLarge CNN, in: International Conference on Data Analytics for Business
+and Industry, ICDABI, 2022, pp. 598–602.
+[29] A. Khormali, J.-S. Yuan, DFDT: An end-to-end DeepFake detection framework
+using vision transformer, Appl. Sci. 12 (6) (2022-01) 2953, Number: 6 Publisher:
+Multidisciplinary Digital Publishing Institute.
+[30] Y. Luo, Y. Zhang, J. Yan, W. Liu, Generalizing face forgery detection with high-
+frequency features, in: Proceedings of the IEEE/CVF Conference on Computer
+Vision and Pattern Recognition, 2021, pp. 16317–16326.
+[31] Y. Xu, K. Raja, L. Verdoliva, M. Pedersen, Learning pairwise interaction for
+generalizable DeepFake detection, in: Proceedings of the IEEE/CVF Winter
+Conference on Applications of Computer Vision, 2023, pp. 672–682.
+[32] T. Zhao, X. Xu, M. Xu, H. Ding, Y. Xiong, W. Xia, Learning self-consistency for
+deepfake detection, in: Proceedings of the IEEE/CVF International Conference on
+Computer Vision, 2021, pp. 15023–15033.
+[33] A.V. Nadimpalli, A. Rattani, On improving cross-dataset generalization of deep-
+fake detectors, in: Proceedings of the IEEE/CVF Conference on Computer Vision
+and Pattern Recognition, 2022, pp. 91–99.
+[34] A. Jevnisek, S. Avidan, Aggregating layers for deepfake detection, in: 26th
+International Conference on Pattern Recognition, ICPR, IEEE, 2022, pp.
+2027–2033.
+[35] D.A. Coccomini, R. Caldelli, F. Falchi, C. Gennaro, G. Amato, Cross-forgery analy-
+sis of vision transformers and cnns for deepfake image detection, in: Proceedings
+of the 1st International Workshop on Multimedia AI Against Disinformation,
+2022, pp. 52–58.
+[36] T. Wang, H. Cheng, K.P. Chow, L. Nie, Deep convolutional pooling transformer
+for deepfake detection, ACM Trans. Multimed. Comput. Commun. Appl. 19 (6)
+(2023) 1–20.
+[37] D.A. Coccomini, N. Messina, C. Gennaro, F. Falchi, Combining efficientnet and
+vision transformers for video deepfake detection, in: International Conference on
+Image Analysis and Processing, Springer, 2022, pp. 219–229.
+[38] D. Wodajo, S. Atnafu, Deepfake video detection using convolutional vision
+transformer, 2021, arXiv preprint arXiv:2102.11126.
+[39] Y.-J. Heo, Y.-J. Choi, Y.-W. Lee, B.-G. Kim, Deepfake detection scheme based on
+vision transformer and distillation, 2021, arXiv preprint arXiv:2104.01353.
+[40] S. Chen, T. Yao, Y. Chen, S. Ding, J. Li, R. Ji, Local relation learning for face
+forgery detection, 2021-05-06, arXiv:2105.02577, arXiv:2105.02577
+[cs].
+[41] L. Chen, Y. Zhang, Y. Song, L. Liu, J. Wang, Self-supervised learning of
+adversarial example: Towards good generalizations for deepfake detection, in:
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern
+Recognition, 2022, pp. 18710–18719.
+[42] S. Lee, S. Tariq, J. Kim, S.S. Woo, Tar: Generalized forensic framework to detect
+deepfakes using weakly supervised learning, in: IFIP International Conference on
+ICT Systems Security and Privacy Protection, Springer, 2021, pp. 351–366.
+[43] W. Ge, J. Patino, M. Todisco, N. Evans, Explaining deep learning models for
+spoofing and deepfake detection with SHapley additive exPlanations, 2021-10-07,
+arXiv:2110.03309, arXiv:2110.03309
+[eess].
+[44] Q. Yin, W. Lu, B. Li, J. Huang, Dynamic difference learning with spatio-temporal
+correlation for deepfake video detection, IEEE Trans. Inf. Forensics Secur. (2023).
+[45] H. Wang, Z. Liu, S. Wang, Exploiting complementary dynamic incoherence for
+deepfake video detection, IEEE Trans. Circuits Syst. Video Technol. 33 (8) (2023)
+4027–4040.
+[46] F. Becattini, C. Bisogni, V. Loia, C. Pero, F. Hao, Head pose estimation patterns
+as deepfake detectors, ACM Trans. Multimed. Comput. Commun. Appl. 20 (11)
+(2024) 1–24.
+[47] Y. Ju, S. Hu, S. Jia, G.H. Chen, S. Lyu, Improving fairness in deepfake detection,
+in: Proceedings of the IEEE/CVF Winter Conference on Applications of Computer
+Vision, 2024, pp. 4655–4665.
+[48] L. Lin, X. He, Y. Ju, X. Wang, F. Ding, S. Hu, Preserving fairness generalization
+in deepfake detection, in: Proceedings of the IEEE/CVF Conference on Computer
+Vision and Pattern Recognition, 2024, pp. 16815–16825.
+[49] K. Xu, X. Hu, X. Zhou, X. Xu, L. Qi, C. Chen, RLGC: Reconstruction learning
+fusing gradient and content features for efficient deepfake detection, IEEE Trans.
+Consum. Electron. (2024).
+[50] L. Li, J. Bao, T. Zhang, H. Yang, D. Chen, F. Wen, B. Guo, Face X-ray for more
+general face forgery detection, 2019, arXiv:1912.13458.
+[51] M. Tan, Q. Le, Efficientnet: Rethinking model scaling for convolutional neural
+networks, in: International Conference on Machine Learning, PMLR, 2019, pp.
+6105–6114.
+[52] A. Rossler, D. Cozzolino, L. Verdoliva, C. Riess, J. Thies, M. Nießner, Faceforen-
+sics++: Learning to detect manipulated facial images, in: Proceedings of the
+IEEE/CVF International Conference on Computer Vision, 2019, pp. 1–11.
+[53] Y. Li, X. Yang, P. Sun, H. Qi, S. Lyu, Celeb-df: A large-scale challenging dataset
+for deepfake forensics, in: Proceedings of the IEEE/CVF Conference on Computer
+Vision and Pattern Recognition, 2020, pp. 3207–3216.
+[54] GitHub - deepfakes/faceswap: Deepfakes software for all — github.com, 2024,
+https://github.com/deepfakes/faceswap. (Accessed 07 March 2024).
+[55] J. Thies, M. Zollhofer, M. Stamminger, C. Theobalt, M. Nieß ner, Face2face: Real-
+time face capture and reenactment of RGB videos, in: Proceedings of the IEEE
+Conference on Computer Vision and Pattern Recognition, 2016, pp. 2387–2395.
+[56] J. Thies, M. Zollhöfer, M. Nießner, Deferred neural rendering: Image synthesis
+using neural textures, Acm Trans. Graph. ( TOG) 38 (4) (2019) 1–12.
+[57] GitHub - MarekKowalski/FaceSwap: 3D face swapping implemented in Python
+— github.com, 2023, https://github.com/MarekKowalski/FaceSwap/. (Accessed
+12 November 2023).
+[58] A. Jevnisek, S. Avidan, Aggregating layers for deepfake detection, in: 2022
+26th International Conference on Pattern Recognition, ICPR, IEEE, 2022, pp.
+2027–2033.
+[59] D.A. Coccomini, N. Messina, C. Gennaro, F. Falchi, Combining efficientnet and
+vision transformers for video deepfake detection, in: International Conference on
+Image Analysis and Processing, Springer, 2022, pp. 219–229.
+[60] Y. Xu, K. Raja, L. Verdoliva, M. Pedersen, Learning pairwise interaction for
+generalizable DeepFake detection, in: Proceedings of the IEEE/CVF Winter
+Conference on Applications of Computer Vision, 2023, pp. 672–682.
+[61] D. Wodajo, S. Atnafu, Deepfake video detection using convolutional vision
+transformer, 2021, arXiv preprint arXiv:2102.11126.
+[62] Y. Luo, Y. Zhang, J. Yan, W. Liu, Generalizing face forgery detection with high-
+frequency features, in: Proceedings of the IEEE/CVF Conference on Computer
+Vision and Pattern Recognition, 2021, pp. 16317–16326.
+[63] T. Zhao, X. Xu, M. Xu, H. Ding, Y. Xiong, W. Xia, Learning self-consistency for
+deepfake detection, in: Proceedings of the IEEE/CVF International Conference on
+Computer Vision, 2021, pp. 15023–15033.
+[64] A. Haliassos, K. Vougioukas, S. Petridis, M. Pantic, Lips don’t lie: A generalisable
+and robust approach to face forgery detection, in: Proceedings of the IEEE/CVF
+Conference on Computer Vision and Pattern Recognition, 2021, pp. 5039–5049.
+[65] Y. Zheng, J. Bao, D. Chen, M. Zeng, F. Wen, Exploring temporal coherence
+for more general video face forgery detection, in: Proceedings of the IEEE/CVF
+International Conference on Computer Vision, 2021, pp. 15044–15054.
+[66] K. He, X. Zhang, S. Ren, J. Sun, Deep residual learning for image recognition, in:
+Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition,
+2016, pp. 770–778.
+[67] M. Sandler, A. Howard, M. Zhu, A. Zhmoginov, L.-C. Chen, Mobilenetv2: Inverted
+residuals and linear bottlenecks, in: Proceedings of the IEEE Conference on
+Computer Vision and Pattern Recognition, 2018, pp. 4510–4520.

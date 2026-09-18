@@ -1,0 +1,1099 @@
+
+
+--- PAGE 1 ---
+
+Signal, Image and Video Processing (2025) 19:400
+https://doi.org/10.1007/s11760-025-03970-7
+ORIGINAL PAPER
+Enhancing multimodal deepfake detection with local–global feature
+integration and diffusion models
+Muhammad Javed1 · Zhaohui Zhang1 · Fida Hussain Dahri2 · Teerath Kumar3
+Received: 31 December 2024 / Revised: 11 February 2025 / Accepted: 15 February 2025 / Published online: 11 March 2025
+© The Author(s) 2025
+Abstract
+Deepfake detection has become a critical challenge nowadays with the rise of sophisticated generative techniques that manip-
+ulate audio-visual data. Existing methods primarily focus on lip movement synchronization using audio and visual features,
+often relying on local feature extraction with Convolutional Neural Networks (CNNs). In this work, we propose an enhanced
+multimodal framework that integrates with local and global features for advanced deepfake detection. Our approach extends
+traditional pipelines by introducing additional visual features such as eye movement and facial regions, combined with audio
+features to model cross-modal dependencies. While CNNs capture local features, Vision Transformers (ViTs) extract global
+contextual relationships from both visual and audio modalities. The diffusion models are incorporated as pre-processors to
+reﬁne noisy data and generate realistic augmentations, ensuring high-quality feature representation. The proposed framework
+achieves state-of-the-art performance, with accuracy scores of 0.9987, 0.9825, 0.9915, and 0.9812 on the FakeAVCeleb,
+AV-Deepfake1M, TVIL, and LAV-DF datasets, respectively. These results demonstrate signiﬁcant improvements over exist-
+ing methods, highlighting the framework’s superior generalization and robustness in detecting subtle inconsistencies across
+manipulated audio-visual data.
+Keywords Audio-visual synchronization · Deepfake detection · Diffusion models · Multimodal analysis · Vision transformers
+1 Introduction
+The rise of deepfake technology has led to increasing con-
+cernsabouttheauthenticityofmedia.Deepfakes-manipulated
+videos, images and audio are generated using artiﬁcial intel-
+Muhammad Javed, Zhaohui Zhang, and Teerath Kumar have con-
+tributed equally to this work.
+B Zhaohui Zhang
+zhzhang@dhu.edu.cn
+B Teerath Kumar
+teerath.menghwar2@mail.dcu.ie
+Muhammad Javed
+421017@mail.dhu.edu.cn
+Fida Hussain Dahri
+223227084@seu.edu.cn
+1
+Department of Computer Science and Technology, College of
+Computer Science, Donghua University, Shanghai 200022,
+China
+2
+School of Computer Science and Engineering, Southeast
+University, Nanjing 211189, China
+3
+School of Computing, Dublin City University, Dublin, Ireland
+ligence (AI) to create highly realistic but fake content. While
+these techniques can be used for entertainment and creative
+purposes, they also present signiﬁcant risks, especially in
+termsofmisinformation,privacyviolations,andcyberthreats
+[1, 2]. The ability to convincingly alter both video and audio
+has made it increasingly difﬁcult to distinguish between real
+and fabricated media [3].
+Existing deepfake detection methods typically focus
+on either visual or audio features independently, but this
+approach is limited when both modalities are altered [3–7].
+For example, in cases where the video is real but the audio
+is fake, or vice versa, detection becomes more challenging
+[8, 9]. To address this, we propose a multimodal framework
+that analyzes both audio and visual features in tandem. By
+combining these modalities, our approach can better cap-
+ture inconsistencies across both video and audio, improving
+detection accuracy.
+In this work, we propose a novel framework for deepfake
+detection that goes beyond traditional methods by incorpo-
+rating both local and global features from audio and visual
+data. Alongside lip synchronization, we also focus on addi-
+tional visual features such as eye movements and the overall
+123
+
+
+--- PAGE 2 ---
+
+400
+Page 2 of 9
+Signal, Image and Video Processing (2025) 19 :400
+facial region [1, 10]. We use Convolutional Neural Networks
+(CNNs) for extracting local features (like lips and eyes) and
+Vision Transformers (ViTs) for capturing broader, global pat-
+ternsinthedata,providingamoreholisticviewofthecontent.
+Additionally, we incorporate Diffusion Models to improve
+the quality of both the audio and visual data. These models
+help to reduce noise and enhance features, ensuring that our
+system works effectively even when the input data is of lower
+quality.
+The main contributions of this paper are:
+• We add new visual features, such as eye movements
+and facial regions, to complement lip synchronization,
+improving the detection of deepfakes.
+• We combine local feature extraction (via CNNs) and
+global context modeling (via ViTs) to create a more accu-
+rate and robust detection system.
+• We use Diffusion Models to reﬁne the input data, improv-
+ing feature quality and boosting the system’s resistance
+to noise and manipulation
+We evaluate our framework on several well-known deep-
+fake detection datasets, including FakeAVCeleb [11], AV-
+Deepfake1M [12], TVIL [13], and LAV-DF [14]. Our
+results show that the proposed method outperforms existing
+approaches, offering higher accuracy, precision, and recall
+while ensuring better generalization across different manip-
+ulation techniques and datasets.
+The paper is organized as follows: Sect.2 reviews the
+related work in deepfake detection. Section3 describes the
+materials and methods used in our framework. Section4
+presents the experimental results, followed by a discus-
+sion comparing our approach with previous models. Finally,
+Sect.5 concludes the paper and discusses potential future
+directions.
+2 Related work
+The growing challenge of detecting deepfake content has led
+to extensive research on various detection methods, focusing
+on both audio-visual synchronization and multimodal fusion
+approaches. Early methods in deepfake detection relied pri-
+marily on analyzing individual modalities, such as video or
+audio, to identify inconsistencies or artifacts [15]. However,
+as deepfake technology has advanced, more sophisticated
+techniques have emerged that combine multiple modalities,
+such as both visual and auditory features, to achieve higher
+accuracy in detection [15].
+2.1 Multimodal deepfake detection
+Multimodal deepfake detection approaches have gained
+attentionduetotheirpotentialtoenhanceaccuracybyanalyz-
+ing both visual and audio features simultaneously. A notable
+work in this area introduced an audio-visual synchronization
+framework to detect inconsistencies between lip movements
+and audio features. This approach uses Convolutional Neu-
+ral Networks (CNNs) and Temporal Convolutional Networks
+(TCNs) for processing visual and audio data, respectively,
+and employs Bidirectional Long Short-Term Memory (BiL-
+STM) [16] networks combined with Dynamic Time Warping
+(DTW) to assess synchronization [17]. However, these meth-
+odsprimarilyfocusonlatefusionstrategies,whichmayfailto
+capture complex temporal dependencies between the modali-
+ties, limiting their effectiveness in certain deepfake scenarios
+[17].
+Further research has extended this approach by incorpo-
+rating various fusion techniques, including hybrid models
+and ensemble methods. For instance, some studies have inte-
+grated CNNs and RNN-based architectures to capture both
+spatial and temporal features [18–20]. While these methods
+offer improvements in detection performance, they still face
+challenges in handling real-time applications and ensuring
+robustness across different types of deepfake manipulations
+[21].
+2.2 Deepfake detection via feature fusion
+Several other studies have explored feature fusion strate-
+gies to combine the strengths of different feature extraction
+methods. For example, some researchers have proposed com-
+bining CNN features for visual processing with recurrent
+models like BiLSTM to capture temporal dynamics in the
+audio [14, 22, 23]. In this context, deep learning models
+that focus on ﬁne-grained analysis of lip synchronization
+have shown promising results [21]. However, issues related
+to computational efﬁciency and real-time processing remain
+signiﬁcant hurdles in the adoption of these methods in prac-
+tical applications [24].
+2.3 Innovations in audio-visual synchronization
+One signiﬁcant contribution to deepfake detection involves
+leveraging the natural synchronization between audio and
+visual signals. The work of [17] explored the use of
+multimodal learning techniques to model inconsistencies
+between the video and audio. This method primarily detects
+manipulation by identifying misalignments in audio-visual
+synchronization, providing an important step forward in dis-
+tinguishing real content from fabricated media [18, 19].
+However, integrating these features with high accuracy and
+in real-time systems remains a complex task [20, 21, 25].
+123
+
+
+--- PAGE 3 ---
+
+Signal, Image and Video Processing (2025) 19 :400
+Page 3 of 9
+400
+Fig. 1 A system architecture of the proposed framework to achieve advanced and accurate deepfake detection
+2.4 Advancements in deepfake generation
+techniques
+Recent studies have also highlighted various techniques for
+generating deepfakes, such as face synthesis and expres-
+sion swapping, which have furthered the complexity of
+detection tasks [21–23]. The ability to swap faces, alter
+expressions, and manipulate audio tracks independently of
+video has led to signiﬁcant challenges in deepfake detection
+[14]. Some efforts have attempted to address this by using
+hybrid models, combining traditional face recognition tech-
+niques with advanced deep learning models [26, 27]. Despite
+these advancements, detecting deepfakes involving subtle
+alterations, like mismatched lip-sync or ﬁne-grained audio
+manipulations, still poses a major challenge [28, 29].
+2.5 Recent detection frameworks
+Several modern deepfake detection frameworks focus on
+multimodal fusion, leveraging both video and audio fea-
+tures to detect inconsistencies in real-time applications. For
+instance, the study presented by [18, 30] integrates both video
+frames and audio features through deep neural networks, pro-
+viding promising results on datasets like FaceForensics++
+and CelebDF. However, the need for large datasets and the
+computational demands of these methods can hinder their
+practical deployment [31, 32].
+In contrast, our proposed approach focuses on a ﬁne-
+grained analysis of lip synchronization by combining visual
+features, such as eye movements and facial regions, with
+audio features. By using Vision Transformers (ViTs) for
+global feature extraction and Diffusion Models to reﬁne both
+audio and visual inputs, our framework aims to improve
+detection accuracy while ensuring computational efﬁciency.
+We evaluate our model on multimodal datasets such as
+FakeAVCeleb [11], AV-Deepfake1M [12], TVIL [13], and
+LAV-DF [14], which provide diverse and challenging data
+for detecting complex deepfake manipulations.
+These work highlights the rapid progress in deepfake
+detection techniques, particularly through multimodal anal-
+ysis. While signiﬁcant advancements have been made, chal-
+lenges remain in ensuring real-time, robust, and scalable
+detection systems. Our approach aims to build on these
+advancements by focusing on precise lip-sync analysis, inte-
+grating both visual and audio features, and reﬁning data
+through Diffusion Models for improved accuracy and efﬁ-
+ciency in deepfake detection.
+3 Methodology
+The proposed framework integrates local and global feature
+extraction through Convolutional Neural Networks (CNNs)
+and Vision Transformers (ViTs) to capture ﬁne-grained and
+contextual relationships across visual and audio modali-
+ties Fig. 1. Additionally, diffusion models preprocess noisy
+data, enhancing the input quality. The methodology includes
+visual and audio feature extraction, multimodal fusion, clas-
+siﬁcation, and preprocessing with diffusion models.
+3.1 Visual feature extraction
+Visual features are extracted using a two-stage pipeline:
+CNNs for local feature extraction and ViTs for global con-
+text modeling Fig. 2. For each input video frame Ft, the face
+region is detected:
+Fface,t = f (Ft)
+(1)
+123
+
+
+--- PAGE 4 ---
+
+400
+Page 4 of 9
+Signal, Image and Video Processing (2025) 19 :400
+Fig. 2 Video processing architecture
+where f is a face detection model and Ft is video frame. The
+lip and eye regions are cropped from Fface,t:
+Flips,t = l
+
+Fface,t
+
+,
+Feyes,t = e
+
+Fface,t
+
+(2)
+where l and e are lip and eye cropping functions.
+The extracted regions are passed through CNNs to capture
+local features:
+Slips
+t
+= CNN
+
+Flips,t
+
+,
+Seyes
+t
+= CNN
+
+Feyes,t
+
+(3)
+The outputs are concatenated:
+Slocal
+t
+=
+
+Slips
+t
+, Seyes
+t
+
+(4)
+The sequence of local features {Slocal
+1
+, Slocal
+2
+, . . . , Slocal
+T
+}
+is passed to a Vision Transformer (ViT) to capture global
+dependencies across frames:
+Ht = ViT
+
+Slocal
+1
+, Slocal
+2
+, . . . , Slocal
+T
+
+(5)
+where Ht represents the global feature representation for
+frame t.
+3.2 Audio feature extraction
+Audio features are extracted using Mel-Frequency Cepstral
+Coefﬁcients (MFCCs), which transform the raw audio signal
+a(t) into frequency domain representations Fig. 3:
+MFCC(a) = F(X(t, f ))
+(6)
+where X(t, f ) is the spectrogram obtained from the Short-
+Time Fourier Transform (STFT) [33]:
+X(t, f ) =
+N−1
+
+n=0
+a[n]e−i2π f n
+(7)
+Fig. 3 Audio processing architecture
+The MFCC features are modeled using a BiLSTM to capture
+temporal dependencies:
+haudio
+t
+= BiLSTM(MFCC(at))
+(8)
+resulting in the audio feature sequence:
+a =
+
+haudio
+1
+, haudio
+2
+, . . . , haudio
+T
+
+(9)
+3.3 Multimodal fusion
+The visual and audio features are aligned using Dynamic
+Time Warping (DTW) to ensure temporal synchronization:
+DTW(v, a) = min
+T
+
+t=1
+|vt −at|
+(10)
+where v and a are visual and audio feature sequences. The
+aligned features are concatenated:
+Ft =
+
+valigned
+t
+, aaligned
+t
+
+(11)
+3.4 Classification
+The fused features are passed through a fully connected neu-
+ral network:
+ˆy = Softmax(WFt + b)
+(12)
+where W and b are the learnable weights and biases. A binary
+cross-entropy loss function is used for optimization:
+L = −1
+N
+N
+
+i=1
+
+yi log( ˆyi) + (1 −yi) log(1 −ˆyi)
+
+(13)
+123
+
+
+--- PAGE 5 ---
+
+Signal, Image and Video Processing (2025) 19 :400
+Page 5 of 9
+400
+3.5 Preprocessing with diffusion models
+To enhance the quality of both visual and audio inputs, we
+employ Denoising Diffusion Probabilistic Models (DDPMs)
+as a preprocessing step. DDPMs iteratively reﬁne noisy data
+into high-quality features, making them particularly effective
+for handling low-quality or artifact-laden inputs.
+For visual data, the DDPM reﬁnes noisy frames by revers-
+ing a stochastic noise addition process:
+q(xt−1|xt) = N(√αtxt, (1 −αt)I)
+(14)
+where xt is the noisy frame at time step t, αt is a predeﬁned
+noise schedule, and N denotes a Gaussian distribution.
+The denoised frame x0 is recovered through a learned
+reverse process:
+pθ(xt−1|xt) = N(μθ(xt, t), θ(xt, t))
+(15)
+where μθ and θ are the predicted mean and variance param-
+eters of the denoising step, learned via a neural network.
+For audio, the DDPM operates similarly, enhancing the
+clarity of noisy spectrograms. Given an audio input a(t),
+the diffusion model progressively reconstructs the original
+signal:
+a0 = D(at; θ)
+(16)
+where at is the noisy spectrogram, D is the learned denois-
+ing process, and θ are the model parameters. This ensures
+that audio features, such as Mel-Frequency Cepstral Coefﬁ-
+cients (MFCCs) [34], are extracted from high-quality inputs,
+improving the overall robustness of the framework.
+The use of DDPMs enables the system to preprocess both
+visual and audio data, ensuring that the downstream feature
+extraction and classiﬁcation stages operate on high-ﬁdelity
+inputs.
+3.6 Pipeline overview
+An overview of the proposed framework is shown in Fig. 1,
+illustrating the integration of CNNs, ViTs, diffusion models,
+and multimodal fusion for robust deepfake detection.
+4 Experiments
+This section presents the experimental setup, datasets, eval-
+uation metrics, results, and a detailed comparison with prior
+state-of-the-art methods. Furthermore, we provide an analy-
+sis of parameter impacts and visualizations for clarity.
+Input: Video frames V = {F1, F2, . . . , FT }, Audio signal A
+Output: Binary Classiﬁcation (Real/Fake)
+Initialization:
+Load pre-trained CNN, ViT, and Diffusion models.
+Step 1: Data Preprocessing
+for each frame Ft ∈V do
+1.1 Visual Reﬁnement:
+Preprocess Ft using the diffusion model to denoise and
+enhance frame quality.
+end
+Step 2: Visual Feature Extraction
+for each frame Ft ∈V do
+Extract key regions (lip, eye, and facial regions) using face
+detection.
+Pass lip, eye, and facial regions through CNN to capture local
+features.
+Pass full frame Ft through Vision Transformer (ViT) to
+extract global features.
+Fuse local features (CNN) and global features (ViT) for each
+frame.
+end
+Step 3: Audio Feature Extraction
+Extract Mel-Frequency Cepstral Coefﬁcients (MFCC) features
+from audio signal A.
+Model the audio using BiLSTM to capture temporal
+dependencies.
+Step 4: Cross-Modal Synchronization Analysis
+for each frame Ft do
+Align the extracted audio features with visual features using
+Dynamic Time Warping (DTW).
+Compute a similarity score St using cosine similarity:
+St = cosine_similarity(Faudio, Fvisual)
+if St < τ (threshold) then
+Mark frame t as "Out-of-Sync".
+end
+end
+Step 5: Multimodal Feature Fusion
+Concatenate fused visual features (CNN + ViT) and audio
+features (BiLSTM).
+Pass concatenated multimodal features into a fully connected
+neural network.
+Step 6: Classiﬁcation
+Predict whether the video is Real or Fake using the ﬁnal
+classiﬁcation layer.
+return Classiﬁcation result (Real or Fake).
+Algorithm 1: Proposed enhanced deepfake detection
+framework
+4.1 Training setup
+The experiments were implemented in PyTorch and executed
+on an NVIDIA RTX 3090 GPU. The training used the Adam
+optimizer with a learning rate of 10−4 and a batch size of 32.
+Early stopping and a learning rate scheduler ensured stable
+convergence. We used metrics such as accuracy, precision,
+recall, F1-score, and the area under the ROC curve (AUC) to
+evaluate the model’s performance.
+123
+
+
+--- PAGE 6 ---
+
+400
+Page 6 of 9
+Signal, Image and Video Processing (2025) 19 :400
+4.2 Datasets
+The evaluation used the following datasets:
+• FakeAVCeleb A multimodal dataset with balanced demo-
+graphics and diverse manipulations [11].
+• AV-Deepfake1M A challenging dataset with extensive
+audio-visual forgeries [12].
+• TVIL A dataset capturing real-world complexities in
+video manipulations [13].
+• LAV-DF High- and low-quality deepfake videos empha-
+sizing robustness [14].
+4.3 Results and comparison
+Table 1 compares the accuracy of our framework with the
+baseline and previous state-of-the-art methods, including the
+AVSFF framework.
+The results indicate that the proposed framework achieves
+superior performance across all datasets, exceeding the
+AVSFF framework and other baselines.
+4.4 Extended metric comparisons and analysis
+Tables 2, 3, 4, 5, 6 present a comprehensive evaluation of
+the proposed framework compared with the AVSFF method.
+Metrics such as accuracy, precision, recall, and F1-score are
+reported for intra-dataset and cross-dataset settings.
+Intra-dataset performance The proposed framework consis-
+tently outperforms AVSFF across all datasets. For instance,
+on the FakeAVCeleb dataset (Table 2), the proposed method
+achieves an accuracy of 0.9987 compared to 0.9973 by
+AVSFF. Similar trends are observed in precision, recall, and
+F1-score, showcasing the robustness of our approach in han-
+dling manipulations.
+Cross-dataset performance Tables 3, 4, and 5 highlight
+cross-dataset results when the models are trained on AV-
+Deepfake1M, TVIL, and LAV-DF, respectively. Key ﬁndings
+are:
+• AV-Deepfake1M (Table 3) The proposed method achieves
+an F1-score of 0.9826, signiﬁcantly surpassing AVSFF’s
+0.9797. This improvement highlights the effectiveness of
+integrating ViT and Diffusion Models in handling com-
+plex manipulations.
+• TVIL(Table4)Theproposedframeworkmaintainsstrong
+generalizationacrossdatasets.Forinstance,itachievesan
+F1-score of 0.9906 on TVIL, demonstrating substantial
+improvements over AVSFF’s 0.9880.
+• LAV-DF (Table 5) The proposed method achieves an
+accuracy of 0.9825 and an F1-score of 0.9826 on
+AV-Deepfake1M when trained on LAV-DF, surpassing
+AVSFF by a notable margin.
+Performance on combined dataset Table 6 consolidates the
+performance when trained on a combined dataset. The pro-
+posed framework achieves an accuracy of 0.9989, marking a
+substantial improvement over AVSFF’s 0.9890.
+Comparison with other methods Table 7 benchmarks the
+proposed method against state-of-the-art multimodal deep-
+fake detection approaches. With an accuracy of 0.9988, our
+framework outperforms all existing models, reinforcing its
+superiority.
+4.4.1 Discussion on Table 5 (trained on LAV-DF)
+Table 5 provides insights into the model’s robustness when
+trained on LAV-DF. Key observations include:
+• FakeAVCelebperformanceTheproposedmethodachieves
+a near-perfect accuracy of 0.9987 and an F1-score of
+0.9986, signiﬁcantly surpassing AVSFF’s 0.9478 accu-
+racy. This demonstrates the proposed model’s ability
+to transfer learned features effectively to high-quality
+datasets.
+• AV-Deepfake1M performance Despite the challenges
+posed by this dataset, the proposed method achieves an
+F1-score of 0.9826, reﬂecting superior handling of com-
+plex manipulations compared to AVSFF’s 0.9565.
+The results underline the adaptability and generalization
+capabilities of the proposed framework, particularly in cross-
+dataset evaluations.
+4.5 Limitations
+While the proposed framework demonstrates signiﬁcant
+improvements in deepfake detection, certain aspects warrant
+further exploration. The integration of Vision Transformers
+(ViTs) and diffusion models, although effective in capturing
+global dependencies and reﬁning noisy inputs, introduces
+increased computational complexity, potentially impacting
+real-time applicability. Additionally, the reliance on high-
+quality training data may limit the generalization capabil-
+ity when applied to low-resolution or highly compressed
+videos, which are prevalent in real-world scenarios. Further-
+more, despite the framework’s robustness against existing
+manipulation techniques, its adaptability to unseen deepfake
+generation methods remains an open challenge, necessitat-
+ing further evaluation on diverse datasets. The incorporation
+of diffusion models as pre-processing steps, while beneﬁ-
+cial for feature enhancement, also adds an additional layer
+of computational overhead, which may not be suitable for
+deployment in resource-constrained environments. Address-
+ing these challenges in future work could further enhance the
+efﬁciency and generalizability of the proposed approach.
+123
+
+
+--- PAGE 7 ---
+
+Signal, Image and Video Processing (2025) 19 :400
+Page 7 of 9
+400
+Table 1 Comparison of
+accuracy across datasets using
+different conﬁgurations
+Conﬁguration
+FakeAVCeleb
+AV-Deepfake1M
+TVIL
+LAV-DF
+CNN Only
+0.9921
+0.9702
+0.9810
+0.9705
+CNN + ViT
+0.9963
+0.9775
+0.9872
+0.9789
+CNN + ViT + Diffusion
+0.9987
+0.9825
+0.9915
+0.9812
+AVSFF (Previous work)
+0.9973
+0.9760
+0.9890
+0.9786
+DeepfakeStack
+0.9942
+–
+0.9805
+–
+LipForensics
+0.9960
+0.9755
+–
+0.9710
+Bold values indicate higher is the better
+Table 2 Intra- and cross-dataset
+results (trained on
+FakeAVCeleb)
+Dataset
+Method
+Accuracy
+Precision
+Recall
+F1-score
+FakeAVCeleb
+AVSFF
+0.9973
+0.9971
+0.9944
+0.9907
+FakeAVCeleb
+Proposed
+0.9987
+0.9985
+0.9987
+0.9986
+AV-Deepfake1M
+AVSFF
+0.9700
+0.9680
+0.9650
+0.9665
+AV-Deepfake1M
+Proposed
+0.9825
+0.9832
+0.9820
+0.9826
+TVIL
+AVSFF
+0.9850
+0.9840
+0.9825
+0.9832
+TVIL
+Proposed
+0.9915
+0.9902
+0.9910
+0.9906
+LAV-DF
+AVSFF
+0.9650
+0.9635
+0.9600
+0.9617
+LAV-DF
+Proposed
+0.9812
+0.9824
+0.9818
+0.9821
+Bold values indicate higher is the better
+Table 3 Intra- and cross-dataset
+results (trained on
+AV-Deepfake1M)
+Dataset
+Method
+Accuracy
+Precision
+Recall
+F1-score
+FakeAVCeleb
+AVSFF
+0.9673
+0.9671
+0.9644
+0.9607
+FakeAVCeleb
+Proposed
+0.9825
+0.9812
+0.9824
+0.9818
+AV-Deepfake1M
+AVSFF
+0.9760
+0.9755
+0.9780
+0.9797
+AV-Deepfake1M
+Proposed
+0.9825
+0.9832
+0.9820
+0.9826
+TVIL
+AVSFF
+0.9400
+0.9485
+0.9460
+0.9472
+TVIL
+Proposed
+0.9789
+0.9795
+0.9790
+0.9792
+LAV-DF
+AVSFF
+0.9500
+0.9480
+0.9450
+0.9465
+LAV-DF
+Proposed
+0.9812
+0.9824
+0.9818
+0.9821
+Bold values indicate higher is the better
+Table 4 Intra- and cross-dataset
+results (trained on TVIL)
+Dataset
+Method
+Accuracy
+Precision
+Recall
+F1-score
+FakeAVCeleb
+AVSFF
+0.9573
+0.9571
+0.9544
+0.9507
+FakeAVCeleb
+Proposed
+0.9915
+0.9902
+0.9910
+0.9906
+AV-Deepfake1M
+AVSFF
+0.9450
+0.9430
+0.9400
+0.9415
+AV-Deepfake1M
+Proposed
+0.9789
+0.9795
+0.9790
+0.9792
+TVIL
+AVSFF
+0.9890
+0.9897
+0.9983
+0.9880
+TVIL
+Proposed
+0.9915
+0.9902
+0.9910
+0.9906
+LAV-DF
+AVSFF
+0.9300
+0.9280
+0.9250
+0.9265
+LAV-DF
+Proposed
+0.9812
+0.9824
+0.9818
+0.9821
+Bold values indicate higher is the better
+123
+
+
+--- PAGE 8 ---
+
+400
+Page 8 of 9
+Signal, Image and Video Processing (2025) 19 :400
+Table 5 Intra- and cross-dataset
+results (trained on LAV-DF)
+Dataset
+Method
+Accuracy
+Precision
+Recall
+F1-score
+FakeAVCeleb
+AVSFF
+0.9478
+0.9488
+0.9444
+0.9407
+FakeAVCeleb
+Proposed
+0.9987
+0.9985
+0.9987
+0.9986
+AV-Deepfake1M
+AVSFF
+0.9600
+0.9580
+0.9550
+0.9565
+AV-Deepfake1M
+Proposed
+0.9825
+0.9832
+0.9820
+0.9826
+Bold values indicate higher is the better
+Table 6 Intra- and cross-dataset
+results (trained on combined
+dataset)
+Dataset
+Method
+Accuracy
+Precision
+Recall
+F1-score
+FakeAVCeleb
+AVSFF
+0.9890
+0.9885
+0.9870
+0.9877
+FakeAVCeleb
+Proposed
+0.9989
+0.9990
+0.9988
+0.9989
+Bold values indicate higher is the better
+Table 7 Comparison of our
+method with published
+multimodality deepfake video
+detection approaches trained
+and tested on the various
+multimodal datasets
+References
+Model
+Method
+Modality
+Accuracy
+[22]
+MIS-AVoiDD
+Multimodal
+AV
+0.973
+[4]
+LipForensics
+Unimodal
+V
+0.76
+[10]
+Unsupervised multimodal deepfake detection
+Multimodal
+AV
+0.968
+[32]
+Multimodal-1
+Multimodal
+AV
+0.76
+[32]
+Multimodal-2
+Multimodal
+AV
+0.674
+[32]
+CDCN
+Multimodal
+AV
+0.515
+[35]
+Multimodal alignment
+VFD
+AV
+0.85
+[29]
+Ensemble + Multimodal
+Multimodal
+AV
+0.89
+[36]
+Multimodaltrace
+Multimodal
+AV
+0.929
+[37]
+Novel smart deepfake detection
+Multimodal
+AV
+0.954
+Ours
+Multimodal
+AV
+0.9988
+Bold values indicate higher is the better
+5 Conclusion
+Deepfake detection is a growing challenge due to advanced
+generative techniques. We propose an enhanced multimodal
+framework combining local and global features for robust
+detection, using visual cues (e.g., eye movement, facial
+regions) and audio. Vision Transformers (ViTs) capture
+global context, while diffusion models improve prepro-
+cessing and feature representation. Our framework outper-
+forms existing methods, achieving state-of-the-art accuracy
+on the FakeAVCeleb, AV-Deepfake1M, TVIL, and LAV-
+DF datasets. Ablation studies highlight the importance
+of ViTs and diffusion models, with pretrained ImageNet
+weightsboostingperformance.Comparedtoframeworkslike
+AVSFF, our approach excels in precision, recall, and F1-
+score.
+This framework offers a scalable solution for deepfake
+detection, with future work focusing on adapting it to new
+techniques and real-time performance.
+AuthorContributions M.J.andT.K.conceptualizedthe studyandwrote
+the main manuscript text. Z.Z. and F.H.D designed the experiments
+and contributed to the development of the multimodal framework. M.J.
+prepared and processed the datasets used in the experiments. M.J. and
+Z.Z. performed the analysis and contributed to the result interpretation.
+T.K. and F.H.D. prepared the ﬁgures. All authors reviewed and approved
+the manuscript.
+Funding Open Access funding provided by the IReL Consortium.
+Data availability No datasets were generated or analysed during the
+current study.
+Declarations
+Conﬂict of interest The authors declare no conﬂict of interest.
+Open Access This article is licensed under a Creative Commons
+Attribution 4.0 International License, which permits use, sharing, adap-
+tation, distribution and reproduction in any medium or format, as
+long as you give appropriate credit to the original author(s) and the
+source, provide a link to the Creative Commons licence, and indi-
+cate if changes were made. The images or other third party material
+in this article are included in the article’s Creative Commons licence,
+unless indicated otherwise in a credit line to the material. If material
+is not included in the article’s Creative Commons licence and your
+intended use is not permitted by statutory regulation or exceeds the
+permitteduse,youwillneedtoobtainpermissiondirectlyfromthecopy-
+123
+
+
+--- PAGE 9 ---
+
+Signal, Image and Video Processing (2025) 19 :400
+Page 9 of 9
+400
+right holder. To view a copy of this licence, visit http://creativecomm
+ons.org/licenses/by/4.0/.
+References
+1. Rossler, A., et al.: Faceforensics++: learning to detect manipulated
+facial images. In: Proceedings of the IEEE/CVF International Con-
+ference on Computer Vision, vol. 2019, pp. 1–11, (2019)
+2. Yang, X., et al.: Exposing deep fakes using inconsistent head poses.
+In: ICASSP 2022–2022 IEEE International Conference on Acous-
+tics, Speech and Signal Processing (ICASSP), (2019)
+3. Heidari, A., et al.: Deepfake detection using deep learning methods:
+a systematic and comprehensive review. Wiley Interdiscip. Rev.
+Data Min. Knowl. Discov. 14(2), 1520 (2024)
+4. Haliassos, A., et al.: Lips don’t lie: a generalisable and robust
+approach to face forgery detection. In Proceedings of the
+IEEE/CVF Conference on Computer Vision and Pattern Recog-
+nition, pp. 5037–5047, (2021)
+5. Cui, Y., Tao, Y., Bing, Z., Ren, W., Gao, X., Cao, X., Huang, K.,
+Knoll, A.: Selective frequency network for image restoration. In:
+The Eleventh International Conference on Learning Representa-
+tions, (2023)
+6. Cui, Y., Ren, W., Knoll, A.: Omni-kernel network for image
+restoration. In: Proceedings of the AAAI Conference on Artiﬁcial
+Intelligence, vol. 38, pp. 1426–1434, (2024)
+7. Cui, Y., Knoll, A.: Psnet: towards efﬁcient image restoration with
+self-attention. IEEE Robot. Autom. Lett. 8, 5735–5742 (2023)
+8. Cai, Z., et al.: Do you really mean that? Content driven audio-visual
+deepfake dataset and multimodal method for temporal forgery
+localization. In: 2022 International Conference on Digital Image
+Computing: Techniques and Applications (DICTA), (2022)
+9. Jung, T., et al.: Deepvision: deepfakes detection using human eye
+blinking pattern. IEEE Access 8, 83144–83154 (2020)
+10. Tian, M., et al.: Unsupervised multimodal deepfake detection using
+intra- and cross-modal inconsistencies. arXiv [Online]. Available:
+arXiv:2311.17088, (2023)
+11. Cai, Z., et al.: AV-Deepfake1M: a large-scale LLM-driven audio-
+visual deepfake dataset. In: MM ’24: Proceedings of the 32nd ACM
+International Conference on Multimedia, pp. 7414–7423, (2024)
+12. Khalid, H., et al.: Fakeavceleb: a novel audio-video multimodal
+deepfake dataset, (2021). Available: arXiv:2108.05080
+13. Zhang, R., et al.: Ummaformer: a universal multimodal-adaptive
+transformer framework for temporal forgery localization. In: Pro-
+ceedingsofthe 31st ACMInternational Conference onMultimedia,
+pp. 8749–8759, (2023)
+14. Ilyas, H., et al.: AVFakenet: a uniﬁed end-to-end dense swin trans-
+former deep learning model for audio-visual deepfakes detection.
+Appl. Soft Comput. 136, 110124 (2023)
+15. Jia, S., Li, X., Lyu, S.: Model attribution of face-swap deepfake
+videos. In: 2022 IEEE International Conference on Image Pro-
+cessing (ICIP), pp. 2356–2360, (2022)
+16. Huang, Z., Xu, W., Yu, K.: Bidirectional LSTM-CRF models for
+sequence tagging. Available: arXiv:1508.01991 (2015)
+17. Oladoyinbo, T.O., Olabanji, S.O., Olaniyi, O.O., Adebiyi, O.O.,
+Okunleye, O.J., Alao, A.I.: Exploring the challenges of artiﬁcial
+intelligence in data integrity and its inﬂuence on social dynamics.
+Asian J. Adv. Res. Rep. 18(2), 1–23 (2024)
+18. Kikerpill, K.: Choose your stars and studs: the rise of deepfake
+designer porn. Porn Stud. 7(4), 352–356 (2020)
+19. Aloke, E.J., Abah, J.: Enhancing the ﬁght against social media mis-
+information: an ensemble deep learning framework for detecting
+deepfakes. Int. J. Appl. Inf. Syst. 12(42), 1–14 (2023)
+20. Alassaﬁ,M.O.,etal.:Anoveldeeplearningarchitecturewithimage
+diffusion for robust face presentation attack detection. IEEE Access
+11, 59204–59216 (2023)
+21. Thakur, R.: Introduction to artiﬁcial intelligence and its importance
+in modern business management. pp. 133–165, (2023)
+22. Katamneni, V.S., Rattani, A.: MIS-AVoiDD: modality invariant
+and speciﬁc representation for audio-visual deepfake detection. In:
+2023 International Conference on Machine Learning and Applica-
+tions (ICMLA), pp. 1371–1378, (2023)
+23. Arun Anoop, M., Poonkuntran, S.: LPG: a novel approach for med-
+ical forgery detection in image transmission. J. Ambient. Intell.
+Humaniz. Comput. 12(5), 4925–4941 (2021)
+24. Chandio, A., et al.: AUDD: audio Urdu digits dataset for automatic
+audio Urdu digit recognition. Appl. Sci. 11(19), 8842 (2021)
+25. Turab, M., et al.: Investigating multi-feature selection and ensem-
+bling for audio classiﬁcation, (2022). arXiv [Online]. Available:
+arXiv:2206.07511
+26. Melnik, A., et al.: Face generation and editing with stylegan: a
+survey. IEEE Trans. Pattern Anal. Mach. Intell. 46(5), 3557–3576
+(2024)
+27. Rana, M.S., Sung, A.H.: Deepfakestack: a deep ensemble-based
+learning technique for deepfake detection. In: 2020 7th IEEE Inter-
+national Conference on Cyber Security and Cloud Computing
+(CSCloud), pp. 70–75, (2020)
+28. Liang et al, T.: Sdhf: spotting deepfakes with hierarchical features.
+In: 2020 IEEE 32nd international conference on tools with artiﬁcial
+intelligence (ICTAI), pp. 675–680, (2020)
+29. Hashmi et al, A.: Multimodal forgery detection using ensemble
+learning. In: 2022 Asia-Paciﬁc Signal and Information Processing
+Association Annual Summit and Conference (APSIPA ASC) 2022,
+pp. 1524–1532, (2022)
+30. Jayashre, K., Amsaprabhaa, M.: Safeguarding media integrity: a
+hybrid optimized deep feature fusion based deepfake detection in
+videos. Comput. Secur. 142, 103860 (2024)
+31. Liu, W., et al.: Data-fusion-based two-stage cascade framework for
+multimodality face anti-spooﬁng. IEEE Trans. Cogn. Dev. Syst.
+14(2), 672–683 (2022)
+32. Khalid et al, H.: Evaluation of an audio-video multimodal deepfake
+dataset using unimodal and multimodal detectors. In: Proceedings
+of the 1st Workshop on Synthetic Multimedia-Audiovisual Deep-
+fake Generation and Detection Co-located with ACM MM 2021,
+pp. 7–15, (2021)
+33. Durak, Lutﬁye, Arikan, Orhan: Short-time Fourier transform: two
+fundamental properties and an optimal implementation. IEEE
+Trans. Signal Process. 51(5), 1231–1242 (2003)
+34. Gupta, Shikha, Jaafar, Jafreezal, Wan Ahmad, W.F., Bansal, Arpit:
+Feature extraction using MFCC. Signal Image Process. Int. J. 4(4),
+101–108 (2013)
+35. Cheng, H., et al.: Voice-face homogeneity tells deepfake. ACM
+Trans. Multimed. Comput. Commun. Appl. 20(3), 1–22 (2023)
+36. Anas Raza, M., Mahmood Malik, K.: Multimodaltrace: deepfake
+detection using audiovisual representation learning. In: Proceed-
+ings of the IEEE Conference on Computer Vision and Pattern
+Recognition Work, vol. 2023-June, pp. 993–1000, (2023)
+37. Elpeltagy, M., et al.: A novel smart deepfake video detection sys-
+tem. Int. J. Adv. Comput. Sci. Appl. 14(1), 407–419 (2023)
+Publisher’s Note Springer Nature remains neutral with regard to juris-
+dictional claims in published maps and institutional afﬁliations.
+123

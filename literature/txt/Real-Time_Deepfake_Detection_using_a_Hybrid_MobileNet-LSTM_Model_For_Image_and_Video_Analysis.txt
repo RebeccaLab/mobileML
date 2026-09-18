@@ -1,0 +1,728 @@
+
+
+--- PAGE 1 ---
+
+ 
+ 
+Real-Time Deepfake Detection using a 
+ Hybrid MobileNet-LSTM Model For  
+Image and Video Analysis 
+ 
+S Ambika 
+Associate Professor  
+ Department of CSE 
+Vel Tech Rangarajan Dr. Sagunthala R&D 
+Institute of Science and Technology 
+Chennai, India  
+drambikas@veltech.edu.in 
+                 
+                   Yerramsetty Harini 
+                       4th year, B.Tech 
+Department of CSE 
+Vel Tech Rangarajan Dr. Sagunthala R&D 
+Institute of Science and Technology, 
+Chennai, India  
+hariniyerramsetty9@gmail.com 
+ 
+                    B R Sumanth  
+4th year, B.Tech, 
+Department of CSE 
+Vel Tech Rangarajan Dr. Sagunthala R&D 
+Institute of Science and Technology 
+Chennai, India  
+brsumanth1405@gmail.com      
+      Abstract— As deepfake technology has become more 
+advanced, there is an urgent need for strengthening 
+detection 
+mechanisms 
+that 
+can 
+help 
+counter 
+misinformation and online fraud. Deepfake media is 
+manufactured using deep learning techniques. It has 
+recently become increasingly sophisticated and the 
+boundary between genuine and tampered content is often 
+hard to see. This paper introduces a hybrid MobileNet-
+LSTM model, which is made for spotting deepfakes in 
+both image and video.The deepfake identification system 
+uses MobileNet to efficiently sample spatial features and 
+LSTM to gather temporal dependencies, thereby 
+improving the detection rate of tampered content. 
+Meanwhile, this method is validated on standard datasets 
+and that the accuracy is better, in terms of computational 
+efficiency and that it is more robust than other types of 
+manipulation. 
+ 
+      Keywords Deepfake Detection, Hybrid MobileNet-
+LSTM Model, Real-time Analysis, Machine Learning, 
+MobileNet, 
+LSTM, 
+Computer 
+Vision, 
+Media 
+Authentication. 
+ 
+I. INTRODUCTION  
+      The rise of artificial intelligence (AI) has seen the 
+emergence of many disruptive technologies, including one of 
+the most controversial which is deepfake technology. 
+Deepfakes (very realistic manipulations of visual and audio 
+material) have gained notoriety in recent years due to its 
+potential uses for misinformation or social deception. The 
+term "deepfake" is a combination of the many deep learning 
+algorithms including Generative Adversarial Networks 
+(GANs), and the word fakes, with deepfakes allowing 
+individuals to create fake videos, photographs, and audio, or 
+content. These fakes are observed to be unidentifiable from 
+original material. Many times these manipulated media are 
+used for malicious purposes, like misinformation, political 
+propaganda, and more recently there are instances of 
+cyberbullying and slander. As deepfake technologies 
+continue to evolve and become easier to access, the detection 
+of manipulated media is now a pressing issue of concern in 
+many industries (e.g., news, social media, entertainment, law 
+enforcement, even education). The current state of deepfake 
+detection tools widely use either Convolutional Neural 
+Network (CNN) or Recurrent Neural Network (RNN) to 
+process time static images and time dynamic video. Deepfake 
+detection tools generally used either Convolutional Neural 
+Networks (CNNs) or Recurrent Neural Networks (RNNs) to 
+process static images and dynamic video content. CNNs are 
+good at extracting spatial features from images but can be 
+challenged by videos, where the temporal dimension also 
+needs to be taken into account. RNNs and its more complex 
+variant, LSTM, can scan sequences of video frames to 
+identify very subtle discrepancies that may not be apparent in 
+an individual frame. Existing deepfake detection systems are 
+good for many applications, but they often have issues with 
+real-time detection, scalability, and computational cost. This 
+work suggests a new solution which combines MobileNet and 
+LSTM networks to overcome these limitations... While many 
+existing deepfake detection systems are effective, they tend 
+to face challenges when it comes to real-time detection, 
+scalability, and computational efficiency. This project 
+suggests a new hybrid approach that incorporates the 
+strengths of MobileNet and LSTM networks to overcome the 
+above limitations. The major goal of this project is to create 
+a real-time efficient and scalable deepfake detection system 
+that together incorporates spatial feature extraction from 
+MobileNet and temporal pattern recognition from LSTM 
+networks. This model will be able to distinguish between 
+static images and dynamic video content, a complete solution 
+towards detecting deepfakes. Given its emphasis on real-time 
+detection, this model seeks to lend its hand in meeting the 
+burgeoning demand for equipment that can serve to 
+counteract the proliferation of false media in several fields 
+such as social networking sites, media houses, and digital 
+forensics. The system to be proposed will support processing 
+high amounts of media content in real-time and offer 
+immediate feedback to the users regarding the authenticity of 
+the media they consume.  
+II. LITERATURE SURVEY 
+      In this study presents a hybrid deepfake detection model 
+that incorporates Convolutional Neural Networks (CNNs) 
+and Long Short-Term Memory (LSTM) networks to improve 
+classification accuracy across images and videos. It is likely 
+that the authors improve the processing of both spatial 
+features and the temporal aspects of the data in order to help 
+detection of manipulated media. The paper also discusses the 
+benefits and drawbacks of the hybrid models, especially how 
+Proceedings of the 8th International Conference on Computing Methodologies and Communication (ICCMC-2025)
+IEEE Xplore Part Number: CFP25K25-ART; ISBN: 979-8-3315-1211-8
+979-8-3315-1211-8/25/$31.00 ©2025 IEEE
+981
+2025 8th International Conference on Computing Methodologies and Communication (ICCMC) | 979-8-3315-1211-8/25/$31.00 ©2025 IEEE | DOI: 10.1109/ICCMC65190.2025.11140856
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:35:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 2 ---
+
+they perform for advanced deepfake generation techniques 
+and the ability for real-time detections [1]. 
+The study involves integrating CNN and LSTM models for 
+video-based deepfake detection that uses optical flow 
+features to exploit physical inconsistencies in motion. Also 
+likely to discuss is how optical flow improves both true 
+positives and classification accuracy in high resolution video. 
+The paper probably features a discussion of whether the real-
+time performance of deepfake detection is achievable, or 
+whether sophistication of the approach would cause 
+computational costs exist to some extent, and potential 
+optimizations to the architecture or processing pipeline that 
+could be employed [2]. 
+The target of this research is latent actors identified as 
+"deepfake" images through the closed-loop process of 
+utilizing Deep Neural Networks (DNNs). It is probable that 
+the authors study various architectures of DNNs while 
+elucidating their specific advantages and disadvantages in 
+classifying manipulated media images and their descriptions. 
+It may be suggested in the paper that additional time-
+expansive images are needed to classify deepfake images; or 
+there may be overlap with another identified gap for a more 
+generalized classification so that they can reduce the false 
+positive rates of misclassification when models are deployed 
+under different environments [3]. 
+This study explores a bespoke deep learning model, 
+developed for detecting deepfake images. It is likely that the 
+authors present an optimized CNN architecture architecture 
+compared to the standard approach, and they were able to 
+outpace the latter methods to provide a state-of-the-art 
+classification accuracy; while also identifying the challenges 
+tactile people's agency in accurately detecting a deepfake 
+video and the models overall performance sequentially 
+through optimized temporal feature extraction [4]. 
+This study investigates transfer learning and ensemble 
+models to potentially improve deepfake detection accuracy. 
+The authors potentially highlight the positive aspects of 
+utilizing pre-trained networks, which sometimes not only 
+reduce the time for training, but retain similar detection 
+accuracy. However the authors may also identify weaknesses 
+in model adaptation as reliance on pre-trained architecture 
+can restrict flexibilities in identifying new methods of 
+deepfakes [5]. 
+This study also investigates a hybrid framework that 
+combines machine and deep learning methods to improve 
+deepfake 
+detection. 
+The 
+authors 
+likely 
+assess 
+the 
+effectiveness of feature extraction through CNNs in 
+conjunction, with classification through traditional machine 
+learning models. While the hybrid model may provide a 
+compromise of accuracy and computational expense, the 
+authors potentially address obstacles surrounding tuning the 
+model to achieve maximum performance [6].  
+This study assesses the potential of advanced deep learning 
+models for real-time detection of deepfake video content. The 
+authors likely address how deepfake detection models assess 
+inconsistencies in frames to signal classified manipulation of 
+media. The authors may also offer commentary on scalability, 
+in particular the computation components of processing high-
+resolution videos affecting performance in real-time [7]. 
+This research gives a comparative study of several deep 
+learning architectures for deepfake detection. The authors 
+likely present the benefits and weaknesses of different 
+architectures, including CNNs, LSTMs, and transformer-
+based architectures. Moreover, the authors likely discuss the 
+impact of the dataset in which they train and evaluate their 
+model [8]. 
+This research offers a study of using CNNs and LSTMs in a 
+video-based deepfake detection algorithm that identifies 
+temporal inconsistencies and motion artifacts. The authors 
+likely provided results indicating that the use of the temporal 
+analysis increased classification accuracy. However, they 
+may also noted the challenges of real-time processing, 
+including delays in processing video frame [9].  
+This study presents a self-attention mechanism with 
+EfficientNet to improve deepfake detection and focuses on 
+feature extraction as well as interpretability of the model. The 
+authors likely discuss how a self-attention model improves 
+validity from adversarial attacks. Although, they may have 
+not addressed the computational complexity of training an 
+efficient self-attention model which may also require more 
+time and resources when processing [10]. 
+This research investigates a CNN-LSTM model that can be 
+used for facial expression recognition in video sequences. 
+The authors use CNNs to pull spatial features from individual 
+frames and LSTM networks to extract temporal relationships 
+from the sequences of frames. This combined method models 
+sequential data, and increased classification accuracy of 
+facial expressions can be achieved [11]. 
+This research presents a real-time human action recognition 
+system based on raw depth video and RNN. Utilizing depth 
+video aims to improve action recognition accuracy while 
+reducing the computational cost. The authors explained how 
+depth video analysis is advantageous over traditional RGB 
+video methods when there is clutter in the background or 
+when ambient lighting conditions can vary. This model's 
+ability to analyze the raw depth video is a significant 
+contribution toward real-time surveillance and application for 
+gesture recognition [12]. 
+ 
+III. METHODOLOGY 
+      The Hybrid MobileNet-LSTM Model proposed is a 
+formalized approach to obtaining accurate as shown in Fig. 1, 
+timely deepfake detection with improved scalability and 
+interpretability. The proposed system will identify spatial and 
+temporal anomalies in deepfake media, superior to the 
+performance of conventional detecting mechanisms. The 
+approach is structured into several phases, such as data 
+collection, preprocessing, feature extraction, use of a deep 
+learning model, and deployment. 
+ 
+Proceedings of the 8th International Conference on Computing Methodologies and Communication (ICCMC-2025)
+IEEE Xplore Part Number: CFP25K25-ART; ISBN: 979-8-3315-1211-8
+979-8-3315-1211-8/25/$31.00 ©2025 IEEE
+982
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:35:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 3 ---
+
+ 
+Fig. 1. System Architecture 
+A. DATA COLLECTION AND PREPROCESSING 
+      To build a trustworthy deepfake detection model, there 
+should be a vast corpus of real and deepfake media. The 
+model is trained on widely used deepfake datasets such as 
+FaceForensics++, Celeb-DF, and DFDC to address diverse 
+and high-quality training samples. The data, after being 
+collected, is processed by a preprocessing pipeline that 
+extracts informative features and removes noise. Faces are 
+cropped from video using OpenCV, and face detection 
+models like dlib's frontal face detector crop and align the face 
+landmarks. Faces are resized, normalized, and augmented to 
+solve 
+the 
+model 
+generalization 
+problems. 
+Color 
+normalization 
+and 
+pixel 
+intensity 
+scaling 
+during 
+preprocessing normalize the input data to train the model 
+effectively. 
+ 
+B. FEATURE EXTRACTION USING MOBILENET 
+      After data preprocessing, the system acquires spatial 
+features through MobileNet, a lightweight Convolutional 
+Neural Network (CNN) with high efficiency in feature 
+extraction. MobileNet processes every frame to detect pixel-
+level anomalies like unnatural lighting, texture inconsistency, 
+and blending flaws, typical in deepfakes. In contrast to 
+conventional CNNs, MobileNet minimizes computational 
+complexity by a significant margin, and thus the system is 
+more efficient and faster. Now that we have obtained spatial 
+features, they are now sent to the LSTM model for temporal 
+analysis. 
+ 
+C. TEMPORAL ANALYSIS USING LSTM 
+      While CNN based models process individual frames, they 
+cannot identify motion based inconsistencies in videos. To 
+address this limitation, we use Long Short-Term Memory 
+(LSTM) networks to process sequences of frames, and will 
+use this data to identify anomalies in dynamics of motion. 
+LSTM is effective at detecting inconsistencies in unnatural 
+facial motion, head motion, and lip-sync errors, as well as 
+other artifacts identified in deepfake videos that would 
+otherwise not be visible in static images. Through 
+examination of temporal dependencies, the LSTM-based 
+model significantly enhances video-based deepfake detection 
+accuracy. The blended spatial analysis method of MobileNet 
+and temporal detection of LSTM together will allow the 
+proposed system to be more robust than current systems. 
+ 
+D. MODEL TRAINING AND OPTIMIZATION 
+      MobileNet-LSTM hybrid is trained with a supervised 
+learning approach where deepfake and real media are 
+appropriately tagged. The model is trained thoroughly with 
+batch normalization, dropout layers, and hyperparameter 
+adjustment for generalization. Adam optimizer is used for 
+convergence acceleration, and cross-entropy loss function is 
+employed 
+for 
+enabling 
+real 
+vs. 
+deepfake 
+precise 
+classification. The system is trained on GPU-based machines 
+for effective handling of big datasets. 
+ 
+E. DEPLOYMENT AND REAL-TIME PROCESSING 
+      Once trained, the deepfake model is hosted on Streamlit, 
+an interactive web application that provides users a UI to 
+upload images and videos to be processed. The model is 
+optimized for real-time processing to enable immediate 
+classification results without causing any latency. For 
+scalability, the system is containerized with Docker, which is 
+simple to deploy on cloud infrastructure, edge devices, and 
+mobile applications. The light weight of the MobileNet-
+LSTM hybrid model makes it efficient to run on low-power 
+devices and hence available for social media monitoring, 
+forensic analysis, and disinformation detection. 
+ 
+F. PROPOSED SYSTEM 
+      To address the weaknesses of existing deepfake detection 
+methodologies, this work proposes a Hybrid MobileNet-
+LSTM Model that achieves spatial and temporal analysis in 
+the most efficient manner possible to increase efficiency and 
+real-time performance. The framework presented here 
+combines MobileNet which is efficient for spatial feature 
+extraction and Long Short Term Memory (LSTM) to 
+recognize temporal patterns making it one of the best 
+candidates for the detection of manipulated media in images 
+and videos. Traditionally CNN-based models measure pixel 
+level inconsistencies in images while the proposed 
+framework focuses frame to frame anomalies when detecting 
+motion artifacts and unnatural transition in deepfake movies. 
+This critically enhances the robustness of the deepfake 
+detection, 
+especially 
+where 
+high 
+quality 
+deepfake 
+manipulation cannot be detected using traditional image 
+based methodologies.  
+The framework is capable of real-time deepfake detection 
+through a simple and easy to use Streamlit-based web 
+interface and presents users of the framework and real time 
+classification of uploaded use media, and captures the 
+required upload media. To enable additional interpretability, 
+Explainable AI (XAI) methods in the form of Grad-CAM 
+heatmaps will be utilized to provide visual explanation of the 
+identified anomalies. This extends the transparencies in AI 
+decision-making and renders the system robust for forensic 
+Proceedings of the 8th International Conference on Computing Methodologies and Communication (ICCMC-2025)
+IEEE Xplore Part Number: CFP25K25-ART; ISBN: 979-8-3315-1211-8
+979-8-3315-1211-8/25/$31.00 ©2025 IEEE
+983
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:35:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 4 ---
+
+analysis approaches, content moderation, and security use 
+cases. 
+ 
+G. COMPARISON OF EXISTING AND PROPOSED 
+SYSTEM 
+              The current system for deepfake detection utilizes 
+CNNs and RNNs that evaluate spatial and temporal features 
+separately. CNNs identify pixel inconsistencies, temporal 
+RNNs detect motion artifacts in a video. This is not suitable 
+for high fidelity deepfakes, is expensive in terms of 
+computational cost, does not provide any real-time 
+explanations, and therefore cannot be deployed at scale. In 
+the new system presented here we use MobileNet for spatial 
+verification and LSTM to detect temporal patterns. The 
+combination provides for the detection of deepfakes with 
+improved accuracy and detection speeds. MobileNet uses 
+minimal resources for fast feature extraction, while the 
+LSTM neural network identifies inconsistencies between 
+frames, allowing for real-time detection. We also utilize 
+Explainable AI (XAI) techniques (e.g., Grad-CAM 
+heatmaps) 
+for 
+visual 
+explanations, 
+which 
+improve 
+explainability. Our system is energy efficient (also improves 
+deployment at scale), scalable (adapts with new deepfake 
+approaches), and better than the existing technique. 
+IV. RESULT AND ANALYSIS 
+ 
+A. ACCURACY COMPARISON 
+      Figure 2 is a bar graph that displays a comparison of the 
+performance of the existing system and the proposed system, 
+showing that the proposed system has better classification 
+accuracy as indicated by the data in the bar chart below. The 
+bar graph below is a comparison chart showing accuracy of 
+the existing system, which is between 85% and 88%, and the 
+new system returning an accuracy of 92%. 
+Fig. 2. Accuracy Comparison between Existing and 
+Proposed System. 
+The system can be tested against a large collection of labeled 
+media, which the predictions can be compared to the truth. 
+The results can be used to test how well the system separates 
+real media and fraudulent media so that it is reliable across 
+different conditions. 
+ 
+B. PROCESSING SPEED COMPARISON 
+      The line graph in Fig. 3 compares the processing speed of 
+the 'existing' system and the 'proposed' system. The graph 
+illustrated the proposed system in parallel processing of 
+videos and had simultaneous processing as outlined. The 
+graph displays the frames per second (FPS) of the 'existing' 
+and 'proposed' systems processing videos. The'existing' 
+system processes at a maximum 30 FPS, while the 'proposed' 
+system processes frames in real-time at 15-20 FPS.  
+ 
+ 
+Fig. 3. Processing Speed Comparison(FPS) 
+ 
+C. RESOURCE USAGE COMPARISON 
+The Fig. 4 bar chart is used to compare resource utilization 
+such as memory and CPU/GPU usage of the two systems.The 
+proposed system uses less memory and CPU/GPU resources. 
+Fig. 4. Resource Usage Comparison. 
+ 
+The stacked bar chart displays memory utilization and GPU 
+utilization of the 'existing' system and the 'new' system, the 
+proposed system consumes significantly less memory 
+resources making it a more efficient option for deployment 
+on edge devices and mobile. 
+      The visual evidence shows that the new system is better 
+at efficiency, speed and accuracy compared to currently 
+existing systems. With its real-time processing and low 
+memory usage, the proposed system forms a basis for 
+interaction with devices with a wide range in processing 
+power from mobile phones to IoT devices. The level of 
+accuracy is going to ensure that the system will be able to 
+reliably detect deepfake media and it is going to work very 
+well in proper application destinations. 
+      The accuracy comparison graph provides additional 
+support in that the proposed system has a reported accuracy 
+of 92% accuracy while existing systems have comparably 
+lower accuracy, typically 85%-88%. 
+D. FRAME ANALYSIS OVER TIME 
+As illustrated in Fig. 5 Frame analysis over time examines 
+the systems classification confidence at each frame of 
+video whilst recording where discrepancies occur, shifts 
+Proceedings of the 8th International Conference on Computing Methodologies and Communication (ICCMC-2025)
+IEEE Xplore Part Number: CFP25K25-ART; ISBN: 979-8-3315-1211-8
+979-8-3315-1211-8/25/$31.00 ©2025 IEEE
+984
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:35:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 5 ---
+
+occur, and trends shift and evolve. The model provides 
+confidence levels on a per-frame basis with values 
+identifying higher confidence as a measure of authentic as 
+opposed to forged labeling. A Frame Analysis Over Time 
+plot captures all of these changes and shows where 
+predictions appear stable, what oscillating looks like 
+when the system has uncertainty in predictions and shows 
+outliers or areas for re-evaluation. The confidence also 
+provides an indication-of-accurate (and likely correct 
+classification) above (> 90%) and uncertain (< 50%). The 
+per-frame comparison is essentially raw, and improves 
+upon the accuracy of identifying manipulated content, but 
+also offers strength through the removal of errors that 
+arise from classification based on false frames alone. 
+ 
+ 
+Fig. 5. Frame Analysis Over Time 
+ 
+ 
+Interpretation of the Graph 
+      The graph demonstrates the model's decision-making 
+process over the course of time: 
+• 
+High confidence in a classification with confidence 
+scores above 90% 
+• 
+Low confidence in frame classification with 
+confidence scores less than 50% where the model 
+struggles to handle the frame 
+• 
+An increase or decrease in confidence will illustrate 
+the shift between classes of content. 
+• 
+Improves Precision: The system can make a more 
+precision last decision on many frames rather than 
+the models dealing with a single frame. 
+• 
+Captures Manipulations: If some frames capture 
+inconsistencies, these decoupled. may capture 
+manipulations of adjustments of the content. 
+• 
+Ensuring Robustness: The process can reduce 
+classification errors to none simply with a single 
+misclassifying frame. 
+      The system can differentiate between real and fake with 
+weighted probabilities and high accuracy, so it is a safe bet 
+for the fraudulent content detection piece. 
+      The system analyzes frames and the likelihood of the 
+frames having inconsistencies, and it plots confidence levels. 
+The graph is used to visualize how the model determines fake 
+and real content in the various types of frames. 
+ 
+ 
+ 
+Fig. 6. Key Frames Analysis and Final Verdict 
+ 
+      An extensive analysis of their respective frames, as 
+described in Fig. 6 provides further validation of the process. 
+If the key frame is identified as fake, the system will also 
+show the probability score and confidence percentage, thus 
+offering an additional layer of transparency on the judgement. 
+After all frames are evaluated, a final determination will be 
+made, based on the overall probability. If the probability of 
+fake is situated extremely high near the top of the scale, the 
+content is flagged as FAKE otherwise it will be called REAL. 
+V. CONCLUSION AND FUTURE WORK 
+      To conclude, the Hybrid MobileNet-LSTM Model 
+presented in this paper has offered an economically viable, 
+scalable and efficient deepfake detection system that 
+addresses the limitations presented by current solutions. The 
+implementation of the MobileNet network for the 
+identification of spatial features and the learning of temporal 
+patterns with LSTMs has potential and has shown overall 
+accuracy in determining tampered media as it functions in 
+real time. The model has been designed to incorporate 
+negligible computational burdens in order toadopt the system 
+to cloud usages, edge computing and mobile device 
+applications.  
+      The paper outlines a hybrid MobileNet-LSTM method for 
+deepfake detection with a consistent accuracy level and more 
+efficient in resource utilization than current models. We 
+successfully detected spatial inconsistencies and temporal 
+inconsistencies and effectively detected all forms of deepfake 
+manipulations. Through experimentation, we present further 
+evidence with enhanced deepfake detection accuracy, 
+meeting an appropriate threshold of a ROC-AUC value of 
+0.96 to be a reliable system for real-world deployment. Our 
+method greatly contributes to social media security, forensic 
+investigations, and content verification using AI-based tools. 
+In reducing the security risk of deepfakes, our system 
+mitigates the risk of misinformation, identity fraud, and other 
+adverse use cases of deepfake deployment..  
+      Future advancements of the Hybrid MobileNet-LSTM 
+Model for deepfake detection will be focused on 
+generalizability, 
+real-time 
+prediction, 
+and 
+security. 
+Increasing the dataset through varied and advanced 
+manipulations will improve the model's resiliency to novel 
+manipulations 
+to 
+become 
+effective 
+against 
+novel 
+manipulation methods. Further enhancement towards 
+Proceedings of the 8th International Conference on Computing Methodologies and Communication (ICCMC-2025)
+IEEE Xplore Part Number: CFP25K25-ART; ISBN: 979-8-3315-1211-8
+979-8-3315-1211-8/25/$31.00 ©2025 IEEE
+985
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:35:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 6 ---
+
+optimization of live-stream deepfake detection will improve 
+the model's speed of response will make the model's 
+predictive power more efficient for uses in social media 
+surveillance and cybersecurity. Continued reduction in 
+required computational complexity will allow for the use of 
+the model on low power devices, i.e., smartphones, IoT 
+devices. Increasing the robustness of the model against 
+adversarial attacks will improve the model's security; with 
+deepfake methods, the likelihood of detectors to fail as 
+adversarial attacks would be negated. Future work will also 
+explore and develop Explainable AI (XAI) methods, with 
+increased knowledge of the deepfake classifications on 
+justified reasoning features that can be explained through 
+simpler to understand visualizations. 
+ 
+Future enhancements will focus on:  
+• 
+Real-Time Deployment: Further optimization of 
+inference speed specifically for deployment on 
+mobile or IoT devices. 
+• 
+Cross-Domain 
+Generalization: 
+Assisting 
+generalization on datasets that were derived from 
+different manipulations, and datasets to augment the 
+learning experiences. 
+• 
+Integration 
+with 
+Transformer 
+Networks: 
+Implementing models specifically for improving 
+sequential feature learning to improve detection. 
+• 
+Explainable AI (XAI): Improving the user's ability 
+to interpret the classifier's decision making in 
+classification.  
+  
+REFERENCES 
+[1] Aarthe, S., Sindhuja, S., Ranjan, V., Vishal, V., Sinha, A., & Agarwal, 
+M. (2024). A Hybrid Approach for Deep Fake Detection Using Deep 
+Learning Algorithm. In International Conference on Power 
+Engineering and Intelligent Systems (PEIS) (pp. 137-146). Springer, 
+Singapore. 
+[2] Saikia, P., Dholaria, D., Yadav, P., Patel, V., & Roy, M. (2022, July). 
+A hybrid CNN-LSTM model for video deepfake detection by 
+leveraging optical flow features. In 2022 international joint conference 
+on neural networks (IJCNN) (pp. 1-7). IEEE. 
+[3] Agnihotri, A. (2021). DeepFake Detection using Deep Neural 
+Networks (Doctoral dissertation, Dublin, National College of Ireland). 
+[4] Raza, A., Munir, K., & Almutairi, M. (2022). A novel deep learning 
+approach for deepfake image detection. Applied Sciences, 12(19), 
+9820. 
+[5] Qazi, N., & Ahmed, I. (2024, July). Enhancing Authenticity 
+Verification with Transfer Learning and Ensemble Techniques in 
+Facial Feature-Based Deepfake Detection. In 2024 14th International 
+Conference on Pattern Recognition Systems (ICPRS) (pp. 1-6). IEEE. 
+[6] Helode, A., Yadav, A., Verma, V. P., & Srinivasa, K. G. (2024, June). 
+Fusion of Machine Learning and Deep Learning: A Hybrid Approach 
+for Deepfake Detection. In 2024 15th International Conference on 
+Computing Communication and Networking Technologies (ICCCNT) 
+(pp. 1-6). IEEE. 
+[7] Sundaram, V., Senthil, B., & Vekkot, S. (2024, June). Enhancing 
+Deepfake 
+Detection: 
+Leveraging 
+Deep 
+Models 
+for 
+Video 
+Authentication. In 2024 15th International Conference on Computing 
+Communication and Networking Technologies (ICCCNT) (pp. 1-7). 
+IEEE. 
+[8] Rajeev, A., & Raviraj, P. (2024). Performance evaluation of deep 
+learning models for detecting deep fakes. International Journal of 
+Systematic Innovation, 8(1), 49-62. 
+[9] Tipper, S., Atlam, H. F., & Lallie, H. S. (2024). An Investigation into 
+the Utilisation of CNN with LSTM for Video Deepfake Detection. 
+Applied Sciences, 14(21), 9754. 
+[10] Singh, R. P., Sree, N. H., Reddy, K. L. S. P., & Jashwanth, K. (2024). 
+Convergence of Deep Learning and Forensic Methodologies Using 
+Self-attention Integrated EfficientNet Model for Deep Fake Detection. 
+SN Computer Science, 5(8), 1-12. 
+[11] Abdullah, M., Ahmad, M., & Han, D. (2020, January). Facial 
+expression recognition in videos: A CNN-LSTM-based model for 
+video classification. In 2020 International Conference on Electronics, 
+Information, and Communication (ICEIC) (pp. 1–3). IEEE. 
+[12] Sánchez-Caballero, A., Fuentes-Jiménez, D., & Losada-Gutiérrez, C. 
+(2022, October). Real-time human action recognition using raw depth 
+video-based recurrent neural networks. Multimedia Tools and 
+Applications, 82(11), 16213–16235. 
+[13] Mihanpour, A., Rashti, M. J., & Alavi, S. E. (2020, April). Human 
+action recognition in video using DB-LSTM and ResNet. In 6th 
+International Conference on Web Research (ICWR) (pp. 133–138). 
+IEEE. 
+[14] Ullah, W., Ullah, A., Haq, I. U., Muhammad, K., Sajjad, M., & Baik, 
+S. W. (2020, August). CNN features with bi-directional LSTM for real-
+time anomaly detection in surveillance networks. Multimedia Tools 
+and Applications, 80(11), 16979–16995. 
+[15] Ghadekar, P., Adsare, T., Agrawal, N., Dharmik, T., Patil, A., & Zod, 
+S. (2023, September). Ensemble learning approach for anomaly 
+detection in crowd scene classification. In IEEE Fifth International 
+Conference 
+on 
+Advances 
+in 
+Electronics, 
+Computers 
+and 
+Communications (ICAECC) (pp. 01–11). IEEE. 
+[16] Hashmi, M. F., Ashish, B. K. K., Keskar, A. G., Bokde, N. D., Yoon, 
+J. H., & Geem, Z. W. (2020, January). An exploratory analysis on 
+visual counterfeits using Conv-LSTM hybrid architecture. IEEE 
+Access, 8, 101293–101308. 
+ 
+Proceedings of the 8th International Conference on Computing Methodologies and Communication (ICCMC-2025)
+IEEE Xplore Part Number: CFP25K25-ART; ISBN: 979-8-3315-1211-8
+979-8-3315-1211-8/25/$31.00 ©2025 IEEE
+986
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:35:02 UTC from IEEE Xplore.  Restrictions apply. 

@@ -1,0 +1,1537 @@
+
+
+--- PAGE 1 ---
+
+ARTICLE IN PRESS
+Article in Press
+We are providing an unedited version of this manuscript to give early access to its 
+findings. Before final publication, the manuscript will undergo further editing. Please 
+note there may be errors present which affect the content, and all legal disclaimers 
+apply.
+If this paper is publishing under a Transparent Peer Review model then Peer 
+Review reports will publish with the final article.
+Cite this article as: Aljabri, J.
+Integrating enhanced feature fusion
+with adaptive hidden semi-markov
+model and deep neural network for
+robust deepfake detection in Internet
+of Things-based edge computing
+environments. J. King Saud Univ.
+Comput. Inf. Sci. (2026).
+https://doi.org/10.1007/s4444
+3-026-00654-1
+©The Author(s) 2026. Open Access This article is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0
+International License, which permits any non-commercial use, sharing, distribution and reproduction in any medium or format, as long as you
+give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons licence, and indicate if you
+modified the licensed material. You do not have permission under this licence to share adapted material derived from this article or parts
+of it. The images or other third party material in this article are included in the article's Creative Commons licence, unless indicated
+otherwise in a credit line to the material. If material is not included in the article's Creative Commons licence and your intended use is
+not permitted by statutory regulation or exceeds the permitted use, you will need to obtain permission directly from the copyright holder.
+To view a copy of this licence, visit http://creativecommons.org/licenses/by-nc-nd/4.0/
+Integrating enhanced feature fusion with adaptive
+hidden semi-markov model and deep neural network
+for robust deepfake detection in Internet of
+Things-based edge computing environments
+Journal of King Saud University Computer and Information Sciences
+https://doi.org/10.1007/s44443-026-00654-1
+Received: 05 Jan 2026
+Accepted: 07 Mar 2026
+Jawhara Aljabri
+
+
+--- PAGE 2 ---
+
+ARTICLE IN PRESS
+Integrating Enhanced Feature Fusion with Adaptive Hidden Semi-Markov 
+Model and Deep Neural Network for Robust Deepfake Detection in Internet of 
+Things-based Edge Computing Environments 
+Abstract 
+The increasing convergence of Internet of Things (IoT) devices and edge computing 
+platforms in current digital networks has presented extraordinary opportunities. However, this 
+surge has presented a massive attack surface susceptible to developing attacks like deepfakes. 
+Deepfakes refer to realistic, but fake images, videos, and sounds made by artificial 
+intelligence (AI) models. Recent developments in deepfake generation have made deepfakes 
+more accurate and simpler to make. Deepfakes have previously been employed for numerous 
+malicious reasons, including the publication of fabricated outcomes in scientific magazines or 
+an attack on the identity tests employed by banks over artificial videos and voices, raising 
+concerns regarding them and their usage. In response to this occurrence, the research group 
+has selected the growth of techniques to distinguish real content from deepfakes. Machine 
+learning (DL) and deep learning (DL) driven systems have attained extremely precise 
+outcomes in the detection of deepfakes. Furthermore, numerous previous studies on 
+perceiving deepfake images or videos were concentrated on DL. This paper presents a 
+Feature Fusion Integrated with Adaptive Hidden Semi-Markov Model for Robust Deepfake 
+Detection (FFAHSMM-RDD) method. The aim is to present a reliable pathway for securing 
+multimedia communication and preventing deepfake-driven threats in real-world 
+applications. Initially, data augmentation, image resizing, and normalization techniques are 
+applied to improve image quality and enhance generalization. For feature representation, a 
+fusion of three models, such as ResNet-50, EfficientNet-B4, and MobileNetV3, is used. 
+Moreover, the adaptive hidden semi-Markov model (AHSMM) is employed to model 
+temporal dependencies and sequence dynamics within the data effectively. In the deepfake 
+classification process, a deep belief network (DBN) model is implemented to classify real and 
+fake content efficiently. The performance validation of the FFAHSMM-RDD methodology 
+demonstrated a superior value of 98.61% under the Celeb DF (v2) dataset 
+Keywords 
+Deepfake; Edge Computing; Deep Learning; Internet of Things; Deep Belief Network 
+1. Introduction 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 3 ---
+
+ARTICLE IN PRESS
+In recent years, owing to advancements in software design and hardware, information and 
+communication technology (ICT) has taken a significant leap, enhancing the efficiency of 
+operations and city lifestyles, leading to the “Smart City”. Different investors are 
+communicated with through the IoT [1]. The percentage of the world population living in 
+cities will reach 70% by the year 2050. The smart city presents a variety of services to the 
+benefit of its citizens [2]. Therefore, people want to be smart to help each smart city service. 
+The maximum potential of smart cities is accessed when a digital ID is delivered to people 
+for accessing all applications or services. Biometrics digital ID is unique and individual-
+based biometrics are linked to physical or personality traits of a human being [3]. 
+Consequently, it is not required to maintain any private key for protecting the privacy and 
+user identity, as the individual is their private key. Therefore, a digital ID that depends on 
+biometrics could be a smart decision for unlocking the locked door of a smart city. The major 
+difficulties of digital ID are validating an actual individual [4]. Deepfakes, synthetic media 
+established across developed AI techniques, have transformed the visual creation of content 
+by enabling the perfect manipulation of voices, faces, and gestures with remarkable realism 
+[5]. The incorporation of a face recognition approach within organised structures for deepfake 
+creation is an essential improvement, providing ethical protections, authenticity, and 
+improved accuracy. Moreover, the propagation of deepfake content raises important ethical 
+and social problems, involving spreading a rumor, identity theft, and invasion of privacy [6]. 
+There is an urgent need for strong regulatory mechanisms and technical countermeasures to 
+reduce the risks involved with deepfake technology. 
+Furthermore, current research is concentrated on evolving modern detection and 
+authentication approaches to differentiate between manipulated media and genuine protection 
+against hateful utilisation of deepfake technology [7]. With technological developments, 
+deepfakes become more challenging to differentiate from unique content because of their 
+regular usage of minor alterations that are untraceable to both individuals [8]. ML methods 
+can classify slight variations, which allows precise and effective detection of influenced 
+material, involving deepfake detection. Timely forensic methods concentrate on detecting 
+precise, specific discrepancies, namely pixel-level anomalies, compression artifacts, and 
+unnatural lighting. While these approaches sustain importance, they frequently struggle 
+against extremely advanced manipulations [9]. To address these restrictions, DL methods use 
+information-based patterns, learning to recognize specific discrepancies unnoticeable to the 
+human eye. Various past research on detecting deepfake video or photo was concentrated on 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 4 ---
+
+ARTICLE IN PRESS
+DL approaches, which are divided into 2 detection approaches: Region Conventional Neural 
+Networks (RCNN)-driven approach and Conventional Neural Network (CNN)-driven 
+approach. The CNN-driven method takes facial images from video streams and feeds them 
+into the CNN to train and predict to obtain a picture-level outcome [10]. Therefore, in 
+deepfake video streams, some techniques only use spatial data from an individual frame. The 
+RCNN-driven methods need a sequence of video streams to train for producing video-level 
+outcomes. These methods, called CNN, integrate RCNN and Recurrent Neural Networks 
+(RNN). Therefore, the RCNN-driven approach can entirely employ temporal and spatial data 
+in deepfake films [11]. 
+This paper presents a Feature Fusion Integrated with Adaptive Hidden Semi-Markov Model 
+for Robust Deepfake Detection (FFAHSMM-RDD) method. The key contributions are listed 
+below. 
+ Initially, the image quality and generalization are improved by applying data 
+augmentation, image resizing, and normalization techniques. 
+ Furthermore, a fusion of ResNet-50, EfficientNet-B4, and MobileNetV3 is used for 
+feature representation. This extracts rich, multi-scale features for improving detection 
+and computational efficiency. 
+ Moreover, the adaptive hidden semi-Markov model (AHSMM) model is employed for 
+modelling temporal dependencies and sequence dynamics, thus enabling effective 
+detection of subtle deepfake artifacts. 
+ Additionally, the deep belief network (DBN) model is implemented to efficiently 
+classify real and fake content, thus capturing intrinsic associations and deepfake 
+patterns. This also enhances accuracy and robustness compared to softmax or 
+Multilayer Perceptron (MLP) classifiers. 
+ The experimental validation of the FFAHSMM-RDD method is performed under the 
+Celeb DF (v2) dataset. 
+2. Review of Existing DeepFake Detection Approaches 
+Dagar and Vishwakarma [12] advanced a dual-branch method that combines primarily 
+intended characteristic noise with traditional CNN methods. This approach uses a dual-step 
+strategy, in which the first step combines noise features, and the second step combines RGB 
+characteristics utilizing the hierarchical ConvNext method. Also, this study employs a feature 
+extraction methodology for optimizing and refining the performance qualities. Asaduzzaman 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 5 ---
+
+ARTICLE IN PRESS
+et al. [13] proposed a unique hybrid detection structure that integrates speech and face 
+features with multi-modal biometric analysis and feature-level fusion. This recommended 
+method is outstanding at recognizing slight deepfake changes since it combines Bidirectional 
+Long Short-Term Memory (Bi-LSTM)-driven classifiers for temporal examination and CNNs 
+for feature representation. Moreover, the structure utilizes a multi-task learning method that 
+makes it likely for locating and detecting deepfake artefacts concurrently, improving the 
+presentation and interpretability of the method. Lin et al. [14] presented a Quantum-Trained 
+CNN (QT-CNN) structure intended to improve the deepfake audio identification, utilizing the 
+computing capacity of quantum ML (QML). This method uses a hybrid quantum-traditional 
+method, combining Quantum NNs (QNNs) alongside traditional neural structures for 
+optimizing training effectiveness. This approach integrates a new quantum-to-traditional 
+parameter function that efficiently uses quantum conditions. Yasir and Kim [15] presented an 
+effective and lightweight approach to detect deepfake videos and photos, making it 
+appropriate for devices with restricted computation power. To decrease the computational 
+cost generally associated with the DL method, this method combines an ML classifier with 
+texture analysis and keyframing methods, especially in solving privacy risks produced by 
+artificially created "deepfake" photos on social media settings. 
+Selvaraj et al. [16] recommended resilient training tactics for amplifying generalization 
+abilities. This method is trained employing purposely crafted examples for a deceiving 
+classification method, thus considerably improving its generalization capability. In terms of 
+this difficulty, a new hybrid adversarial training structure was presented, incorporating Virtual 
+Adversarial Training (VAT) with two-generated blurred adversarial training. This integrated 
+structure boosts the method’s strength in deepfakes detection made utilizing new DL 
+methodologies. Zhang et al. [17] suggested a Spectral Transformer with a Pyramid Attention 
+(STPA) method for detecting series variations in manipulated facial photos. Particularly, 
+propose a pyramid attention module that combines either channel or spatial attention methods 
+for prioritizing the face area above the background area. Moreover, a spectral Transformer is 
+used simultaneously for extracting local and global features to enable the fine-grained 
+extraction of the face forgery area. Rafique et al. [18] developed an automated system for 
+detecting deep fake images using Error Level Analysis (ELA), CNN, Support Vector 
+Machines (SVM), and K-Nearest Neighbors (KNN) models to distinguish between real and 
+manipulated images accurately. Kavthekar et al. [19] presented a solution that depends on 
+Masked Image Modelling for tackling the issues of Deepfake Detection. This method 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 6 ---
+
+ARTICLE IN PRESS
+contains 2 methods working simultaneously, such as the Masked Autoencoder and the Multi-
+scale Vision Transformer, ConvNeXt. The new facial quality detection techniques have 
+evolved to assist in enhancing the information quality by addressing the difficulty of 
+misrepresented facial information. Deepfake videos are utilized for different hateful reasons. 
+Table 1 signifies an overview of edge computing-based deepfake detection. 
+Table 1 Comparative study of deepfake detection’s related work 
+Authors 
+Goals 
+Technique 
+Datasets 
+Outcomes 
+Dagar and 
+Vishwakar
+ma [12] 
+To 
+suggest 
+a 
+dual-branch 
+technique 
+that 
+integrates 
+manually 
+intended 
+feature 
+noise with traditional models. 
+Additionally, it employs loss of 
+edge supervision by taking 
+boundary manipulation data 
+and 
+inducing 
+a 
+precise 
+localization at the edges. 
+CNN 
+Shallowfakes 
+and 
+Faceforensics++ 
+Datasets 
+AUC score 
+of 99%. 
+Asaduzzam
+an et al. 
+[13] 
+To project a unique hybrid 
+recognition 
+method 
+that 
+integrates speech features with 
+fusion 
+and 
+multi-modal 
+biometric 
+recognition. 
+The 
+recommended 
+method 
+is 
+excellent at recognizing subtle 
+modifications in deepfakes. 
+CNN and Bi-
+LSTM 
+DeepfakeTIMIT 
+and 
+AVSpeech 
+Datasets 
+Accuracy of 
+98.7%. 
+Lin et al. 
+[14] 
+Intended 
+to 
+improve 
+the 
+recognition of deepfake audio, 
+utilizing 
+the 
+computational 
+power 
+and 
+integrating 
+an 
+innovative 
+quantum-to-
+classical parameter map that 
+effectively employs quantum 
+states to increase powers. 
+QML 
+and 
+QNN 
+DEEP-VOICE 
+Dataset 
+Achieving 
+parameter 
+reduction 
+up to 70%. 
+Yasir and 
+Kim [15] 
+To project a lightweight and 
+effective 
+approach 
+for 
+identifying deepfake videos 
+and images makes it suited for 
+gadgets 
+with 
+confined 
+computational resources. 
+DL 
+FaceForensics+
++ and Celeb-
+DF(v2) Datasets 
+Accuracy of 
+92% 
+and 
+96%. 
+Selvaraj et 
+al. [16] 
+To develop robust training 
+tactics by increasing the ability 
+of 
+generalization. 
+In 
+VAT 
+FaceForensics+
++ Dataset 
+Precision 
+86.7%. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 7 ---
+
+ARTICLE IN PRESS
+adversarial training, purposely 
+crafted instances are used to 
+deceive classification models, 
+thus substantially improving 
+their generalizability. 
+Zhang et al. 
+[17] 
+To 
+identify 
+sequence 
+permutations in a manipulated 
+facial 
+image. 
+Particularly, 
+develop a pyramid attention 
+module, which combines either 
+spatial or channel attention 
+mechanisms by prioritizing the 
+face 
+region 
+over 
+the 
+background. 
+ResNet50 and 
+Transformer 
+Seq-Deepfake 
+Dataset 
+Accuracy of 
+72.30% and 
+68.71%. 
+Rafique et 
+al. [18] 
+To 
+explore 
+a 
+trustworthy 
+approach 
+for 
+recognizing 
+deepfake 
+images, 
+multiple 
+investigators 
+are 
+working 
+tirelessly 
+to 
+recognize 
+the 
+content of deep fakes utilizing 
+various approaches. 
+CNN, 
+SVM, 
+and KNN 
+DF Dataset 
+Accuracy of 
+89.5%. 
+Kavthekar 
+et al. [19] 
+To present a solution depends 
+on a masked image model and 
+to 
+address 
+the 
+issue 
+of 
+identification. An innovative 
+recognition model is advanced 
+that aids in increasing the 
+quality of data by overcoming 
+the task of misrepresented 
+facial data. 
+Auto Encoders 
+and 
+Vision 
+Transformers 
+DFDCp 
+and 
+Face 
+Forensics++ 
+Datasets 
+Accuracy 
+80.22% and 
+98.1%. 
+3. Proposed Methodological Framework 
+In this manuscript, an FFAHSMM-RDD model is presented in IoT and Edge Computing 
+Applications. The FFAHSMM-RDD method is created to provide a reliable path to safeguard 
+multimedia communication and prevent deepfake-based threats in real-world applications. To 
+perform that, the FFAHSMM-RDD method encompasses the following processes: Input 
+image processing, feature representation models, sequence modelling using the AHSMM 
+method, and classification via the DBN technique. Fig. 1 signifies the general process of the 
+FFAHSMM-RDD method. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 8 ---
+
+ARTICLE IN PRESS
+ 
+Fig. 1 General process of the FFAHSMM-RDD approach 
+3.1. Image Pre-processing Methods 
+Primarily, the collected image data is served into numerous pre-processing steps like data 
+augmentation, image resizing, and normalization [20]. These steps confirm that the data is 
+reliable, clean, and stable for effective learning. These steps are significant to heighten the 
+generality and the accuracy of the model. The brief description of these steps is given below. 
+Data Augmentation 
+To increase the assortment of databases and to decrease the problem of overfitting, the set of 
+augmentation models is used, like random rotation, rescaling, zooming, horizontal flipping, 
+shifting of height and width, and alteration of brightness. The model of rescaling is employed 
+to normalize the pixel intensity; the random rotation model will somewhat alternate images to 
+aid the model learn from dissimilar viewpoints. Further, horizontal flipping, vertical flipping, 
+and both are employed to flip an image to simulate manifold directions, which is signified in 
+Eqs. (1)-(3) correspondingly. 
+𝑥′, 𝑦′ = 𝑊−1 −𝑥, 𝑦                                                                    (1) 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 9 ---
+
+ARTICLE IN PRESS
+𝑥′, 𝑦′ = 𝑥, 𝐻−1 −𝑦                                                                     (2) 
+𝑥′, 𝑦′ = 𝑊−1 −𝑥, 𝐻−1 −𝑦                                                            (3) 
+Here, 𝑥 𝑎𝑛𝑑 𝑦 denote the location of a pixel, 𝑊 indicates the width, 𝐻 is the height of an 
+image, and 𝑥′ and 𝑦′ are the new locations of a pixel. Lastly, height and width shifting moves 
+image content in vertical or horizontal direction to pretend spatial variation, and brightness 
+adjustment adjusts image intensity to make the model strong to variances of brightness. 
+Image Resizing 
+The raw data of every image is handled by the image resizing mode, which resizes every 
+image to a fixed resolution of 224x224 pixels. The resizing describes the size of the target. In 
+the context of the developed method, the target size is 224 pixels in width and height. Further, 
+the original image's pixels are mapped to the target grid, where the resizing technique 
+computes every novel pixel in a 224x224 grid, and each must get its value from the original 
+image. If an original image is greater than, it downscales the content, and if the original 
+image is smaller, it executes upscaling the content. Therefore, step 3 contains interpolation 
+that contains a weighted average of the 4 nearest pixels from an original image, both 
+vertically and horizontally. Afterward, a novel image of 224x224 pixels is built. This 
+resolution model certifies that every image of input has equivalent sizes, which approves 
+smooth TL without altering the structure of the model. 
+Normalization 
+Further, the resized data is served into a normalization model to alter the values of pixel 
+intensity in an image within the range of [0,1] or [-1,1], respectively. The proposed model 
+employed a mean standard normalization model, which measures the values of pixels 
+utilizing a mean and standard deviation. Eq. (4) provides a mathematical calculation. 
+𝑋𝑛𝑜𝑟𝑚𝑎𝑙𝑖𝑧𝑒𝑑= 𝑋−𝜇
+𝜎
+                                                                       (4) 
+Here, 𝜇 signifies mean and 𝜎 denotes standard deviation. These normalized values certify that 
+an input image distribution will equal the pre-trained method employed in the proposed 
+structure. 
+3.2. Fusion of Feature Extraction Techniques 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 10 ---
+
+ARTICLE IN PRESS
+For the feature extraction, a fusion of three methods, including ResNet-50, EfficientNet-B4, 
+and MobileNetV3, is utilized for capturing diverse and discriminative features. This fusion 
+presents robust and effective feature extraction. The features are fused by using a 
+concatenation technique, and also, the methods utilize ImageNet pretrained weights with 
+partial fine-tuning (final layers unfrozen) to adapt to deepfake-specific artifacts while 
+averting overfitting. 
+3.2.1. ResNet‐50 Architecture 
+The ResNet‐50 method is a deep convolutional neural network (DCNN), which consists of 50 
+layers, intended to tackle the vanishing gradient issue in deep networks [21]. Its structure is 
+constructed on the notion of residual learning, where shortcut connections go around one or 
+many layers. These connections allow the system to learn residual mappings instead of an 
+original feature mapping, permitting deeper layers to concentrate on more intricate features 
+without losing gradient data. The ResNet‐50 method is a CNN, which was initially pre-
+trained on the ImageNet database. The structure of the ResNet‐50 model holds 50 layers and 
+is generally divided into 5 sections. The first part contains an input pre-processing layer, 
+which consists of a convolutional layer. The remaining 4 parts contain Bottleneck Building 
+Blocks. Every Bottleneck Building Block comprises numerous normalization layers, ReLU 
+activation functions, convolutional layers, and a shortcut connection. The ResNet‐50 
+technique has 49 convolutional layers and one fully connected (FC) layer in total. The design 
+of Bottleneck Building Blocks, which creates ResNet‐50, is stated by 𝑦= 𝐹(𝑥) + 𝑥. In the 
+given calculation, 𝐹(𝑥) is denoted as the residual function, whereas 𝑥 and 𝑦 signify the 
+residual function’s input and output parameters. The structure of ResNet uses two kinds of 
+building blocks, regular and modified. The regular building blocks are employed in ResNet‐
+34 and hold dual layers of 3𝑋3 convolutional layers. 
+The bottleneck building blocks are a specific alteration employed in deeper ResNet structures 
+like ResNet‐50, ResNet‐101, and ResNet‐152. These blocks contain a series of 3 layers, such 
+as 1 × 1,3 × 3, and 1 × 1 convolutional layers. The dual 1 × 1 layers aid in decreasing and 
+then enlarging the sizes, thus narrowing the flow’s dimensions. This makes a bottleneck 
+effect, which provides a Bottleneck Building Block. This modification permits a deeper 
+network to be trained without considerably enlarging the time of training. The feature 
+mapping of ResNet‐50 exposes intricate and expanded activation patterns in the deeper layer 
+owing to its deep structure and residual connections. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 11 ---
+
+ARTICLE IN PRESS
+3.2.2. EfficientNet-B4 Model 
+EfficientNet includes a sequence of CNN structures, which attain advanced accuracy with 
+significantly enhanced computational efficacy over preceding methods [22]. The main 
+invention of EfficientNet rests in its compound scaling model that evenly measures the 
+network's width, depth, and input resolution utilizing a group of fixed scaling coefficients. 
+This evades the physical and frequently sub-optimal scaling of individual sizes observed in 
+previous structures. The base method, EfficientNet‐BO, is constructed utilizing the Mobile 
+Inverted Bottleneck Convolution (MBConv) blocks presented in MobileNetV2, which unite 
+depth-wise separable convolution with squeeze‐ and‐excitation (SE) optimization to enrich 
+channel‐wise feature recalibration. Also, it uses Swish activation for enhanced non-linear 
+expressiveness. Subsequent methods in the EfficientNet family (B1‐B7) originate from 
+analytically scaling up the base structure with a compound coefficient, upholding the balance 
+between efficiency and accuracy. The compound scaling model at EfficientNet measures the 
+network's width, depth, and input resolution utilizing a fixed coefficient set. Instead of 
+randomly altering 1D, this model seeks to enhance every dimension, governed by the below-
+mentioned formulations: 
+depth = 𝛼∅,
+width = 𝛽∅,
+resolution = 𝛾∅                                   (5) 
+Subject to constraint: 
+𝛼⋅𝛽2 ⋅𝛾2 ≈2 with  𝛼≥1, 𝛽≥1,   𝛾≥1                                     (6) 
+Here, ∅ denotes a compound coefficient. 
+𝛼= 1.2,
+𝛽= 1.1,
+𝛾= 1.15                                                    (7) 
+EfficientNet‐B4 corresponds to the compound coefficient of ∅= 4, which results in the 
+below-mentioned scaled factors: 
+depth scale ≈1. 24 = 2.07 
+width scale ≈1. 14 = 1.46 
+resolution scale ≈1.154 = 1.75                                                 (8) 
+Therefore, EfficientNet‐B4 originates by evenly scaling up EfficientNet‐B0 by these factors, 
+which leads to a method with an input resolution of 380×380 pixels and nearly 19 million 
+parameters. This principled scaling upholds the balance between model capability and the 
+Comment [DocPrep1]: [spice] DOCPREP:
+Section may contain Splitted Paragraphs 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 12 ---
+
+ARTICLE IN PRESS
+cost of computation. EfficientNet‐B4 holds initial convolutional layers tracked by a sequence 
+of MBConv blocks with fluctuating kernel sizes (3×3 and 5×5) and expansion factors. Every 
+group of blocks is marked with the number of layers, gradually constructing a hierarchical 
+feature representation down to the last feature mapping. Fig. 2 describes the framework of the 
+EfficientNet‐B4 method. 
+ 
+Fig. 2 Framework of the EfficientNet‐B4 method 
+3.2.3. MobileNetV3 Method 
+MobileNet-V3 is an effective creation of a DL method for edge computing. It holds dual 
+releases, such as larger and smaller [23]. The larger version owns a somewhat higher number 
+of parameters and is more challenging, which permits it to acquire several intricate patterns 
+and high‐scale abstract features. Therefore, the larger method was selected as the basis 
+encoding in this work. Constructing upon the inventions of its predecessors, MobileNet-V3 
+was more sophisticated over the combination of dual superior models: MNas Net, which 
+enhances configuration assortment, and NetAdapt model, intended at finding and perfecting 
+network structure. In a first phase, MobileNet-V3 executes an innovative activation function 
+recognized as hard swish (ℎ‐swish) that improves speed of operation and decreases 
+computational cost when compared to an improved sigmoid function. The main building 
+block is named as an inverted residual block that unites a depth-wise separable convolutional 
+block with an attention block of a squeeze‐and‐excitation (SE) network. This intention 
+appeals to stimulation from a layer of bottleneck, using an inverted residual connection for 
+connecting input as well as output features in similar networks, thus enhancing feature 
+depiction while diminishing the usage of memory. Compared to a conventional convolution 
+block, depth-wise separable convolution uses a depth-wise kernel for every network, 
+followed by a 1 x 1 point-wise convolution kernel and a layer of batch normalization. The SE 
+block improves the model's ability to concentrate on major feature networks, thus reinforcing 
+its representative power. This procedure includes calculating the mean of an input feature 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 13 ---
+
+ARTICLE IN PRESS
+over a layer of average pooling, using ℎ‐swish or ReLU activation functions for originating 
+feature weights, and then multiplying it by a matrix of original features to produce a weighted 
+output feature. This model considerably supports MobileNet-V3’s learning efficiency by 
+merging feature networks. 
+In the last phase, an average pooling layer is innovative, and a convolutional layer alters the 
+number of feature networks to enlarge into a high-dimensional space. This increases the pace 
+of computation and performance without compromising accuracy. With its lightweight 
+structure and extraordinary performance, MobileNet-V3 has become an effective backbone in 
+applications of industrial and academic use. 
+3.3. Adaptive Hidden Semi-Markov Model 
+Furthermore, the AHSMM method is used for effectively modeling temporal dependencies 
+and sequence dynamics in the data [24]. This method efficiently captures state durations and 
+also assists in detecting consistent deepfake artifacts. The consecutive frames are used for 
+forming video sequences. Also, a CNN feature vector is employed for the representation of 
+each frame. These vectors also act as constant observation input. Furthermore, this model is 
+excellent in modelling duration-specific patterns. Moreover, the hidden states link the 
+temporal modelling to deepfake behaviour. 
+The HSMM is an addition of HMM with the inclusion of a variable sojourn time. For each 
+fake state, several observations are produced based on the sojourn time of the fake state. 
+Here, the sojourn time of each fake condition is set by a Weibull distribution. The parameters 
+of HSMM are defined below: 
+ 𝑁: number of fake states. The set of fake states is represented as 𝑆= {𝑆1, 𝑆2, … , 𝑆𝑁}. 
+Every fake state signifies a frame consistency level. 
+ 𝑀: number of different observation symbols. The observation procedure is 
+demonstrated with a Gaussian distribution; hence, the space contains every real 
+number. 
+ 𝜆: function of transition rate. It defines the frame consistency procedure, which 
+follows a rate function, represented by 𝜆. Here, the 𝜆 function relates to the Weibull 
+distribution, which is regularly employed in reliability theory. 
+To train HSMM, the Expectation‐Maximization algorithm is employed. Some 
+assumptions are prepared to use this method for prognostics. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 14 ---
+
+ARTICLE IN PRESS
+ Initial state: The model begins in the initial fake state. So, the engineering method is 
+expected to continue as good as new. 
+ Transitions: only left‐to‐right transitions are permitted. This means that the method 
+can only transfer to a neighboring state or sojourn in the present state. So, it is 
+expected that the engineering method does not recover health and that it has to go 
+over every state before reaching failure. 
+ Final state: the final state of HSMM is visible, and it signifies failure. Here, only one 
+value of observation is released. 
+As previously stated, the model AHSMM is an adaptive addition of HSMM. Throughout the 
+testing stage, the adaptation is generated once a changeover from the fake state occurs, and 
+the transition from the fake state 𝑆𝑖 to the fake state 𝑆𝑖+1 happens. Then, the sojourn time of 
+the fake state 𝑆𝑖 is 𝑇𝑖 and is equated to an expected value from the Weibull distribution for 
+that fake state, 𝐸𝑖. The Weibull distribution is expressed in Eq. (9), in which 𝛼 is a shape 
+parameter and 𝛽 denotes a scale parameter. The expected value is formulated in Eq. (10). 
+𝑓(𝑥) = {
+𝛼
+𝛽(
+𝑥
+𝛽)
+𝛼−1
+𝑒
+−(𝑋
+𝛽)
+𝛼
+,
+𝑥≥0,
+0,
+𝑥< 0.
+  (9) 
+𝔼[𝑋] = 𝛽𝛤(1 + 1
+𝛼)                                                                   (10) 
+A ratio between 𝑇𝑖 and 𝐸𝑖 of the present state, 𝑆𝑖, is intended and employed as a resampling 
+factor (𝑅𝑓) for the sojourn time of the following fake state, 𝑆𝑖+1. To resample the sojourn 
+time of 𝑆𝑖+1, the scale parameter is modified since it can move the Weibull distribution to 
+have smaller and extended sojourn times. The adapted scale parameter for 𝑆𝑖+1 is signified as 
+𝛽𝑖+1
+∗ and explained in Eq. (11). Therefore, the Weibull distribution for 𝑆𝑖+1 is well-defined by 
+parameters (𝛼𝑖+1, 𝛽𝑖+1
+∗
+), as the shape parameter 𝛼 is not modified and stays similar to the one 
+calculated throughout training. 
+𝛽𝑖+1
+∗
+=
+𝐸𝑖+1[𝑅𝑓]
+𝛤(1 +
+1
+𝛼𝑖+1)
+                                                                 (11) 
+Eq. (11) moves the Weibull so that its predictable sojourn equals the experimental behavior 
+detected in deployment, permitting the method to shorten or lengthen forecast segment 
+periods after unexpected events adaptively. This adaptation enhances detection robustness in 
+an edge environment where operations can differ from training. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 15 ---
+
+ARTICLE IN PRESS
+3.4. DBN-based Classification 
+In the deepfake classification process, a DBN is employed to classify real and fake content 
+[25] effectively. This method is chosen for its effectiveness in learning hierarchical, 
+generative data transformation from the fused CNN and AHSMM models, thus capturing 
+intrinsic associations in deepfake patterns. This model is also considered for its efficiency 
+over conventional classifiers. Furthermore, this model is efficient for computation, and unlike 
+transformers, they are excellent in modelling high-level abstractions. This mitigates 
+overfitting and stabilizes learning. The DBN model also enhances accuracy and robustness 
+against subtle changes in videos, while also extracting probabilistic latent features. 
+DBN is formed by many layers of stacked Restricted Boltzmann Machines (RBM), proficient 
+in removing deeper features from the original data. Pre-training comprises unsupervised 
+learning; here, the procedure initiates the input data passed into the primary RBM. The output 
+from the primary RBM turns the input for the second RBM, and this layer-wise training 
+remains until each layer is completely trained. After pre‐training, the parameters of every 
+layer, like biases and weights, were employed by the primary values for the parameters of the 
+network. The training model initiates with a low‐level RBM, which acquires the inputs of 
+DBN and develops higher levels by the hierarchy till the final RBM is trained at the topmost 
+layers that comprises the output of DBN. In this RBM, the middle and visible layer 𝐼ℎ and 𝐼𝑣 
+comprise random dual parameters in the middle and upper layers, respectively. Furthermore, 
+the indirect weight connects the visible layer and middle layer (𝑤), which were designed to 
+create a shared distribution function. 
+𝜌(𝑙𝑣, 𝑙ℎ) = 1
+𝐹𝑃
+𝑒−𝐸(𝐼𝑣,𝐼ℎ)                                                                   (12) 
+While 𝐹𝑝 denotes the partition function, computed by adding each probable pair of middle 
+and observable units. 
+𝐹𝑃= ∑𝑒−𝐸(𝐼𝑣,𝐼ℎ)
+𝑙𝑣,𝑙ℎ
+                                                                      (13) 
+The total energy of the combined state of the hidden unit and visible unit is presented. 
+𝐸(𝑙v, 𝑙ℎ) = −∑𝑎𝑖
+𝑖=1
+𝑙𝑣𝑖−∑𝑏𝑗
+𝑗=1
+𝑙ℎ𝑗−∑𝑙𝑣𝑖
+𝑖,𝑗
+𝑤𝑖𝑗𝑙ℎ𝑗                                   (14) 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 16 ---
+
+ARTICLE IN PRESS
+Here, 𝑙ℎ𝑗 and 𝑙𝑣𝑖 refer to the binary state and position of hidden nodes 𝑗 and observable nodes 
+𝑖, respectively, and 𝑤𝑖𝑗 depicts the weighted connection of the observable layer and the 
+middle layer, respectively. Furthermore, 𝑎𝑖 and 𝑏𝑗 signify the biases for observable and 
+middle nodes, respectively. 
+The RBM's weight is further refined to employ the succeeding equation: 
+𝛥𝑤𝑖𝑗= 𝐸𝑡(𝑙𝑣𝑖𝑙ℎ𝑗) −𝐸𝑚(𝑙𝑣𝑖𝑙ℎ𝑗)                                                    (15) 
+Now, 𝐸𝑡(∙) and 𝐸𝑚(∙) depict the expectation for learning data and models, correspondingly. 
+Whereas DBN is effective for multiple tasks, accomplishing an optimum solution depends 
+upon having a suitably designed framework. Algorithm 1 describes the DBN model. 
+Algorithm 1: DBN method 
+Input Preparation: 
+ Use input data. 
+2. Layer-wise Pre-training (Unsupervised): 
+ Send input to the initial RBM and train it for learning hidden feature 
+representations. 
+ Give the output of RBM to the subsequent RBM. 
+ Repeat layer-wise until all RBMs are given training, thus forming the 
+hierarchical DBN. 
+3. Parameter Initialization: 
+ Initialize the corresponding DBN layers by using the trained weights and 
+biases from every RBM. 
+4. Fine-tuning (Supervised): 
+ Form the full DBN for stacking all RBMs. 
+ Train the DBN end-to-end on labeled data for optimizing the process. 
+5. Feature Hierarchy: 
+ Capture simple features by utilizing lower RBMs. 
+6. Output Prediction: 
+ Obtain the output as real or deepfake in the final layer. 
+3.5. Evaluation Metrics 
+For evaluating the proposed method's performance, recall, accuracy, specificity, and AUROC 
+are used as the main measures. To calculate the accuracy, the number of samples properly 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 17 ---
+
+ARTICLE IN PRESS
+categorized and divided by the total number of instances. It is computed in the mathematical 
+formulation as exposed in Eq. (16). Here , 𝑡𝑛, 𝑡𝑝, 𝑓𝑛, and 𝑓𝑝 imply true negative, true 
+positive, false negative, and false positive, respectively. Thus, having a higher score in both 
+recall and sensitivity is vital. Precision is essential for defining how many instances predicted 
+to be positive are really positive. Precision was computed by separating the number of tp by 
+the summation of fp and tp as shown in Eq. (17). 
+𝐴𝑐𝑐=
+𝑡𝑝+ 𝑡𝑛
+𝑡𝑛+ 𝑡𝑝+ 𝑓𝑛+ 𝑓𝑝                                                             (16) 
+𝑃𝑟𝑒=
+𝑡𝑝
+𝑡𝑝+ 𝑓𝑝                                                                           (17) 
+Besides, the classifier utilizes recall or sensitivity to compute the proportion of real positive 
+cases, which are accurately recognized as true positives. Eq. (18) portrays the numerical 
+model for recall. The F1 score was defined by utilizing their precision and recall as described 
+in Eq. (19). Furthermore, the confusion matrix aids in assessing how fine a classification 
+model achieves by attaining incorrect as well as correct predictions it creates. It has dual 
+axes, such as true and predicted labels. Likewise, the ROC curve is computed by equating the 
+false positive rate with the true negative rate. The AUC assesses the ROC curve efficiency in 
+categorizing an input. If the value of AUC increases, the performance of the model's 
+classification increases. The AUC was defined for every model, and lastly, each model is 
+equated to define which one beats the other. 
+𝑅𝑒𝑐=
+𝑡𝑝
+𝑡𝑝+ 𝑓𝑛                                                                      (18) 
+𝐹1 −𝑠𝑐𝑜𝑟𝑒=
+2𝑡𝑝
+2𝑡𝑝+ 𝑓𝑝+ 𝑓𝑛                                                     (19) 
+4. Experimental Setup 
+In this section, the experimental validation of the FFAHSMM-RDD model is verified under 
+the Celeb DF (v2) dataset [26]. The model is simulated using Python 3.6.5 on a PC with an 
+i5-8600k, 250GB SSD, GeForce 1050Ti 4GB, 16GB RAM, and 1TB HDD. Parameters 
+include a learning rate of 0.01, ReLU activation, 50 epochs, 0.5 dropout, and a batch size of 
+5. The training and testing analysis ensure the prevention of data leakage and overfitting. 
+Also, temporal dynamics are effectively captured from each video at regular intervals. 
+Furthermore, techniques such as data augmentation, regularization, and partial fine-tuning are 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 18 ---
+
+ARTICLE IN PRESS
+used for reducing overfitting, thus retaining general features. Additionally, data augmentation 
+and weighted loss functions are employed for handling the data imbalance. This dataset 
+comprises real and DeepFake-synthesized videos having the same visual quality as those 
+circulated online. This dataset contains 12 real and synthetic videos. The training has 4004 
+real and 4027 synthesis images. And the testing has 1716 real and 1726 synthetic images. The 
+complete details of this dataset are shown in Table 2. Fig. 3 exhibits a sample of real and 
+synthesized images. Fig. 4 illustrates the original images, pre-processed images, and feature 
+maps of set 1, and Fig. 5 portrays the original images, pre-processed images, and feature 
+maps of set 2. 
+Table 2 Details of the dataset 
+No. of Video 
+No. of Images 
+Training 
+Testing 
+Real 
+Synthesis Real 
+Synthesis Real 
+Synthesis 
+12 
+12 
+4004 
+4027 
+1716 
+1726 
+ 
+Fig. 3 Sample of (a) Real and (b) DeepFake images 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 19 ---
+
+ARTICLE IN PRESS
+ 
+Fig. 4 Original images, pre-processed images, and feature maps on set 1 
+ 
+Fig. 5 Original images, pre-processed images, and feature maps on set 2 
+4.1. Classification Results of Proposed Model 
+Fig. 6 displays the classifier outcome of the ResNet-50 model. Figs. 6a and 6b show the 
+confusion matrices at 70:30. The figure implies that the ResNet-50 model has recognized two 
+Comment [DocPrep2]: [spice] DOCPREP:
+Please check this duplicate para. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 20 ---
+
+ARTICLE IN PRESS
+classes precisely. Fig. 6c demonstrates the training and validation accuracy over 100 epochs. 
+The figure shows that the ResNet-50 model achieves progressively higher accuracy values 
+over rising epochs. The results specify that the ResNet-50 technique accomplishes close 
+training and validation loss values. Fig. 6d exhibits the training and validation loss over 100 
+epochs. Fig. 6e illustrates the PR examination, denoting maximal performance on each class. 
+Fig. 6f exemplifies the ROC investigation, exhibiting efficacious outcomes with higher ROC 
+values for diverse classes. At Last, Figs. 6g and 6h present the classification outcome at 
+70:30. The results specify that the ResNet-50 technique has effectively detected the real and 
+synthesized samples under all classes. 
+ 
+Fig. 6 ResNet-50 model (a, b) Confusion matrices, (c, d) Accuracy and Loss curves, (e, f) PR 
+and ROC curves, and (g, h) Training and Testing phases of 70:30 
+Table 3 and Fig. 7 represent a deepfake detection on the ResNet-50 method. On 70% TRPHE, 
+it obtains average 𝑎𝑐𝑐𝑢𝑟𝑦, 𝑝𝑟𝑒𝑐𝑖𝑛, 𝑟𝑒𝑐𝑎𝑙𝑙, 𝐹1𝑆𝑐𝑜𝑟𝑒, and 𝐴𝑈𝐶𝑆𝑐𝑜𝑟𝑒 of 97.36%, 97.47%, 
+97.33%, 97.36%, and 97.33%, respectively. Similarly, at 30% TSPHE, it attains average 
+𝑎𝑐𝑐𝑢𝑟𝑦, 𝑝𝑟𝑒𝑐𝑖𝑛, 𝑟𝑒𝑐𝑎𝑙𝑙, 𝐹1𝑆𝑐𝑜𝑟𝑒, and 𝐴𝑈𝐶𝑆𝑐𝑜𝑟𝑒 of 97.30%, 97.34%, 97.33%, 97.30%, and 
+97.33%, respectively. 
+Table 3 Deepfake detection of the ResNet-50 method 
+Classes 
+𝑨𝒄𝒄𝒖𝒓𝒚 
+𝑷𝒓𝒆𝒄𝒊𝒏 
+𝑹𝒆𝒄𝒂𝒍𝒍 
+𝑭𝟏𝑺𝒄𝒐𝒓𝒆 
+𝑨𝑼𝑪𝑺𝒄𝒐𝒓𝒆 
+TRPHE (70%) 
+Real 
+97.36 
+99.42 
+95.21 
+97.27 
+97.33 
+Synthesis 
+97.36 
+95.51 
+99.46 
+97.44 
+97.33 
+Average 
+97.36 
+97.47 
+97.33 
+97.36 
+97.33 
+TSPHE (30%) 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 21 ---
+
+ARTICLE IN PRESS
+Real 
+97.30 
+99.23 
+95.44 
+97.30 
+97.33 
+Synthesis 
+97.30 
+95.44 
+99.23 
+97.30 
+97.33 
+Average 
+97.30 
+97.34 
+97.33 
+97.30 
+97.33 
+ 
+Fig. 7 Average values of the ResNet-50 method under 70:30 
+Fig. 8 points out the classifier outcome of the EfficientNet-B4 method. Figs. 8a and 8b 
+portray the confusion matrices at 70:30. The figure denotes that the EfficientNet-B4 model 
+accurately identified dual classes. Fig. 8c describes the training and validation accuracy over 
+100 epochs. The figure shows that the EfficientNet-B4 technique gets higher accuracy values 
+over growing epochs. Fig. 8d displays the training and validation loss over 100 epochs. The 
+outcomes imply that the EfficientNet-B4 technique attains close training and validation loss 
+values. Fig. 8e exhibits the PR inspection, denoting maximal performance on every class. Fig. 
+8f demonstrates the ROC study, displaying efficacious outcomes with the highest ROC values 
+for various classes. Finally, Figs. 8g and 8h embody the training and testing phases at 70:30. 
+The results point out that the EfficientNet-B4 technique has effective detection of the real and 
+synthesis samples on all classes. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 22 ---
+
+ARTICLE IN PRESS
+ 
+Fig. 8 Results of EfficientNet-B4 method (a, b) Confusion matrices, (c, d) Accuracy and Loss 
+curves, (e, f) PR and ROC curves, and (g, h) Training and Testing phases of 70:30 
+Table 4 and Fig. 9 represent a deepfake detection of the EfficientNet-B4 method. At 70% 
+TRPHE, it obtains average 𝑎𝑐𝑐𝑢𝑟𝑦, 𝑝𝑟𝑒𝑐𝑖𝑛, 𝑟𝑒𝑐𝑎𝑙𝑙, 𝐹1𝑆𝑐𝑜𝑟𝑒, and 𝐴𝑈𝐶𝑆𝑐𝑜𝑟𝑒 of 97.60%, 
+97.69%, 97.57%, 97.59%, and 97.57%, respectively. Likewise, on 30% TSPHE, it achieves 
+average 𝑎𝑐𝑐𝑢𝑟𝑦, 𝑝𝑟𝑒𝑐𝑖𝑛, 𝑟𝑒𝑐𝑎𝑙𝑙, 𝐹1𝑆𝑐𝑜𝑟𝑒, and 𝐴𝑈𝐶𝑆𝑐𝑜𝑟𝑒 of 97.65%, 97.68%, 97.68%, 97.65
+ 
+%, and 97.68%, respectively. 
+Table 4 Deepfake detection of the EfficientNet-B4 approach 
+Classes 
+𝑨𝒄𝒄𝒖𝒓𝒚 
+𝑷𝒓𝒆𝒄𝒊𝒏 
+𝑹𝒆𝒄𝒂𝒍𝒍 
+𝑭𝟏𝑺𝒄𝒐𝒓𝒆 
+𝑨𝑼𝑪𝑺𝒄𝒐𝒓𝒆 
+TRPHE (70%) 
+Real 
+97.60 
+99.48 
+95.64 
+97.52 
+97.57 
+Synthesis 
+97.60 
+95.90 
+99.51 
+97.67 
+97.57 
+Average 
+97.60 
+97.69 
+97.57 
+97.59 
+97.57 
+TSPHE (30%) 
+Real 
+97.65 
+99.41 
+95.95 
+97.65 
+97.68 
+Synthesis 
+97.65 
+95.94 
+99.41 
+97.64 
+97.68 
+Average 
+97.65 
+97.68 
+97.68 
+97.65 
+97.68 
+Comment [DocPrep3]: [spice] DOCPREP:
+Please check this duplicate para. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 23 ---
+
+ARTICLE IN PRESS
+ 
+Fig. 9 Average values on the EfficientNet-B4 approach under 70:30 
+Fig. 10 portrays the classifier outcome of the MobileNetV3 approach. Figs. 10a and 10b 
+describe the confusion matrices at 70:30. The figure implies that the MobileNetV3 model has 
+identified all 2 class labels correctly. Fig. 10c illustrates the training and validation accuracy 
+over 100 epochs. The figure reports that the MobileNetV3 model achieves greater accuracy 
+values over extended epochs. Fig. 10d displays the training and validation loss over 100 
+epochs. The results denote that the MobileNetV3 model attains closer training and validation 
+loss values. Fig. 10e reveals the PR investigation, denoting maximal performance on each 
+class. Fig. 10f proves the ROC analysis, indicating capable outcomes with the highest ROC 
+values for separate classes. Figs. 10g and 10h signify the training and testing phases at 70:30. 
+The outcomes suggest that the MobileNetV3 model has effectively recognized the real and 
+synthesized samples under all classes. 
+Comment [DocPrep4]: [spice] DOCPREP:
+Please check this duplicate para. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 24 ---
+
+ARTICLE IN PRESS
+ 
+Fig. 10 Results of MobileNetV3 method (a, b) Confusion matrices, (c, d) Accuracy and Loss 
+curves, (e, f) PR and ROC curves, and (g, h) Training and Testing phases of 70:30 
+Table 5 and Fig. 11 present a deepfake detection of the MobileNetV3 method. On 70% 
+TRPHE, it gets average 𝑎𝑐𝑐𝑢𝑟𝑦, 𝑝𝑟𝑒𝑐𝑖𝑛, 𝑟𝑒𝑐𝑎𝑙𝑙, 𝐹1𝑆𝑐𝑜𝑟𝑒, and 𝐴𝑈𝐶𝑆𝑐𝑜𝑟𝑒 of 98.08%, 98.14%, 
+98.07%, 98.08%, and 98.07%, respectively. Also, at 30% TSPHE, it gets average 𝑎𝑐𝑐𝑢𝑟𝑦, 
+𝑝𝑟𝑒𝑐𝑖𝑛, 𝑟𝑒𝑐𝑎𝑙𝑙, 𝐹1𝑆𝑐𝑜𝑟𝑒, and 𝐴𝑈𝐶𝑆𝑐𝑜𝑟𝑒 of 97.88%, 97.90%, 97.91%, 97.88%, and 97.91%, 
+respectively. 
+Table 5 Deepfake detection of the MobileNetV3 method 
+Classes 
+𝑨𝒄𝒄𝒖𝒓𝒚 
+𝑷𝒓𝒆𝒄𝒊𝒏 
+𝑹𝒆𝒄𝒂𝒍𝒍 
+𝑭𝟏𝑺𝒄𝒐𝒓𝒆 
+𝑨𝑼𝑪𝑺𝒄𝒐𝒓𝒆 
+TRPHE (70%) 
+Real 
+98.08 
+99.48 
+96.62 
+98.03 
+98.07 
+Synthesis 
+98.08 
+96.79 
+99.51 
+98.13 
+98.07 
+Average 
+98.08 
+98.14 
+98.07 
+98.08 
+98.07 
+TSPHE (30%) 
+Real 
+97.88 
+99.35 
+96.46 
+97.89 
+97.91 
+Synthesis 
+97.88 
+96.44 
+99.35 
+97.87 
+97.91 
+Average 
+97.88 
+97.90 
+97.91 
+97.88 
+97.91 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 25 ---
+
+ARTICLE IN PRESS
+ 
+Fig. 11 Average values on the MobileNetV3 method under 70:30 
+Fig. 12 exemplifies the classifier outcome of the Fusion model. Figs. 12a and 12b depict the 
+confusion matrices under 70:30. The figure denotes that the Fusion model has classified all 2 
+class labels accurately. Fig. 12c shows the training and validation accuracy over 100 epochs. 
+The figure reports that the Fusion model obtains rising accuracy values over extending 
+epochs. Fig. 12d illustrates the training and validation loss over 100 epochs. The results 
+specify that the Fusion model achieves close values of training and validation loss. Fig. 12e 
+reveals the PR examination, denoting maximal performance on each class. Fig. 12f portrays 
+the ROC investigation, determining proficient outcomes with superior ROC values for 
+individual classes. Finally, Figs. 12g and 12h denote the training and testing phases at 70:30. 
+The results denote that the Fusion model has effective identification of the real and synthesis 
+samples under all classes. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 26 ---
+
+ARTICLE IN PRESS
+ 
+Fig. 12 Results of Fusion model (a, b) Confusion matrices, (c, d) Accuracy and Loss curves, 
+(e, f) PR and ROC curves, and (g, h) Training and Testing phases of 70:30 
+Table 6 and Fig. 13 display a deepfake detection of the Fusion model. Under 70% TRPHE, 
+the fusion model accomplishes average 𝑎𝑐𝑐𝑢𝑟𝑦, 𝑝𝑟𝑒𝑐𝑖𝑛, 𝑟𝑒𝑐𝑎𝑙𝑙, 𝐹1𝑆𝑐𝑜𝑟𝑒, and 𝐴𝑈𝐶𝑆𝑐𝑜𝑟𝑒 of 
+98.61%, 98.63%, 98.59%, 98.60%, and 98.59%, respectively. Further, at 30% TSPHE, the 
+fusion model obtains average 𝑎𝑐𝑐𝑢𝑟𝑦, 𝑝𝑟𝑒𝑐𝑖𝑛, 𝑟𝑒𝑐𝑎𝑙𝑙, 𝐹1𝑆𝑐𝑜𝑟𝑒, and 𝐴𝑈𝐶𝑆𝑐𝑜𝑟𝑒 of 98.58%, 
+98.58%, 98.59%, 98.58%, and 98.59%, respectively. 
+Table 6 Deepfake detection of Fusion model 
+Classes 
+𝑨𝒄𝒄𝒖𝒓𝒚 
+𝑷𝒓𝒆𝒄𝒊𝒏 
+𝑹𝒆𝒄𝒂𝒍𝒍 
+𝑭𝟏𝑺𝒄𝒐𝒓𝒆 
+𝑨𝑼𝑪𝑺𝒄𝒐𝒓𝒆 
+TRPHE (70%) 
+Real 
+98.61 
+99.51 
+97.66 
+98.58 
+98.59 
+Synthesis 
+98.61 
+97.75 
+99.53 
+98.63 
+98.59 
+Average 
+98.61 
+98.63 
+98.59 
+98.60 
+98.59 
+TSPHE (30%) 
+Real 
+98.58 
+99.48 
+97.72 
+98.59 
+98.59 
+Synthesis 
+98.58 
+97.67 
+99.47 
+98.56 
+98.59 
+Average 
+98.58 
+98.58 
+98.59 
+98.58 
+98.59 
+Comment [DocPrep5]: [spice] DOCPREP:
+Please check this duplicate para. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 27 ---
+
+ARTICLE IN PRESS
+ 
+Fig. 13 Average values of the Fusion model under 70:30 
+4.2. Comparative Result Analysis with Existing Studies 
+Table 7 exemplifies the comparative investigation of the FFAHSMM-RDD model with 
+existing models under training and testing [27-33]. Fig. 14 presents a comparison of the 
+outcome of the FFAHSMM-RDD model with the existing model under training. The table 
+values specify that the FFAHSMM-RDD methodology achieved maximum performance with 
+𝑎𝑐𝑐𝑢𝑟𝑦, 𝑝𝑟𝑒𝑐𝑖𝑛, and 𝐴𝑈𝐶𝑆𝑐𝑜𝑟𝑒 of 98.61%, 98.63%, and 98.59%, respectively. 
+Table 7 Comparative analysis of FFAHSMM-RDD model with existing approaches 
+Model 
+Training 
+Testing 
+𝑨𝒄𝒄𝒖𝒓𝒚 
+𝑷𝒓𝒆𝒄𝒊𝒏 
+𝑨𝑼𝑪𝑺𝒄𝒐𝒓𝒆 
+𝑨𝒄𝒄𝒖𝒓𝒚 
+𝑷𝒓𝒆𝒄𝒊𝒏 
+𝑨𝑼𝑪𝑺𝒄𝒐𝒓𝒆 
+CNN+ SVM [27] 
+88.10 
+90.27 
+95.76 
+95.95 
+97.89 
+89.14 
+Custom CNN model [28] 
+97.24 
+90.94 
+91.06 
+89.02 
+93.60 
+91.36 
+CEViT-VDD [30] 
+87.06 
+93.99 
+95.79 
+90.06 
+94.72 
+98.38 
+FFDL-DVD [31] 
+84.56 
+92.85 
+97.79 
+91.28 
+95.76 
+90.12 
+DVD-CViT [32] 
+90.35 
+97.74 
+93.23 
+94.24 
+98.05 
+94.93 
+ViXNet-DVIFD [29] 
+94.40 
+96.52 
+95.52 
+93.35 
+96.09 
+91.80 
+DD-DFSML [33] 
+96.33 
+91.84 
+96.60 
+90.41 
+92.64 
+92.07 
+Comment [DocPrep6]: [spice] DOCPREP:
+Please check this duplicate para. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 28 ---
+
+ARTICLE IN PRESS
+FFAHSMM-RDD 
+98.61 
+98.63 
+98.59 
+98.58 
+98.58 
+98.59 
+In the meantime, the existing methodologies, such as CNN+ SVM, Custom CNN model, 
+CEViT-VDD, FFDL-DVD, DVD-CViT, ViXNet-DVIFD, and DD-DFSML, achieved worse 
+performance under various measures. 
+ 
+Fig. 14 Comparative analysis of the FFAHSMM-RDD model under training 
+Fig. 15 describes the simulation outcome of the FFAHSMM-RDD model with existing 
+methodologies under testing. Under 𝑎𝑐𝑐𝑢𝑟𝑦, the FFAHSMM-RDD model got the highest 
+𝑎𝑐𝑐𝑢𝑟𝑦 of 98.58%. In contrast, CNN+ SVM, Custom CNN model, CEViT-VDD, FFDL-
+DVD, DVD-CViT, ViXNet-DVIFD, and DD-DFSML methodologies have obtained a lower 
+𝑎𝑐𝑐𝑢𝑟𝑦 of 95.95%, 89.02%, 90.06%, 91.28%, 94.24%, 93.35%, and 90.41%, respectively. 
+Finally, on 𝐴𝑈𝐶𝑆𝑐𝑜𝑟𝑒, the FFAHSMM-RDD approach got a maximum 𝐴𝑈𝐶𝑆𝑐𝑜𝑟𝑒 of 98.59% 
+while the CNN+ SVM, Custom CNN model, CEViT-VDD, FFDL-DVD, DVD-CViT, 
+ViXNet-DVIFD, and DD-DFSML methodologies have attained a minimum 𝐴𝑈𝐶𝑆𝑐𝑜𝑟𝑒 of 
+89.14%, 91.36%, 98.38%, 90.12%, 94.93%, 91.80%, and 92.07%, respectively. These results 
+indicate that approach demonstrates more consistent and superior overall discriminative 
+capability across evaluation metrics. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 29 ---
+
+ARTICLE IN PRESS
+ 
+Fig. 15 Comparative analysis of the FFAHSMM-RDD model under testing 
+4.3. Computational Time Analysis 
+Table 8 and Fig. 16 indicate the computational time (CT) evaluation of the FFAHSMM-RDD 
+approach with existing methods. The FFAHSMM-RDD approach illustrated robust predictive 
+capability with a CT of 2.45 sec, significantly lower than CNN plus SVM at 6.69 sec, Custom 
+CNN model at 5.52 sec, CEViT-VDD at 6.22 sec, FFDL-DVD at 7.40 sec, DVD-CViT at 
+7.09 sec, ViXNet-DVIFD at 6.32 sec, and DD-DFSML at 6.73 sec. Thus, the model 
+highlights superior computational efficiency while maintaining high classification 
+performance. 
+Table 8 CT evaluation of the FFAHSMM-RDD approach with existing methods 
+Model 
+CT (sec) 
+CNN+ SVM 
+6.69 
+Custom CNN model 
+5.52 
+CEViT-VDD 
+6.22 
+FFDL-DVD 
+7.40 
+DVD-CViT 
+7.09 
+Comment [DocPrep7]: [spice] DOCPREP:
+Please check this duplicate para. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 30 ---
+
+ARTICLE IN PRESS
+ViXNet-DVIFD 
+6.32 
+DD-DFSML 
+6.73 
+FFAHSMM-RDD 
+2.45 
+ 
+Fig. 16 CT evaluation of the FFAHSMM-RDD approach with existing methods 
+4.4. Ablation Study 
+Table 8 and Fig. 16 represent the ablation study of the FFAHSMM-RDD model with existing 
+methods. The DBN with fusion feature extraction and AHMM Sequence Modelling 
+(FFAHSMM-RDD) illustrated the efficiency of the model with an 𝑎𝑐𝑐𝑢𝑟𝑦 of 98.61%, 𝑝𝑟𝑒𝑐𝑖𝑛 
+of 98.63%, and AUC of 98.59%. Additionally, DBN+ResNet-50 achieved an 𝑎𝑐𝑐𝑢𝑟𝑦 of 
+97.36%, 𝑝𝑟𝑒𝑐𝑖𝑛 of 97.47%, and AUC of 97.33%. Furthermore, DBN+EfficientNet-B4 
+achieved an 𝑎𝑐𝑐𝑢𝑟𝑦 of 97.65%, 𝑝𝑟𝑒𝑐𝑖𝑛 of 97.68%, and AUC of 97.68%, respectively. 
+Moreover, the DBN+MobileNetV3 achieved an 𝑎𝑐𝑐𝑢𝑟𝑦 of 98.08%, 𝑝𝑟𝑒𝑐𝑖𝑛 of 98.14%, and 
+AUC of 98.07%, respectively. These results ensured that the proposed model has resulted in 
+an effective deepfake detection process. 
+Table 8 Ablation study of FFAHSMM-RDD model with existing methods 
+Comment [DocPrep8]: [spice] DOCPREP:
+Please check this duplicate para. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 31 ---
+
+ARTICLE IN PRESS
+Methods 
+𝑨𝒄𝒄𝒖𝒓𝒚 
+𝑷𝒓𝒆𝒄𝒊𝒏 
+𝑨𝑼𝑪𝑺𝒄𝒐𝒓𝒆 
+DBN+ResNet-50 (Without Efficient-B4 and 
+MobileNetV3) 
+97.36 
+97.47 
+97.33 
+DBN+EfficientNet-B4 (Without ResNet-50 
+and MobileNetV3) 
+97.65 
+97.68 
+97.68 
+DBN+MobileNetV3 (Without Efficient-B4 and 
+ResNet-50) 
+98.08 
+98.14 
+98.07 
+FFAHSMM-RDD (DBN with fusion feature 
+extraction and AHMM Sequence Modelling) 
+98.61 
+98.63 
+98.59 
+ 
+Fig. 16 Comparative analysis of ablation study under various models 
+5. Conclusion 
+In this article, the FFAHSMM-RDD model is presented. The FFAHSMM-RDD approach is 
+designed to provide a reliable pathway for safeguarding multimedia communication and 
+preventing deepfake-based threats in real-world applications. Primarily, the FFAHSMM-
+RDD approach uses data augmentation, image resizing, and normalization methods to 
+enhance image quality and improve generality. For the feature extraction, a fusion of three 
+methods, including ResNet-50, EfficientNet-B4, and MobileNetV3, is utilized for capturing 
+diverse and discriminative features. Furthermore, the AHSMM approach is leveraged for 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 32 ---
+
+ARTICLE IN PRESS
+effectively modeling temporal dependencies and sequence dynamics in the data. In the 
+deepfake classification process, a DBN is employed to effectively classify real and fake 
+content. The performance validation of the FFAHSMM-RDD methodology demonstrated a 
+superior value of 98.61% under the Celeb DF (v2) dataset. Limitations exist in low-quality 
+videos and computationally heavy videos due to various CNN and DBN layers. Future work 
+must explore lightweight, attention-based temporal, and self-supervised learning models for 
+improving generalization and efficiency. 
+Data Availability Statement 
+The data that support the findings of this study are openly available in the Kaggle repository 
+at https://www.kaggle.com/datasets/reubensuju/celeb-df-v2, reference number [26]. 
+References 
+[1] Heidari, A., Jafari Navimipour, N., Dag, H. and Unal, M., 2024. Deepfake detection using 
+deep learning methods: A systematic and comprehensive review. Wiley Interdisciplinary 
+Reviews: Data Mining and Knowledge Discovery, 14(2), p.e1520. 
+[2] Yan, Z., Zhang, Y., Yuan, X., Lyu, S. and Wu, B., 2023. Deepfakebench: A comprehensive 
+benchmark of deepfake detection. arXiv preprint arXiv:2307.01426. 
+[3] Malik, A., Kuribayashi, M., Abdullahi, S.M. and Khan, A.N., 2022. DeepFake detection 
+for human face images and videos: A survey. Ieee Access, 10, pp.18757-18775. 
+[4] Yan, Z., Zhang, Y., Fan, Y. and Wu, B., 2023. Ucf: Uncovering common features for 
+generalizable deepfake detection. In Proceedings of the IEEE/CVF international conference 
+on computer vision (pp. 22412-22423). 
+[5] Ahmed, S.R., Sonuç, E., Ahmed, M.R. and Duru, A.D., 2022, June. Analysis survey on 
+deepfake detection and recognition with convolutional neural networks. In 2022 International 
+Congress on Human-Computer Interaction, Optimization and Robotic Applications 
+(HORA) (pp. 1-7). IEEE. 
+[6] Wang, T., Liao, X., Chow, K.P., Lin, X. and Wang, Y., 2024. Deepfake detection: A 
+comprehensive survey from the reliability perspective. ACM Computing Surveys, 57(3), pp.1-
+35. 
+[7] Cheng, J., Yan, Z., Zhang, Y., Luo, Y., Wang, Z. and Li, C., 2024. Can we leave deepfake 
+data behind in training deepfake detector?. Advances in Neural Information Processing 
+Systems, 37, pp.21979-21998. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 33 ---
+
+ARTICLE IN PRESS
+[8] Wang, T. and Chow, K.P., 2023, June. Noise based deepfake detection via multi-head 
+relative-interaction. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 
+37, No. 12, pp. 14548-14556). 
+[9] Taeb, M. and Chi, H., 2022. Comparison of deepfake detection techniques through deep 
+learning. Journal of Cybersecurity and Privacy, 2(1), pp.89-106. 
+[10] Dong, S., Wang, J., Ji, R., Liang, J., Fan, H. and Ge, Z., 2023. Implicit identity leakage: 
+The stumbling block to improving deepfake detection generalization. In Proceedings of the 
+IEEE/CVF conference on computer vision and pattern recognition (pp. 3994-4004). 
+[11] Kumar, M. and Sharma, H.K., 2023. A GAN-based model of deepfake detection in social 
+media. Procedia Computer Science, 218, pp.2153-2162. 
+[12] Dagar, D. and Vishwakarma, D.K., 2025. A noise and edge extraction-based dual-branch 
+method 
+for 
+shallowfake 
+and 
+deepfake 
+localization. Signal, 
+Image 
+and 
+Video 
+Processing, 19(3), p.198. 
+[13] Asaduzzaman, M., Hassan, M.M. and Bhuiyan, T., 2025, March. Deepfake Detection for 
+Enhanced Security in Workplace Environments Using Deep Learning Techniques. In 2025 
+8th International Conference on Information and Computer Technologies (ICICT) (pp. 173-
+179). IEEE. 
+[14] Lin, C.H.A., Liu, C.Y., Chen, S.Y.C. and Chen, K.C., 2025, April. Quantum-trained 
+convolutional neural network for deepfake audio detection. In 2025 IEEE International 
+Conference on Acoustics, Speech, and Signal Processing Workshops (ICASSPW) (pp. 1-5). 
+IEEE. 
+[15] Yasir, S.M. and Kim, H., 2025. Lightweight Deepfake detection based on multi-feature 
+fusion. Applied Sciences, 15(4), p.1954. 
+[16] Selvaraj, P., Jagatheesaperumal, S., Marimuthu, K., Saravanan, O., Alkhamees, B. and 
+Hassan, M., 2025. Deepfake Detection Using Adversarial Neural Network. Computer 
+Modeling in Engineering & Sciences, 143(2), p.1575. 
+[17] Zhang, G., Gao, M., Li, Q., Guo, S. and Jeon, G., 2024. Detecting sequential deepfake 
+manipulation via spectral transformer with pyramid attention in consumer IoT. IEEE 
+Transactions on Consumer Electronics. 
+[18] Rafique, R., Gantassi, R., Amin, R., Frnda, J., Mustapha, A. and Alshehri, A.H., 2023. 
+Deep fake detection and classification using error-level analysis and deep learning. Scientific 
+reports, 13(1), p.7422. 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 34 ---
+
+ARTICLE IN PRESS
+[19] Kavthekar, S., Vaidya, S., Pujari, V. and Mane, S., 2023, August. Mim-vit: Deepfake 
+detection using masked image modelling and vision transformer. In International conference 
+on soft computing for problem-solving (pp. 1-14). Singapore: Springer Nature Singapore. 
+[20] MuhsnHasan, M. and Chennupati, N., Privacy Preserving in Disease Diagnosis using 
+Federated Personalization with Transfer Learning. 
+[21] Radmer, J., Zooplankton ClassificationonUnbalanced Data using an AdaptedResNet-50 
+modelwith Transfer Learning. Available at SSRN 5473254. 
+[22] Rieck, C., Mai, C., Eisentraut, L. and Buettner, R., 2025. A Novel Transformer–CNN 
+Hybrid Deep Learning Architecture for Robust Broad-Coverage Diagnosis of Eye Diseases 
+on Color Fundus Images. IEEE Access. 
+[23] Marasović, T. and Papić, V., 2025. Few-Shot Breast Cancer Diagnosis Using a Siamese 
+Neural Network Framework and Triplet-Based Loss. Algorithms, 18(9), p.567. 
+[24] Salinas-Camus, M., Galanopoulos, G., Amaral, L., Jull, E.I.L. and Eleftheroglou, N., 
+2025. Robust prognostics of impacted composite structures using an adaptive hidden semi-
+Markov model. Structural Health Monitoring, p.14759217251368254. 
+[25] Sheikhshoaei, A.H., Khoshsima, A. and Zabihzadeh, D., 2025. Predicting the heat 
+capacity of strontium-praseodymium oxysilicate SrPr4 (SiO4) 3O using machine learning, 
+deep learning, and hybrid models. Chemical Thermodynamics and Thermal Analysis, 17, 
+p.100154. 
+[26] https://www.kaggle.com/datasets/reubensuju/celeb-df-v2 
+[27] J. Mallet, L. Pryor, R. Dave, and M. Vanamala, ‘‘Deepfake detection analyzing hybrid 
+dataset utilizing CNN and SVM,’’ in Proc. 7th Int. Conf. Intell. Syst., Apr. 2023, pp. 7–11. 
+[28] S. Pawar, S. Vetal, S. Sharma, A. Pagare, and C. Patil, ‘‘Generation and detection of 
+artificial facial images,’’ in Proc. 8th Int. Conf. Comput., Commun., Control Autom. 
+(ICCUBEA), Aug. 2024, pp. 1–6. 
+[29] Shreyan Ganguly, Aditya Ganguly, Sk Mohiuddin, Samir Malakar, Ram Sarkar, ViXNet: 
+vision transformer with xception network for deepfakes based video and image forgery 
+detection, Expert Syst. Appl. 210 (2022) 118423. 
+[30] Davide Alessandro Coccomini, Nicola Messina, Claudio Gennaro, Fabrizio Falchi, 
+Combining EfficientNet and vision transformers for video deepfake detection, in: 
+International Conference on Image Analysis and Processing, Springer, 2022, pp. 219–229. 
+[31] Sk Mohiuddin, Shreyan Ganguly, Samir Malakar, Dmitrii Kaplun, Ram Sarkar, A feature 
+fusion based deep learning model for deepfake video detection, in: International Conference 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS
+
+
+--- PAGE 35 ---
+
+ARTICLE IN PRESS
+on Mathematics and Its Applications in New Computer Systems, Springer, 2022, pp. 197–
+206. 
+[32] Wodajo Deressa, Solomon Atnafu, Deepfake video detection using convolutional vision 
+transformer, arXiv preprint arXiv :2102 .11126, 2021. 
+[33] Naskar, G., Mohiuddin, S., Malakar, S., Cuevas, E. and Sarkar, R., 2024. Deepfake 
+detection using deep feature stacking and meta-learning. Heliyon, 10(4). 
+ACCEPTED MANUSCRIPT
+ARTICLE IN PRESS

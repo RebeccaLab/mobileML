@@ -1,0 +1,1023 @@
+
+
+--- PAGE 1 ---
+
+ 
+Deep Fake Face Detection using Efficient 
+Convolutional Neural Networks 
+ 
+1st Dr. M. Umadevi 
+Department of Computer Science & 
+Engineering 
+Vignan's Foundation For Science, 
+Technology and Research (Deemed to 
+be University) 
+Guntur, India 
+umamaramreddy@gmail.com 
+ 
+ 
+2nd Mr. S. Barghav Krishna 
+Department of Computer Science 
+& Engineering 
+Vignan's Foundation For Science, 
+Technology and Research 
+(Deemed to 
+be University) 
+Guntur, India 
+barghavsanka@gmail.com 
+3rd Mr. N. Sai Kumar 
+Department of Computer Science & 
+Engineering 
+Vignan's Foundation For Science, 
+Technology and Research (Deemed to 
+be University) 
+Guntur, India 
+saisri3634@gmail.com
+AbstractDeep fake content, especially in images and 
+videos, is spreading at an unprecedented rate.  Fake content 
+are generated with the help of advanced deep learning (DL) 
+algorithms such as GANs, autoencoders, and variation 
+autoencoders. This fake content spreads misinformation, 
+causing a severe impact on society by degrading the 
+trustworthiness of content on social media. Mitigating the risk 
+of these techniques can be done by utilizing the power of one of 
+the DL models, which is CNN. This research study focuses on 
+analysing various Deep-Fake (DF) identification techniques 
+that are trained on various datasets with a small number of 
+samples. The proposed work demonstrates an efficient CNN 
+model and three other CNN pre-trained models through 
+transfer learning on a large dataset available on Kaggle, 
+consisting of 140k images of faces. The proposed CNN model 
+achieved a high accuracy of 96%, while DenseNet121 reached 
+97%. Both EfficientNetB0 and MobileNet demonstrated even 
+higher performance, each achieving an accuracy of 98% 
+within 15 epochs. 
+ 
+Keywords—Deep-Fakes (DF), Deep Learning (DL), CNN: 
+Convolutional 
+Neural 
+Networks, 
+GAN: 
+Generative 
+Adversarial Neural Network, Autoencoders. 
+I. INTRODUCTION
+Nowadays, technology is available to everyone, and 
+people are being exposed to the latest advancements. 
+Recent times have witnessed a drastic technological 
+advancement in artificial intelligence making machines to 
+think and act according to the instructions given to them. 
+The development of Deep Fakes (DFs) employ deep 
+learning algorithms to produce realistic illustration but 
+artificial media without the knowledge of the people 
+portrayed, has been done by using AI based image and 
+video editing tools. These algorithms can replicate human 
+behavior and speech by utilizing open-source deep learning 
+frameworks and the wealth of online material. This presents 
+a huge challenge in the fight against the spread of fake 
+content. 
+ 
+Deep Fake (DF) technology has both positive and 
+negative aspects. On the positive side, it can generate 
+morphed content for the entertainment industry, such as de-
+aging actors or bringing deceased ones back, as well as for 
+voice acting, dubbing, and creating realistic training content 
+for doctors. It can help teach computers to spot fake content, 
+recreate historical events, and enhance old audio and video 
+recordings. However, the misuse of DF technology poses 
+significant risks, such as spreading misinformation through 
+fake videos of public figures, impacting elections and 
+public trust, enabling phishing attacks, and creating non-
+consensual adult content. Detecting and stopping fake 
+content remains challenging, necessitating better methods to 
+distinguish real from fake and educating people on 
+recognizing the differences. This work focuses on DFs, 
+which use DL, a type of artificial intelligence that employs 
+multi-layer artificial neural networks to imitate the 
+functioning of the human brain. DL algorithms extract 
+complex information from data by processing it gradually. 
+To be able to recognize complex patterns, these models 
+must be trained on large datasets. DL helps AI understand 
+complex facial emotions, mouth movements, and voice 
+patterns in source footage and high-resolution photos, 
+which helps AI create convincing DFs. These algorithms 
+mimic the target person's speech patterns, realistic emotions, 
+and facial features with great accuracy.  
+ 
+Some DL techniques to generate DFs are described 
+below. 
+ 
+Generative Adversarial Networks (GANs) generate 
+artificial images or videos using a two-player game 
+approach: the generator creates realistic synthetic data, 
+while the discriminator evaluates its authenticity. The 
+generator iteratively improves based on the discriminator's 
+feedback until the synthetic data is indistinguishable from 
+real data. In DeepFakes, this technique manipulates media 
+to convincingly alter faces or voices.[13] [10] [8]. 
+Variational Autoencoders (VAEs) and Autoencoders are 
+both types of DL neural networks used for compressing and 
+reconstructing data. VAEs focus on capturing the essence of 
+the original data in a smaller space, while in DFs, VAEs can 
+be employed to encode both the original and target faces, 
+allowing for subtle changes. Autoencoders, on the other 
+hand, learn from large data to make realistic faces or voices, 
+even when there are limited samples, and are also used to 
+enhance image compression by generating compact 
+versions of images [12]. Both are crucial for creating 
+effective DFs. 
+Additionaly Facial Recognition Algorithms are used to 
+identify and track people's faces in images or videos. This 
+helps in selecting the target face for manipulation in DFs [7]. 
+344
+2024 5th International Conference on Image Processing and Capsule Networks (ICIPCN)
+979-8-3503-6717-1/24/$31.00 ©2024 IEEE
+DOI 10.1109/ICIPCN63822.2024.00063
+2024 5th International Conference on Image Processing and Capsule Networks (ICIPCN) | 979-8-3503-6717-1/24/$31.00 ©2024 IEEE | DOI: 10.1109/ICIPCN63822.2024.00063
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:31:47 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 2 ---
+
+On the detection side, successfully distinguishing 
+between real and fake media by extracting and analyzing 
+critical elements like facial expressions, speech patterns, 
+and spatial-temporal signals, DL is an essential tool in the 
+fight against the spread of DF content. Large datasets, 
+including both actual and fake information from multiple 
+sources such as public repositories and social media 
+platforms, are needed to efficiently train DL models. To 
+reduce prediction errors and increase detection accuracy, 
+these models are carefully trained via supervised learning.  
+A variety of DL techniques can be used in DF 
+detection, 
+including 
+convolutional 
+neural 
+networks 
+(CNNs), 
+recurrent 
+neural 
+networks 
+(RNNs), 
+and 
+generative adversarial networks (GANs). CNNs are 
+efficient in image-based DF detection, while RNNs are 
+effective for analyzing temporal sequences in videos [10] 
+[15]. Additionally, GANs, traditionally used for DF 
+creation, can also be used for detection by learning to 
+discriminate between real and manipulated media. 
+The main objective of this study is to develop an automated 
+system for detecting and classifying deep fake faces using 
+CNN. Specifically, this study aims to: 
+1. To implement efficient CNN models to accurately 
+distinguish real vs. fake images with high computational 
+efficiency. Use a large dataset of 140,000, with 70k being 
+manipulated images and 70k being real images, to improve 
+model generalization and robustness, as more data helps the 
+model learn better.  
+2.  To achieve effective training with fewer epochs, 
+employing 
+efficient 
+CNN 
+models 
+to 
+minimize 
+computational resources and accelerate the training process. 
+This research study was organized in six sections 1. 
+Introduction, 2. Literature Review, 3. Proposed System, 4. 
+Results and Analysis, 5. Conclusion, 6. References. 
+II. LITERATURE REVIEW 
+Detecting DF is not a new paradigm; several research 
+studies have been conducted on DF detection in both 
+images and videos. Many works have been published on 
+this topic. Mostly, the data used to train these models were 
+generated by GANs because these networks have the ability 
+to automate the generation of DF images, which are 
+difficult for human eyes to detect. However, there are 
+several other techniques present to detect the images 
+generated by GANs. One such technique is using CNN for 
+classifying whether an image is real or fake, as CNNs are 
+meant to classify images. Many authors have employed 
+CNN architecture to automatically learn hierarchical 
+representations of features from raw image pixels. 
+Several research studies have focused on detecting DF 
+face images using CNN models as a means to detect fake 
+images. One such paper is [1], the authors aim to utilize the 
+effectiveness of CNN models to detect fake images. The 
+aims to achieve higher accuracy in classifying fake images, 
+mainly by reducing the cost and effort of detection. The 
+dataset of 9000 images undergoes data augmentation, and 
+fed into their custom CNN model, which is a 13-layer 
+architecture, alongside some pre-trained models are used. 
+The ResNet50 model performed the best with 99.18% 
+accuracy. Their custom CNN model achieved 95.21% 
+accuracy. Other models like MobileNet and InceptionV3 
+also showed over 98% accuracy.  
+In [2], the authors used the “real-and-fake-face-
+detection-dataset” from Kaggle, pre-processed with data 
+augmentation. They employed a custom CNN model with 4 
+Conv2D, 4 Maxpooling, and ReLU activation layers, 
+achieving 98.46% training and 99.44% testing accuracy 
+after 150 epochs. To address limitations in [2] regarding 
+video detection, the authors proposed [3], where they used 
+the same CNN model and tested on videos instead of 
+images. They applied the Haar Cascade method to extract 
+facial regions from video frames, and if any frame was 
+predicted as fake, the entire video was classified as fake. 
+Their method correctly identified 91 out of 100 videos from 
+the DF Detection Challenge dataset.  
+The custom CNN model in [4] consists of 5 
+convolutional blocks. This paper uses Flickr’s 140k dataset 
+which is present in Kaggle is used to train and validate the 
+model. Data augmentation was applied on the dataset. The 
+dataset consists of color images with 3 channels which were 
+converted to grayscale with just 1 channel to simplify the 
+training process, the proposed CNN model achieved an 
+accuracy of 91.82%, F1 score of 91% and a precision is 
+81% in detecting deep fake faces.  
+The paper [5] the authors have utilized the potential of 
+pre-trained models to detect fake images to that of real 
+once, firstly they have applied Error Level Analysis to the 
+images in their dataset which is a technique that is used to 
+identify whether an image has been modified or not based 
+on the JPEG compression levels. The ELA images were 
+sent to those pre-trained models for training, the extracted 
+features were then classified using SVM and KNN with 
+hyperparameter optimization. The highest accuracy of 
+89.5% was achieved using the ResNet18 architecture and 
+the KNN classifier with optimized hyper parameters. 
+GoogLeNet achieved an accuracy of 81% with KNN, while 
+SqueezeNet obtained 69.4% accuracy with SVM.  
+The custom CNN model in [6] is trained detect the DF 
+videos. The authors have created a dataset from videos 
+these images were then pre-processed by using data 
+augmentation, then sent to their custom model for training, 
+various optimization functions and loss functions were used 
+for training, then the model was run on testing and 
+validation data. To improve accuracy, additional parameter 
+and hyperparameter tuning was done. Finally, the model 
+was run on a sample video, and classes were identified in 
+each frame of the video. 
+The authors of study [7] used a layered approach, first 
+identifying the person's face in the picture using already-
+existing facial recognition networks. After that, CNN is 
+used to extract face features, which are subsequently fed to 
+LSTM model to examine facial modifications and temporal 
+sequences between frames. The last stage is a Recycle-
+GAN, which combines spatial and temporal data using 
+345
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:31:47 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 3 ---
+
+GANs. The study utilizes the FaceForensics++ dataset. For 
+this dataset, the results achieve a good detection accuracy of 
+above 99%. The authors recognize the difficulty of pre-
+processing image data to highlight relevant features and the 
+benefits of removing high-frequency components and 
+unnecessary noise using methods like Gaussian Blur and 
+Gaussian Noise.
+XceptionNet which is a specialized CNN model 
+designed to detect fake images [8], inspired by Inception 
+modules and introduces by Google researchers. It utilizes a 
+unique architecture with 36 convolutional layers grouped 
+into 14 modules. They have used depth wise separable 
+convolution layers. This change and the Inception design 
+offer superior feature extraction with lower computational 
+costs. They have used Flicker’s dataset, these images are 
+preprocessed by resizing and converting to the YCbCr color 
+system, which provides better accuracy for detecting fake 
+images. During feature extraction, a modified version called 
+MTXception Net is used, incorporating SeparableConv2D 
+and MaxPooling2D layers for enhanced accuracy and 
+reduced parameters. 
+The technique for detecting fake faces was studied by 
+the authors in the paper [9] uses the VGG19 CNN model, 
+this model is enhanced with two attention mechanisms, one 
+the Layer-Integrated Channel Attention and Scaled Spatial 
+Attention. LICA focuses on understanding the importance 
+of data across channels, while SSA helps decide where to 
+focus within an image. These mechanisms are integrated 
+into the VGG19 network after the last convolutional layer. 
+This refined output helps the model better detect 
+manipulated faces. The trained model is tested on the DFFD 
+dataset. Faces are pre-processed using FaceNet's MTCNN. 
+In paper [10] provides an overview of deep fake face 
+detection techniques, including methods like GANs for 
+creating fake images. Image detection methods, such as 
+those use deep CNNs and pre-processing techniques like 
+Gaussian blur to improve detection accuracy. Detecting 
+fake 
+videos, 
+involves 
+analysing 
+spatiotemporal 
+characteristics. Challenges include improving approaches to 
+recognize increasingly realistic deep fakes and determining 
+optimal detection architectures. Commonly used datasets 
+like DFFD, VGGFace2, and FFHQ provide diverse training 
+examples. Evaluation metrics like accuracy and precision 
+are vital for assessing detection model performance. 
+In their research [11], the authors used three advanced 
+methods to address fake audio and video. Method 1: 
+MesoNet, a specially created deepfake image and video 
+detection system that was inspired by InceptionNet, uses 
+Meso-4 and a modified Inception module to analyze image 
+attributes and identify face manipulation. It gains 
+knowledge from DF datasets by highlighting key areas of 
+images 
+for 
+classification. 
+Method 
+2: 
+To 
+identify 
+discrepancies, SyncNet, a lip-sync system, integrates audio 
+(MFCC values) and mouth images. To identify DFs, its 
+ConvNet architecture calculates the separation between the 
+audio and video outputs.
+Method-3: By extending 
+EfficientNet, the Video Face Manipulation Detection using 
+Ensemble of CNNs technique improves face manipulation 
+detection. It makes use of triplet Siamese training to 
+increase accuracy and an attention mechanism to help it 
+comprehend important aspects.   
+  
+The paper [12] provides an overview of the current 
+position of research in DFs, which are fake audio, video, or 
+image content which were created through deep learning 
+techniques to make it look as it is real. The study reviews 
+machine learning (ML) and DL models like SVMs, CNNs, 
+and LSTMs, with CNNs achieving up to 95.75% accuracy 
+on datasets like Celeb-DF and DFDC. The paper also 
+explores public datasets such as FaceForensics++, Celeb-
+DF, and DFDC used for training DF detection models, 
+along with metrics like SSIM and FID to assess DF quality. 
+ 
+The study [14] provides an overview of the DF 
+detection problem and the classification of DF detection 
+methods into statistical models, machine learning (ML), and 
+deep learning (DL). The authors have compared the 
+performance of four models, namely MobileNetV2, 
+InceptionV3, VGG16 and XceptionNet in DF detection. 
+The authors trained these models on FaceForensics++ 
+dataset which contains images related to DFs, Face2Face, 
+FaceSwap, Neural Textures. The models were trained 
+separately and evaluated based on training accuracy, 
+average loss, testing accuracy, precision, recall, and F1-
+score. 
+The researchers in [15] have evaluated several state-of-
+the-art CNN models to detect DF videos. The study 
+compared four CNN models, the authors have implemented 
+a custom dataset from FaceForensics++. Each model was 
+enhanced with the LSTM layer to capture sequential 
+information. EfficientNetB7 has attained the top accuracy 
+of 75%, then ConvNeXt Large with 67.17%, the ResNet-
+152 and MobileNetV3 have achieved slightly low 
+accuracies of 61% and 61.33%, respectively. However, all 
+models were overfitted, which indicate the need for 
+improved generalization. The paper also shows the need to 
+address issues like overfitting and improve model efficiency 
+through better training data and advanced methods. 
+Despite 
+significant 
+advancements 
+in 
+deep 
+fake 
+detection, several research gaps persist in the existing 
+literature. Most studies have either focused on custom CNN 
+models or individual pre-trained models without a 
+comprehensive comparison, limiting the understanding of 
+their relative strengths and weaknesses. High accuracy in 
+many models has often come at the cost of increased 
+computational complexity, making them less practical for 
+real-time applications. Additionally, some studies have not 
+leveraged data augmentation effectively, resulting in 
+models that lack robustness and generalization. The use of 
+varied custom datasets and pre-processing methods has also 
+impacted the reproducibility of results, creating challenges 
+in standardizing evaluations. Overfitting remains a critical 
+issue, with many models showing poor generalization 
+across different datasets. Furthermore, there is a lack of 
+direct comparison with multiple state-of-the-art methods in 
+a unified framework, which is essential for a comprehensive 
+evaluation. 
+346
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:31:47 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 4 ---
+
+III. PROPOSED METHODOLOGY 
+The paper focuses on developing a DF detection system 
+to fight against the wide-spread of manipulated media 
+content. The study uses several models and techniques to 
+tackle the increasing worries about whether digital content 
+is real and trustworthy. Beginning with data preprocessing, 
+the proposed system applies data augmentation techniques 
+to enhance diversity and robustness. The model definition 
+stage plays a crucial role, with a focus on designing a DL 
+architecture optimized for effective feature extraction and 
+classification, the model is designed to detect minor 
+irregularities that suggest the content has been artificially 
+changed or modified.  
+The first step in the proposed system involves the 
+acquisition of data from the “DF” dataset, which contains 
+Real and Fake images. The dataset (‘deepfake-and-real-
+images’) under consideration consists of a total of 70k x 2 
+images for training, 19.6k x 2 images for Validation. The 
+images are 256x256 JPG files and are intended to be used 
+in the DF Detection Challenge on Kaggle. These images 
+are structured into two directories, Fake and Real images. The 
+dataset is designed for the purpose of DF detection. 
+ 
+The pre-processing pipeline shown in Figure 1 serves as 
+a crucial preparatory stage in deep-fake detection, laying 
+the groundwork for accurate and reliable model predictions. 
+Firstly, the dataset is split into training, and validation sets, 
+enabling efficient model training, performance monitoring, 
+and unbiased evaluation of the model's generalization 
+capabilities.  
+ 
+A. Data Pre-processing 
+ 
+Fig 1: Pre-processing pipeline 
+Then Data augmentation techniques are employed on 
+training set to enrich the dataset by generating diverse 
+variations of the original images, enhancing the model's 
+efficiency 
+and 
+generalization 
+ability. 
+After 
+that, 
+Normalization and standardization techniques are applied to 
+ensure consistency in the input data distribution, mitigating 
+numerical instabilities and expediting model convergence 
+during training. 
+i. Strategic Dataset Splitting 
+The dataset is split into training and validation subsets. 
+Training data teaches the model by revealing patterns, while 
+validation data tests its performance on new data. 
+ 
+ 
+ii. Data Augmentation for Enhanced Diversity 
+The training set undergoes augmentation, diversifying it 
+through techniques like rotations and flips as shown in 
+Figure 2. This process enriches the dataset, helping the 
+model in capturing the complexities of DF manipulation 
+and preventing overfitting. 
+ 
+Fig 2: Data Augmentation 
+iii. Normalization and Scaling for Consistent Input 
+Prior to model training, images undergo pixel value 
+scaling and normalization, ensuring even distribution and 
+minimizing biases. This process reduces pixel values to the 
+[0, 1] interval for numerical stability, leading to improved 
+model 
+performance 
+and faster 
+convergence 
+during 
+optimization. 
+ 
+Fig 3: Proposed System Architecture 
+ 
+After preparing the data for training, the architecture 
+shown in Figure 3 includes a proposed custom CNN model, 
+as well as pre-trained models like MobileNet, DenseNet121, 
+and EfficientNetB0, which are employed to learn and 
+extract features from the images. The outputs from these 
+models are used to detect whether a face is real or fake, 
+facilitating robust deep-fake detection by combining the 
+strengths of different CNN architectures. 
+ 
+B. Proposed CNN Model - 1  
+The model is a deep CNN designed for image 
+classification tasks. It includes many advanced techniques 
+such as depthwise separable convolutions, residual 
+connections, batch normalization, and global average 
+pooling. These components work together to efficiently 
+learn and extract features from input images, the proposed 
+CNN models architecture is shown in Figure 4. 
+ 
+ 
+ 
+347
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:31:47 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 5 ---
+
+i. Entry Block 
+The model starts with an entry block, which serves as 
+the initial processing stage for the input image. In this block 
+The input image, represented as “(180, 180, 3)” for RGB 
+channels, is convolved with 128 filters of size 3x3 with a 
+stride of 2. This initial convolution reduces the spatial 
+dimensions of the image. The output of the Conv2D layer is 
+then normalized using batch normalization. This step helps 
+in stabilizing and accelerating the training process by 
+normalizing the activations. Then a Rectified Linear Unit 
+(ReLU) activation function is applied. ReLU introduces 
+non-linearity to the network, allowing it to learn complex 
+patterns in the data. 
+ 
+
+Fig 4: Proposed CNN Model Architecture  
+ 
+ii. Multiple Blocks 
+The model consists of multiple blocks, used for feature 
+extraction and representation. These blocks are repeated for 
+sizes `[256, 512, 728]` , allowing it to learn features at 
+different scales and complexities. These values represent 
+the number of filters used in each depthwise separable 
+convolutional layer within each block. Different sizes allow 
+the model to learn features at different scales and 
+complexities. This technique is often used in deep neural 
+networks architecture to improve the model's ability to 
+capture and represent various levels of information in the 
+input data. 
+ 
+Components of Each Block 
+1. Activation (ReLU) 
+After each block's input, another ReLU (Rectified 
+Linear Unit) activation is applied. It is a non-linear 
+activation function that introduces non-linearity to the 
+network. It helps in learning complex patterns and 
+features in the data, allowing the network to model more 
+complicated relationships. 
+ 
+2. Depthwise Separable Convolution 
+Two depthwise separable convolutional layers are 
+stacked together in each block. These layers are designed 
+to be computationally efficient, reducing the number of 
+parameters and allow the model to learn spatial and 
+cross-channel features effectively, it consists of the two 
+layers 2.1 and 2.2. 
+   
+2.1. Depthwise Convolution 
+The first part of the layer is a depthwise convolution, 
+where each input channel is convolved separately with its 
+own kernel. This operation applies a 3x3 convolution to 
+each channel of the input independently. The goal is to 
+learn spatial features within each channel. 
+ 
+2.2. Pointwise Convolution 
+The second part of the layer is a pointwise 
+convolution, which combines the output of the depthwise 
+convolution. It uses 1x1 convolutions to mix information 
+from different channels. This step helps in increasing the 
+model's capacity to learn complex patterns and 
+relationships across channels. 
+ 
+1. Batch Normalization (BN) 
+Batch normalization is applied after every depthwise 
+separable convolutional layer. It is used to normalize the 
+output of the previous layer across the batch dimension. 
+It helps in stabilizing and accelerating the training 
+process. By normalizing the activations, it makes sure 
+that the model can train faster and do not overfit. The 
+first BN layer occurs after the first depthwise separable 
+convolution and the second one after the second 
+depthwise separable convolution. 
+ 
+2. MaxPooling2D 
+After the two depthwise separable convolutions and 
+BN, MaxPooling2D layer is applied. It downsamples the 
+feature maps by taking the maximum value from a 3x3 
+window and moving with a stride of 2. It helps in finding 
+the most important features and reducing the spatial 
+resolution. 
+ 
+Each block in the model contains two depthwise 
+separable convolutional layers then batch normalization and 
+ReLU activation, all of these are important for feature 
+extraction. 
+ 
+Residual Connections 
+In each block, a residual connection is introduced to 
+help in training the network more effectively. It adds the 
+output of the current block to a Conv2D layer's output from 
+the previous block. This helps in reusing the important 
+information again without being vanished, so helps stopping 
+the vanishing gradient problem. The residual connection is 
+created after the MaxPooling2D layer. 
+ 
+Within each iteration, the "current block" consists of 
+two Depthwise Separable Convolutional layers, BN after 
+each layer, ReLU activation after each BN, and finally the 
+MaxPooling2D layer. The output from this "current block" 
+is then combined with the residual connection from the 
+Conv2D layer of the previous block to form the output for 
+that iteration. This structure helps in learning residual 
+functions, which can be beneficial for training deep neural 
+networks. 
+ 
+iii. Final Layers 
+Towards the end of the model, after repeated blocks, the 
+following layers are applied. A final depthwise separable 
+convolutional layer with 1024 filters and a 3x3 kernel is 
+applied. This layer further refines the learned features. BN 
+is applied again, followed by ReLU activation.Then Global 
+Average Pooling layer averages the feature maps across 
+spatial dimensions, reducing each feature map to a single 
+value. It helps in capturing the most important information 
+from the feature maps. To prevent overfitting, a dropout 
+layer with a dropout rate of 0.25 is included. Dropout helps 
+in generalization. The final layer is a dense layer that 
+produces the model's output. The model is used for binary 
+classification; it has one unit with no activation. In our case, 
+348
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:31:47 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 6 ---
+
+it is binary classification because the model needs to 
+distinguish between real and fake images. 
+C. Using Pre-Trained models for Binary Classification (DF 
+Detection) 
+Pre-trained models were designed for multi-class 
+classification, these models can also be adapted for binary 
+classification tasks 
+This study utilizes pre-trained models which have been 
+trained on a massive dataset like ImageNet. These model 
+have already learned valuable feature representations. 
+ 
+i. Mobilenet (CNN Model - 2) 
+MobileNet, a lightweight CNN architecture designed by 
+Google, is ideal for embedded and mobile vision 
+applications due to its efficient use of depthwise separable 
+convolutions, which significantly reduce computational 
+complexity 
+and 
+the 
+number 
+of 
+parameters 
+while 
+maintaining accuracy. This makes MobileNet perfect for 
+resource-constrained contexts and a popular choice for real-
+time applications such as DF detection. Its scalable 
+architecture effectively extracts features at various scales, 
+making it versatile for tasks like object identification, 
+semantic segmentation, and image classification. 
+ii. EfficientNetB0 (CNN Model - 3) 
+EfficientNetB0, developed by Google researchers, 
+balances 
+complexity 
+and 
+efficiency 
+for 
+superior 
+performance by dynamically adjusting depth, width, and 
+resolution through compound scaling. Integrating squeeze-
+and-excitation modules and convolutional layers with skip 
+connections, it maximizes representational capacity and 
+facilitates feature reuse. With low computational demands, 
+EfficientNetB0 achieves high accuracy, making it ideal for 
+image classification and other computer vision tasks in 
+resource-constrained environments. Its scalability and 
+efficiency make it a popular choice for real-time 
+applications such as DF detection. 
+iii. DenseNet121 (CNN Model - 4) 
+DenseNet121, developed by Facebook AI Research 
+(FAIR), features a dense connectivity structure where each 
+layer passes data to all subsequent layers within its block, 
+promoting feature reuse and mitigating the vanishing 
+gradient problem. Comprising dense blocks and transition 
+layers, it manages parameter growth and maintains spatial 
+dimensions of feature maps, achieving cutting-edge 
+performance in image classification without excessive 
+complexity. DenseNet121's efficient use of parameters and 
+ability to learn deep features with fewer parameters make it 
+computationally 
+efficient 
+and 
+versatile 
+for 
+various 
+applications, including impressive performance in DF 
+detection.  
+ 
+This paper has used three pre-trained models for DF 
+detection, unfreezed all the layers of these pre-trained 
+models while training which helps the network, unfreezing 
+all the layers of a pre-trained CNN model is useful because 
+of the large dataset, such as 140k images, it allows the 
+model to learn from the specific and important features and 
+patterns in the dataset, added a Global Average Pooling 
+layer, this layer compresses the information within a feature 
+map by averaging its values across spatial dimensions 
+(width and height), and a Dense layer for the classification 
+of images in the dataset. 
+IV. RESULTS AND ANALYSIS 
+This research study presents a comparative performance 
+analysis of four CNN models shown in Table 1. The 
+experimentation results show better performance in terms of 
+accuracy metric of different CNN models assessed on a 
+classification job. Out of all the models evaluated, 
+MobileNet showed a comparatively low loss of 0.0393 and 
+an accuracy of 98.45%. With a little more loss of 0.0437, 
+but an accuracy of 98.50%, EfficientNetB0 trailed closely 
+behind.DenseNet121 had a loss of 0.0725 and a slightly 
+lower accuracy of 97.18%. Finally, the accuracy of the 
+proposed CNN model was 96.67% with a 0.0681 loss, 
+despite its somewhat lower accuracy when compared to 
+other models.The proposed model has been implemented 
+using some advanced techniques unlike traditional CNNs 
+such as depthwise separable convolutional layer and 
+residual connections hepls the model to better learn how to 
+distinguish real images from that of fake images. 
+ 
+TABLE 1: EVALUATION METRICS 
+ 
+Table 2 contains accuracy graphs depict the training and 
+validation accuracy over 15 epochs for each model. The 
+Proposed CNN Model exhibits a steady increase in both 
+training and validation accuracy, stabilizing around an 
+accuracy of 0.98. MobileNet shows a rapid rise in accuracy 
+during the initial epochs, reaching around 0.98 for 
+validation accuracy, with some fluctuations observed 
+throughout the epochs. EfficientNetB0 shows good 
+performance with training and validation accuracies close to 
+0.99, 
+indicating 
+a 
+strong 
+learning 
+capability 
+and 
+generalization. DenseNet121, while demonstrating high 
+initial training accuracy, experiences notable fluctuations in 
+validation accuracy, particularly a significant drop around 
+epoch 6, which indicates some instability during training. 
+ 
+The loss graphs provide insight into the convergence 
+behavior of the models by plotting training and validation 
+loss over the same epochs. The Proposed CNN Model and 
+MobileNet both show a consistent decrease in loss, with 
+validation loss stabilizing at a low level, suggesting 
+effective learning. EfficientNetB0 maintains the lowest loss 
+Models 
+Accuracy 
+Loss 
+Precision 
+F1-
+Score 
+Recall 
+MobileNet 
+0.9845 
+0.0393 
+0.9832 
+0.9865 
+0.9898 
+EfficientNetB0 
+0.9850 
+0.0437 
+0.9822 
+0.9822 
+0.9725 
+DenseNet 
+121 
+0.9718 
+0.0725 
+0.9815 
+0.9715 
+0.9616 
+Proposed CNN 
+Model 
+0.9667 
+0.0681 
+0.9735 
+0.9723 
+0.9613 
+349
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:31:47 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 7 ---
+
+values throughout the epochs, with both training and 
+validation loss exhibiting minimal fluctuations, signifying 
+robust performance. In contrast, DenseNet121 shows erratic 
+behavior with substantial spikes in validation loss, 
+particularly around epoch 6, which correlates with the 
+observed drop in validation accuracy, indicating potential 
+overfitting or training instability issues. 
+ 
+Overall, EfficientNetB0 outperforms the other models 
+in terms of both accuracy and stability, while the Proposed 
+CNN Model and MobileNet also demonstrate strong 
+performance with slight fluctuations. DenseNet121, despite 
+high initial accuracy, requires further investigation to 
+address its instability and improve generalization. 
+ 
+True color images (RGB) of size [180,180,3] is given as 
+input for the proposed model, it predicts the image as real or 
+fake. 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 8: Predicting Fake image as Fake 
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 9: Predicting Real image as Real 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+. 
+350
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:31:47 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 8 ---
+
+ 
+ 
+ 
+TABLE 2: ACCURACY AND LOSS GRAPHS 
+ 
+Model 
+Accuracy Graph
+Loss Graph
+Proposed CNN 
+Model 
+
+
+MobileNet 
+EfficientNetB0 
+
+DenseNet121 
+
+ 
+ 
+ 
+V. CONCLUSION 
+The Deep Fake detection system implemented in this 
+paper has shown better performance in distinguishing real 
+images from fake ones. This research study has considered 
+four CNN models of which one is the proposed CNN model 
+and rest are pre-trained models, trained on dataset 
+containing images. This research study has utilized the 
+power of pre-trained models by unfreezing all of its layers, 
+which helps the proposed model to learn specific features in 
+the considered dataset. The proposed model has achieved a 
+good accuracy when trained on large dataset in less number 
+of epochs. 
+ 
+REFERENCES 
+ 
+[1]     Salman, Fatima Maher, and Samy S. Abu-Naser. "Classification of 
+real and fake human faces using deep learning." (2022). 
+ 
+[2]      Jellali, Ameni, Ines Ben Fredj, and Kais Ouni. "Data Augmentation 
+for 
+Convolutional 
+Neural 
+Network 
+DeepFake 
+Image 
+Detection." 2023 IEEE International Conference on Advanced 
+Systems and Emergent Technologies (IC_ASET). IEEE, 2023. 
+ 
+[3]     Jellali, Ameni, Ines Ben Fredj, and Kaïs Ouni. "An Approach of 
+Fake Videos Detection Based on Haar Cascades and Convolutional 
+Neural Network." 2023 IEEE International Conference on Advanced 
+Systems and Emergent Technologies (IC_ASET). IEEE, 2023. 
+ 
+351
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:31:47 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 9 ---
+
+[4]     Richards, Mj Alben, et al. "Deep Fake Face Detection using 
+Convolutional 
+Neural 
+Networks." 2023 
+12th 
+International 
+Conference on Advanced Computing (ICoAC). IEEE, 2023. 
+ 
+[5]     Rafique, Rimsha, et al. "Deep fake detection and classification using 
+error-level analysis and deep learning." Scientific Reports 13.1 
+(2023): 7422. 
+ 
+[6]     Badale, Anuj, et al. "Deep fake detection using neural 
+networks." 15th IEEE international conference on advanced video 
+and signal based surveillance (AVSS). 2018. 
+ 
+[7]     Jolly, Vedant, et al. "CNN based deep learning model for deepfake 
+detection." 2022 2nd Asian conference on innovation in technology 
+(ASIANCON). IEEE, 2022. 
+ 
+[8]     Sahib, Ihsan, and Tawfiq Abd Alkhaliq AlAsady. "Deep fake Image 
+Detection based on Modified minimized Xception Net and 
+DenseNet." 2022 5th International Conference on Engineering 
+Technology and its Applications (IICETA). IEEE, 2022. 
+ 
+[9]     Sadhya, Supriyo, and Xiaojun Qi. "Complementary Attention-Based 
+Deep Learning Detection of Fake Faces." 2023 IEEE International 
+Conference on Big Data (BigData). IEEE, 2023. 
+ 
+[10]   Mary, Amala, and Anitha Edison. "Deep fake Detection using deep 
+learning techniques: a literature review." 2023 International 
+Conference on Control, Communication and Computing (ICCC). 
+IEEE, 2023. 
+ 
+[11]   Salman, Sonia, and Jawwad Ahmed Shamsi. "Comparison of 
+Deepfakes 
+Detection 
+Techniques." 2023 
+3rd 
+International 
+Conference on Artificial Intelligence (ICAI). IEEE, 2023. 
+ 
+[12]   Garg, Diya, and Rupali Gill. "Deepfake Generation and Detection-
+An Exploratory Study." 2023 10th IEEE Uttar Pradesh Section 
+International Conference on Electrical, Electronics and Computer 
+Engineering (UPCON). Vol. 10. IEEE, 2023. 
+ 
+[13]   Nirkin, Yuval, et al. "Deepfake detection based on discrepancies 
+between faces and their context." IEEE Transactions on Pattern 
+Analysis and Machine Intelligence 44.10 (2021): 6111-6121. 
+ 
+[14]   Khatri, Nishika, Varun Borar, and Rakesh Garg. "A Comparative 
+Study: Deepfake Detection Using Deep-learning." 2023 13th 
+International Conference on Cloud Computing, Data Science & 
+Engineering (Confluence). IEEE, 2023.  
+ 
+[15]   Ritter, Pattrick, Devan Lucian, and Andry Chowanda. 
+"Comparative Analysis and Evaluation of CNN Models for 
+Deepfake Detection." 2023 4th International Conference on 
+Artificial Intelligence and Data Sciences (AiDAS). IEEE, 2023 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+352
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:31:47 UTC from IEEE Xplore.  Restrictions apply. 

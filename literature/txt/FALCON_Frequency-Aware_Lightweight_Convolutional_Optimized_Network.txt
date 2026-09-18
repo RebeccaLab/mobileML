@@ -1,0 +1,753 @@
+
+
+--- PAGE 1 ---
+
+D 
+FALCON: Frequency-Aware Lightweight 
+Convolutional Optimized Network 
+ 
+Himanshu Maan 
+Department of Computer Engineering 
+Delhi Technological University 
+Delhi, India 
+maanhimanshu1000@gmail.com 
+ 
+Anukriti Kaushal* 
+Department of Computer Engineering 
+Delhi Technological University 
+Delhi, India 
+Anukritikaushal@dtu.ac.in 
+Hemang Hooda 
+Department of Computer Engineering 
+Delhi Technological University 
+Delhi, India 
+Hemanghooda@gmail.com 
+Harshit Verma 
+Department of Computer Engineering 
+Delhi Technological University 
+Delhi, India 
+harshitverma933@gmail.com 
+ 
+ 
+Abstract—The rise of deepfakes—images or videos that are 
+manipulated using AI techniques like GANs—has created serious 
+challenges in the areas of media trust, security, and online safety. 
+Many existing methods for detecting deepfakes depend on visible 
+image features or large, complex models like transformers. These 
+models often struggle to detect newer types of deepfakes and 
+require high computational power, which makes them hard to 
+use on mobile or low-power devices. To address these issues, we 
+propose FALCON (Frequency-Aware Lightweight Convolutional 
+Optimized Network), a simple and efficient deep learning model 
+for deepfake detection. The main goal of FALCON is to improve 
+accuracy while keeping the model small and fast enough to run 
+on real-time systems and low-resource devices. FALCON works 
+in the frequency domain, where deepfakes often leave hidden 
+traces. It uses three key techniques: High-Frequency Residual 
+Injection (HFRI) to boost fake signals early in the network, 
+Frequency Convolutional Layers (FCL) to analyze amplitude and 
+phase patterns, and High-Frequency Refined Features (HFRF) 
+to improve feature detection in deeper layers. We trained the 
+model using techniques like mixed-precision, gradient clipping, 
+and early stopping for better performance and stability. On the 
+Kaggle “Deepfake and Real Images” dataset, FALCON achieved 
+90% accuracy, 0.90 F1-score, and 0.97 AUC, outperforming 
+other lightweight models. FALCON is ideal for real-time, reliable 
+deepfake detection on everyday devices. This study highlights the 
+effectiveness of frequency-domain learning as a practical and 
+generalizable approach for deepfake detection. 
+Index Terms—Convolutional Neural Networks, Deep Learning, 
+Deepfake Detection, Frequency Domain, High-Frequency Fea- 
+tures 
+ 
+I. INTRODUCTION 
+eepfakes, generated using powerful AI techniques like 
+GANs and autoencoders, have become a growing con- 
+cern due to their potential misuse in media, politics, and 
+cybersecurity [1]. Traditional methods for detecting deepfakes 
+are no longer reliable, making deep learning-based approaches 
+a necessity for robust detection [2]. Machine learning models 
+have shown effectiveness by identifying visual inconsistencies 
+Corresponding author-Anukriti Kaushal Email: Anukritikaushal@dtu.ac.in 
+such as face warping and unnatural transitions [3]. High- 
+performing CNN architectures, such as NASNetLarge, have 
+demonstrated success in extracting facial features and achiev- 
+ing high accuracy with limited data [4]. Combining CNNs with 
+LSTM networks allows for capturing both spatial features and 
+temporal sequences, improving the detection of manipulated 
+content [5]. Incorporating generative modules such as Recycle- 
+GAN improves the model’s adaptability to both spatial and 
+temporal changes within video data [6]. Efficient models 
+tailored for low-resolution images using frequency domain 
+features have shown promise for deployment on mobile and 
+low-resource systems [7]. 
+Recent methods focus on detecting frequency-level incon- 
+sistencies introduced during GAN-based generation, enabling 
+generalization across unknown deepfake types [8]. Models 
+that use frequency-aware learning, such as high-frequency 
+filters and spectral convolutions, can effectively capture subtle 
+artifacts often missed in the pixel domain [9]. Discrete cosine 
+transform (DCT)-based techniques reveal upsampling artifacts 
+present in generated images, helping to distinguish them 
+from real ones [10]. Some methods apply self-blended image 
+transformations combined with wavelet features to highlight 
+fine manipulation patterns [11]. Universal detectors have also 
+been proposed by masking frequency bands during training, 
+encouraging the model to focus on generalizable features 
+[12]. Combining spatial and frequency attention maps through 
+dynamic graph structures enables more accurate detection of 
+both local and global forgery cues [13]. Detection models 
+trained on high-quality data can also transfer frequency knowl- 
+edge to student models, maintaining performance even on 
+compressed videos [14]. Enhancing high-frequency artifacts 
+through bilateral filters helps in capturing manipulation traces 
+across object categories and color shifts [15]. 
+Multimodal transformer-based architectures that combine 
+RGB and frequency streams have shown high performance 
+on large-scale datasets [16]. Spectral analysis methods for 
+Proceedings of the 3rd International Conference on Inventive Computing and Informatics (ICICI-2025)
+IEEE Xplore Part Number: CFP25L34-ART; ISBN: 979-8-3315-3830-9
+979-8-3315-3830-9/25/$31.00 ©2025 IEEE
+1019
+2025 3rd International Conference on Inventive Computing and Informatics (ICICI) | 979-8-3315-3830-9/25/$31.00 ©2025 IEEE | DOI: 10.1109/ICICI65870.2025.11069816
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:37:01 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 2 ---
+
+attributing synthesized content offer insight into GAN sig- 
+natures across different environments and applications [17]. 
+Some real-time approaches rely on electrical network fre- 
+quency (ENF) inconsistencies in audio and video recordings 
+to verify authenticity without deep learning models [18]. 
+Generalization-focused methods utilize high-frequency feature 
+extraction to maintain performance across unseen manipu- 
+lations [19]. Two-stream convolutional networks, integrating 
+coarse and fine feature extraction, have proven effective in 
+handling real and fake face data [20]. Joint localization 
+and classification frameworks use attention in both spatial 
+and frequency domains to enhance forgery region detection 
+[21]. To address environmental variations, models have been 
+designed to be robust to real-world conditions and various 
+media formats [22]. Multi-task learning frameworks improve 
+detection and localization by leveraging both global features 
+and regional manipulations [23]. Transformers that operate 
+on discrete cosine transformed inputs offer an alternative to 
+convolution-based architectures with better frequency sensitiv- 
+ity [24]. Finally, novel detection models integrating frequency 
+analysis and diffusion reconstruction errors offer strong results 
+for both detection and localization tasks in academic forensics 
+[25]. 
+Our paper offers the following key contributions: 
+• We propose FALCON (Frequency-Aware Lightweight 
+Convolutional Optimized Network), a CNN model that 
+uses frequency-domain features like HFRI, HFRF, and 
+FCL to detect deepfakes effectively. 
+• FALCON is lightweight and efficient, making it suitable 
+for real-time applications on resource-limited devices by 
+avoiding heavy architectures. 
+• The model achieves 90% accuracy, 0.90 F1-score, and 
+0.97 AUC on the Kaggle deepfake dataset, outperforming 
+or matching models like BiHPF and FreqNet in both 
+accuracy and generalization. 
+The organization of this paper is as follows, Section II re- 
+views related work on deepfake detection, Section III describes 
+the proposed methodology, Section IV presents experimental 
+results and comparisons, and Section V concludes the paper. 
+II. RELATED WORK 
+In this section, recent advancements in deepfake detec- 
+tion are reviewed across three categories: foundational meth- 
+ods, frequency-domain techniques, and advanced architectures. 
+Each group highlights key approaches aimed at enhancing 
+detection accuracy, generalization, and robustness. 
+A. Foundations and Classical Architectures 
+Early deepfake detection techniques explored the limita- 
+tions of traditional methods, stressing the need for adaptive 
+learning systems to address increasing visual realism [1]. 
+Deep learning significantly outperformed rule-based systems, 
+offering stronger generalization to facial manipulation patterns 
+[2]. Machine learning models trained on face-warping artifacts 
+provided early accuracy boosts but lacked robustness across 
+domains [3]. Advanced CNNs like NASNetLarge achieved 
+high accuracy even on limited data by leveraging automated 
+architecture search [4]. Hybrid models combining CNN and 
+LSTM architectures captured both spatial and temporal fea- 
+tures for video forgery detection [5], which were further 
+enhanced by Recycle-GAN modules that adapted to frame- 
+level variations [6]. For low-resource settings, lightweight 
+CNNs operating in the frequency domain provided efficient 
+solutions while maintaining competitive detection rates [7]. 
+B. Frequency-Domain and Signal-Based Methods 
+Frequency-domain techniques revealed subtle GAN arti- 
+facts invisible in the spatial domain. FrePGAN introduced 
+perturbations in the spectral space, improving generalization 
+across generative models [8]. FreqNet used amplitude and 
+phase-aware convolutions to extract high-frequency details 
+effectively [9]. DCT-based methods exposed upsampling ar- 
+tifacts from synthetic media [10], while self-blended wavelet- 
+based models emphasized fine, imperceptible manipulation 
+features [11]. Universal detectors employed frequency mask- 
+ing to improve robustness across unseen generation methods 
+[12]. Graph-based models combined attention and frequency 
+learning to detect complex forgeries [13], and distillation tech- 
+niques allowed compressed video detection without sacrificing 
+accuracy [14]. Bilateral filtering of high-frequency regions was 
+also found to be effective across object categories and image 
+manipulations [15]. Transformer-based multimodal networks 
+further enhanced performance by merging RGB and frequency 
+cues [16], while signal-based detection using ENF offered real- 
+time, model-free alternatives for verifying media integrity [17], 
+[18]. 
+C. Advanced Architectures and Real-World Robustness 
+Generalization remained a focus, with models leveraging 
+high-frequency features to remain effective across datasets 
+and forgery types [19]. Two-stream CNNs tackled coarse 
+and fine manipulation signals simultaneously [20], and dual- 
+domain attention mechanisms improved both classification 
+and localization [21]. Detection models trained for real-world 
+robustness addressed distribution shifts, compressions, and 
+lighting variations [22]. Multi-task learning architectures si- 
+multaneously handled classification and manipulation region 
+detection, boosting accuracy [23]. DCT-based transformers 
+offered frequency-focused attention without relying on con- 
+volutions [24]. Finally, combining diffusion reconstruction 
+error with frequency features improved localization of subtle 
+manipulations, particularly in scientific and academic media 
+[25]. 
+III. METHODOLOGY 
+In this section, we present the theoretical foundation and 
+design rationale for FALCON, our proposed Frequency-Aware 
+Lightweight Convolutional Optimized Network, that focuses 
+on frequency-domain features. The method is tailored to 
+exploit frequency-domain cues left by generative models and 
+incorporates architectural and optimization strategies that sup- 
+port generalization, robustness, and computational efficiency. 
+Proceedings of the 3rd International Conference on Inventive Computing and Informatics (ICICI-2025)
+IEEE Xplore Part Number: CFP25L34-ART; ISBN: 979-8-3315-3830-9
+979-8-3315-3830-9/25/$31.00 ©2025 IEEE
+1020
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:37:01 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 3 ---
+
+j 
+H 
+W 
+2s 
+k 
+Σ Σ 
+ 
+Fig. 1: Overview of FALCON (Frequency-Aware Lightweight Convolutional Optimized Network) architecture. (a) High- 
+frequency feature extraction via FFT, HPF, and IFFT. (b) Frequency Convolution Layer (FCL) processes amplitude and phase 
+spectra. (c) Dual-path inference across spatial and channel dimensions. (d) Full model pipeline integrating convolution, HFRI, 
+FCL, and residual blocks for final prediction. 
+ 
+A. Problem Definition 
+Let X = {X1, X2, . . . , Xn 
+ 
+} denote a collection of image 
+To isolate the high-frequency components, we apply a 
+square high-pass filter Bh with a cutoff frequency fc = H , 
+where s is a tunable scale factor (set to 8): 
+sets, where each set originates from one of n real or deepfake 
+i 
+Ni 
+sources. Each subset Xi = {(xj, yj)}j=1 contains Ni labeled 
+(0  if u, v ∈ [f , H − f ] 
+images, with xi ∈ RH×W ×3 representing an RGB image, and 
+yj ∈ {0, 1} indicating whether the sample is real (0) or fake 
+Bh(u, v) = 
+c 
+c 
+1  otherwise 
+(1). 
+The objective is to train a deepfake classification model 
+D(·; θ) by minimizing the binary cross-entropy loss over the 
+source training data Xs, defined as: 
+The inverse transform reconstructs a high-frequency resid- 
+ual: 
+ 
+xh = Re(F−1(F(x) ⊙ Bh)) 
+θ∗ = arg min E(x,y)∼X 
+θ 
+s [L(D(x; θ), y)] 
+This transformation, implemented in our HFRI module, 
+Here, L is the binary cross-entropy loss function. The 
+performance of the trained classifier is evaluated on a separate 
+test set Xt, sampled from the same distribution. 
+B. Frequency Domain Representation 
+Generative models typically introduce subtle high-frequency 
+artifacts in synthetic images due to processes like upsampling, 
+blending, and texture inconsistencies. To address this, we take 
+advantage of this characteristic by converting RGB images into 
+the frequency domain using the 2D discrete Fourier transform 
+(DFT): 
+injects frequency-enhanced residuals into the early layers of 
+the network. 
+C. Frequency-Aware Feature Processing 
+In deeper layers, we continue to emphasize frequency com- 
+ponents using FFT-based filtering modules. The HFRF module 
+applies FFT along either the spatial or channel dimension of 
+intermediate features Mk, followed by masking and inverse 
+FFT: 
+ 
+Mh = Re(F−1(F(Mk) ⊙ Bh)) + Mk 
+ 
+H−1 W −1 
+F(x)(u, v) = 
+x(h, w)e−2πi( 
+uh + 
+vw ) 
+ 
+ 
+This preserves the original spatial information while en- 
+hancing frequency-domain patterns relevant for detecting ma- 
+ 
+h=0 w=0 
+nipulations. 
+Proceedings of the 3rd International Conference on Inventive Computing and Informatics (ICICI-2025)
+IEEE Xplore Part Number: CFP25L34-ART; ISBN: 979-8-3315-3830-9
+979-8-3315-3830-9/25/$31.00 ©2025 IEEE
+1021
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:37:01 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 4 ---
+
+2 
+k 
+k 
+D. Frequency Convolutional Layer (FCL) 
+To operate directly on amplitude and phase spectra, we 
+introduce the Frequency Convolutional Layer (FCL). We de- 
+compose a feature map Mk as: 
+F(Mk) = Akeiϕk , 
+Each convolutional stream in FCL uses depthwise separable 
+convolutions — a depthwise 3×3 followed by a pointwise 
+1×1 convolution — to reduce parameter count and improve 
+efficiency. 
+A˜k = ConvA(Ak), ϕ˜k = Convϕ(ϕk) 
+Finally, the real-valued reconstruction is given by: 
+FCL(M ) = Re
+ 
+F −1(A˜ eiϕ˜k )
+ 
++ M 
+a learning rate scheduler tracks validation performance and 
+reduces the learning rate if no improvement is detected. 
+FALCON’s importance lies in its practical applicability. 
+While many models require large GPUs or server infrastruc- 
+ture, FALCON can run efficiently on mobile and edge devices 
+without sacrificing accuracy. This makes it highly suitable for 
+real-world applications like social media verification, content 
+moderation, and in-camera deepfake detection. 
+This methodological design allows it to learn rich 
+frequency-domain features while remaining computationally 
+efficient and robust to real-world variations in deepfake 
+datasets. 
+IV. EXPERIMENTS 
+This section provides an overview of the dataset utilized for 
+training and evaluation, details on the implementation of our 
+ 
+This design enables the network to separately reason about 
+global frequency magnitudes and spatial phase arrangements, 
+improving sensitivity to GAN-induced inconsistencies. 
+E. Network Architecture 
+The architecture of FALCON, as shown in Figure 1 , is 
+constructed with frequency-aware layers from the input to the 
+classifier. It consists of: 
+- Entry Block: A shallow convolutional stack followed by 
+HFRI to encode frequency-enhanced inputs. 
+- Feature Blocks: A sequence of modules including HFRF, 
+FCL, and Residual Blocks to learn multi-scale representations. 
+- Global Pooling: Adaptive average pooling to compress 
+features across spatial dimensions. 
+- Classifier: A fully connected layer that converts the pooled 
+features into a scalar output. 
+Residual connections throughout the architecture help main- 
+tain low-level information and stabilize gradient flow, dropout 
+layers with a probability of 0.3 were optionally inserted 
+after frequency convolutional and residual blocks to reduce 
+overfitting and improve generalization, while adaptive pooling 
+ensures robustness to spatial variations. 
+F. Optimization Strategy 
+We optimize FALCON by minimizing the binary cross- 
+entropy loss with L2 regularization: 
+ 
+L(x, y) = − [y log D(x) + (1 − y) log(1 − D(x))] + λ  θ  2 
+To enhance both convergence and computational efficiency, 
+we utilize mixed precision training, which reduces memory 
+usage and speeds up processing without compromising accu- 
+racy. Additionally, gradient clipping is applied to prevent the 
+issue of exploding gradients: 
+∇θ  2 ≤ 1 
+To prevent overfitting, we apply early stopping based on 
+validation accuracy, with a patience of 10 epochs. Additionally, 
+analysis with other deepfake detection approaches. 
+A. Datasets 
+We used the publicly available Kaggle dataset, ”Deepfake 
+and Real Images,” which includes both real and manipulated 
+face images. These images vary in terms of their sources and 
+synthesis methods, such as GAN-generated content and face- 
+swapping techniques. The dataset was divided into three sub- 
+sets: 80% for training, 10% for validation, and 10% for testing. 
+Images were resized to 64×64 resolution and normalized using 
+ImageNet mean and standard deviation. Basic augmentation, 
+including horizontal flipping, was applied during training, 
+following practices in prior work such as [9], [14]. 
+B. Implementation Details 
+FALCON was implemented using PyTorch.Before describ- 
+ing the implementation, it is important to note that FALCON’s 
+design stands out due to, it’s novel and efficient approach to 
+deepfake detection by uniquely combining frequency-domain 
+processing with a lightweight convolutional framework. Unlike 
+existing models that rely heavily on spatial artifacts or large 
+transformer-based architectures, FALCON enhances general- 
+ization through high-frequency residual injection (HFRI) and 
+dual-domain refinement (HFRF) in both spatial and channel 
+dimensions. The addition of Frequency Convolutional Layers 
+(FCL) that separately process amplitude and phase allows 
+the model to capture subtle GAN-induced artifacts often 
+overlooked in traditional approaches. Its low computational 
+cost, mixed-precision compatibility, and robust performance 
+make it not only state-of-the-art but also suitable for real-time 
+deployment on edge devices — a rare combination in current 
+deepfake detection research. The training process lasted for 30 
+epochs with a batch size of 64, a learning rate of 2 × 10−4, 
+and a weight decay of 10−5, utilizing the AdamW optimizer. 
+We employed binary cross-entropy loss for training, with 
+early stopping applied if no improvement was observed in 
+the validation set after 10 epochs. Mixed-precision training 
+and gradient clipping (  ∇θ  2 ≤ 1) were used to optimize 
+performance. 
+model, the empirical results we obtained, and a comparative 
+k 
+Proceedings of the 3rd International Conference on Inventive Computing and Informatics (ICICI-2025)
+IEEE Xplore Part Number: CFP25L34-ART; ISBN: 979-8-3315-3830-9
+979-8-3315-3830-9/25/$31.00 ©2025 IEEE
+1022
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:37:01 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 5 ---
+
+ 
+ 
+Fig. 2: Training and validation performance curves for FALCON over 30 epochs, showing loss, accuracy, F1 score, and AUC 
+metrics. The close alignment between training and validation curves indicates stable learning with minimal overfitting. 
+ 
+ 
+ 
+ 
+Fig. 3: Precision-Recall curve of FALCON on the test set, 
+achieving an Average Precision (AP) of 0.97, which confirms 
+the model’s strong discriminative capability between real and 
+fake images. 
+Fig. 4: Receiver Operating Characteristic (ROC) curve with an 
+AUC of 0.97, illustrating high classification performance and 
+reliable separation between classes. 
+Proceedings of the 3rd International Conference on Inventive Computing and Informatics (ICICI-2025)
+IEEE Xplore Part Number: CFP25L34-ART; ISBN: 979-8-3315-3830-9
+979-8-3315-3830-9/25/$31.00 ©2025 IEEE
+1023
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:37:01 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 6 ---
+
+ 
+ 
+Fig. 5: Confusion matrix of FALCON on the test set, indicating 
+balanced performance with high true positive rates and low 
+false positive and false negative counts for both real and fake 
+classes. 
+TABLE I: Classification Report on Test Set 
+ 
+Class 
+Precision 
+Recall 
+F1-score 
+Support 
+Real 
+0.87 
+0.94 
+0.91 
+5492 
+Fake 
+0.93 
+0.86 
+0.90 
+5413 
+Avg 
+0.90 
+0.90 
+0.90 
+10905 
+ 
+Our model leverages frequency-domain information to en- 
+hance manipulation detection. The HFRI module extracts high- 
+frequency components from images using FFT, masked by 
+a high-pass filter with a scale of 8. These filtered signals 
+are injected into the model’s early layers. The HFRF module 
+operates on intermediate feature maps using FFT along either 
+the spatial or channel dimensions, refining their frequency 
+representation. 
+FCL processes the magnitude and phase of Fourier- 
+transformed features separately via depthwise separable con- 
+volutions. These are then recombined using the polar form 
+and inverse FFT. Residual blocks and adaptive average pooling 
+are used for deep representation learning, followed by a final 
+linear classifier. This architecture supports generalization by 
+promoting spectral awareness, as emphasized in [9], [12], 
+[15], and is efficient enough to be deployed in real-time 
+environments, contrasting heavier transformer-based solutions 
+like [16], [24], and [25]. 
+C. Computational Complexity and Deployment Suitability 
+One of the main goals of FALCON is to provide an effective 
+deepfake detection solution that can operate efficiently on real- 
+time and low-resource systems. Unlike many existing models 
+that rely on heavy transformer architectures or large-scale 
+convolutional backbones, FALCON is designed with compu- 
+tational efficiency in mind. The architecture uses depthwise 
+separable convolutions in its Frequency Convolutional Layers 
+(FCL), significantly reducing the number of parameters and 
+floating-point operations (FLOPs) compared to standard con- 
+volutions. The input images are resized to 64×64 resolution, 
+further lowering the computational burden while retaining 
+sufficient detail for deepfake detection. FALCON incorporates 
+techniques like mixed-precision training and gradient clip- 
+ping, which reduce memory usage and training time without 
+sacrificing model performance. During training, the use of 
+early stopping prevents overfitting and avoids unnecessary 
+computation by halting when validation performance stops 
+improving. 
+D. Model Performance 
+FALCON achieved strong results on the test set. Figure 2 
+displays the training and validation loss, accuracy, F1-score, 
+and AUC over epochs. FALCON achieved an overall accuracy 
+of 90%, a macro F1-score of 0.90, and an AUC exceeding 
+0.97. We also plotted training and validation curves for loss, 
+accuracy, F1 score, and AUC over epochs. These plots provide 
+a holistic view of model convergence, overfitting behavior, and 
+learning dynamics. They are included in the supplementary 
+figure set. The precision-recall curve is shown in Figure 3, 
+and the ROC curve in Figure 4, confirming reliable class 
+separation. 
+The confusion matrix is visualized in Figure 5, illustrating 
+a balanced error distribution. Table I shows the classification 
+report explaining precision, recall, and F1-score for both 
+classes. 
+E. Comparison with Existing Methods 
+We compared FALCON with various different methods 
+from recent literature. As shown in Table II, it delivers com- 
+petitive results while maintaining computational simplicity. 
+Compared to BiHPF [15] and Dual-Domain Attention [21], 
+our model achieves similar F1-score and AUC, outperforming 
+lightweight CNNs [7] in both robustness and precision. 
+F. Effectiveness Evaluation 
+To validate the effectiveness of FALCON, we conducted 
+additional experiments focusing on generalization, robustness, 
+and efficiency. When tested on unseen datasets like CelebDF 
+and FaceForensics++, FALCON maintained high F1-scores 
+(0.88 and 0.89), confirming strong generalization. The model 
+also showed robustness under real-world degradations such as 
+JPEG compression, resizing, and Gaussian noise, with only a 
+minor drop in performance. In terms of efficiency, FALCON 
+contains just 1.3 million parameters and runs at 48 images 
+per second on a mobile-class GPU, making it suitable for 
+real-time applications. An ablation study further demonstrated 
+that removing any frequency-domain module (HFRI, HFRF, or 
+FCL) led to noticeable drops in performance, highlighting their 
+importance. These results collectively confirm that FALCON 
+is not only accurate but also generalizable, robust, lightweight, 
+and effective for deployment in practical deepfake detection 
+scenarios. 
+Our results demonstrate that FALCON effectively captures 
+discriminative frequency signatures without the overhead of 
+Proceedings of the 3rd International Conference on Inventive Computing and Informatics (ICICI-2025)
+IEEE Xplore Part Number: CFP25L34-ART; ISBN: 979-8-3315-3830-9
+979-8-3315-3830-9/25/$31.00 ©2025 IEEE
+1024
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:37:01 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 7 ---
+
+TABLE II: Comparison with Other Deepfake Detection Mod- 
+els 
+ 
+Model 
+Accuracy 
+F1-score 
+AUC 
+Lightweight CNN [7] 
+0.88 
+0.86 
+0.91 
+BiHPF [15] 
+0.90 
+0.89 
+0.94 
+Dual-Domain Attention [21] 
+0.91 
+0.91 
+0.96 
+DCT-Transformer [24] 
+0.92 
+0.92 
+0.97 
+Proposed model 
+0.90 
+0.90 
+0.97 
+ 
+transformer-based models [24], [25], while maintaining better 
+generalization compared to classical CNNs [1], [4]. Future 
+work may explore multi-modal fusion as in [16] or sequence 
+modeling like [6] to further improve detection in video 
+streams. 
+V. CONCLUSION 
+In this work, we introduced FALCON, a frequency-aware 
+lightweight approach for deepfake detection that efficiently 
+and accurately differentiates between real and fake images. 
+Tested on the Kaggle ”Deepfake and Real Images” dataset, 
+FALCON achieved 90.11% accuracy, an F1 score of 89.63%, 
+and an AUC of 96.98%. The classification report highlights 
+its effectiveness, with balanced precision and recall across 
+classes. The confusion matrix and precision-recall curves 
+further confirm reliability, showing few false positives and 
+negatives. Compared to existing frequency-domain methods 
+like BiHPF, FALCON demonstrates superior accuracy and 
+robustness. 
+However, some practical limitations remain. FALCON has 
+been validated mainly on images, and its performance on 
+video-based deepfakes is yet to be explored. While robust 
+to compression and resizing, extreme distortions or novel 
+manipulations may affect detection. Additionally, further op- 
+timization is needed for ultra low-power devices and high- 
+resolution real-time processing. 
+In future work, we aim to enhance generalization across di- 
+verse datasets, optimize computational efficiency, and explore 
+multi-modal and video-based detection. Extending FALCON 
+with multimodal fusion and multi-task learning also offers 
+promising directions for developing more reliable and adapt- 
+able forgery detection systems. 
+REFERENCES 
+[1] Pandey, P., Solanki, A. and Sharma, S.K., 2024, November. Foundations 
+of Deepfake Detection: Insights from Initial Research. In 2024 4th Inter- 
+national Conference on Advancement in Electronics & Communication 
+Engineering (AECE) (pp. 1386-1390). IEEE. 
+[2] Wang, Jinlong, and Xiongxin Tang. "Learning Frequency-Aware 
+Representation 
+For 
+Low-light 
+Image 
+Enhancement." 
+In 2024 
+International Joint Conference on Neural Networks (IJCNN), pp. 1-8. 
+IEEE, 2024. 
+[3] Maksutov, A.A., Morozov, V.O., Lavrenov, A.A. and Smirnov, A.S., 2020, 
+January. Methods of deepfake detection based on machine learning. In 
+2020 IEEE conference of russian young researchers in electrical and 
+electronic engineering (EIConRus) (pp. 408-411). IEEE. 
+[4] ˙Ilhan, ˙I., Balı, E. and Karako¨se, M., 2022, October. An improved deep- 
+fake detection approach with NASNetLarge CNN. In 2022 International 
+Conference on Data Analytics for Business and Industry (ICDABI) (pp. 
+598-602). IEEE. 
+ 
+[5] Satpute, R. and Onwe, C.P., 2024, November. CNN-LSTM Model for 
+Deepfake Image Detection. In 2024 2nd DMIHER International Con- 
+ference on Artificial Intelligence in Healthcare, Education and Industry 
+(IDICAIEI) (pp. 1-6). IEEE. 
+[6] Jolly, V., Telrandhe, M., Kasat, A., Shitole, A. and Gawande, K., 2022, 
+August. CNN based deep learning model for deepfake detection. In 2022 
+2nd Asian conference on innovation in technology (ASIANCON) (pp. 
+1-5). IEEE. 
+[7] Sabareshwar, D., Raghul, S., Varalakshmi, M. and Peer Mohamed, P.U., 
+2024, February. A Lightweight CNN for Efficient Deepfake Detection of 
+Low-resolution Images in Frequency Domain. In 2024 Second Interna- 
+tional Conference on Emerging Trends in Information Technology and 
+Engineering (ICETITE) (pp. 1-6). IEEE. 
+[8] Jeong, Y., Kim, D., Ro, Y. and Choi, J., 2022, June. Frepgan: robust 
+deepfake detection using frequency-level perturbations. In Proceedings 
+of the AAAI conference on artificial intelligence (Vol. 36, No. 1, pp. 
+1060-1068). 
+[9] Cai, R., Ding, Y. and Lu, H., 2021. FreqNet: A frequency-domain image 
+super-resolution network with dicrete cosine transform. arXiv preprint 
+arXiv:2111.10800. 
+[10]  Frank, J., Eisenhofer, T., Scho¨nherr, L., Fischer, A., Kolossa, D. and 
+Holz, T., 2020, November. Leveraging frequency analysis for deep fake 
+image recognition. In International conference on machine learning (pp. 
+3247-3258). PMLR. 
+[11]  Hasanaath, A.A., Luqman, H., Katib, R. and Anwar, S., 2025. FSBI: 
+Deepfake detection with frequency enhanced self-blended images. Image 
+and Vision Computing, p.105418. 
+[12]  Doloriel, C.T. and Cheung, N.M., 2024, April. Frequency masking for 
+universal deepfake detection. In ICASSP 2024-2024 IEEE International 
+Conference on Acoustics, Speech and Signal Processing (ICASSP) (pp. 
+13466-13470). IEEE. 
+[13]  Zhang, G., Li, Q., Gao, M., Guo, S., Jeon, G. and Abdelmoniem, 
+A.M., 2025. Space–Frequency and Global–Local Attentive Networks for 
+Sequential Deepfake Detection. IEEE Transactions on Computational 
+Social Systems. 
+[14]  Woo, S., 2022, June. Add: Frequency attention and multi-view based 
+knowledge distillation to detect low-quality compressed deepfake images. 
+In Proceedings of the AAAI conference on artificial intelligence (Vol. 36, 
+No. 1, pp. 122-130). 
+[15]  Jeong, Y., Kim, D., Min, S., Joe, S., Gwon, Y. and Choi, J., 2022. Bihpf: 
+Bilateral high-pass filters for robust deepfake detection. In Proceedings of 
+the IEEE/CVF Winter Conference on Applications of Computer Vision 
+(pp. 48-57). 
+[16]  Wang, J., Wu, Z., Ouyang, W., Han, X., Chen, J., Jiang, Y.G. and 
+Li, S.N., 2022, June. M2tr: Multi-modal multi-scale transformers for 
+deepfake detection. In Proceedings of the 2022 international conference 
+on multimedia retrieval (pp. 615-623). 
+[17]  Zhang, J., Wang, Y., Tohidypour, H.R. and Nasiopoulos, P., 2022, 
+December. Deep learning-based synthesized image attribution using fre- 
+quency distribution information. In 2022 International Conference on 
+Computational Science and Computational Intelligence (CSCI) (pp. 1566- 
+1567). IEEE. 
+[18]  Nagothu, D., Xu, R., Chen, Y., Blasch, E. and Aved, A., 2022. Defake- 
+pro: Decentralized deepfake attacks detection using enf authentication. IT 
+Professional, 24(5), pp.46-52. 
+[19]  Luo, Y., Zhang, Y., Yan, J. and Liu, W., 2021. Generalizing face 
+forgery detection with high-frequency features. In Proceedings of the 
+IEEE/CVF conference on computer vision and pattern recognition (pp. 
+16317-16326). 
+[20]  Hu, J., Liao, X., Wang, W. and Qin, Z., 2021. Detecting compressed 
+deepfake videos in social networks using frame-temporality two-stream 
+convolutional network. IEEE Transactions on Circuits and Systems for 
+Video Technology, 32(3), pp.1089-1102. 
+[21]  Xu, D., Li, M., Wu, Y., Zhang, P. and Xin, X., 2024. Dual Attention- 
+Based Global-Local Feature Extraction Network for Unsupervised 
+Change Detection in PolSAR Images. IEEE Journal of Selected Topics 
+in Applied Earth Observations and Remote Sensing. 
+[22]  Khalifa, A.H., Zaher, N.A., Abdallah, A.S. and Fakhr, M.W., 2022. 
+Convolutional neural network based on diverse Gabor filters for deepfake 
+recognition. IEEE Access, 10, pp.22678-22686. 
+[23] Huang, P.H., Han, Y.H., Chu, E., Chen, J.C. and Hua, K.L., 2023, 
+December. Multi-Task Self-Blended Images for Face Forgery Detection. 
+In Proceedings of the 5th ACM International Conference on Multimedia 
+in Asia (pp. 1-7). 
+Proceedings of the 3rd International Conference on Inventive Computing and Informatics (ICICI-2025)
+IEEE Xplore Part Number: CFP25L34-ART; ISBN: 979-8-3315-3830-9
+979-8-3315-3830-9/25/$31.00 ©2025 IEEE
+1025
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:37:01 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+--- PAGE 8 ---
+
+[24]  Pan, H., Hamdan, E., Zhu, X., Biswas, K., Cetin, A.E. and Bagci, 
+U., 2024. Dct-based decorrelated attention for vision transformers. arXiv 
+preprint arXiv:2405.13901. 
+[25]  Ding, J., Liu, J., Shi, J., Hu, X. and Qiao, X., 2024, August. DDEM: 
+Deepfake Detection Enhanced Model for Image Forgery Detection Com- 
+bat Academic Misconduct. In 2024 11th International Conference on 
+Behavioural and Social Computing (BESC) (pp. 1-6). IEEE. 
+Proceedings of the 3rd International Conference on Inventive Computing and Informatics (ICICI-2025)
+IEEE Xplore Part Number: CFP25L34-ART; ISBN: 979-8-3315-3830-9
+979-8-3315-3830-9/25/$31.00 ©2025 IEEE
+1026
+Authorized licensed use limited to: OREGON STATE UNIV. Downloaded on September 18,2026 at 10:37:01 UTC from IEEE Xplore.  Restrictions apply. 

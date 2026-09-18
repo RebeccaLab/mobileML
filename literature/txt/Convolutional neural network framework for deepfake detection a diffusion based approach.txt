@@ -1,0 +1,1684 @@
+
+
+--- PAGE 1 ---
+
+Computer Vision and Image Understanding 257 (2025) 104375
+ 
+Contents lists available at ScienceDirect
+Computer Vision and Image Understanding
+journal homepage: www.elsevier.com/locate/cviu
+ 
+Convolutional neural network framework for deepfake detection: A 
+diffusion-based approach
+Emmanuel Pintelas a,∗, Ioannis E. Livieris b
+a Department of Mathematics, University of Patras, GR 265-00, Greece
+b Department of Statistics and Insurance, University of Pireaus, GR 185-34, Greece
+A R T I C L E  I N F O
+Communicated by Arjan Kuijper
+Keywords:
+Computer Vision
+Deep Learning
+Convolutional neural networks
+Image classification
+Deepfake detection
+ 
+A B S T R A C T
+In the rapidly advancing domain of synthetic media, DeepFakes emerged as a potent tool for misinformation 
+and manipulation. Nevertheless, the engineering challenge lies in detecting such content to ensure information 
+integrity. Recent artificial intelligence contributions in deepfake detection have mainly concentrated around 
+sophisticated convolutional neural network models, which derive insights from facial biometrics, including 
+multi-attentional and multi-view mechanisms, pairwise/siamese, distillation learning technique and facial-
+geometry approaches. In this work, we consider a new diffusion-based neural network approach, rather than 
+directly analyzing deepfake images for inconsistencies. Motivated by the considerable property of diffusion 
+procedure of unveiling anomalies, we employ diffusion of the inherent structure of deepfake images, seeking 
+for patterns throughout this process. Specifically, the proposed diffusion network, iteratively adds noise to 
+the input image until it almost becomes pure noise. Subsequently, a convolutional neural network extracts 
+features from the final diffused state, as well as from all transient states of the diffusion process. The 
+comprehensive experimental analysis demonstrates the efficacy and adaptability of the proposed model, 
+validating its robustness against a wide range of deepfake detection models, being a promising artificial 
+intelligence tool for DeepFake detection.
+1. Introduction
+DeepFake technology, which involves the creation of synthetic me-
+dia such as images, videos, and audio, is rapidly evolving primarily 
+through the use of deep learning models such as Generative Adversarial 
+Networks (GAN) (Pan et al., 2019). These models can almost seamlessly 
+substitute the facial characteristics of a person in the original content 
+with someone else’s likeness, making it exceptionally challenging even 
+for human experts to discern their authenticity (Nightingale et al., 
+2017; Rossler et al., 2019). This rapid advancement has raised concerns 
+due to the technology’s potential misuse, especially when is used as 
+a tool for misinformation, manipulation, and harassment; therefore, 
+posing threats to human rights (Agarwal et al., 2019; Pintelas and 
+Pintelas, 2022).
+This potential threat has led to increased interest in the field of 
+DeepFake detection (Qian et al., 2020; Huang et al., 2021; Liang et al., 
+2023; Hsu et al., 2020). However, detecting these manipulated pieces 
+of media is not straightforward. It is a complex classification problem, 
+which challenges both machines and humans (Li et al., 2020; Rossler 
+et al., 2019). While significant efforts (Tolosana et al., 2022; Pintelas 
+et al., 2023; Dolhansky et al., 2020; Zhao et al., 2021; Bonettini et al., 
+∗Corresponding author.
+E-mail addresses: e.pintelas@upatras.gr (E. Pintelas), livieris@unipi.gr (I.E. Livieris).
+2021; Heo et al., 2021; Liang et al., 2023) have been devoted to detect-
+ing DeepFakes using techniques such as attention mechanisms, trans-
+former architectures and geometric feature extraction, the potential of 
+diffusion processes in enhancing feature extraction for detection has 
+not been thoroughly explored. Diffusion processes, grounded in physics 
+and biology, describe how elements disperse through a medium (Weigel 
+et al., 2011; Metzler et al., 2014) and have been effectively employed in 
+tasks like image synthesis, denoising and anomaly detection (Prasath, 
+2017). Motivated by the hypothesis that DeepFakes, might exhibit 
+unusually rapid diffusion states due to artificial blending of features and 
+display odd diffusion patterns as they do not maintain natural image 
+coherence (Pan et al., 2019), the core of the proposed approach lies 
+on simulating how the inherent structure of a deepfake image diffuses, 
+searching for patterns in that process.
+In this work, we propose a new Diffusion-based Convolutional Net-
+work framework called ‘‘DiffConvNet’’, which extracts features via a dif-
+fusion process for enhancing a CNN-based model to detect DeepFakes. 
+Utilizing a diffusion network the input image (in fact the encoded 
+representation of the first layers of a CNN) is iteratively diffused in 
+order to extract its diffused representation states. Then, via a CNN 
+https://doi.org/10.1016/j.cviu.2025.104375
+Received 2 July 2024; Received in revised form 2 March 2025; Accepted 23 April 2025
+Available online 28 April 2025
+1077-3142/© 2025 Elsevier Inc. All rights are reserved, including those for text and data mining, AI training, and similar technologies.
+
+
+--- PAGE 2 ---
+
+E. Pintelas and I.E. Livieris
+Computer Vision and Image Understanding 257 (2025) 104375
+model, we exploit the transient and the final states of diffusion, in 
+order to extract features during this diffusion process and finally per-
+form the prediction. Unlike prior approaches, which primarily rely 
+on advanced architectures to directly analyze input images, the pro-
+posed method leverages the iterative diffusion process to reveal hidden 
+patterns indicative of manipulation. By integrating a diffusion-based 
+framework directly into a CNN pipeline, this study aims to uncover sub-
+tle anomalies, enhance feature extraction and improve the robustness 
+of DeepFake detection models.
+More specifically, the proposed approach incorporates a diffusion 
+procedure through the convolutional layers in order to leverage dif-
+fusion patterns. In detail, the CNN backbone is initially trained with 
+respect to the deepfake classification loss and then, is ‘‘cut’’ into two 
+parts (refer also to Fig. 1), forming a Shallow and a Deep Network 
+(SN and DN). Next, a Diffusion Network (DiffN) is attached between 
+these two network parts forming a SN-DiffN-DN end-to-end network. 
+The SN aims to encode the initial image into a more robust and suitable 
+form for the diffusion process. Then, the DiffN diffuses the encoded 
+representation aiming to reveal deepfake patterns. Finally, the DN aims 
+to extract these patterns by exploiting the final and transient states 
+of the diffusion procedure, in order to perform the final prediction. 
+Additionally, this SN-DiffN-DN network is fine-tuned end-to-end with 
+respect to the DeepFake classification loss in order to synergistically 
+optimize each main part of this network. This implies that the SN 
+is expected to learn better representations for the diffusion layers as 
+regards the deepfake detection, the diffusion network is expected to be 
+optimized in a way to perform more efficient diffusions with respect 
+to the deepfake detection, while the DN will be optimized in order to 
+extract in a more efficient way patterns and features via the diffusion 
+states.
+In our numerical experiments ResNet18 was utilized as a CNN 
+backbone due to its high speed-accuracy trade-off performance (He 
+et al., 2016; Canziani et al., 2017). Nevertheless, the proposed approach 
+can be easily integrated into any CNN backbone network, with mi-
+nor modifications. In the ablations studies we also incorporated our 
+approach into Xception (Chollet, 2017), and EfficientNet (Tan and 
+Le, 2019) backbones since these networks serve as the main utilized 
+networks for DeepFake detection (Bonettini et al., 2021; Zhao et al., 
+2021).
+The main contributions of this research work are summarized as 
+follows:
+• We propose the idea of leveraging the diffusion process to en-
+hance the feature extraction capabilities of CNN models for 
+detecting DeepFakes. Building on this idea, we present a new 
+diffusion-based CNN framework, which efficiently incorporates 
+the diffusion process into state-of-the-art CNN architectures, offer-
+ing a flexible and adjustable framework for improved DeepFake 
+detection.
+• We propose a CNN-based model, which achieves superior per-
+formance, compared to state-of-the-art models, for the DeepFake 
+detection problem.
+• Finally, we conduct a comprehensive experimental analysis pro-
+viding insights and interpretations about the reasons of the pro-
+posed model’s performance efficacy which strengthens the pro-
+posed method trustfulness.
+The rest of this paper is followed by the recent related work for 
+deepfake detection (Section 2), the detailed presentation of the pro-
+posed approach (Section 3), the case-study datasets used in our ex-
+periments (Section 4), followed by extensive comparison, ablation and 
+visualization studies (Sections 5, 6 and 7 respectively). Finally, our dis-
+cussions (Section 8) and conclusions (Section 9) offer insights into the 
+effectiveness and potential future directions of proposed methodology 
+in the field of DeepFake detection.
+2. Related work
+In this section, we summarize a wide range of state-of-the-art CNN-
+based deepfake detection methodologies. These methods are catego-
+rized into feature-based, attention-based, and training-based frame-
+works, all of which aim to improve detection by leveraging specific 
+properties of the input data.
+Feature-Based Frameworks: Feature-based techniques focus on ex-
+tracting meaningful representations from images to distinguish real and 
+manipulated content. Fine-Tuning (FT) methods (Huang et al., 2021) 
+serve as a baseline, adapting pre-trained CNN backbones to the deep-
+fake classification task. Facial-Fusion (Tolosana et al., 2022) further 
+refine this process by analyzing segmented facial regions and employ-
+ing fusion techniques across first and second-generation deepfakes, en-
+hancing detection robustness. Facial geometry-based approaches (Liang 
+et al., 2023) embed biometric features derived from facial landmarks 
+into CNN-LSTM networks, leveraging spatial and frequency domain 
+correlations for improved detection. The Multi-View approach (Pintelas 
+et al., 2023) focuses on generating diverse perspectives of input images 
+using mathematical transformations, enriching feature representations 
+through the fusion of pre-trained CNN-extracted features. This tech-
+nique has demonstrated improved performance in detecting subtle 
+manipulation signs, making it effective for deepfake classification tasks.
+Attention-Based Frameworks: Attention mechanisms have been piv-
+otal in enhancing deepfake detection. Siamese-Attention techniques
+(Bonettini et al., 2021) integrate siamese networks with attention maps 
+to refine feature spaces, optimizing them for fine-grained classification. 
+Multi-attentional networks (Zhao et al., 2021) extend this concept 
+by employing multiple spatial attention heads and textural enhance-
+ment blocks to capture subtle anomalies within manipulated regions, 
+merging low-level textures and high-level semantics.
+Training-Based Frameworks: Training-based frameworks investigate 
+advanced training schemes to enhance the robustness and generaliza-
+tion of deepfake detection models. Pairwise learning strategies (Hsu 
+et al., 2020) employ a two-step process using contrastive loss to train 
+CNN models on pairs of images, learning a relational feature space. In 
+the second step, a classifier based on this feature space is trained with 
+binary cross-entropy loss to predict individual labels. Distillation-based 
+models (Heo et al., 2021) utilize a teacher–student training scheme, 
+where a pre-trained teacher model transfers knowledge to a smaller 
+student model through distillation loss. This design integrates features 
+from CNNs with a patch-based positioning model, which was then 
+trained to interact with all positions in order to accurately identify ar-
+tifact regions; thereby, addressing the false negative problem prevalent 
+in previous methods.
+In contrast to these approaches, which mainly emphasize on extract-
+ing features from the input images through complicated architectures, 
+the proposed approach mainly differs in extracting features via the dif-
+fusion of input images. This approach is inspired by the hypothesis that 
+manipulated images will exhibit unique patterns during the diffusion 
+process, which can be critical for detecting deepfakes. By incorporating 
+diffusion-based dynamics directly into the network, our method ensures 
+compatibility across a variety of CNN backbones. Additionally, the 
+diffusion patterns can offer insights into the detection process, enabling 
+a deeper understanding of how deepfakes are identified. Detailed ex-
+perimental analysis and extended ablation studies reveal the efficacy 
+of the proposed approach.
+3. Proposed framework
+Next, we present the proposed approach starting from an abstract 
+overview description, to end up into a comprehensive and detailed 
+architectural description.
+Fig. 1 illustrates a high-level description of the proposed DiffCon-
+vNet model. Initially, a classification neural-network model, using as 
+backbone a pre-trained feature extraction network, is fine-tuned with 
+2
+
+
+--- PAGE 3 ---
+
+E. Pintelas and I.E. Livieris
+Computer Vision and Image Understanding 257 (2025) 104375
+Fig. 1. High-level architectural overview of the DiffConvNet model. The proposed framework integrates a diffusion network between the shallow and deep parts of a pre-trained 
+CNN backbone to enhance DeepFake detection by leveraging diffusion-based feature extraction.
+respect to the classification loss. Notice that, this backbone network is 
+composed by a series of modules of convolution layers followed by a 
+classification head (series of dense layers along with the classification 
+output layer). Then, this base network (BN) model is split into two 
+network parts, forming a Shallow Network (SN) and a Deep Network 
+(DN).
+Next, the Diffusion Network (DiffN) constituted by convolutional 
+layers is attached between the SN and DN. The SN has the objective 
+to process the input image, converting it into an encoded and more 
+robust representation (denoted as 𝑥0) suitable for diffusion. Next, the 
+encoded input 𝑥0 is fed into the DiffN, which iteratively diffuses it 
+for 𝑁 iterations. Then, the 𝑥0, the transient diffused representations 
+𝑥1, 𝑥2, … , 𝑥𝑁−1 and the final diffusion state 𝑥𝑁 are averaged in order 
+to form a comprehensive diffused-representation 𝑑 (it actually contains 
+in a compressed form information of the diffusion process). Finally, the 
+DN extracts patterns from the diffused representation 𝑑 and performs 
+the final prediction. In the sequel, we provide a detailed description of 
+the proposed framework focusing on its main steps and its architectural 
+design.
+3.1. Description of the proposed framework
+Initially, a pre-trained base network (BN) is fine-tuned with respect 
+to the DeepFake Classification loss ℒ defined as: 
+ℒ(̂𝑦, 𝑦; Θ𝐵𝑁) = −𝑦log(̂𝑦) −(1 −𝑦) log(1 −̂ 𝑦)
+(1)
+where 𝑦 and ̂𝑦 denotes the true and predicted label, respectively (Real 
+or Fake), while ΘBN represents the parameters of the base network. 
+Thus, given an input image 𝐼, the fine-tuned function 𝐹 of BN can be 
+represented as: 
+𝐹(𝐼; ΘBN) →̂ 𝑦
+(2)
+Subsequently, the fine-tuned BN is split to form the shallow network 
+(SN) and the deep network (DN). Notice that ΘSN and ΘDN denote 
+the parameters of the swallow and deep network, respectively, namely 
+ΘBN = [ΘSN, ΘDN]. Furthermore, we employ the Diffusion Network 
+(DiffN) for 𝑁 iterations and attach it between the SN and DN; therefore, 
+forming DiffConvNet model with parameters: 
+ΘDiffConvNet = [ΘSN, ΘDiffN, ΘDN]
+(3)
+3
+
+
+--- PAGE 4 ---
+
+E. Pintelas and I.E. Livieris
+Computer Vision and Image Understanding 257 (2025) 104375
+Given an input image 𝐼, the initial encoded representation 𝑥0 is ex-
+tracted from the fine-tuned shallow network namely: 
+𝐼
+SN
+←←←←←←←←←→
+𝛩SN
+𝑥0
+(4)
+while through the DiffN with 𝑁 iterations, the diffusion process is 
+defined as: 
+𝑥0
+DiffN
+←←←←←←←←←←←←←→
+𝛩DiffN
+𝑥𝑁
+(5)
+where 𝑥𝑁 is the output through 𝑁 diffusion iterations and 𝑥1, 𝑥2, … ,
+𝑥𝑁−1 are the transient diffusion states in 1, 2, … , 𝑁−1 iterations, 
+respectively.
+The diffusion process propagates through the network by iteratively 
+applying the convolutional operations within the DiffN to the encoded 
+representation 𝑥0 generated by the SN. During each iteration, the repre-
+sentation evolves into transient states (𝑥1, 𝑥2, … , 𝑥𝑁−1) by progressively 
+diffusing its features. These states capture in a dynamic manner the 
+patterns and anomalies, with the final state 𝑥𝑁 being the outcome of 
+the full diffusion process. The transient states, along with 𝑥0 and 𝑥𝑁, 
+are aggregated via averaging to create the diffused representation 𝑑
+(Eq. (6)), which is then fed into the DN for final classification (Eq. (7)).
+𝑑= 1
+𝑁
+𝑁
+∑
+𝑖=0
+𝑥𝑖
+(6)
+𝑑
+DN
+←←←←←←←←←←→
+𝛩DN̂
+𝑦
+(7)
+Finally, based on the same classification loss ℒ defined in Eq. 
+(1), we fine-tune the DiffConvNet model. Therefore, given the input 
+image 𝐼, the fine-tuned function of the network DiffConvNet can be 
+represented as: 
+𝐹(𝐼; ΘSN, ΘDiffN, ΘDN) →̂ 𝑦
+(8)
+Algorithm 1 summarizes the proposed approach in a compact form.
+The fine-tuning process of the DiffConvNet model involves opti-
+mizing the parameters of the SN, DiffN and DN jointly during the 
+end-to-end training. The DeepFake classification loss ℒ is computed 
+based on the final prediction of the DN. This loss is back-propagated 
+through the entire network, allowing each component to adjust its pa-
+rameters in a synergistic manner. Specifically, the SN learns to generate 
+encoded representations 𝑥0 that are more suitable for the diffusion 
+process, while the DiffN parameters are optimized to reveal subtle 
+patterns and anomalies through the iterative diffusion process. The 
+DN, in turn, adapts its parameters to effectively extract features from 
+the diffused representation 𝑑 and improve classification performance. 
+By fine-tuning the entire network end-to-end, the SN, DiffN and DN 
+components are collaboratively optimized to enhance the detection of 
+DeepFakes, ensuring that the entire architecture works in harmony for 
+this task.
+3.2. Architecture
+Finally, for completeness Tables 1 and 2 present the architecture of 
+BN and DiffConvNet, respectively, using ResNet18 as backbone. This 
+architectural description serves to provide a comprehensive overview 
+of the network components and their configurations, setting a clear 
+understanding of the systemic implementations made in this study.
+The modules from Layer 0 to Layer 4 correspond to the structured 
+design and pre-trained weights inherent to the ResNet18 backbone, 
+while global average pooling (GAP) and fully connected (FC) head are 
+used in order to adapt to the task of deepfake classification. Each of the 
+designated Layers is constructed utilizing the fundamental block design 
+of the backbone, constituted with operations including convolutional 
+layers, batch normalization and ReLU activation functions. Notice that 
+𝐻 and 𝑊 denote the height and width dimensions of the input RGB 
+image, respectively. For the purpose of this presentation, we have 
+focused primarily on showcasing the dimension reduction resulting 
+Algorithm 1 Pseudocode description of proposed framework.
+ Inputs:
+BN: A Backbone network constituted by modules of convolution 
+layers followed by a classification head.
+DiffN: A convolution layer repeated 𝑁 times (as the number of 
+diffusion iterations).
+ Output:
+DiffConvNet: Proposed DiffConvNet classification model.
+1: Fine-tune BN with respect to DeepFake classification loss ℒ
+2: Split the BN to form the SN and DN ⊳ Formulation of DiffConvNet
+3: Attach DiffN into the SN and DN to form the DiffConvNet
+4: Use SN to encode 𝐼 into 𝑥0
+⊳ DiffConvNet inner prediction 
+mechanism
+5: Use DiffN to diffuse 𝑥0 for 𝑁 iterations and extract 𝑥1, … , 𝑥𝑁
+6: Average 𝑥0, … , 𝑥𝑁 to create 𝑑
+7: Use DN to encode 𝑑 and predict ̂𝑦
+8: Fine-tune DiffConvNet with respect to DeepFake classification loss 
+ℒ
+Table 1
+Architectural presentation of BN for ResNet18 backbone.
+ 
+modules
+input
+output
+ 
+ 
+Base Network (BN)
+Layer 0
+3 × 𝐻× 𝑊
+64 × 𝐻
+4 × 𝑊
+4 
+ 
+Layer 1
+64 × 𝐻
+4 × 𝑊
+4
+64 × 𝐻
+4 × 𝑊
+4 
+ 
+Layer 2
+64 × 𝐻
+4 × 𝑊
+4
+128 × 𝐻
+8 × 𝑊
+8 
+ 
+Layer 3
+128 × 𝐻
+8 × 𝑊
+8
+256 × 𝐻
+16 × 𝑊
+16 
+ 
+Layer 4
+256 × 𝐻
+16 × 𝑊
+16
+512 × 𝐻
+32 × 𝑊
+32 
+ 
+GAP
+512 × 𝐻
+32 × 𝑊
+32
+512
+ 
+ 
+FC Head
+512
+1
+ 
+Table 2
+Architectural presentation of DiffConvNet for ResNet18 backbone.
+ 
+modules
+input
+output
+ 
+ 
+DiffConvNet
+SN
+Layer 0
+3 × 𝐻× 𝑊
+64 × 𝐻
+4 × 𝑊
+4
+ 
+ 
+DiffN
+DiffLayer(×𝑁)
+64 × 𝐻
+4 × 𝑊
+4
+𝑁× 64 × 𝐻
+4 × 𝑊
+4 
+ 
+Averaging (dim=0)
+𝑁× 64 × 𝐻
+4 × 𝑊
+4
+64 × 𝐻
+4 × 𝑊
+4
+ 
+ 
+DN
+Layer 1
+64 × 𝐻
+4 × 𝑊
+4
+64 × 𝐻
+4 × 𝑊
+4
+ 
+ 
+Layer 2
+64 × 𝐻
+4 × 𝑊
+4
+128 × 𝐻
+8 × 𝑊
+8
+ 
+ 
+Layer 3
+128 × 𝐻
+8 × 𝑊
+8
+256 × 𝐻
+16 × 𝑊
+16
+ 
+ 
+Layer 4
+256 × 𝐻
+16 × 𝑊
+16
+512 × 𝐻
+32 × 𝑊
+32
+ 
+ 
+GAP
+512 × 𝐻
+32 × 𝑊
+32
+512
+ 
+ 
+FC Head
+512
+1
+ 
+from the strides in each layer. Factors like padding, kernel size and 
+other parameters, while important, are not detailed in this overview 
+for brevity and clarity.
+In this scheme, the BN is split between Layer 0 and Layer 1; 
+thus, forming SN constituted of Layer 0 and DN constituted of layers: 
+{Layer 1, Layer 2, Layer 3, Layer 4, GAP, FC Head}. The DiffN is then 
+attached between SN and DN forming thus the DiffConvNet. The DiffN 
+is composed by a DiffLayer, which consists of a convolutional layer of 
+3 × 3 kernel size and an Averaging operation. The DiffLayer is repeated 
+𝑁 times (the iteration number of diffusion), while Averaging operation 
+averages the 𝑁 diffused representations (initial, transient, and final 
+states) into a unified diffused representation.
+4
+
+
+--- PAGE 5 ---
+
+E. Pintelas and I.E. Livieris
+Computer Vision and Image Understanding 257 (2025) 104375
+4. DeepFake case-study datasets
+In order to guarantee diversity in our experimental simulations, we 
+have used three different types of fake manipulation datasets namely, 
+DeepFake Detection Challenge (DFDC), DeepFakeMnist+ (DFMNIST+) 
+and EXPerts professional photoshop designers (EXP) datasets, and also 
+a mixed one (MIXED), which is a mixed version of DFDC, DFMNIST+ 
+and EXP.
+DFDC dataset (Dolhansky et al., 2020) is currently the largest public 
+facial forgery dataset being a collaborative endeavor by AWS, Face-
+book, Microsoft and the Partnership on AI’s Media Integrity Steering 
+Committee to counter the proliferation of deepfakes. Derived from 
+GAN-generated fakes, it originally captured diverse individuals across 
+various settings. For our experiments, we created a curated version1 
+incorporating one image frame per video, isolating also the faces from 
+every individual in the videos, comprising in total around 100000
+instances.
+DFMNIST+ (Huang et al., 2021) offers animated video data har-
+nessed through the First Order Motion Model for Image Animation. 
+It showcases 10,000 legitimate videos from VoxCeleb1, complemented 
+by an equal number of animations stemming from the real videos. 
+The animation videos vividly imitate a range of actions, from blinking 
+to surprise and embarrassment, realized through a plethora of actors. 
+Notably, to ensure quality, all animations successfully deceived contem-
+porary liveness detectors, with prominent ones being from Baidu and 
+Tianyan.
+However, the ‘‘real’’ dataset did not have a unique actor ID for each 
+instance; hence, in a 10-fold evaluation with random splits, the model 
+risked on distinguishing based on persons instead of genuinely distin-
+guishing between real and fake. This is because repeated appearances of 
+the same individual across training and test sets could lead the model 
+to recognize person-specific characteristics rather than discerning au-
+thenticity, introducing a potential bias. To sidestep this concern, we 
+ensured each instance in our dataset represented a unique individual, 
+preventing the model from resorting to person-specific recognition and 
+compelling it to truly discern between real and fake.
+The EXP dataset is a remarkable work of professional Photoshop 
+designers of the Computational Intelligence and Photography Lab at 
+Yonsei University’s Computer Science Department. It uniquely fea-
+tures injected facial elements, such as eyes, noses, and mouths, trans-
+posed onto different faces. This dataset comprises around 1000 genuine 
+and 1000 manipulated facial images, with the latter spanning varying 
+degrees of detection difficulty. Leveraging EXP, we aspire to detect 
+genuine fake-image markers, bypassing potential incidental patterns 
+produced by GANs.
+Aiming for a robust and comprehensive evaluation, we have also 
+integrated these three distinct fake manipulation datasets. By com-
+bining these three datasets into a unified MIXED dataset, we aim to 
+cover a wide range of manipulative techniques prevalent in the real 
+world. This fusion not only adds diversity in the types of manipulations 
+our model is exposed to but also enhances its generalization ability in 
+different situations. Such a diverse training ensures that our model is 
+not narrowly tailored to a specific kind of manipulation but is resilient 
+against a variety of manipulation methods. Ultimately, this mixed-
+dataset approach reinforces our evaluation’s reliability and underscores 
+our model’s adaptability in a more real-world scenario.
+5. Comparison study
+In this section, we present the experimental results from the com-
+parison of the proposed model (DiffConvNet) with the state-of-the-art 
+DeepFake detection approaches. Among them, a wide and diverse 
+1 This version of this dataset can be found in the following link
+range of different CNN-based methodologies were included (Fine-
+Tuning (Huang et al., 2021), Facial-Fusion (Tolosana et al., 2022), 
+Facial-Geometry (Liang et al., 2023), Pairwise (Hsu et al., 2020), 
+Siamese & Attention (Bonettini et al., 2021), Multi-View (Pintelas et al., 
+2023), Multi-Attentional (Zhao et al., 2021), and Distillation (Heo et al., 
+2021)), in order to perform comprehensible experimental comparisons.
+5.1. Experimental setup
+In this comparison the proposed approach was implemented with 
+𝑁
+=
+5 (the effect of higher number of diffusion iterations were 
+investigated in our ablation study in Section 6.2). In order to guarantee 
+fairness in the experiments we have followed the following global 
+experimental settings in all models described as follows:
+• ResNet18 was selected as CNN backbone in all approaches be-
+cause of its high balance between speed and accuracy (He et al., 
+2016; Canziani et al., 2017).
+• The input dimensions of facial images for every dataset for every 
+model was set to 256 × 256. We must clarify that, the raw frames 
+per video instance specifically for the DFDC dataset was much 
+higher around to 1000 × 1000. However since we cropped the 
+faces per instance frame, the extracted facial images had much 
+lower dimensions around to 256 × 256.
+• As regards the training parameters, Adam optimizer (Kingma and 
+Ba, 2014) was used with an initial learning rate (10−4) followed 
+by reduce-learning-rate-on-plateau scheduler (Smith, 2017) in 
+order to upgrade the learning rate with respect to the validation 
+score (for every 5 epochs where there was no improvement, the 
+learning was decreasing by a 0.7 factor). Additionally, early-
+stopping (Goodfellow et al., 2016) and weight-decay (Loshchilov 
+and Hutter, 2019) were used in order to prevent over-fitting. In 
+particular for early stopping, if there was no validation improve-
+ment for 10 epochs the training was terminated, while for weight 
+decay, a coefficient of 10−4 was applied to the L2 regularization 
+term, which penalizes large weights in the models.
+• For solidness and robustness in the outcome results, 10-fold cross 
+validation was also applied in all experimental evaluations. More 
+specifically, 10 distinct folds were created comprised by a 90% 
+training and 10% testing ratio each. Also, for each training fold, a 
+separate validation set was also used (10% ratio of the remaining 
+90% training set fold) in order to apply the reduce-learning-
+rate-on-plateau scheduler and early stopping strategies described 
+before. The final testing results were extracted by averaging the 
+testing accuracy of each distinct testing fold (10 in total).
+• The evaluation was based on the following performance metrics: 
+Accuracy (Acc) in %, Area Under Curve (AUC), and Geomet-
+ric Mean (GM) score. Acc is a straightforward method, which 
+provides a direct measure of correct predictions but may be 
+misleading for imbalanced datasets. AUC takes into account the 
+probabilistic outputs of the model evaluating its ability to distin-
+guish between classes across various thresholds offering higher 
+evaluation depth beyond binary outcomes while GM is a robust 
+metric, which measures the balance between sensitivity and speci-
+ficity ensuring balanced performance across both classes (Pintelas 
+and Pintelas, 2022).
+It is worth mentioning that the numerical experiments and compar-
+isons prioritize in the main concept and unique research value of each 
+method. Our aim is to avoid adding extra complexities that are more 
+suitable for real-world or competitions situations. Thus, we did not 
+include advanced augmentations and backbones to boost performance, 
+which might overshadow the true efficiency of our proposed method 
+for deepfake detection.
+5
+
+
+--- PAGE 6 ---
+
+E. Pintelas and I.E. Livieris
+Computer Vision and Image Understanding 257 (2025) 104375
+Table 3
+Performance comparison of DiffConvNet with state-of-the-art DeepFake detection methods across four datasets (DFDC, DFMNIST+, EXP, MIXED). Metrics include Accuracy (Acc), 
+Area Under the Curve (AUC), and Geometric Mean (GM) with the best results highlighted in bold.
+ Approaches
+DFDC
+DFMNIST+
+EXP
+MIXED
+ 
+Acc
+AUC
+GM
+Acc
+AUC
+GM
+Acc
+AUC
+GM
+Acc
+AUC
+GM 
+ Fine-Tuning
+90.4
+0.930
+0.825
+86.6
+0.948
+0.860
+68.0
+0.744
+0.679
+91.5
+0.946
+0.828 
+ Facial-Fusion
+93.2
+0.959
+0.847
+87.5
+0.946
+0.867
+70.9
+0.783
+0.707
+91.9
+0.953
+0.832 
+ Facial-Geometry
+92.8
+0.958
+0.822
+87.1
+0.951
+0.865
+70.2
+0.753
+0.701
+91.8
+0.951
+0.844 
+ Pairwise
+92.7
+0.957
+0.838
+88.5
+0.956
+0.868
+68.9
+0.763
+0.684
+91.4
+0.954
+0.841 
+ Siamese-Attention
+91.4
+0.951
+0.837
+87.1
+0.940
+0.862
+67.1
+0.754
+0.670
+91.3
+0.953
+0.855 
+ Multi-View
+87.8
+0.934
+0.845
+85.2
+0.928
+0.838
+71.1
+0.778
+0.709
+91.6
+0.955
+0.840 
+ Multi-Attentional
+91.5
+0.953
+0.857
+87.5
+0.945
+0.873
+70.7
+0.782
+0.704
+92.4
+0.956
+0.856 
+ Distillation
+92.8
+0.956
+0.832
+88.2
+0.949
+0.875
+69.9
+0.758
+0.697
+92.6
+0.954
+0.843 
+ DiffConvNet
+92.9
+0.962
+0.860
+88.5
+0.953
+0.877
+71.2
+0.791
+0.711
+91.7
+0.959
+0.864 
+Finally, in order to guarantee full transparency in the presented 
+comparisons, the implementation code of the proposed model alongside 
+with every other model can be found in.2
+5.2. Numerical performance results
+Table 3 summarizes the performance of all utilized DeepFake de-
+tection approaches applied on four facial manipulation datasets. Notice 
+that the best performance for each metric is highlighted in bold.
+As regards DFDC dataset, the proposed model exhibits the best over-
+all performance, achieving an accuracy of 92.9%, AUC score of 0.962, 
+and GM score of 0.860, indicating superior robustness in detecting 
+DeepFakes on the DFDC dataset. Regarding the DFMNIST+ dataset, 
+Pairwise approach reports the best performance relative to accuracy 
+and AUC scores closely followed by DiffConvNet, which presented 
+almost identical performance. In addition, the proposed model high-
+lighted the best GM score (0.877), which implies that it exhibits the 
+best accuracy balance across both classes.
+In the context of the EXP dataset, the proposed model demonstrated 
+superior performance compared to other state-of-the-art models, no-
+tably in the AUC score. Although the difference between the proposed 
+model and the Multi-View is relative small in terms of accuracy (71.2% 
+compared to 71.1%) and GM (0.711 compared to 0.709), our model 
+achieved a substantial difference in terms of AUC (0.791 compared 
+to 0.778). This performance indicates the model’s efficiency in detect-
+ing professionally crafted manipulations, which are usually harder to 
+detect, showcasing its utility in practical, real-world situations where 
+high-quality manipulations are often encountered.
+Finally, as regards the MIXED dataset, the proposed model demon-
+strates the best overall performance, reporting the highest score in 
+two performance metrics, namely AUC (0.959) and GM (0.864). It is 
+worth mentioning that the reported scores, provide strong empirical 
+evidence about the considerable differences between the performance 
+of the proposed model against the state-of-the-art models relative to 
+both classes.
+For providing strong statistical evidence about the effectiveness of 
+the proposed DiffConvNet model, a statistical analysis is conducted for 
+evaluating the hypothesis 𝐻0 that all models present equally accurate 
+predictions. For this purpose, non-parametric Friedman Aligned-Ranks 
+(FAR) test (Hodges Jr. and Lehmann, 2011) is employed for ranking 
+the models based on a performance metric; while Finner post-hoc 
+test (Finner, 1993) with significance level 𝛼= 5% is used for examining 
+the existence of considerable differences and the presence of signifi-
+cant variations in their predictions, without any assumption about the 
+distribution of the performance scores (Kiriakidou et al., 2024).
+Tables 4–6 present the statistical analysis based on Acc, AUC and 
+GM performance metrics, respectively. In all cases, the DiffConvNet 
+reports the highest probability ranking based on FAR test. In addition, 
+2 https://github.com/EmmanuelPintelas/A-Diffusion-CNN-model-for-
+DeepFake-Image-Detection
+Table 4
+Statistical analysis: FAR and Li post-hoc tests results relative to Acc metric.
+ Model
+Friedman
+Finner post-hoc test
+ 
+Ranking
+𝑝-value
+𝐻0
+ 
+ DiffConvNet
+8.125
+–
+–
+ 
+ Facial-Fusion
+10.875
+0.00596
+Rejected 
+ Distillation
+12.875
+0.000002
+Rejected 
+ Multi-Attentional
+16.125
+0.0
+Rejected 
+ Facial-Geometry
+17.000
+0.0
+Rejected 
+ Pairwise
+18.625
+0.0
+Rejected 
+ Multi-View
+23.750
+0.0
+Rejected 
+ Siamese-Attention
+28.875
+0.0
+Rejected 
+ Fine-Tuning
+30.250
+0.0
+Rejected 
+Table 5
+Statistical analysis: FAR and Li post-hoc tests results relative to AUC metric.
+ Model
+Friedman
+Finner post-hoc test
+ 
+Ranking
+𝑝-value
+𝐻0
+ 
+ DiffConvNet
+6.250
+–
+–
+ 
+ Facial-Fusion
+13.625
+0.0
+Rejected
+ 
+ Multi-Attentional
+14.750
+0.0
+Rejected
+ 
+ Pairwise
+15.625
+0.0
+Rejected
+ 
+ Distillation
+18.875
+0.0
+Rejected
+ 
+ Facial-Geometry
+19.750
+0.0
+Rejected
+ 
+ Multi-View
+22.500
+0.0
+Rejected
+ 
+ Siamese-Attention
+25.875
+0.0
+Rejected
+ 
+ Fine-Tuning
+29.250
+0.0
+Rejected
+ 
+Table 6
+Statistical analysis: FAR and Li post-hoc tests results relative to GM metric.
+ Model
+Friedman
+Finner post-hoc test
+ 
+Ranking
+𝑝-value
+𝐻0
+ 
+ DiffConvNet
+3.250
+–
+–
+ 
+ Multi-Attentional
+8.375
+0.0
+Rejected
+ 
+ Facial-Fusion
+16.875
+0.0
+Rejected
+ 
+ Distillation
+19.250
+0.0
+Rejected
+ 
+ Multi-View
+20.500
+0.0
+Rejected
+ 
+ Facial-Geometry
+21.750
+0.0
+Rejected
+ 
+ Siamese-Attention
+22.750
+0.0
+Rejected
+ 
+ Pairwise
+23.000
+0.0
+Rejected
+ 
+ Fine-Tuning
+30.750
+0.0
+Rejected
+ 
+Li post-hoc test presents that there exist significant differences between 
+the performance of DiffConvNet and the rest models, which highlights 
+the effectiveness and prediction accuracy of the proposed model.
+Summarizing, the presented numerical experiments highlight that 
+the proposed model presented the best overall performance. In addi-
+tion, they indicate the model’s reliability and efficiency in distinguish-
+ing real from manipulated content effectively and its ability to handle 
+a wide range of manipulations, reinforcing its robustness to generalize 
+effectively across diverse types of facial manipulations.
+6
+
+
+--- PAGE 7 ---
+
+E. Pintelas and I.E. Livieris
+Computer Vision and Image Understanding 257 (2025) 104375
+Table 7
+Analysis of the effect of splitting point depths in the DiffConvNet model. 
+Depth 0 corresponds to applying the diffusion network directly on the 
+raw input, while Depth 1–4 refer to progressively deeper splits within 
+the backbone.
+ DiffConvNet
+Acc
+AUC
+GM 
+ Depth 0
+90.2
+0.928
+0.812 
+ Depth 1
+91.7
+0.959
+0.864 
+ Depth 2
+92.0
+0.957
+0.839 
+ Depth 3
+92.3
+0.956
+0.817 
+ Depth 4
+89.5
+0.929
+0.790 
+6. Ablation study
+In this section, we engage a detailed exploration of the effective-
+ness of the proposed approach through an ablation study, which is 
+structured into two categories: Splitting-depth impact and Accuracy-
+speed trade-off. Each of these studies investigates specific aspects of 
+the proposed approach, providing insights into its effectiveness and 
+adjustability. For the purpose of this analysis, we choose the MIXED 
+dataset due to its rich diversity in manipulation techniques, since 
+this dataset is a synthesis of the three major utilized dataset sources: 
+DFDC, DFMNIST+, and EXP; making it an ideal choice for a broad and 
+comprehensive assessment.
+6.1. Splitting-depth impact
+In this study, we examine the influence of different depths for the 
+base network’s (BN) splitting point. These depths range from the initial 
+image (Depth 0) to deeper layers (Depth 1–4). Specifically, Depth 0 
+means that the DiffN is applied directly to the raw input image. Depth 
+1 specifies that the DiffN is integrated between Layer 0 and Layer 
+1, Depth 2 between Layer 1 and Layer 2, and so forth. For a more 
+comprehensive understanding of the network’s modules and layers, we 
+refer to Table 2.
+Based on the presented results in Table 7, it is evident that Depth 
+1 achieves the most balanced and superior results across the evaluated 
+metrics, which balances between preserving the inherent coherence of 
+the image and leveraging the feature insights provided by the early 
+transformations of base network.
+Consequently, Depth 1 is considered the most optimal depth for 
+integrating the diffusion network and is adopted as the standard config-
+uration for all experiments in this study. This depth demonstrates the 
+efficacy of incorporating diffusion processes at initial layers, allowing 
+for meaningful representations and feature extraction while retaining 
+the essential characteristics and coherence of the input image.
+6.2. Accuracy-speed trade-off
+This study delves into the applicability of the proposed method 
+across various CNN backbones. Although we primarily used ResNet for 
+the experimental analysis because of its high balance between speed 
+and accuracy, our methodology is not restricted to this backbone. 
+Furthermore, we employed the proposed approach to other popular 
+CNN architectures, namely Xception (Tolosana et al., 2022) and Ef-
+ficientNet (EfficientNet-B0) (Raza et al., 2023), which are frequently 
+applied in DeepFake detection. Finally, we conducted an Accuracy-
+Speed Trade-off analysis by integrating our diffusion-based approach 
+into these utilized CNN backbones in order to examine the impact of 
+various number of diffusion iterations 𝑁 with respect to the prediction 
+performance and the time overhead (total inference prediction time in 
+seconds given a batch of instances).
+Table 8 presents the performance results for the proposed DiffCon-
+vNet model, applied to various CNN backbones, with the diffusion 
+iterations set to 𝑁= 5. Clearly, the incorporation of the diffusion 
+Table 8
+Performance results of proposed DiffConvNet (𝑁= 5) approach applied on various CNN 
+backbones.
+ Models
+Evaluation Metrics
+CPU time 
+ 
+Acc
+AUC
+GM
+(in secs) 
+ ResNet18
+91.5
+0.946
+0.828
+0.004
+ 
+ Diffusion - ResNet18
+91.7
+0.959
+0.864
+0.005
+ 
+ Xception41
+90.8
+0.945
+0.843
+0.014
+ 
+ Diffusion - Xception41
+92.7
+0.962
+0.853
+0.015
+ 
+ EfficientNet
+92.9
+0.964
+0.858
+0.013
+ 
+ Diffusion – EfficientNet
+93.1
+0.967
+0.879
+0.014
+ 
+process enhances the performance across all utilized backbones, sub-
+stantiating the efficacy of the proposed methodology in improving 
+deepfake detection. The models exhibit improvement in all metrics 
+especially in Auc and GM, showcasing additionally the approach’s 
+effectiveness.
+As regards the computation cost, based on Table 8, there is approx-
+imately a 7% increase in time overhead for medium-heavy backbones 
+like Xception and EfficientNet. This implies that the integration of the 
+diffusion process does not significantly amplify the computational com-
+plexity of already complex and large networks, rendering the approach 
+practical for more advanced models. However, for lighter models like 
+ResNet18, there is a substantial, around 25% increase in time overhead. 
+This underscores that while the methodology is generally beneficial, the 
+impact on CPU time is more pronounced for lightweight models due to 
+the relative increase in complexity.
+In summary, these results indicate a well-balanced trade-off with 
+the observed performance improvement leading to the fact that the 
+increase in computational demand is worthy due to the significant 
+performance gains.
+Fig. 2 illustrates the trade-off between AUC performance and com-
+putation time of the three distinct utilized CNN backbones: ResNet18, 
+Xception41, and EfficientNet, each enhanced with varying numbers of 
+diffusion iterations 𝑁. Each point on the graph represents a distinct 
+count of diffusion iterations (𝑁= 0, 5, 10, 20, 30, 40, 50) incorporated 
+into each backbone (the 𝑁= 0 refers to the initial standard CNN 
+backbone without incorporating our proposed approach). The 𝑥-axis 
+signifies the computation time, showcasing the overhead introduced by 
+the diffusion process, while the 𝑦-axis depicts the AUC performance.
+The interpretation of Fig. 2 suggests that both EfficientNet and 
+ResNet demonstrate a superior balance between performance and com-
+putation time compared to Xception when incorporating the proposed 
+diffusion methodology. As the number of diffusion iterations increases 
+the computation time overhead for EfficientNet remains relatively sta-
+ble achieving also the highest performance. On the other hand, ResNet, 
+given its lightweight architecture, experiences a significant increase in 
+computation time via the incorporation of diffusion process. However, 
+it is noteworthy that the integration of the diffusion process into ResNet 
+results in significant performance gains (enabling it to achieve the 
+performance levels of EfficientNet), in contrast to EfficientNet which 
+shows modest performance improvement across the increased diffusion 
+iterations.
+In summary, the findings of this ablation study imply to the fact 
+that the proposed approach can be extended to a wide range of CNN 
+backbones (compatibility property), improving also their prediction 
+performance for identifying deepfakes (performance property), fol-
+lowed by a stable time overhead cost as 𝑁 increases especially for 
+larger and more complex architectures (scalability property).
+7. Visualization study
+Last but not least, we also conducted comprehensive visualiza-
+tion studies in order to enhance trust providing explanations and 
+reasoning of the proposed model’s efficacy that are meaningful and 
+7
+
+
+--- PAGE 8 ---
+
+E. Pintelas and I.E. Livieris
+Computer Vision and Image Understanding 257 (2025) 104375
+Fig. 2. Analysis of the accuracy-speed trade-off for different CNN backbones (ResNet18, Xception41, EfficientNet) integrated with the proposed diffusion methodology. Each point 
+corresponds to a specific number of diffusion iterations (𝑁), demonstrating the balance between computational cost and performance.
+closer to human understanding, rather than relying solely on numerical 
+outcomes. Specifically, we conducted interpretability evaluations and 
+visualization of the diffusion states, for our proposed approach.
+7.1. Predictions’ interpretation
+In order to enhance the reliability and trustfulness of our model, 
+we performed a Grad-Cam-based (Livieris et al., 2023; Selvaraju et al., 
+2017) interpretation of predictions (Fig. 3), applied on the Exp dataset 
+(due to the fact that the exact locations where the manipulations took 
+place3 in the facial images are known). For this task, we presented 
+various ‘‘extreme’’ case study instances for visual evaluation to further 
+emphasize our point. These instances are challenging because what 
+appears ‘‘real’’ might seem ‘‘fake’’ and vice versa.
+The primary objective is to demonstrate that the model accurately 
+focuses on the appropriate regions during its decision-making process. 
+In contexts where specific manipulated regions are known (as with the 
+Exp dataset), it is vital to ensure that the model’s attention correctly 
+aligns with these areas to establish its reliability (Pintelas et al., 2021). 
+It is essential thus to verify that the model concentrates on at least 
+one manipulated region when predicting fake instances, which serves 
+as a crucial indicator of its effectiveness and trustworthiness in detect-
+ing manipulations. If the model instead, focuses on irrelevant regions 
+(e.g., the model focuses on hair, while the manipulation took place 
+in eyes and mouth), its reliability would be questionable, even if the 
+prediction is technically correct (Pintelas et al., 2020).
+For image (C), depicted in Fig. 3, where manipulations are exclu-
+sively in the eyes (1100), the model notably focuses on these specific 
+regions to classify the image as ‘‘fake’’. Whereas in image (B) which 
+features manipulations in both the eyes and nose (1110), the model’s 
+attention focus more broadly, encompassing both eyes and the nose. In 
+addition, in the case of image (D) (1111), the model’s focus extends 
+beyond the eyes and nose, also encompassing the mouth area. This 
+3 Each manipulation is denoted by a binary four-digit code indicating which 
+parts of the face were altered (left eye, right eye, nose, mouth). For instance, 
+the code ‘1100’ signifies that both eyes were manipulated, while the nose and 
+mouth remain original.
+observation is a positive indication given the known alterations across 
+the eyes, nose, and mouth regions in this image.
+Furthermore, for the real image (E), one can initially suspect ma-
+nipulation due to the slightly asymmetrical and darker appearance of 
+the left eye. So, the model properly focuses on this potential anomaly 
+to determine whether it is a manipulation or not, ultimately making 
+the correct decision that the image is real. Unfortunately, the model 
+misinterpreted the image (F). The natural makeup on the subject’s face 
+misled the model, primarily because the makeup around the left eye 
+looks like to a possible fake manipulation, causing it to be misclassified 
+as ‘‘fake’’.
+7.2. Diffusion states’ interpretation
+Finally, we also attempted to visualize the transient diffusion states 
+from 0 to 50 of the diffusion network process (for 𝑁= 50 iterations), 
+applied to the encoded representation of SN, using a ResNet18 back-
+bone with a splitting point at Depth 1 (as described in Table 2). This 
+allows us to illustrate the diffusion impact of our approach on some 
+case study instances, as presented in Fig. 4.
+We recall, that DeepFakes may show either unusually rapid diffu-
+sion states due to the artificial elements merging or exhibit strange 
+diffusion patterns as they might not preserve the inherent coherence 
+of a natural image. The primary objective of the diffusion approach 
+is to discern potential distinctions between these scenarios. Through 
+these visualizations, our aim is to provide empirical evidence by explor-
+ing whether discernible patterns emerge during the diffusion process, 
+allowing for a more intuitive understanding of the proposed method 
+beyond solely relying on numerical experimental results. However, it is 
+important to acknowledge that such patterns may be subtle, ambiguous, 
+or even imperceptible to the human eye. Our goal is not to claim that 
+these visuals definitively expose DeepFakes but rather to demonstrate 
+how the diffusion process refines and enriches the initial encoded 
+representation, potentially aiding a CNN model in detecting DeepFakes 
+more effectively.
+As presented in Fig. 4, for the ‘‘real’’ cases, the transition through 
+each transient diffusion state appears smoother, more natural and more 
+stable. In contrast, the ‘‘fake’’ cases exhibit more abrupt and unnatural 
+8
+
+
+--- PAGE 9 ---
+
+E. Pintelas and I.E. Livieris
+Computer Vision and Image Understanding 257 (2025) 104375
+Fig. 3. Grad-Cam visualization of the DiffConvNet model’s predictions on real and manipulated facial images from the EXP dataset. The highlighted regions indicate the model’s 
+focus areas for decision-making, demonstrating its ability to detect manipulated regions effectively.
+Fig. 4. Sequential visualization of the transient diffusion states for ‘‘real’’ and ‘‘fake’’ images across 50 iterations of proposed diffusion network. The diffusion process exposes 
+distinct patterns, with manipulated images displaying abrupt transitions and inconsistencies compared to smoother transitions in authentic images.
+transitions; for example in the transition from states 4 to 5 to 6 for the 
+‘‘fake’’ case (D).
+Furthermore, the ‘‘fake’’ cases exhibit more odd and inconsistent 
+diffusion patterns. For example, in the ‘‘fake’’ case (B), noticeable 
+inconsistencies emerge in states 6, 8, 12, and 26, where unnatural struc-
+tural deviations can be observed. In particular, for this case, the left 
+eye appears inconsistent with the right eye, which appears significantly 
+lighter/highlighted. This asymmetry strongly suggests a manipulation 
+artifact/pattern, especially since we already know that the eyes of this 
+person were manipulated by blending them with another person’s facial 
+features3. In contrast to the ‘‘real’’ cases, where facial features are 
+diffused more smoothly, preserving their overall spatial structure and 
+coherence without too many deviations.
+Additionally, we conducted two additional experiments to visually 
+evaluate and compare alternative diffusion-like processes: (1) iterative 
+Gaussian blurring and (2) Gaussian noise-based diffusion (Xiao et al., 
+2024). Both methods were also applied to the output of SN (using 
+the same splitting point at Depth 1, refer to Table 2), ensuring a fair 
+baseline for comparison.
+The comparison between the network-based diffusion process
+(Fig. 4) and the two Gaussian-based transformations (Figs. 5 and 6) 
+highlight the distinct advantages of the proposed approach:
+• Gaussian blurring (Fig. 5): This process progressively smooths the 
+image, causing an indiscriminate loss of fine-grained details. Both 
+real and fake images undergo similar degradation, preventing it 
+from exposing any deepfake-specific inconsistencies.
+• Gaussian diffusion (Fig. 6): This method introduces progressive 
+noise, leading to stochastic image degradation. Interestingly, 
+some manipulation artifacts persist throughout the diffusion pro-
+cess (e.g., the left manipulated eye in the fake case (B)), which 
+aligns with our hypothesis that manipulated images might ex-
+hibit distinct diffusion patterns due to their unnatural statistical 
+properties. However, unlike the proposed diffusion network (Fig. 
+4), Gaussian diffusion lacks a learnable filtering mechanism. 
+As a result, the process does not selectively highlight manipu-
+lated artifacts and inconsistencies to further reveal discriminative 
+features.
+9
+
+
+--- PAGE 10 ---
+
+E. Pintelas and I.E. Livieris
+Computer Vision and Image Understanding 257 (2025) 104375
+Fig. 5. Sequential visualization of iterative Gaussian blurring applied to ‘‘real’’ and ‘‘fake’’ images across 50 iterations. This serves as a baseline comparison to assess the proposed 
+diffusion process’s effects. Gaussian blurring leads to a homogeneous loss of detail, lacking the discriminative features observed in the transitions of Fig. 4.
+Fig. 6. Sequential visualization of Gaussian noise-based diffusion applied to ‘‘real’’ and ‘‘fake’’ images across 50 iterations. This method introduces progressive noise, revealing 
+some manipulation artifacts due to unnatural statistical properties. However, unlike the proposed network-based diffusion approach, it lacks its learnable mechanism, preventing 
+it from selectively highlighting deepfake inconsistencies and enhancing discriminative features.
+These findings demonstrate that the proposed network-based dif-
+fusion framework is not merely a random noise operation, but a tar-
+geted diffusion mechanism acting as a learnable feature extraction and 
+filtering process for DeepFake detection.
+8. Discussion & reasoning of methodology
+In this Section, we provide a thorough reasoning and discussion 
+of the key procedures and methods used in the proposed approach. 
+This includes the diffusion procedure and methodology in general, 
+the rationale behind the initial fine-tuning procedure (step 1)4, the 
+cutting/splitting-based approach (step 2), the decision on the splitting 
+‘‘depth’’ which involves whether to split shallowly or more deeply (step 
+4), the averaging of the diffused representation (step 6), and the final 
+end-to-end DiffConvNet fine-tuning (step 8).
+4 Steps 1–8 refer to the steps of Fig. 1 of Section 3.
+As regards the diffusion procedure, our approach is motivated by 
+the intuition that deepfakes could exhibit unusual diffusion states due 
+to unnatural artificial blending. However, we consider essential to 
+clarify that the diffusion process could not perform just by itself all the 
+‘‘hard job’’ for exposing the deepfake manipulations; it also requires 
+an efficient image encoding for performing diffusion and an efficient 
+exploitation of the diffusion process, in order to extract patterns and 
+features. In fact, the diffusion process mainly aims on assisting a CNN 
+classifier (DN) to detect deepfakes by providing it with a ‘‘richer’’ 
+representation (diffused-representation: 𝑑), compared to providing only 
+the encoded feature maps (𝑥0) of the initial image as extracted via the 
+shallow convolutional layers of a standard CNN backbone.
+Regarding the rationale of the method used for creating diffu-
+sion process, it is described as follows: Diffusion processes, funda-
+mental to many physical and mathematical models, are typically rep-
+resented using Partial Differential Equations (PDEs) (Gilboa and Os-
+her, 2009; Osher and Shen, 2019). Traditional methods for simu-
+lating these processes have often employed techniques derived from 
+10
+
+
+--- PAGE 11 ---
+
+E. Pintelas and I.E. Livieris
+Computer Vision and Image Understanding 257 (2025) 104375
+PDEs, such as Gaussian diffusion (Xiao et al., 2024), Laplacian dif-
+fusion (Osher and Shen, 2019), anisotropic diffusion (Tsiotsios and 
+Petrou, 2013), and bilateral filtering (Paris et al., 2009). Instead, we 
+adopted a convolutional-based approach allowing for a flexible, ef-
+ficient, and highly parallelizable diffusion simulation. Convolutional 
+layers can be interpreted as discrete approximations to PDEs, since in a 
+convolution operation, the filters (or kernels) serve functions analogous 
+to the spatial derivatives in PDEs (Ruthotto and Haber, 2020; Kag and 
+Saligrama, 2022). Therefore, interpreting convolutional operations as 
+approximations to PDEs it is a logical step to suggest that convolutional 
+layers can simulate diffusion processes.
+Regarding the rationale of the initial fine-tuning procedure, it is 
+described as follows: Since we cut/split the BN into two sub-networks 
+(SN and DN), the initial fine-tuning procedure of BN aims to ensure 
+that the SN will encode the input image into a more relevant encoded 
+representation 𝑥0 with respect to the deepfake task. Thus, the diffusion 
+input 𝑥0 may have already highlighted some initial deepfake patterns, 
+while now since the diffusion process will start its operation from a 
+better initial point, it can perform more ‘‘targeted’’ diffusion on 𝑥0, 
+for augmenting even more the deepfake’s feature extraction proce-
+dure; hence, providing more enriched data representations for the DN 
+classifier.
+As regards the reasoning for adopting the splitting-based approach, 
+we clarify it as follows: Instead of using separate custom-designed 
+Shallow Network (SN) and Deep Network (DN), we aim to leverage 
+the prior knowledge encapsulated in a pre-trained CNN backbone, such 
+as ResNet. Consequently, we strategically split this backbone into two 
+sub-networks: the SN, tasked with encoding input images into compact, 
+robust, and noise-reduced latent representations ideal for targeted dif-
+fusion, and the DN, specialized in extracting high-level features from 
+the diffusion outcomes and performing the final classification. This 
+methodology provides significant advantages in terms of functionality, 
+adjustability, and performance since our diffusion-based strategy can 
+seamlessly integrate with various CNN backbones, fully exploiting their 
+pre-trained weights.
+However, the question of identifying an optimal splitting depth 
+arises naturally: Why not directly apply diffusion to raw input im-
+ages, or why not utilize deeper latent representations? The rationale 
+behind our selected splitting point involves carefully balancing two 
+critical factors: retaining the inherent natural coherence of images and 
+effectively extracting meaningful representations for diffusion. Splitting 
+the network at excessively deep layers would risk losing essential 
+coherent structural information inherent to natural images, render-
+ing the diffusion process inefficient. Our method fundamentally relies 
+on detecting unnatural diffusion patterns characteristic of DeepFakes, 
+which requires preserving initial image coherence. On the other hand, 
+applying diffusion directly at the raw pixel level (depth 0) would be 
+significantly more computationally expensive and less efficient, as raw 
+images contain redundant information and irrelevant noise, bypassing 
+valuable preliminary structural transformations performed by the ini-
+tial network layers. To empirically justify this choice, our ablation study 
+(Section 6.1) presents a comprehensive performance analysis across 
+multiple splitting depths, ranging from raw input images (depth 0) to 
+progressively deeper encoded layers (e.g., depths 1 and 2).
+For the decision to average the diffused representations, the primary 
+motivations are for ensuring robustness and preserving the structure 
+and weight configuration of the used CNN backbone. More specifically, 
+by averaging the transient diffusion states, the model minimizes the 
+effect of noise and potential outliers that might have been introduced 
+during the diffusion process. This approach effectively works as an 
+ensemble method within the diffusion layers, aggregating the outcomes 
+and thereby increasing stability and robustness.
+Also, the diffusion process, by its very nature, captures varying 
+feature scales and patterns across different states. Averaging them aims 
+to fuse these diverse feature representations into a unified feature map. 
+This operation ensures that the network benefits from the rich patterns 
+captured across different diffusion states, resulting in a more compre-
+hensive and integrated feature representation for the subsequent layers 
+of the DN.
+Furthermore, it is necessary to ensure that the input representation 
+for the DN matches the ancestral BN architecture. This is particularly 
+crucial as regards the adaptability property to maintain the weight 
+structure and more importantly, the integrity of the utilized CNN 
+backbone. By averaging the diffusion states, the network maintains a 
+consistent input dimensionality that aligns with the requirements of the 
+downstream modules in the DN. For example, in out context, the DiffN, 
+given an encoded representation 𝑥0 of dimensions 64 × 𝐻
+4 × 𝑊
+4 , creates 
+a 𝑁× 64 × 𝐻
+4 × 𝑊
+4 representation (Table 2), which does not match the 
+64 × 𝐻
+4 × 𝑊
+4 input dimensions of DN. Thus, by averaging the diffused 
+representation we ensure that the output of DiffN will match the input 
+dimensions of DN preserving thus the CNN backbone’s architecture.
+Finally, as regards the final end-to-end DiffConvNet model’s fine-
+tuning with respect to the DeepFake classification loss, one basic reason 
+is to optimize the DN to adjust to its new input representation. Origi-
+nally, the DN was fine-tuned via the BN’s initial fine-tuning process, 
+adapted to identify patterns from the 𝑥0 representation. However, 
+with its new input being the diffused representation 𝑑, it will have 
+to re-adjust its weights to discern the patterns lied into this new 
+representation. Also, we let the SN and DiffN weights to get updated. 
+This aims to let the SN to learn an even better encoded representation 
+for diffusion further optimized via the end-to-end training, while since 
+for the diffusion process we do not use a fixed diffusion function like 
+gaussian, we let instead the model, via the end-to-end training, to find 
+its own diffusion function which will be more optimal regarding the 
+deepfake detection task.
+9. Conclusions
+This work focuses on image-based DeepFake detection. Although 
+deepfakes are predominantly recognized as manipulated videos, there 
+exist many cases to be produced as manipulated images (Nightingale 
+et al., 2017; Yan et al., 2018). Furthermore, the world has witnessed 
+cases where deepfakes are mainly manifested in image form, especially 
+in scenarios where a brief but impactful disinformation is intended, 
+without the need for longer video narratives (Chesney and Citron, 
+2019). Such instances underscore the importance of an effective image-
+based deepfake detection method. Additionally, the challenge of de-
+tecting deepfakes in images is arguably more complex because the 
+manipulations or ‘‘injections’’ are harder to be detected accurately in a 
+static frame as opposed to a dynamic video sequence. As regards video-
+based detection, the manipulations can be more easily exposed due to 
+the plethora of frames and the continuity of motion (Thies et al., 2016).
+In addition, it is essential to mention that although this work focuses 
+on image-based deepfake detection, the proposed framework could be 
+easily extended into deepfake videos. This is because the transition 
+from image to video essentially involves processing sequences of images 
+(frames) and thus our image-based model could be easily applied to 
+individual frames of a video, and then the model’s outputs for each 
+frame could be aggregated to derive a final prediction. Therefore, if 
+a model achieves satisfactory performance in image-based deepfake 
+detection, it is reasonable to infer that it would do so in video-based 
+detection too.
+In this study, we proposed a CNN-based model, DiffConvNet, which 
+leverages diffusion processes to detect DeepFake manipulations in im-
+ages. The approach is based on the hypothesis that manipulated images 
+exhibit distinct diffusion patterns due to their unnatural distributions 
+introduced by generative processes. The diffusion mechanism aims to 
+expose inconsistencies within the input image, enhancing the CNN’s 
+ability to identify DeepFake content. Extensive experimental evalua-
+tions demonstrated the effectiveness of this framework, highlighting 
+its potential as a promising tool in the field of DeepFake detection. 
+In conclusion, the main advantages of the proposed approach are 
+summarized as follows:
+11
+
+
+--- PAGE 12 ---
+
+E. Pintelas and I.E. Livieris
+Computer Vision and Image Understanding 257 (2025) 104375
+• Accuracy: The model demonstrates high performance across a 
+wide range of facial image manipulations (refer to Table 3).
+• Compatibility & Performance: The approach exhibits adaptability 
+with various CNN backbones that also manage to significantly 
+improve their performance (see Sections 6.2 and 8).
+• Scalability: Our framework can be efficiently scaled to larger and 
+more complex architectures (refer to Section 6.2).
+• Interpretability: Incorporating diffusion patterns can provide bet-
+ter insight into the detection process, allowing for more transpar-
+ent and trustworthy DeepFake decision (refer to Section 7).
+However, the main disadvantage of our approach lies in the increased 
+computation time compared to standard CNN backbones (Table 8), 
+particularly when the model has to handle a large number of diffusion 
+iterations, such as 𝑁= 50 (Fig. 2). This is a trade-off that our approach 
+needs to deal with in order to create an efficient diffusion simulation 
+for exposing manipulation content, especially for the very high-quality 
+manipulated image cases, such as those depicted in Figs. 3(B) and 3(C), 
+which can be considered very hard to detect.
+Nevertheless, as with any methodology, our study has limitations 
+that warrant further investigation. The full potential of transient diffu-
+sion states remains unexplored. While our averaging approach aimed 
+to create a robust diffused representation compatible with various 
+CNN backbones, more advanced strategies should be considered. For 
+instance, integrating CNN-LSTM-based methods (Köpüklü et al., 2022; 
+Jain et al., 2020) could capture sequential and dynamic feature corre-
+lations across transient diffusion states. Additionally, exploring alterna-
+tive diffusion architectures and sampling strategies (Yang et al., 2023), 
+may enhance both performance and efficiency.
+CRediT authorship contribution statement
+Emmanuel Pintelas: Writing – original draft, Visualization, Val-
+idation, Software, Methodology, Investigation, Formal analysis, Data 
+curation, Conceptualization. Ioannis E. Livieris: Writing – review & 
+editing, Visualization, Validation, Supervision, Software, Methodology, 
+Investigation, Formal analysis, Data curation.
+Declaration of competing interest
+The authors declare that they have no known competing finan-
+cial interests or personal relationships that could have appeared to 
+influence the work reported in this paper.
+Data availability
+Data will be made available on request.
+References
+Agarwal, S., Farid, H., Gu, Y., He, M., Nagano, K., Li, H., 2019. Protecting world leaders 
+against deep fakes. In: CVPR Workshops, vol. 1, p. 38.
+Bonettini, N., Cannas, E.D., Mandelli, S., Bondi, L., Bestagini, P., Tubaro, S., 2021. Video 
+face manipulation detection through ensemble of CNNS. In: 2020 25th International 
+Conference on Pattern Recognition. ICPR, IEEE, pp. 5012–5019.
+Canziani, A., Paszke, A., Culurciello, E., 2017. An analysis of deep neural network 
+models for practical applications. In: ISCAS.
+Chesney, B., Citron, D., 2019. Deep fakes: A looming challenge for privacy. Democr. 
+Natl. Secur. Calif. L. Rev. 107, 1753.
+Chollet, F., 2017. Xception: Deep learning with depthwise separable convolutions. In: 
+Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 
+pp. 1251–1258.
+Dolhansky, B., Bitton, J., Pflaum, B., Lu, J., Howes, R., Wang, M., Ferrer, C.C., 2020. 
+The deepfake detection challenge (DFDC) dataset. arXiv preprint arXiv:2006.07397.
+Finner, H., 1993. On a monotonicity problem in step-down multiple test procedures. 
+J. Amer. Statist. Assoc. 88 (423), 920–923.
+Gilboa, G., Osher, S., 2009. Nonlocal operators with applications to image processing. 
+Multiscale Model. Simul. 7 (3), 1005–1028.
+Goodfellow, I., Bengio, Y., Courville, A., 2016. Deep Learning. MIT Press.
+He, K., Zhang, X., Ren, S., Sun, J., 2016. Deep residual learning for image recog-
+nition. In: Proceedings of the IEEE Conference on Computer Vision and Pattern 
+Recognition. pp. 770–778.
+Heo, Y.-J., Choi, Y.-J., Lee, Y.-W., Kim, B.-G., 2021. Deepfake detection scheme based 
+on vision transformer and distillation. arXiv preprint arXiv:2104.01353.
+Hodges Jr., J.L., Lehmann, E.L., 2011. Rank methods for combination of independent 
+experiments in analysis of variance. In: Selected Works of E.L. Lehmann. Springer, 
+pp. 403–418.
+Hsu, C.-C., Zhuang, Y.-X., Lee, C.-Y., 2020. Deep fake image detection based on pairwise 
+learning. Appl. Sci. 10 (1), 370.
+Huang, J., Wang, X., Du, B., Du, P., Xu, C., 2021. Deepfake MNIST+: a DeepFake 
+facial animation dataset. In: Proceedings of the IEEE/CVF International Conference 
+on Computer Vision. pp. 1973–1982.
+Jain, M., Subramanyam, A.V., Denman, S., Sridharan, S., Fookes, C., 2020. LSTM guided 
+ensemble correlation filter tracking with appearance model pool. Comput. Vis. 
+Image Underst. 195, 102935.
+Kag, A., Saligrama, V., 2022. Condensing CNNs with partial differential equations. 
+In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern 
+Recognition. pp. 610–619.
+Kingma, D.P., Ba, J., 2014. Adam: A method for stochastic optimization. arXiv preprint 
+arXiv:1412.6980.
+Kiriakidou, N., Livieris, I.E., Pintelas, P., 2024. Mutual information-based neighbor 
+selection method for causal effect estimation. Neural Comput. Appl. 1–15.
+Köpüklü, O., Hörmann, S., Herzog, F., Cevikalp, H., Rigoll, G., 2022. Dissected 3D 
+CNNs: Temporal skip connections for efficient online video processing. Comput. 
+Vis. Image Underst. 215, 103318.
+Li, L., Bao, J., Zhang, T., Yang, H., Chen, D., Wen, F., Guo, B., 2020. Face X-ray for 
+more general face forgery detection. In: Proceedings of the IEEE/CVF Conference 
+on Computer Vision and Pattern Recognition. pp. 5001–5010.
+Liang, P., Liu, G., Xiong, Z., Fan, H., Zhu, H., Zhang, X., 2023. A facial geometry based 
+detection model for face manipulation using CNN-LSTM architecture. Inform. Sci. 
+633, 370–383.
+Livieris, I.E., Pintelas, E., Kiriakidou, N., Pintelas, P., 2023. Explainable image 
+similarity: Integrating siamese networks and grad-CAM. J. Imaging 9 (10), 224.
+Loshchilov, I., Hutter, F., 2019. Decoupled weight decay regularization. In: ICLR.
+Metzler, R., Jeon, J.-H., Cherstvy, A.G., Barkai, E., 2014. Anomalous diffusion models 
+and their properties: non-stationarity, non-ergodicity, and ageing at the centenary 
+of single particle tracking. Phys. Chem. Chem. Phys. 16 (44), 24128–24164.
+Nightingale, S.J., Wade, K.A., Watson, D.G., 2017. Can people identify original and 
+manipulated photos of real-world scenes?  Cogn. Res.: Princ. Implic. 2 (1), 1–21.
+Osher, S., Shen, J., 2019. Digitized PDE method for data restoration. In: Handbook of 
+Analytic Computational Methods in Applied Mathematics. Chapman and Hall/CRC, 
+pp. 751–771.
+Pan, Z., Yu, W., Yi, X., Khan, A., Yuan, F., Zheng, Y., 2019. Recent progress on 
+Generative Adversarial Networks (GANs): A survey. IEEE Access 7, 36322–36333.
+Paris, S., Kornprobst, P., Tumblin, J., Durand, F., et al., 2009. Bilateral filtering: Theory 
+and applications. Found. Trends® Comput. Graph. Vis. 4 (1), 1–73.
+Pintelas, E., Liaskos, M., Livieris, I.E., Kotsiantis, S., Pintelas, P., 2020. Explainable 
+machine learning framework for image classification problems: case study on 
+glioma cancer prediction. J. Imaging 6 (6), 37.
+Pintelas, E., Liaskos, M., Livieris, I.E., Kotsiantis, S., Pintelas, P., 2021. A novel 
+explainable image classification framework: Case study on skin cancer and plant 
+disease prediction. Neural Comput. Appl. 33 (22), 15171–15189.
+Pintelas, E., Livieris, I.E., Kotsiantis, S., Pintelas, P., 2023. A multi-view-CNN framework 
+for deep representation learning in image classification. Comput. Vis. Image 
+Underst. 232, 103687.
+Pintelas, E., Pintelas, P., 2022. A 3D-CAE-CNN model for deep representation learning 
+of 3D images. Eng. Appl. Artif. Intell. 113, 104978.
+Prasath, V.S., 2017. Image denoising by anisotropic diffusion with inter-scale 
+information fusion. Pattern Recognit. Image Anal. 27, 748–753.
+Qian, Y., Yin, G., Sheng, L., Chen, Z., Shao, J., 2020. Thinking in frequency: Face 
+forgery detection by mining frequency-aware clues. In: European Conference on 
+Computer Vision. Springer, pp. 86–103.
+Raza, R., Zulfiqar, F., Khan, M.O., Arif, M., Alvi, A., Iftikhar, M.A., Alam, T., 2023. 
+Lung-effnet: Lung cancer classification using efficientnet from CT-scan images. Eng. 
+Appl. Artif. Intell. 126, 106902.
+Rossler, A., Cozzolino, D., Verdoliva, L., Riess, C., Thies, J., Nießner, M., 2019. 
+Faceforensics++: Learning to detect manipulated facial images. In: Proceedings of 
+the IEEE/CVF International Conference on Computer Vision. pp. 1–11.
+Ruthotto, L., Haber, E., 2020. Deep neural networks motivated by partial differential 
+equations. J. Math. Imaging Vision 62, 352–364.
+Selvaraju, R.R., Cogswell, M., Das, A., Vedantam, R., Parikh, D., Batra, D., 2017. 
+Grad-cam: Visual explanations from deep networks via gradient-based localization. 
+In: Proceedings of the IEEE International Conference on Computer Vision. pp. 
+618–626.
+Smith, L.N., 2017. Cyclical learning rates for training neural networks. In: 2017 IEEE 
+Winter Conference on Applications of Computer Vision. WACV, IEEE, pp. 464–472.
+Tan, M., Le, Q., 2019. Efficientnet: Rethinking model scaling for convolutional 
+neural networks. In: International Conference on Machine Learning. PMLR, pp. 
+6105–6114.
+12
+
+
+--- PAGE 13 ---
+
+E. Pintelas and I.E. Livieris
+Computer Vision and Image Understanding 257 (2025) 104375
+Thies, J., Zollhofer, M., Stamminger, M., Theobalt, C., Nießner, M., 2016. Face2face: 
+Real-time face capture and reenactment of RGB videos. In: Proceedings of the IEEE 
+Conference on Computer Vision and Pattern Recognition. pp. 2387–2395.
+Tolosana, R., Romero-Tapiador, S., Vera-Rodriguez, R., Gonzalez-Sosa, E., Fierrez, J., 
+2022. Deepfakes detection across generations: Analysis of facial regions, fusion, and 
+performance evaluation. Eng. Appl. Artif. Intell. 110, 104673.
+Tsiotsios, C., Petrou, M., 2013. On the choice of the parameters for anisotropic diffusion 
+in image processing. Pattern Recognit. 46 (5), 1369–1381.
+Weigel, A.V., Simon, B., Tamkun, M.M., Krapf, D., 2011. Ergodic and nonergodic 
+processes coexist in the plasma membrane as observed by single-molecule tracking. 
+Proc. Natl. Acad. Sci. 108 (16), 6438–6443.
+Xiao, H., Wang, X., Wang, J., Cai, J.-Y., Deng, J.-H., Yan, J.-K., Tang, Y.-D., 2024. Single 
+image super-resolution with denoising diffusion GANs. Sci. Rep. 14 (1), 4272.
+Yan, Y., Ren, W., Cao, X., 2018. Recolored image detection via a deep discriminative 
+model. IEEE Trans. Inf. Forensics Secur. 14 (1), 5–17.
+Yang, L., Zhang, Z., Song, Y., Hong, S., Xu, R., Zhao, Y., Zhang, W., Cui, B., Yang, M.-H., 
+2023. Diffusion models: A comprehensive survey of methods and applications. ACM 
+Comput. Surv. 56 (4), 1–39.
+Zhao, H., Zhou, W., Chen, D., Wei, T., Zhang, W., Yu, N., 2021. Multi-attentional 
+deepfake detection. In: Proceedings of the IEEE/CVF conference on computer vision 
+and pattern recognition. pp. 2185–2194.
+13

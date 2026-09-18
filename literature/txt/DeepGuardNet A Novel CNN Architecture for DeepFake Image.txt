@@ -1,0 +1,445 @@
+
+
+--- PAGE 1 ---
+
+ScienceDirect
+Available online at www.sciencedirect.com
+Procedia Computer Science 258 (2025) 811–818
+1877-0509 © 2025 The Authors. Published by Elsevier B.V.
+This is an open access article under the CC BY-NC-ND license (https://creativecommons.org/licenses/by-nc-nd/4.0)
+Peer-review under responsibility of the scientific committee of the International Conference on Machine Learning and 
+Data Engineering
+10.1016/j.procs.2025.04.313
+Keywords: Deepfake;DeepGuardNet;MesoNet;Separable Convolution;Convolutional Neural Network;Deepfake Detection;Deep Learning
+1. Introduction
+The smartphones gained much acceptance over the past few decades and the growing popularity of digital media
+have made very common digital objects. This growth in the digital media contents also possessed the falsification
+of these contents. Digital image forensics is the area which aims to regulate the circulation of tampered data in the
+E-mail address: philominasimon@keralauniversity.ac.in
+International Conference on Machine Learning and Data Engineering
+DeepGuardNet: A Novel CNN Architecture for DeepFake Image
+Detection
+Amritha Devi Na, Philomina Simonb
+aDepartment of Computer Science, University of Kerala, Kariavattom,Thiruvananthapuram, Kerala, India
+bDepartment of Computer Science, University of Kerala, Kariavattom,Thiruvananthapuram, Kerala, India
+Abstract
+We are in the world where information is the ubiquitous but the authentication of that information is cumbersome. Deepfake
+technology have achieved a tremendous growth in the digital era. Deepfake is a synthetic media audio, video or images that appear
+to be realistic though they are fake or fabricated. Deepfake are created by Generative AI techniques that understand the probabilistic
+distribution of the data. Appropriate detection systems are necessary to prevent the dissemination of misleading information and
+guarantee the authenticity and integrity of data. Detecting deepfake contents in this digital era is very challenging due to the realistic
+nature of fake images. In this paper, we present an enhanced CNN architecture, DeepGuardNet, a deepfake detection model that
+is simple and effective for determining whether images are real or fake. DeepGuardNet is a straightforward, sequential, and robust
+network designed for deepfake recognition and detection. Additionally, our network has an enhanced ability to detect tampered
+content with fewer parameters due to the use of separable convolution. In this work, we utilize depthwise separable convolution
+to efficiently extract deepfake features. The DeepGuardNet architecture effectively captures deepfake image features in both the
+spatial and depth dimensions. Experimental study on Celeb-DF dataset demonstrated the competence of the proposed method with
+an accuracy of 91% when compared with conventional methods. The proposed DeepGuardNet architecture is productive in terms
+of the better feature extraction and reduced computational complexity.
+© 2025 The Authors. Published by Elsevier B.V.
+This is an open access article under the CC BY-NC-ND license (https://creativecommons.org/licenses/by-nc-nd/4.0)
+Peer-review under responsibility of the scientific committee of the International Conference on Machine Learning and Data Engineering
+
+
+--- PAGE 2 ---
+
+812	
+Amritha Devi N  et al. / Procedia Computer Science 258 (2025) 811–818
+social medias. Deepfakes are synthesized media developed with the help of artificial intelligence and advanced deep
+learning algorithms , that fabricate highly realistic videos, images and audios.[22] Despite their numerous benefi-
+cial applications, deepfake images raise serious concerns related to security, privacy of people and about spreading
+misinformation. Now a days generative AI models including generative adversarial networks(GAN), variational auto
+encoders and stable diffusion[21] have the ability to create fake faces that are very realistic so that it is tedious for a
+software to detect it[3]. In the current era, Artificial Intelligence based generative models led to a scenario where the
+fake content generation is easier day by day. So developing suitable methodologies for the deepfake detection in social
+media is the need for the hour now.To tackle these social issues the deepfake detection technology had gained wide
+attention. Several approaches were developed for the deepfake detection. Several methods like local binary pattern
+recognition[4], error level detection[5],facial land marks[6].The contribution of the work is three fold,
+• DeepGuardNet is a simple, sequential and robust convolutional neural network(CNN) model and its main ob-
+jective is to identify forged images and videos.
+• In addition the adoption of separable convolution,the architecture aims to enhance the ability to capture the
+deepfake features with fewer parameters.
+• DeepGuardNet illustrates better performance over Celeb-DF dataset, acheiving an accuracy of 91%.
+A separable convolution or depth wise separable convolution is a set of spatial convolution performed over each
+input channel separately followed by a 1 × 1 convolution, projecting the output channel onto a fresh space[7].The
+feature extraction using depth wise separable convolution is extremely good at tell apart real and false images[20]. The
+media forensics typically involves analysing the inconsistencies and AI based approaches that use machine learning to
+determine real and fake contents. In the modern era of technology,the deepfake media content have revolutionized the
+world because of its wide popularity and there is an exigency for the development of algorithms that can accurately
+detect the fake videos or image content. Here in this paper we discuss about such a technique to detect the fabrication
+made in the digital videos, we have proposed a new deep architecture DeepGuardNet that is inspired from Meso4
+developed by Afchar[1] et al. We have applied DeepGuardNet on the frames of Celeb-DF dataset and overall got
+better result.
+This section gave brief an introduction to deepfake detection techniques. Section 2 includes the short and summa-
+rized works related to deepfake detection. Section 3 presents the proposed method and its salient features. Section 4
+covers the results and inferences from the work and section 5 summarizes the work.
+2. Literature Summary
+2.1. Deepfake Recognition & Detection Methods
+Author et al.
+Year
+Models for Investiga-
+tion
+Dataset
+Remarks
+Darius
+Afchar
+et
+al.[1]
+2018
+Meso4, MesoIncep-
+tion
+Deepfake, Face2Face
+Focuses
+on
+Meso-
+scopic Properties of
+image
+Mohammed Thajeel
+Abdullah et al.[4]
+2023
+DenseNet121
++
+CNN
+FFHQ, Celeb-DF
+MesoNet with pre-
+processing module
+Zhiming Xia et al.[9]
+2022
+MesoNet
+Celeb-DF
+MesoNet with pre-
+processing module
+Nan Wu et al.[10]
+2022
+MSPNN
+FaceForensics++,
+Celeb-DFv2
+Simultaneously cap-
+ture micro, meso and
+macro semantics
+
+
+--- PAGE 3 ---
+
+	
+Amritha Devi N  et al. / Procedia Computer Science 258 (2025) 811–818
+813
+Rimsha
+Rafique
+et
+al.[5]
+2023
+ResNet18
+Dataset
+by
+Yonsei
+University
+It is a robust method.
+ELA manipulates at
+pixel level
+Aminollah Khormali
+et al.[11]
+2024
+Self-supervised
+graph Transformer
+FaceForensics++,
+Celeb-DF
+The model exploited
+transformer
+based
+self-supervised graph
+strategy for deepfake
+detection,
+using
+contrastive learning.
+Ying Xu et al.[10]
+2023
+Multi-Channel Xcep-
+tion Attention Pair-
+wise Interaction
+FaceForensics++,
+Celeb-DF
+It
+uses
+pairwise
+learning and comple-
+mentary color space
+information.
+Deressa Wodajo et
+al[13].
+2021
+CViT
+DFDC
+The combined learn-
+ing capacity of CNNs
+and Transformer en-
+ables the model to
+correlate every pixel
+of an image.
+Akash
+Saxena
+et
+al.[6]
+2023
+XceptionNet
+DFDC
+Efficient for quickly
+accessing
+deepfake
+films using limited
+computing resources.
+Kurniawan Nur Ra-
+madhani et al.[12]
+2024
+ViViT
+Celeb-DF V2
+The
+system
+uses
+ViViT with DSC and
+CBAM
+to
+analyze
+facial
+landmark
+features
+Yue Wu et al.[19]
+2019
+ManTra-Net
+CASIA, NIST
+ManTra-Net is used
+for
+localization
+of
+forged pictures
+Table 1: Summary of DeepFake Works
+In digital image forensics, the conventional methods include splicing where a portion of the image is manipulated
+but in the current scenario entire whole fake images and videos can be generated using generative models.
+In the social media era it is important to validate the authenticity and integrity of data what we are observe and
+share. Deepfake detection plays a vital role in dealing with false information, protecting people’s identity, preventing
+fraudulent activities and maintaining political stability. Moreover, a comprehensive method is required to preserve
+the cybersecurity regulations and preventing the erosion of public trust in digital platforms. As deepfake technology
+continuously achieve rapid growth, the ability to differentiate between the realistic and tailored content becomes
+essential to safeguard the integrity of information in the digital media.
+3. Proposed Method- DeepGuardNet
+In this segment, we present an efficient CNN architecture DeepGuardNet that is simple and light weight for en-
+hanced deepfake detection. This simple model has the capability to extract fake features so that the architecture
+becomes efficient. DeepGuardNet model is less complex, has less number of training parameters and reduced compu-
+tational complexity. This network was designed by leveraging inspiration from MesoNet Proposed by Darius Afchar et
+al[1]. In MesoNet, the mesoscopic feature which lies in between microscopic and macroscopic properties were exam-
+
+
+--- PAGE 4 ---
+
+814	
+Amritha Devi N  et al. / Procedia Computer Science 258 (2025) 811–818
+ined and used for the manipulation of forged images. DeepGuardNet is utilizes the depth-wise separable convolutions
+to decrease the computational complexity, less memory usage, less number of training parameters, . In addition to
+the MesoNet layers, the model used one more convolution layer with separable convolution instead of the traditional
+convolution method. As compared to the conventional methods it has less number of parameters which can facilitate
+to prevent over fitting, which better the generalization to that has not been seen before the features extracted[2].
+The DeepGuardNet have five consecutive separable convolution layers that inturn provide were used along with
+batch normalization and max pooling layers. In this network the data in RGB color space is served by resizing it into
+the frame size of 256 × 256 × 3 with three color channels, then passed into the convolutional layers. Here in separable
+convolution the convolution is performed in two steps:a depth wise convolution followed by pointwise convolution.
+Batch normalization technique is applied after each convolution for increasing its training speed and stability. For
+reducing the spatial dimensions of the feature, map we use maxpooling layers that helps to capture the most relevant
+features. To enhance their reliability, the convolutional layers uses ReLU activation function to bring in non-linearities
+and normalize its output to avert vanishing gradient effect and the fully connected layers use Dropout to stabilize the
+model and prevents over fitting. DeepGuardNet is a compact network having 3204 trainable parameters out of 3332
+After the feature extraction process the model classifies the result into to real and fake images. Experiments are
+conducted in Celeb-DF dataset and obtained better and efficient result as compared to others.
+Fig. 1. DeepGuardNet Architecture
+4. Result Analysis and Discussions
+In the following part we will discuss about the results of the experiment along with a comprehensive discussion
+about the findings. The efficiency of this method is evaluated by the performance measures and then comparing it with
+the other existing methods.
+4.1. Dataset
+The dataset used in this work is Celeb-DF[18], which is a well known challenging dataset that makes a benchmark
+dataset for accessing deepfake detection. It contains 5639 deepfake videos and 590 real videos. These videos have
+average length of 13 seconds which have frame length of 30 frames per second. For training we have used 140002
+and the validation set have 39428 image frame which are classified into real and forged images.The dataset has been
+
+
+--- PAGE 5 ---
+
+	
+Amritha Devi N  et al. / Procedia Computer Science 258 (2025) 811–818
+815
+divided in the ratio of 8:2 for training and validation. The original videos were taken from the YouTube and the
+tampered videos were generated by swapping the faces[8].Because of the high quality of the contents, Celeb-DF
+is one among the most challenging dataset to handle deepfake detection algorithm to handle fundamental deepfake
+hurdles including flickering, facial wrapping and unnatural expressions. Some of the sample images from the dataset
+is given in the Fig.2.
+Fig. 2. Samples from Celeb-DF dataset
+4.2. Experimental Setup & Hyper Parameters Used
+DeepGuardNet network was implemented using python 3.10 and keras 3.4.1 module on Jupyter Notebook. The pa-
+rameters used are ADAM optimizer used for the weight optimization along with default parameters (β1 = 0.9 and β2 =
+0.999), the learning rate of 0.001, batch size of 5 and 20 epochs.This network uses Binary Cross Entropy as its loss
+function, with a 0.5 dropout.
+Table 2. Hyper parameters used for DeepGuardNet
+Parameter
+Value
+No. of epoch
+20
+Batch size
+5
+Optimizer
+ADAM
+Loss function
+Binary Cross Entropy
+Learning rate
+0.001
+Dropout
+0.5
+Parameter β1
+0.9
+Parameter β2
+0.999
+4.3. Computing Metrics
+Evaluation parameters are utilized in machine learning to quantify the success rate of a model. Confusion metrics
+are among the most commonly used evaluation techniques; they are employed to calculate the performance efficiency
+of the test data by contrasting the actual and predicted data[5]. These metrics have four values: Correct Positive (CP),
+Correct Negative (CN), Incorrect Positive (IP), and Incorrect Negative (IN). This framework can be evaluated using
+Accuracy, Precision, Recall, and F1-Score, calculated using the formulas shown in Equations (1) to (4):
+
+
+--- PAGE 6 ---
+
+816	
+Amritha Devi N  et al. / Procedia Computer Science 258 (2025) 811–818
+Recall =
+CP
+CP + IN
+(1)
+Precision =
+CP
+CP + IP
+(2)
+F1 = 2 × Precision × Recall
+Precision + Recall
+(3)
+Accuracy =
+CP + CN
+CP + CN + IP + IN
+(4)
+By using the Celeb-DF dataset on our model, we achieved an accuracy of 91%. The learning curves below provide
+detailed insights into the performance. These curves, shown in Fig(3) to Fig(5), illustrate the training and validation
+accuracy over a set of training data, demonstrating a steady improvement in performance.
+Comparing with other models, our DeepGuardNet achieved better outcome on the Celeb-DF dataset. Table 3 il-
+lustrates the class-wise precision, recall, f1-score on the Celeb-DF dataset and Table 4 shows a collation between
+DeepGuardNet and other models over Celeb-DF dataset.
+Table 3. Model Performance Metrics
+Model
+Class
+Prec
+Rec
+F1
+MesoNet
+Fake
+87%
+52%
+65%
+Real
+66%
+92%
+77%
+DeepGuardNet
+Fake
+92%
+88%
+90%
+Real
+89%
+93%
+91%
+Table 4. Comparison over various existing models
+Author et al.
+Method
+Accuracy
+Yuezun Li[15]
+Xception-c40
+65.5%
+Elhassan et al.[17]
+DFT-MF
+71.29%
+Afchar et al.[1]
+MesoNet
+72%
+Ahmad et al.[16]
+ResViT
+80.48%
+DeepGuardNet(Proposed)
+91%
+Fig. 3. DeepGuardNet Accuracy Curve
+
+
+--- PAGE 7 ---
+
+	
+Amritha Devi N  et al. / Procedia Computer Science 258 (2025) 811–818
+817
+Fig. 4. DeepGuardNet Loss Curve
+Fig. 5. DeepGuardNet Confusion Matrix
+5. Conclusion
+In the digital age, it is crucial to keep the integrity of data what we see and share in digital media. In this research,
+we have developed an model DeepGuardNet for addressing the evolving challenge possessed by the AI generated false
+contents in the digital media, that reduces the wide spread of the misinformation and safe guard the probity of online
+media. We have used the mesoscopic features of an image for the detection with the help of separable convolution.
+Using this method, results demonstrate that separable convolution is superior to the conventional method because of
+its better performance. Separable convolution maintains or even improves the model with lesser number of parameters
+and computational complexity. As comparing with the traditional models, we can state that separable convolution
+can create a better impact on the forgery detection. Experimental results showcased a detection rate of 91% accuracy
+on image frames of Celeb-DF dataset. The proposed model is efficient in identifying real and fake data that shows
+its potential in realistic implementation in safeguarding the integrity of digital contents. Overall the use of separable
+convolution has been found to be an imperative improvement, making a deepfake detection system more effective and
+reliable. This work imposes a groundwork for the future events in deepfake detection resulting in further development
+in this area and applied to variety of datasets and parameters.
+
+
+--- PAGE 8 ---
+
+818	
+Amritha Devi N  et al. / Procedia Computer Science 258 (2025) 811–818
+References
+[1] Afchar, Darius, Nozick, Vincent, Yamagishi, Junichi, and Isao Echizen. (2018). ”Mesonet: A compact facial video forgery detection network.”
+2018 IEEE International Workshop on Information Forensics and Security (WIFS) 1-7. IEEE.
+[2] Kaiser, Lukasz, Aidan N. Gomez, and Franc¸ois Chollet. (2017) ”Depthwise separable convolutions for neural machine translation.” arXiv
+preprint arXiv: 1706.03059.
+[3] Suganthi, S. T., Ayoobkhan, M. U. A., Bacanin, N., Venkatachalam, K., ˇStˇep´an, H., & Pavel, T. (2022). “Deep learning model for deep fake
+face recognition and detection.” PeerJ Computer Science 8: e881.
+[4] Abdullah, M. T., and N. H. M. Ali. (2023) “DeepFake Detection Improvement for Images Based on a Proposed Method for Local Binary
+Pattern of the Multiple-Channel Color Space.” International Journal of Intelligent Engineering & Systems 16 (3).
+[5] Rafique, R., Gantassi, R., Amin, R., Frnda, J., Mustapha, A., & Alshehri, A. H. (2023). “Deep fake detection and classification using error-level
+analysis and deep learning.” Scientific Reports 13 (1): 7422.
+[6] Saxena, A., Yadav, D., Gupta, M., Phulre, S., Arjariya, T., Jaiswal, V., & Bhujade, R. K. (2023). “Detecting deepfakes: A novel framework
+employing XceptionNet-based convolutional neural networks.” Traitement du Signal 40 (3): 202-210.
+[7] Chollet, Franc¸ois. (2017). “Xception: Deep learning with depthwise separable convolutions.” Proceedings of the IEEE Conference on Computer
+Vision and Pattern Recognition 2017: 1251–1258.
+[8] Li, Y., Yang, X., Sun, P., Qi, H., & Lyu, S. (2020). Celeb-df: A large-scale challenging dataset for deepfake forensics. In Proceedings of the
+IEEE/CVF Conference on Computer Vision and Pattern Recognition (pp. 3207-3216).
+[9] Xia, Z., Qiao, T., Xu, M., Wu, X., Han, L., & Chen, Y. (2022). “Deepfake video detection based on MesoNet with preprocessing module.”
+Symmetry 14 (5): 939.
+[10] Xu, Y., Raja, K., Verdoliva, L., and M. Pedersen. (2023) ”Learning pairwise interaction for generalizable deepfake detection.” Proceedings of
+the IEEE/CVF Winter Conference on Applications of Computer Vision 672-682.
+[11] Khormali, A., & Yuan, J. S. (2024). “Self-supervised graph Transformer for deepfake detection.” IEEE Access.
+[12] Ramadhani, K. N., Munir, R., & Utama, N. P. (2024). ”Improving Video Vision Transformer for Deepfake Video Detection using Facial
+Landmark, Depthwise Separable Convolution and Self Attention.” IEEE Access.
+[13] Wodajo, D., & Atnafu, S. (2021). Deepfake video detection using convolutional vision transformer. arXiv preprint arXiv: 2102.11126.
+[14] Wu, N., Jin, X., Jiang, Q., Wang, P., Zhang, Y., Yao, S., & Zhou, W. (2022). ”Multisemantic path neural network for deepfake detection.”
+Security and Communication Networks 2022 (1): 4976848.
+[15] Li, Y., Yang, X., Sun, P., Qi, H., & Lyu, S. (2020). ”Celeb-df: A large-scale challenging dataset for deepfake forensics.” Proceedings of the
+IEEE/CVF Conference on Computer Vision and Pattern Recognition, 3207–3216.
+[16] Ahmad, W., Ali, I., Shahzad, A., Hashmi, A., & Ghaffar, F. (2022). ”ResViT: A framework for deepfake videos detection.” International
+Journal of Electrical and Computer Engineering Systems 13 (9): 807–813.
+[17] Elhassan, A., Al-Fawa’reh, M., Jafar, M. T., Ababneh, M., & Jafar, S. T. (2022). “DFT-MF: Enhanced deepfake detection using mouth move-
+ment and transfer learning.” SoftwareX, 19, 101115.
+[18] Li, Yuezun, et al. “Celeb-df: A large-scale challenging dataset for deepfake forensics.” Proceedings of the IEEE/CVF conference on computer
+vision and pattern recognition. 2020.
+[19] Wu, Yue , AbdAlmageed, Wael & Natarajan, Premkumar. (2019). “ManTra-Net: Manipulation Tracing Network for Detection and Localization
+of Image Forgeries With Anomalous Features”. 9535-9544. 10.1109/CVPR.2019.00977.
+[20] Yu, Chia-Mu, Ching-Tang Chang, and Yen-Wu Ti. “Detecting deepfake-forged contents with separable convolutional neural network and
+image segmentation.” arXiv preprint arXiv:1912.12184 (2019).
+[21] Wang, Tianyi, et al. “Deep convolutional pooling transformer for deepfake detection.” ACM transactions on multimedia computing, commu-
+nications and applications 19.6 (2023): 1-20.
+[22] Pashine, Samay, et al. “Deep fake detection: survey of facial manipulation detection solutions.” arXiv preprint arXiv:2106.12605 (2021).

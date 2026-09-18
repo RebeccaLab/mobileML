@@ -1,0 +1,1059 @@
+
+
+--- PAGE 1 ---
+
+Academic Editor:
+Received: 20 December 2024
+Revised: 10 February 2025
+Accepted: 11 February 2025
+Published:
+Citation: Yasir, S.M.; Kim, H.
+Lightweight Deepfake Detection
+Based on Multi-Feature Fusion. Appl.
+Sci. 2024, 1, 0. https://doi.org/
+Copyright: © 2024 by the authors.
+Licensee MDPI, Basel, Switzerland.
+This article is an open access article
+distributed under the terms and
+conditions of the Creative Commons
+Attribution (CC BY) license
+(https://creativecommons.org/
+licenses/by/4.0/).
+Article
+Lightweight Deepfake Detection Based on Multi-Feature Fusion
+Siddiqui Muhammad Yasir and Hyun Kim *
+Department of Electrical and Information Engineering, Research Center for Electrical and Information Technology,
+Seoul National University of Science and Technology, 232 Gongneung-ro, Nowon-gu,
+Seoul 01811, Republic of Korea; siddiqui@seoultech.ac.kr
+* Correspondence: hyunkim@seoultech.ac.kr
+Abstract: Deepfake technology utilizes deep learning (DL)-based face manipulation tech-
+niques to seamlessly replace faces in videos, creating highly realistic but artificially gen-
+erated content. Although this technology has beneficial applications in media and en-
+tertainment, misuse of its capabilities may lead to serious risks, including identity theft,
+cyberbullying, and false information. The integration of DL with visual cognition has
+resulted in important technological improvements, particularly in addressing privacy risks
+caused by artificially generated “deepfake” images on digital media platforms. In this
+study, we propose an efficient and lightweight method for detecting deepfake images and
+videos, making it suitable for devices with limited computational resources. In order to
+reduce the computational burden usually associated with DL models, our method inte-
+grates machine learning classifiers in combination with keyframing approaches and texture
+analysis. Moreover, the features extracted with a histogram of oriented gradients (HOG),
+local binary pattern (LBP), and KAZE bands were integrated to evaluate using random
+forest, extreme gradient boosting, extra trees, and support vector classifier algorithms. Our
+findings show a feature-level fusion of HOG, LBP, and KAZE features improves accuracy
+to 92% and 96% on FaceForensics++ and Celeb-DF(v2), respectively.
+Keywords: deepfake detection; feature fusion; Histogram of Oriented Gradients (HOG);
+Local Binary Pattern (LBP); KAZE descriptors
+1. Introduction
+The development of deepfake technologies presents significant challenges for visual
+cognition in deep learning (DL) and raises serious concerns for visual information risks,
+as these synthetic media convincingly manipulate visual content, spreading misinforma-
+tion [1–3]. The manipulated content may raise concerns about the potential abuse of
+technology and its consequences on politics, finance, and personal privacy [2,4]. Although
+convolutional neural networks (CNNs) have achieved considerable success in computer vi-
+sion tasks [5–8] including deepfake detection, alternative approaches that combine machine
+learning and hand-made features are gaining popularity. In computer vision, technologies
+such as auto-encoders and generative adversarial networks (GANs) facilitate the genera-
+tion of manipulated visuals. Deepfake images are often categorized into facial synthesis,
+attribute manipulation, identity swapping, and expression swapping, with CNN models
+commonly employed for video detection [4,9]. To identify highly precise synthetic visual
+data as deepfake, an effective deepfake detection method is required [2,10]. DL reduces
+human effort in feature engineering but increases complexity and interpretability due to
+high nonlinearity and input interactions. Traditional machine learning (ML) methods often
+sacrifice accuracy for interpretability due to their complexity and large data volumes. DL
+Appl. Sci. 2024, 1, 0
+https://doi.org/10.3390/app1010000
+arXiv:2502.11763v1  [cs.CV]  17 Feb 2025
+
+
+--- PAGE 2 ---
+
+Appl. Sci. 2024, 1, 0
+2 of 17
+methods are challenging to train and require computing resources, while ML methods are
+easier to evaluate and understand [11,12]. To address these constraints, we encouraged to
+experiment and evaluate traditional machine learning techniques to detect deepfakes.
+Machine learning (ML) classifiers that use features such as local binary pattern
+(LBP) [13] and KAZE descriptor [14] offer promising alternatives to CNN-based methods
+for deepfake detection. LBP encodes texture information through local spatial patterns [13],
+while KAZE provides robust, noise-invariant descriptors [14] and key points, allowing
+the detection of minor deepfake artifacts that CNNs may overlook [12–14]. Traditional
+models can be improved in accuracy and resilience by integrating machine learning feature
+extraction methods [15]. Smaller datasets can benefit greatly from the use of LBP and KAZE
+features, which increase detection process transparency [16,17]. To address the growing
+difficulties presented by deepfake technology, our hybrid approach—which integrates
+feature-based classifiers—offers a potential path ahead in differentiating real from fake
+visual data [18].
+Deepfake detection solutions are limited for social media analysis due to heavy com-
+pression [19]. A compact model, based on ML classifiers, is needed for memory-constrained
+devices like smartphones [20,21]. The proposed model, focusing on auto-encoder-based
+generated videos and keyframe identification, achieves high accuracy with minimal com-
+putational demands, making it suitable for memory-constrained devices and enhancing
+deepfake detection capabilities [22,23].
+This study aims to reduce computational costs in deepfake detection without substan-
+tial accuracy loss. Our proposed model targets compressed social media videos, focusing
+on the existing multi-feature fusion approach using multiple feature types (HOG, LBP, and
+KAZE) for a more comprehensive representation of visual data. By analyzing variations
+in visual artifacts, we achieve significant data reduction while preserving accuracy. The
+method integrates well-known ML feature extraction methods with diverse texture features,
+allowing effective training on limited datasets. The top three classifiers are presented in
+Table 2. We evaluated the proposed fusion model using the Face Forensic++ [24] and Celeb-
+DF [25] dataset, which replicates scenarios commonly found on social media platforms.
+The use of FaceForensics++ and Celeb-DF datasets aligns with the common practice in the
+field, allowing for a direct comparison with existing methods. The main contributions of
+this work are summarized as follows:
+•
+The proposed fusion model introduces a novel approach to deepfake detection on
+platforms with limited memory and processing capabilities, effectively managing
+compressed video data;
+•
+Using existing classification techniques for artifact analysis, the method achieves
+substantial data reduction while preserving detection accuracy;
+•
+The methodology combines forty established ML classifiers (using HOG, LBP, and
+KAZE features) with diverse texture-based features, demonstrating reliable perfor-
+mance even with limited datasets;
+•
+The evaluation primarily uses the Face Forensic++ dataset, which reflects real-world
+scenarios and emphasizes minimizing computational overhead.
+The remainder of this paper is organized as follows. Section 2 examines the impact
+of deepfake technology across different platforms. Section 3 reviews lightweight feature
+detection methods and details the architecture of the proposed fusion model. Section 4 de-
+scribes the dataset, experimental setup, and evaluation metrics used to assess the proposed
+fusion model, as well as its limitations. Finally, Section 5 summarizes the study findings
+and outlines potential future directions.
+
+
+--- PAGE 3 ---
+
+Appl. Sci. 2024, 1, 0
+3 of 17
+2. Related Works
+Deepfakes have emerged as a critical challenge, prompting extensive research into
+detection techniques. The DL-based methods have shown the most advancement, leading to
+efficient detection systems. While various approaches have been proposed, they primarily
+rely on similar underlying principles [26,27]. Most of the detection methods use CNN-
+based models to classify images as fake or real, but state-of-the-art deepfake detectors (e.g.,
+N. Bonettini [28]) still rely on complex neural networks, struggle with generalization to
+unseen deepfake techniques, and lack robustness under real-world distortions [28,29].
+Several deepfake detection approaches depend on various modalities and feature
+fusion to improve accuracy. Prior research has shown that integrating spatial and frequency
+domain features, as well as combining spatial, temporal, and spatiotemporal features,
+significantly improves detection accuracy compared to single-modality approaches [30–32].
+For instance, Almestekawy et al. [33] fused Facial Region Feature Descriptor (FFR-FD)
+with random forest classifier and texture features (standard deviation, gradient domain,
+and GLCM) fed into an SVM classifier. Raza et al. [31] proposed a three-stream network
+utilizing temporal, spatial, and spatiotemporal features for deepfake detection. Moreover,
+security techniques for deepfake detection on untrusted servers were introduced by Chen
+B. et al. [34]; their method enables distant servers to detect deepfake videos without
+understanding the content.
+Proper methods are essential for extracting valuable information from large unpro-
+cessed visual data, with feature-based techniques like LBP and KAZE offering com-
+putational efficiency as an alternative to resource-intensive CNNs [12]. Recent studies
+have suggested that combining extracted features with advanced ML classifiers can de-
+velop hybrid models for deepfake detection while maintaining robustness across diverse
+datasets [12,15,35].
+Alternatively, texture can be encoded by comparing each pixel with its neighbors,
+creating a binary pattern that serves as a robust feature descriptor across various lighting
+conditions. Feature extraction techniques are divided into global and local descriptor
+approaches [36]. Global methods analyze the entire image to generate a feature vector
+and are considered fast processing but have some limitations, such as Principle Compo-
+nent Analysis (PCA) [37], Linear Discriminant Analysis (LDA) [38], and Global Gabor
+generic features [39]. Local descriptors, like LBP [40] and Histogram of Oriented Gradients
+(HOG) [41], provide a more effective representation of images. LBP is widely used in
+face recognition [42], while HOG is used for human detection by dividing the image into
+fixed-size blocks and computing HOG features for each block. Likewise, the selection of
+custom features (Local Binary Patterns (LBP) based on texture and a customized High-
+Resolution Network (HRNet)) proposed by Khalil et al. [43] and fed to the SVM classifier.
+This efficiency makes LBP a popular choice in tasks where texture details are important,
+such as facial recognition and expression analysis, while also reducing processing time
+and computational costs [44]. Deepfake artifacts regularly change gradient orientations
+and edge patterns, which are essential for lightweight detection on resource-constrained
+devices. Compared to CNN-based approaches, it is less successful in detecting higher-level
+semantic discrepancies [45]. KAZE, on the other hand, can detect unique key points that
+are invariant to noise and transformations, which is essential for applications requiring
+high-fidelity feature matching under variable conditions. By detecting and characterizing
+two-dimensional features in nonlinear scale space, the KAZE features [14] resist Gaussian
+blurring. KAZE’s reliance on nonlinear diffusion allows it to capture image structures
+that are often missed by traditional linear approaches, enhancing performance in complex
+environments [46].
+
+
+--- PAGE 4 ---
+
+Appl. Sci. 2024, 1, 0
+4 of 17
+More recent deepfake methods, particularly diffusion models, have introduced high-
+quality synthetic images that closely resemble natural visuals, evading common detection
+markers such as GAN-related grid artifacts [47]. Chen Y et al. and Yuan et al. [48,49]
+developed a model that uses a reference image and text prompt to generate deepfake
+images as human identity. These developments initiate a shift in detection strategies, where
+integrating extracted features with classifiers holds significant potential for improving
+accuracy and reducing computational load [10,27,33,50,51].
+As a result, detecting deepfake images/videos contributes to the struggle against
+spreading false information and encourages preserving the validity of visual content and
+privacy. Our methodology differs from previous approaches in numerous important ways,
+including the use of multi-feature-level fusion (HOG, LBP, and KAZE features) prior to
+classification. Focus on characteristics that are computationally efficient. For validation,
+supervised ML classifiers (such as support vector machines (SVMs), random forest (RF),
+and gradient boosting classifiers) were used, and their performance in deepfake detection
+has been evaluated.
+3. Proposed Fusion Model
+In machine learning, a feature refers to a specific, measurable attribute of an image
+that helps in distinguishing patterns. This study focuses on the integration of two types of
+features (local descriptors) obtained from the LBP and HOG with KAZE features before
+the classification. To reduce computing costs and meaningful results, the detection of
+important frames and the elimination of insufficient frames are necessary. In the first step,
+the keyframes are extracted from videos within an interval of 0.5 s. The first and last 10
+frames are overlooked (only if necessary) because they usually have information about the
+introduction or credits that are not directly related to deepfake detection preprocessing.
+Additionally, to identify the important keyframes, a similarity check between frames is used
+as the criterion. Various threshold values are used to determine different approaches. This
+part of the algorithm results in a pool of distinctive images of frames, which are available
+for feature extraction. The images were resized to a 28 × 28 single-channel format, ensuring
+a standardized input for processing. The research explores the use of frames extracted
+from video footage or standalone images, treating keyframes as textured representations.
+In the second step of feature extraction, the LBP, HOG, and KASE techniques are applied
+separately, which typically generates histograms. Furthermore, the fusion of LBP and
+KAZE and that of HOG and KAZE are used to input futures for the Extra Trees, Random
+Forest, Support Vector, and XGB classifiers. The proposed fusion model aims to improve
+detection accuracy while maintaining efficiency.
+Figure 1 illustrates a general abstract of the proposed fusion model with important key
+concepts involved as data preprocessing (extracting keyframes), extracting features from
+keyframes using LBP and HOG feature extraction methods, feature-level fusion with KAZE
+features, classifier selection of the combined features, and subsequent classification on the
+basis of the chosen classifiers. The keyframes are converted to a logarithmic scale and
+divided into multiple bands to capture localized information about the texture patterns. We
+analyze each band of these frame divisions by calculating the normalized histogram of HOG
+or LBP features to pinpoint characteristics using our classifiers. After these histograms are
+combined to form an LBP feature vector, they are combined with KAZE features to create
+supporting feature sets. To handle the dimensionality caused by merging features at the
+level of characteristics, various classifiers are utilized to identify features, with importance
+scores that are then fed into the ultimate classifier.
+The importance and understanding of feature extraction, along with its configurations,
+are explained in the following section.
+
+
+--- PAGE 5 ---
+
+Appl. Sci. 2024, 1, 0
+5 of 17
+Figure 1. General abstract of the proposed feature-level fusion method.
+3.1. LBP Features
+The LBP is an advanced technique for extracting features from images for texture
+study due to its efficient handling of value variations and straightforward computational
+process [52]. LBP sets thresholds for neighboring pixels, enabling accurate spatial pattern
+extraction from images and transforming textual information into binary data for classifica-
+tion and detection [53]. LBP analyzes every pixel in an image by evaluating the relationship
+between each pixel and its surrounding pixels within a specified radius R distance away
+from it. If the neighboring pixel value exceeds that of the pixel level, a binary bit is assigned
+as 1; otherwise, it is marked as 0 [54].
+Given a grayscale image I of size M × N, the LBP feature for each pixel (x, y) is
+computed via the following formula:
+LBP(xp, yp) =
+
+
+
+1
+if I(xp, yp) ≥I(x, y)
+0
+otherwise
+(1)
+For a pixel (x, y), we compare its intensity I(x, y) with the intensities of its P neighbor-
+ing pixels on a circle of radius R. Let the intensities of these neighbors be {I(xp, yp)}PP=1. A
+binary value is assigned to each neighboring pixel. These binary values are concatenated to
+form a binary number, which is then converted to a decimal value. Compute the histogram
+of these LBP values over the entire image.
+HLBP(k) =
+M
+∑
+x=1
+N
+∑
+y=1
+δ(LBP(x, y), k),
+k ∈{0, 1, . . . , 2P −1}
+where (a, b) is the Kronecker delta function, which is 1 if a = b and 0 otherwise. Finally, the
+histogram is normalized with a small constant to prevent division by zero.
+The calculation used in this study is explained as follows: for a given pixel (xp, yp),
+the intensity I(pi) in the center of the (3 × 3) block is computed by comparing xp to its 8
+neighboring pixels. The texture classification process relies on illumination, translation,
+and rotational variance, while keyframes lack control over these attributes, focusing instead
+on uniform pattern representation. A uniform pattern, LBP(xp, yp), is more suitable.
+Preliminary experiments showed P = 12 and R = 2 provide the best performance for the
+feature descriptor. With regard to categorizing textures on the basis of their patterns in
+images or videos, the way the pattern is perceived is influenced by factors such as lighting
+changes, shifting positions, and orientations of the texture details. However, when we focus
+on moments in a sequence, the patterns are not affected by rotations or translations. Instead,
+they are determined by how colors and contrasts spread out over different frequencies
+and points in time, creating a consistent pattern overall. Therefore, using patterns such
+as LBP(xp, yp) is more suitable for detecting deepfake keyframes. To evaluate this, we
+conducted some experiments where we tried different values for the radius R as well as
+the neighboring pixel P. After conducting our analysis, we determined that the values of
+P = 12 and R = 2 are suitable for the feature descriptor [54].
+
+
+--- PAGE 6 ---
+
+Appl. Sci. 2024, 1, 0
+6 of 17
+These comparisons provide a binary vector that represents the connection between the
+intensity of one pixel and its neighbors. LBPs are widely utilized intensity-based features
+in various domains, including human detection [55,56], facial recognition [55], background
+subtraction, and textured surface recognition [57]. The LBP operator is particularly appeal-
+ing because of its computational simplicity [58]. However, a notable limitation of the LBP
+method is the extensive number of histogram bins needed, which reduces its efficiency for
+localized image patches. Despite this drawback, LBP remains effective for global image
+representations, making it a valuable tool for image classification tasks.
+3.2. HOG Features
+The HOG is a feature descriptor widely used for texture analysis and object detec-
+tion [59]. This method is particularly suitable for tasks requiring robust edge and gradient-
+based analysis, such as detecting structural inconsistencies in deepfake images. HOG
+divides an image into smaller spatial regions, known as cells, and computes a histogram
+of gradient directions within each cell. This process can be summarized into three steps:
+gradient calculation, cell histogram generation, and feature vector construction:
+•
+Gradient Calculation: For each pixel in the image, the gradients along the x- and
+y-axes are calculated using Sobel filters:
+Gx = I(x + 1, y) −I(x −1, y),
+Gy = I(x, y + 1) −I(x, y −1)
+The magnitude M and direction θ of the gradient are computed as:
+M =
+q
+G2x + G2y,
+θ = arctan
+ Gy
+Gx
+
+•
+Cell Histogram Generation: The gradient magnitudes M are binned into orientation
+histograms, where the direction θ is quantized into a fixed number of bins (e.g., 9 bins
+for 0°–180° or 18 bins for 0°–360°). To improve invariance to illumination and contrast
+changes, the histograms are normalized within overlapping spatial blocks. Given a
+block B, normalization can be performed as:
+HOGnorm(B) =
+HOG(B)
+p
+∥HOG(B)∥2 + ϵ
+where ϵ is a small constant to prevent division by zero.
+•
+Feature Vector Construction: The normalized histograms obtained from all the blocks
+are concatenated to form a single feature vector representing the image. HOG captures
+fine-grained details about edge orientations and their distribution, making it suitable
+for identifying subtle spatial distortions caused by deepfake manipulations.
+In this study, the following HOG parameters were used:
+•
+Cell Size: 8 × 8 pixels;
+•
+Block Size: 2 × 2 cells;
+•
+Number of Orientation Bins: 9 (0°–180°);
+•
+Step Size: 50% overlap between blocks.
+HOG is an effective choice for resource-constrained deepfake detection due to these
+parameters, which maintain a balance between descriptive strength and processing effi-
+ciency. HOG can be used in combination with other robust feature descriptors, such as
+KAZE, to improve its sensitivity to high-level semantic adjustments to improve deepfake
+detection.
+
+
+--- PAGE 7 ---
+
+Appl. Sci. 2024, 1, 0
+7 of 17
+3.3. KAZE Features
+The KAZE features are computed to capture the multi-scale and nonlinear structure
+of the keyframes. The KAZE algorithm involves detecting keypoints and computing
+descriptors. This process is involved by applying nonlinear diffusion filtering to the
+keyframe I to create a nonlinear scale space. The keypoints are detected with the KAZE
+detector using the formula: {I(xi, yi)}K(i = 1). For each keypoint (xi, yi), compute a
+descriptor vector di that represents the local image patch around the keypoint. Concatenate
+the descriptor vectors into a single feature vector D. If the total number of features exceeds
+a predefined length, the feature vector is truncated or padded as follows:
+D = [d1, d2, ..., dk](1:m)
+where m is the designed length of the KAZE feature vector. Finally, computed descriptors
+are used for each key point. KAZE descriptors are computed by sampling the responses of
+the nonlinear scale space at keypoint locations using orientation and scale information. The
+extracted features are later used to classify the video as either fake or real. This classification
+is accomplished via ML classifiers with KAZE robustness in extracting image features to
+detect deepfakes precisely.
+3.4. Proposed Feature Fusion and Classification
+The process of combining LBPs and KAZE features for image classification involves
+extracting two distinct sets of features from a single image, merging these feature sets into
+a unified feature vector, and then using this combined vector to train a classifier. This
+procedure improves classification performance, particularly for detecting deepfake content
+by utilizing the included strengths of KAZE (keypoint detection and description) and LBP
+(texture analysis).
+The proposed fusion model is a comprehensive method for image classification that
+integrates LBP or HOG and KAZE features, followed by the selected classifier. Initially, the
+algorithm extracts LBP or HOG features, which capture texture features with the distribu-
+tion of binary patterns in the neighborhood of each pixel. Mathematical representations
+(Equations 2 and 3) by the LBP histogram are used to normalize and achieve uniform
+feature scaling. Concurrently, KAZE features are extracted by detecting key points and
+computing their descriptors, effectively capturing local invariant features. These descrip-
+tors are integrated into a single vector, which is then truncated or padded to maintain
+a consistent feature length. The LBP and KAZE feature vectors are combined to create
+a single feature representation for each image, utilizing the improved strengths of both
+feature extraction methods.
+The process of merging the LBP and KAZE features is explained in these steps. First,
+we extract the LBP feature vector FLBP from the histogram HLBP by employing the follow-
+ing formula:
+FLBP = HLBP(0), HLBP(1), . . . , HLBP(2P −1)
+(2)
+Second, the KAZE feature vector FKAZE is extracted from the concatenated descriptor
+vectors D by FKAZE = D.
+Finally, the FLBP and FKAZE feature vectors are concatenated as follows:
+Fcombined = [FLBP, FKAZE]
+(3)
+The integration of LBP and KAZE features improves the algorithm’s robustness and
+accuracy in deepfake classification tasks, especially when detecting false or real images.
+LBP features improve in detecting texture patterns, which are important in distinguishing
+
+
+--- PAGE 8 ---
+
+Appl. Sci. 2024, 1, 0
+8 of 17
+between real and fake images because deepfakes often possess irregular or inconsistent
+textures. In contrast, KAZE features retrieve fine-grained keypoints, which is necessary
+for detecting minor modifications that may not greatly alter texture but have an impact on
+the structural integrity of the image. The proposed fusion model improves the classifier’s
+capability to identify deepfakes by integrating these two feature sets to provide a deeper
+and more discriminative feature space. In experiments utilizing fake images, the improved
+detection capabilities and decreased false positives demonstrate how the integration of
+texture-based and keypoint-based features results in the improvement of classification
+accuracy. The proposed fusion model improves performance on deepfake detection tasks
+by utilizing the advantages of KAZE (robust keypoint descriptors) and LBP (sensitive to
+textures). Furthermore, Algorithm 1 is expressed to provide a more detailed explanation
+from the perspective of implementation.
+Algorithm 1 Algorithm for merging LBP/HOG and KAZE features and classification
+Require: Set of images {I1, I2, . . . , IN}, corresponding labels {y1, y2, . . . , yN}.
+Ensure: Classification accuracy.
+1: function EXTRACTLBPFEATURES(I, R = 3, P = 24)
+2:
+Convert image I to LBP and HOG using radius R and P points.
+3:
+return ˆHLBP/HOG
+4: end function
+5: function EXTRACTKAZEFEATURES(I, M = 64)
+6:
+Detect keypoints in I using KAZE.
+7:
+Compute descriptors for each keypoint and Concatenate descriptors into D.
+8:
+return D
+9: end function
+10: function COMBINEFEATURES(FLBP/HOG, FKAZE)
+11:
+return [FLBP/HOG, FKAZE]
+12: end function
+13: function PREPAREDATASET({P1, P2, . . . , PN}, {y1, y2, . . . , yN})
+14:
+for each path Pi in {P1, P2, . . . , PN} do
+15:
+Load image I from path P and convert it to grayscale.
+16:
+F(i)
+LBP/HOG ←EXTRACTLBP/HOGFEATURES(Ii)
+17:
+F(i)
+KAZE ←EXTRACTKAZEFEATURES(Ii)
+18:
+F(i)
+combined ←COMBINEFEATURES(F(i)
+LBP/HOG, F(i)
+KAZE)
+19:
+Append F(i)
+combined to features list.
+20:
+end for
+21:
+return feature matrix X and label vector y
+22: end function
+23: function TRAINANDEVALUATE(X, y)
+24:
+Split & Train classifier on the training set. Predict, Compute accuracy of predictions.
+25:
+return accuracy
+26: end function
+27: Main Program
+28: X, y ←PREPAREDATASET({P1, P2, . . . , PN}, {y1, y2, . . . , yN})
+29: accuracy ←TRAINANDEVALUATE(X, y)
+
+
+--- PAGE 9 ---
+
+Appl. Sci. 2024, 1, 0
+9 of 17
+4. Implementation
+4.1. Experimental Design
+This section summarizes the experimental details and results of deepfake datasets
+for FaceForensic++ [24] and Celeb-DF [25]. The robustness of the fusion (LBP, HOG, and
+KAZE) features under various classifiers is evaluated. We applied some preprocessing on
+the raw data prior to experimentation with the datasets. The complete video sequence is
+not taken into account. Instead, as described in Section 3, some keyframes are extracted.
+Both fake and real videos are included in the video dataset. After being extracted, the
+frames were placed in a folder with the appropriate name. The NVIDIA 3090 GPU was
+used for feature extraction and the development of ML algorithms.
+FaceForensics++ [24] is the popular publicly available forensic dataset that includes
+1000 original video sequences that have been manipulated using four distinct face ma-
+nipulation techniques: deepfake, Face2Face, FaceSwap, and NeuralTextures. The dataset
+consists of 977 YouTube videos with 48,431 face counts and a data size of 575 mb, all of
+which feature a clearly visible face, allowing automated tampering methods to produce
+highly accurate forgeries (an example of the dataset is depicted in Figure 2). We targeted
+deepfake videos and their original equivalents for our experiment. The dataset was created
+by extracting keyframes from several videos. Following preprocessing, there were 2946 fake
+images and 2930 real images in the training set. There were 198 real and 197 fake images in
+the validation.
+Figure 2. An example of fake faces from the FaceForensics++ dataset. The pristine image is in
+the first column, whereas the forged images produced by DeepFakes, Face2Face, FaceSwap, and
+NeuralTextures are in the second through fifth columns [24].
+The Celeb-DF [25] dataset is divided into real and fake video/frames, where the real
+videos are 590 original YouTube videos with people of all ages and the fake videos are
+5639 deepfakes. Keyframes from these videos were extracted to create the dataset, making
+sure that the images mostly featured the faces of different celebrities. The dataset consists
+of 100 genuine images, where 900 deepfake images make up the validation set and 1130
+real images and 8022 deepfake images make up the training set. A balanced evaluation
+framework for deepfake detection models is provided by the test set, which consists of 340
+deepfake images and 178 real images.
+There are two classes in the Celeb-DF dataset: real and fake. The percentage of fake
+classes is higher than that of real classes. The FaceForensics++ dataset has five classes,
+including 1000 videos in each class. The original video is the first class, and the other
+four classes are videos that have been altered/are fake. These five classes were reduced to
+binary classes in equal parts for the purposes of this study. To remove the dataset imbalance
+problem, a similar process [60] is adopted, where 800 videos were finalized from each
+
+
+--- PAGE 10 ---
+
+Appl. Sci. 2024, 1, 0
+10 of 17
+dataset, 400 of which were chosen for each class. Following the average number of frames
+prepared for the experiment, the detailed dataset is displayed in Table 1.
+Table 1. FaceForensics++ and Celeb-DF dataset compositions.
+Dataset
+Real Images
+Fake Images
+Celeb-DF
+382
+346
+FaceForensics++
+496
+458
+4.2. Evaluation Criteria
+Empirical benchmarking is a popular way to accurately analyze feature extraction
+and training times. This involves directly quantifying the time spent throughout experi-
+mental runs, resulting in exact and dependable data. This method is especially useful for
+machine learning tasks, where computational complexity varies depending on dataset size,
+hardware capabilities, and specific implementation choices. In this paper, we describe the
+methodological approach used to calculate feature extraction, training, and inference times
+for ML classifiers, providing a thorough assessment of computing efficiency.
+The time required for feature extraction can be computed as follows: for each feature
+extraction method, the extraction process for all the data points in the dataset is applied.
+The start and end times Tf eature = Tend −Tstart are recorded for each feature extraction
+run [61]. To mitigate variability owing to hardware or background processes, the feature
+extraction process is repeated multiple times, and the average time is computed as follows:
+AverageFeatureExtractionTime = ∑n
+i=1 Tfeature,i
+n
+(4)
+where T f eature, i denotes the feature extraction time for the i −th run and n is the number
+of runs. For reporting purposes, the time per data instance (e.g., per frame in video
+processing) can also be computed as follows:
+Tf eature,instance =
+Tf eature
+N
+(5)
+where N is the total number of data instances. Training time refers to the duration required
+to train an ML model on a specified dataset. For each classifier (e.g., RF, SVM, and CNN),
+the training process is initiated and calculated by recording the start and end times as
+follows: Ttrain = Tend −Tstart [62]. Similar to feature extraction, it is often beneficial to
+perform multiple runs and compute the average through the following equation to obtain
+a reliable estimate:
+AverageTrainingTime = ∑n
+i=1 Ttrain,i
+n
+(6)
+For larger datasets, the training time may also be approximated on the basis of model
+complexity. For example, the training time complexity of RF with N trees is generally
+O(NlogN), whereas the support vector classifier may exhibit O(N2) complexity. The
+inference time is the duration required to classify a new instance after training. The total in-
+ference time over a dataset Tin f erence can be approximated by Tin f erence = Tin f erence,instancexN,
+where N is the total number of instances in the test dataset. Multiple test runs were car-
+ried out to establish temporal consistency among approaches, with start and end times
+carefully documented. Measuring the time necessary for each instance provides for more
+detailed comparisons and brings out performance differences more clearly. This established
+approach makes sure that all important time calculations for feature extraction, training,
+and inference are directly comparable, resulting in a rigorous and repeatable experimental
+framework.
+
+
+--- PAGE 11 ---
+
+Appl. Sci. 2024, 1, 0
+11 of 17
+4.3. Results and Discussion
+The results are further provided and analyzed in depth. This study proposed a feature-
+level fusion of LBP, HOG, and KAZE features for classification via the FaceForeensics++
+and Celeb-DF datasets. The evaluation of the results on the basis of the provided validation
+is presented below: Table 2 presents the classification accuracies obtained using various
+classifiers with various feature sets, including LBP alone, KAZE alone, and the fusion of
+LBP, HOG, and KAZE features. The experiment was conducted on the FaceForensics++ and
+Celeb-DF datasets to evaluate the effectiveness of these features in distinguishing between
+genuine and manipulated visual content/deepfake.
+Table 2. Classification accuracy of fusion of LBP, HOG, and KAZE features with FaceForensic++.
+Fusion of Features with Classifiers
+Accuracy
+LBP Features
+Extra Trees Classifier
+71.22%
+RF Classifier
+70.76%
+KAZE Feature
+Extra Trees Classifier
+85%
+Support Vector Classifier
+86.12%
+RF Classifier
+75.70%
+XGB Classifier
+65.29%
+HOG + KAZE Feature
+Extra Trees Classifier
+91%
+Support Vector Classifier
+92.12%
+RF Classifier
+85.70%
+XGB Classifier
+83.19%
+LBP + KAZE Features
+Extra Trees Classifier
+82.61%
+Support Vector Classifier
+86.22%
+RF Classifier
+85.54%
+XGB Classifier
+88.56%
+Analyzing the results shows that both LBP and KAZE features individually perform
+well across different classifiers when tested on the FaceForensics++ dataset. LBP features
+demonstrated their effectiveness in texture-based analysis, achieving an accuracy of 71.22%
+with Extra Trees and 70.76% with Random Forest classifiers. Similarly, KAZE features,
+which focus on detecting structural alterations and keypoint variations in images, pro-
+duced accuracies ranging from 75.70% with Random Forest to 86.12% with a Support
+Vector Classifier.
+HOG features also showed strong performance, with accuracies between 85.76% and
+92.12% using a Support Vector Classifier. This result is close to the benchmark accuracy of
+94.44% for the FaceForensics++ dataset, which was achieved by EfficientNet [28]. These
+findings highlight the potential of integrating feature extraction techniques to improve
+deepfake detection performance.
+However, the most notable results were achieved by the fusion of HOG and KAZE
+features, demonstrating a clear advantage over individual feature sets. This fused approach
+showed superior performance across all classifiers, with accuracy rates of 91.12% using Ex-
+tra Trees, 92.12% with the Support Vector Classifier, and an impressive 94.44% when tested
+with the state-of-the-art EfficientNet. These results indicate that integrating texture-based
+(i.e., HOG) and keypoint-based (i.e., KAZE) features significantly improved the model’s
+ability to detect deepfake content. These features allow for more effective detection of
+deepfakes compared to using either method alone (see Figure 3 for a detailed visualization).
+
+
+--- PAGE 12 ---
+
+Appl. Sci. 2024, 1, 0
+12 of 17
+Future research could focus on strengthening the fusion technique of HOG and KAZE
+features to improve feature selection and reduce dimensionality. Another promising di-
+rection is the exploration of DL architectures, such as CNNs, to gain deeper insights into
+hierarchical feature representations and further boost classification accuracy. Additionally,
+evaluating the proposed fusion model on larger and more diverse datasets other than
+FaceForensics++ would help assess its robustness in real-world scenarios. These advance-
+ments would play an important role in strengthening deepfake detection, particularly in
+addressing the growing challenges in digital manipulation and deepfake technologies.
+Figure 3. Outcome of the proposed and ML algorithms in terms of accuracy (i.e., RF, extra trees,
+and SVC).
+The results presented in Table 3 highlight the classification accuracy of different
+feature extraction techniques when applied to deepfake detection using the Celeb-DF
+dataset. The findings demonstrate that combining multiple feature descriptors improves
+detection performance compared to using individual features alone. Among the single-
+feature approaches, LBP features with a Support Vector Classifier (SVC) achieved the
+highest accuracy (72%), which yielded a lower accuracy of 68%. This suggests that LBP
+is more effective in capturing local texture variations relevant to distinguishing real from
+fake images. When feature fusion was applied, the combination of HOG and KAZE
+features achieved the highest accuracy (78%), showing a significant improvement over
+individual features. This indicates that integrating gradient-based descriptors (HOG) with
+keypoint-based features (KAZE) provides a more comprehensive representation of image
+characteristics, improving classification reliability. Similarly, LBP combined with KAZE
+achieved an accuracy of 75%, further confirming that KAZE features contribute positively
+to deepfake detection by enhancing feature diversity.
+
+
+--- PAGE 13 ---
+
+Appl. Sci. 2024, 1, 0
+13 of 17
+Table 3. Classification accuracy of fusion of LBP, HOG, and KAZE features with Celeb-DF.
+Fusion of Features with Classifier
+Accuracy
+LBP Features
+Support Vector Classifier
+72%
+HOG Features
+Support Vector Classifier
+68%
+HOG + KAZE Features
+Support Vector Classifier
+78%
+LBP + KAZE Features
+Support Vector Classifier
+75%
+Overall, these results demonstrate that fusion strategies, particularly HOG + KAZE,
+are more effective than single-feature approaches in deepfake detection on the Celeb-DF
+dataset. The findings suggest that feature extraction techniques can improve the robustness
+of detection models, making them more resilient to sophisticated deepfake manipulations.
+Future research might investigate refining feature selection and classifier tweaking to
+improve overall performance.
+Table 4 presents a comparison of execution times for feature extraction and classifi-
+cation, measured in milliseconds on both GPU and CPU. This comparison evaluates the
+inference time and classification accuracy of different methods, as outlined in the evaluation
+criteria (Section 4.1), using the FaceForensics++ dataset.
+Table 4. Execution time comparison for feature extraction and classification.
+Methods
+Feature Extraction
+Training
+Inference GPU
+CPU
+Random forest
+0.5 s
+30 m
+15 ms
+92 ms
+Extra Trees Classifier
+0.5 s
+25 m
+15 ms
+95 ms
+Support Vector Classifier
+0.5 s
+60 m
+13 ms
+63 ms
+XGB Classifier
+0.5 s
+45 m
+12 ms
+75 ms
+Support Vector Machine
+0.5 s
+120 m
+25 ms
+85 ms
+XceptionNet
+0.5 s
+210 m
+20 ms
+2 s
+Convolutional Neural Network
+0.5 s
+180 m
+10 ms
+1.5 s
+HOG + KAZE (Proposed)
+1.0 s
+45 m
+16 ms
+67 ms
+LBP + KAZE (Proposed)
+0.5 s
+30 m
+09 ms
+56 ms
+Feature extraction time reflects the duration required to extract LBP, HOG, and KAZE
+features, in contrast with the extraction times of traditional machine learning models.
+Training time refers to the time duration needed to train the classifier after feature extraction,
+while inference time measures the time taken to classify a single instance once the model has
+been trained. This analysis provides insights into the computational efficiency of various
+approaches, helping to assess their suitability for real-time deepfake detection.
+These tables provide a clear comparison of the efficiency and effectiveness of the
+proposed fusion model using KAZE and HOG features against traditional ML approaches.
+Table 4 demonstrates that while feature extraction with KAZE and HOG may take slightly
+longer (per frame) than traditional ML models on GPU, it is significantly faster than
+training DL models. Table 2 highlights that the proposed fusion model achieves competitive
+accuracy while maintaining comparative training and inference time, making it suitable for
+real-time applications where speed is important (see Table 4 for GPU and CPU inference).
+These comparisons underscore the practical advantages of the proposed fusion model in
+terms of computational efficiency without compromising classification performance. The
+proposed fusion-based methods perform better in terms of training time, despite CNN’s
+marginally better performance and accuracy, but are lacking in inference time, especially
+when the CPU is used. Although CNN’s inference is somewhat superior when the GPU
+is used compared to the proposed fusion model, the methods are reliable and perfect for
+resource-constrained situations, as they performed better when the CPU is used. The
+
+
+--- PAGE 14 ---
+
+Appl. Sci. 2024, 1, 0
+14 of 17
+fusion of HOG and KAZE provides a good balance between computational efficiency and
+classification performance.
+4.4. Future Work and Implications of Visual Information Security
+The fusion of LBP, HOG, and KAZE features has proven effective in detecting deep-
+fake content. HOG captures texture patterns, while KAZE detects structural distortions
+introduced by deepfake generation techniques. Future research could refine classifiers to im-
+prove the model’s ability to distinguish between real and fake content. Exploring advanced
+hybrid techniques like ORB, DSIFT, and Wavelet Transform Features could further improve
+detection accuracy and computational efficiency. Additionally, dimensionality reduction
+methods such as PCA and t-SNE can optimize feature selection, while DL approaches like
+hybrid CNN architectures or GANs could bolster the robustness of deepfake detection.
+This approach has strong potential for forensic and legal applications, providing
+a reliable means to verify the authenticity of digital media in critical legal proceedings.
+It could also contribute to real-time authentication systems for digital media platforms,
+potentially integrating blockchain or watermarking techniques for added security. The
+research highlights the importance of robust feature extraction methods in deepfakes, and
+future efforts should focus on refining these techniques and adapting to new manipulation
+strategies to ensure continued efficacy in securing digital media.
+5. Conclusions
+In conclusion, this study introduced an effective approach for detecting deepfake
+images utilizing texture-based features through the fusion of HOG/LBP and KAZE within
+an ML framework. The computational load is significantly reduced compared to traditional
+DL models, making this method ideal for real-time applications with limited processing
+resources. The experiments using classifiers such as RF, XGBoost, extra trees, and support
+vector classifiers demonstrated the distinct advantages of each method in evaluating feature
+importance across HOG feature bands. The feature-level fusion technique further improved
+performance on both the FaceForensics++ and Celeb-DF datasets, achieving an accuracy of
+92.12% and 78%, respectively. This approach not only improves accuracy and efficiency in
+detecting deepfake content but also provides a scalable solution against the potential abuse
+of technology and its consequences on politics, finance, and personal privacy. Beyond
+deepfake detection, the method holds the potential for authenticating various forms of
+digital content, emphasizing its broad applicability in fields that require reliable visual
+data verification.
+Funding: This study was financially supported by the Seoul National University of Science and
+Technology, Seoul, South Korea.
+Conflicts of Interest: The authors declare no conflicts of interest.
+References
+1.
+Kharvi, P.L. Understanding the Impact of AI-Generated Deepfakes on Public Opinion, Political Discourse, and Personal Security
+in Social Media. IEEE Secur. Priv. 2024, 22, 115–122. https://doi.org/10.1109/MSEC.2024.3405963.
+2.
+Domenteanu, A.; T˘ataru, G.C.; Cr˘aciun, L.; Mol˘anescu, A.G.; Cotfas, L.A.; Delcea, C. Living in the Age of Deepfakes: A Bibliometric
+Exploration of Trends, Challenges, and Detection Approaches. Information 2024, 15, 525. https://doi.org/10.3390/info15090525.
+3.
+Bale, D.; Ochei, L.; Ugwu, C. Deepfake Detection and Classification of Images from Video: A Review of Features, Techniques, and
+Challenges. Int. J. Intell. Inf. Syst. 2024, 13, 20–28. https://doi.org/10.11648/j.ijiis.20241302.11.
+4.
+Vijaya, J.; Kazi, A.A.; Mishra, K.G.; Praveen, A. Generation Furthermore, Detection of Deepfakes using Generative Adversarial
+Networks (GANs) and Affine Transformation. In Proceedings of the 2023 14th International Conference on Computing Commu-
+nication and Networking Technologies (ICCCNT), Delhi, India, 6–8 July 2023; pp. 1–6. https://doi.org/10.1109/ICCCNT56998.2
+023.10307811.
+
+
+--- PAGE 15 ---
+
+Appl. Sci. 2024, 1, 0
+15 of 17
+5.
+Lee, J.; Jang, J.; Lee, J.; Chun, D.; Kim, H. CNN-Based Mask-Pose Fusion for Detecting Specific Persons on Heterogeneous
+Embedded Systems. IEEE Access 2021, 9, 120358–120366.
+6.
+Lee, S.I.; Kim, H. GaussianMask: Uncertainty-aware Instance Segmentation based on Gaussian Modeling. In Proceedings of the
+2022 26th International Conference on Pattern Recognition (ICPR), Montreal, QC, Canada, 21–25 August 2022; pp. 3851–3857.
+7.
+Chun, D.; Lee, S.; Kim, H. USD: Uncertainty-Based One-Phase Learning to Enhance Pseudo-Label Reliability for Semi-Supervised
+Object Detection. IEEE Trans. Multimed. 2024, 26, 6336–6347.
+8.
+Lee, J.J.; Kim, H. Multi-Step Training Framework Using Sparsity Training for Efficient Utilization of Accumulated New Data in
+Convolutional Neural Networks. IEEE Access 2023, 11, 129613–129622.
+9.
+Abbas, F.; Taeihagh, A. Unmasking deepfakes: A systematic review of deepfake detection and generation techniques using
+artificial intelligence. Expert Syst. Appl. 2024, 252, 124260. https://doi.org/https://doi.org/10.1016/j.eswa.2024.124260.
+10.
+Naskar, G.; Mohiuddin, S.; Malakar, S.; Cuevas, E.; Sarkar, R. Deepfake detection using deep feature stacking and meta-learning.
+Heliyon 2024, 10, e25933. https://doi.org/https://doi.org/10.1016/j.heliyon.2024.e25933.
+11.
+Rana, M.S.; Murali, B.; Sung, A.H. Deepfake Detection Using Machine Learning Algorithms. In Proceedings of the 2021
+10th International Congress on Advanced Applied Informatics (IIAI-AAI), Niigata, Japan, 11–16 July 2021; pp. 458–463.
+https://doi.org/10.1109/IIAI-AAI53430.2021.00079.
+12.
+Tsalera, E.; Papadakis, A.; Samarakou, M.; Voyiatzis, I. Feature Extraction with Handcrafted Methods and Convolutional Neural
+Networks for Facial Emotion Recognition. Appl. Sci. 2022, 12, 8455. https://doi.org/10.3390/app12178455.
+13.
+Moore, S.; Bowden, R. Local binary patterns for multi-view facial expression recognition. Comput. Vis. Image Underst. 2011,
+115, 541–558. https://doi.org/10.1016/j.cviu.2010.12.001.
+14.
+Alcantarilla, P.F.; Bartoli, A.; Davison, A.J. KAZE Features. In Proceedings of the European Conference on Computer Vision—
+ECCV 2012, Florence, Italy, 7–13 October 2012; Fitzgibbon, A.; Lazebnik, S.; Perona, P.; Sato, Y.; Schmid, C., Eds.; Springer:
+Berlin/Heidelberg, Germany, 2012; pp. 214–227.
+15.
+Huda, N.u.; Javed, A.; Maswadi, K.; Alhazmi, A.; Ashraf, R. Fake-checker: A fusion of texture features and deep learning for
+deepfakes detection. Multimed. Tools Appl. 2024, 83, 49013–49037. https://doi.org/10.1007/s11042-023-17586-x.
+16.
+A. Khalid, N.A.; Imran Ahmad, M.; Shie Chow, T.; H. Mandeel, T.; Majid Mohammed, I.; Kadhim Alsaeedi, M.A. Palmprint
+recognition system using VR-LBP and KAZE features for better recognition accuracy. Bull. Electr. Eng. Inform. 2024, 13, 1060–1068.
+https://doi.org/10.11591/eei.v13i2.4739.
+17.
+Ghosh, B.; Malioutov, D.; Meel, K.S. Efficient Learning of Interpretable Classification Rules. J. Artif. Intell. Res. 2022, 74, 1823–1863.
+https://doi.org/10.1613/jair.1.13482.
+18.
+Patel, Y.; Tanwar, S.; Gupta, R.; Bhattacharya, P.; Davidson, I.E.; Nyameko, R.; Aluvala, S.; Vimal, V. Deepfake Generation and
+Detection: Case Study and Challenges. IEEE Access 2023, 11, 143296–143323. https://doi.org/10.1109/ACCESS.2023.3342107.
+19.
+Chen, P.; Xu, M.; Wang, X. Detecting Compressed Deepfake Images Using Two-Branch Convolutional Networks with Similarity
+and Classifier. Symmetry 2022, 14, 2691. https://doi.org/10.3390/sym14122691.
+20.
+Hong, H.; Choi, D.; Kim, N.; Kim, H. Mobile-X: Dedicated FPGA Implementation of the MobileNet Accelerator Optimizing
+Depthwise Separable Convolution. IEEE Trans. Circuits Syst. II Express Briefs 2024, 71, 4668–4672.
+21.
+Ki, S.; Park, J.; Kim, H. Dedicated FPGA Implementation of the Gaussian TinyYOLOv3 Accelerator. IEEE Trans. Circuits Syst. II
+Express Briefs 2023, 70, 3882–3886.
+22.
+Du, M.; Pentyala, S.; Li, Y.; Hu, X. Towards Generalizable Deepfake Detection with Locality-aware AutoEncoder. In Proceedings
+of the 29th ACM International Conference on Information & Knowledge Management (CIKM’20), Virtual, 19–23 October 2020.
+https://doi.org/10.1145/3340531.3411892.
+23.
+Lanzino, R.; Fontana, F.; Diko, A.; Marini, M.R.; Cinque, L. Faster Than Lies: Real-time Deepfake Detection using Binary Neural
+Networks. In Proceedings of the 2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW),
+Seattle, WA, USA, 17–18 June 2024; pp. 3771–3780. https://doi.org/10.1109/CVPRW63382.2024.00381.
+24.
+Rössler, A.; Cozzolino, D.; Verdoliva, L.; Riess, C.; Thies, J.; Nießner, M. FaceForensics++: Learning to Detect Manipulated Facial
+Images. In Proceedings of the International Conference on Computer Vision (ICCV), Seoul, Republic of Korea, 27 October–2
+November 2019.
+25.
+Li, Y.; Yang, X.; Sun, P.; Qi, H.; Lyu, S. Celeb-DF: A Large-Scale Challenging Dataset for DeepFake Forensics. In Proceedings of the
+IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), Seattle, WA, USA, 13–19 June 2020.
+26.
+Hong, H.; Choi, D.; Kim, N.; Lee, H.; Kang, B.; Kang, H.; Kim, H. Survey of convolutional neural network accelerators on
+field-programmable gate array platforms: Architectures and optimization techniques. J. Real-Time Image Process. 2024, 21, 64.
+27.
+Heidari, A.; Jafari Navimipour, N.; Dag, H.; Unal, M. Deepfake detection using deep learning methods: A systematic and
+comprehensive review. WIREs Data Min. Knowl. Discov. 2024, 14, e1520. https://doi.org/https://doi.org/10.1002/widm.1520.
+28.
+Bonettini, N.; Cannas, E.D.; Mandelli, S.; Bondi, L.; Bestagini, P.; Tubaro, S. Video Face Manipulation Detection Through Ensemble
+of CNNs. In Proceedings of the 2020 25th International Conference on Pattern Recognition (ICPR), Milan, Italy, 10–15 January
+2021; pp. 5012–5019. https://doi.org/10.1109/ICPR48806.2021.9412711.
+
+
+--- PAGE 16 ---
+
+Appl. Sci. 2024, 1, 0
+16 of 17
+29.
+Saberi, M.; Sadasivan, V.S.; Rezaei, K.; Kumar, A.; Chegini, A.; Wang, W.; Feizi, S. Robustness of AI-Image Detectors: Fundamental
+Limits and Practical Attacks. In Proceedings of the 12th International Conference on Learning Representations, Vienna, Austria,
+7–11 May 2024.
+30.
+Dong, F.; Zou, X.; Wang, J.; Liu, X. Contrastive learning-based general Deepfake detection with multi-scale RGB frequency clues.
+J. King Saud Univ.-Comput. Inf. Sci. 2023, 35, 90–99.
+31.
+Raza, M.A.; Malik, K.M.; Haq, I.U. Holisticdfd: Infusing spatiotemporal transformer embeddings for deepfake detection. Inf. Sci.
+2023, 645, 119352.
+32.
+Zhu, Y.; Zhang, C.; Gao, J.; Sun, X.; Rui, Z.; Zhou, X. High-compressed deepfake video detection with contrastive spatiotemporal
+distillation. Neurocomputing 2024, 565, 126872.
+33.
+Almestekawy, A.; Zayed, H.H.; Taha, A. Deepfake detection: Enhancing performance with spatiotemporal texture and deep
+learning feature fusion. Egypt. Inform. J. 2024, 27, 100535. https://doi.org/https://doi.org/10.1016/j.eij.2024.100535.
+34.
+Chen, B.; Liu, X.; Xia, Z.; Zhao, G. Privacy-preserving DeepFake face image detection. Digit. Signal Process. 2023, 143, 104233.
+35.
+Tareen, S.A.K.; Saleem, Z. A comparative analysis of SIFT, SURF, KAZE, AKAZE, ORB, and BRISK. In Proceedings of the 2018
+International Conference on Computing, Mathematics and Engineering Technologies (iCoMET), Sukkur, Pakistan, 3–4 March
+2018; pp. 1–10. https://doi.org/10.1109/ICOMET.2018.8346440.
+36.
+Yallamandaiah, S.; Purnachand, N. A novel face recognition technique using Convolutional Neural Network, HOG, and histogram
+of LBP features. In Proceedings of the 2022 2nd International Conference on Artificial Intelligence and Signal Processing (AISP),
+Vijayawada, India, 12–14 February 2022; pp. 1–5. https://doi.org/10.1109/AISP53593.2022.9760679.
+37.
+Cavalcanti, G.D.; Ren, T.I.; Pereira, J.F. Weighted Modular Image Principal Component Analysis for face recognition. Expert Syst.
+Appl. 2013, 40, 4971–4977. https://doi.org/https://doi.org/10.1016/j.eswa.2013.03.003.
+38.
+Lu, G.F.; Zou, J.; Wang, Y. Incremental complete LDA for face recognition. Pattern Recognit. 2012, 45, 2510–2521.
+39.
+Fathi, A.; Alirezazadeh, P.; Abdali-Mohammadi, F. A new Global-Gabor-Zernike feature descriptor and its application to face
+recognition. J. Vis. Commun. Image Represent. 2016, 38, 65–72.
+40.
+Topi, M.; Timo, O.; Matti, P.; Maricor, S. Robust texture classification by subsets of local binary patterns. In Proceedings of the
+15th International Conference on Pattern Recognition (ICPR-2000), Barcelona, Spain, 3–7 September 2000; Volume 3, pp. 935–938.
+41.
+Dalal, N.; Triggs, B. Histograms of oriented gradients for human detection. In Proceedings of the 2005 IEEE Computer Society
+Conference on Computer Vision and Pattern Recognition (CVPR’05), San Diego, CA, USA, 20–25 June 2005; Volume 1, pp.
+886–893.
+42.
+Déniz, O.; Bueno, G.; Salido, J.; De la Torre, F. Face recognition using histograms of oriented gradients. Pattern Recognit. Lett. 2011,
+32, 1598–1603.
+43.
+Khalil, S.S.; Youssef, S.M.; Saleh, S.N. iCaps-Dfake: An integrated capsule-based model for deepfake image and video detection.
+Future Internet 2021, 13, 93.
+44.
+Ruano-Ordás, D. Machine Learning-Based Feature Extraction and Selection. Appl. Sci. 2024, 14, 6567. https://doi.org/10.3390/
+app14156567.
+45.
+Aslan, M.F.; Durdu, A.; Sabanci, K.; Mutluer, M.A. CNN and HOG based comparison study for complete occlusion handling in
+human tracking. Measurement 2020, 158, 107704. https://doi.org/https://doi.org/10.1016/j.measurement.2020.107704.
+46.
+Zare, M.R.; Alebiosu, D.O.; Lee, S.L. Comparison of Handcrafted Features and Deep Learning in Classification of Medical X-ray
+Images. In Proceedings of the 2018 Fourth International Conference on Information Retrieval and Knowledge Management
+(CAMP), Kota Kinabalu, Malaysia, 26–28 March 2018; pp. 1–5. https://doi.org/10.1109/INFRKM.2018.8464688.
+47.
+Zotova, D.; Pinon, N.; Trombetta, R.; Bouet, R.; Jung, J.; Lartizien, C. Gan-Based Synthetic Fdg Pet Images from T1 Brain MRI Can
+Serve to Improve Performance of Deep Unsupervised Anomaly Detection Models. SSRN 2024, 34. https://doi.org/10.2139/ssrn.
+4917648.
+48.
+Chen, Y.; Haldar, N.A.H.; Akhtar, N.; Mian, A. Text-image guided Diffusion Model for generating Deepfake celebrity interactions.
+In Proceedings of the 2023 International Conference on Digital Image Computing: Techniques and Applications (DICTA), Port
+Macquarie, Australia, 28 November–1 December 2023; pp. 348–355.
+49.
+Yuan, G.; Cun, X.; Zhang, Y.; Li, M.; Qi, C.; Wang, X.; Shan, Y.; Zheng, H. Inserting anybody in diffusion models via celeb basis.
+arXiv 2023, arXiv:2306.00926.
+50.
+Abhisheka, B.; Biswas, S.K.; Das, S.; Purkayastha, B. Combining Handcrafted and CNN Features for Robust Breast Cancer
+Detection Using Ultrasound Images. In Proceedings of the 2023 3rd International Conference on Innovative Sustainable
+Computational Technologies (CISCT), Dehradun, India, 8–9 September 2023; p. 1–6. https://doi.org/10.1109/cisct57197.2023.10
+351282.
+51.
+Mohtavipour, S.M.; Saeidi, M.; Arabsorkhi, A. A multi-stream CNN for deep violence detection in video sequences using
+handcrafted features. Vis. Comput. 2021, 38, 2057–2072. https://doi.org/10.1007/s00371-021-02266-4.
+52.
+Devi, P.A.R.; Budiarti, R.P.N. Image Classification with Shell Texture Feature Extraction Using Local Binary Pattern (LBP) Method.
+Appl. Technol. Comput. Sci. J. 2020, 3, 48–57. https://doi.org/10.33086/atcsj.v3i1.1745.
+
+
+--- PAGE 17 ---
+
+Appl. Sci. 2024, 1, 0
+17 of 17
+53.
+Werghi, N.; Berretti, S.; del Bimbo, A. The Mesh-LBP: A Framework for Extracting Local Binary Patterns From Discrete Manifolds.
+IEEE Trans. Image Process. 2015, 24, 220–235. https://doi.org/10.1109/tip.2014.2370253.
+54.
+Kumar, D.G. Identical Image Extraction from PDF Document Using LBP (Local Binary Patterns) and RGB (Red, Green and Blue)
+Color Features. Int. J. Res. Appl. Sci. Eng. Technol. 2022, 10, 3563–3566. https://doi.org/10.22214/ijraset.2022.45811.
+55.
+Karunarathne, B.A.S.S.; Wickramaarachchi, W.H.C.; De Silva, K.K.K.M.C. Face Detection and Recognition for Security System
+using Local Binary Patterns (LBP). J. ICT Des. Eng. Technol. Sci. 2019, 3, 15–19. https://doi.org/10.33150/jitdets-3.1.4.
+56.
+Yang, B.; Chen, S. A comparative study on local binary pattern (LBP) based face recognition: LBP histogram versus LBP image.
+Neurocomputing 2013, 120, 365–379. https://doi.org/10.1016/j.neucom.2012.10.032.
+57.
+Huang, Z.R. CN-LBP: Complex Networks-Based Local Binary Patterns for Texture Classification. In Proceedings of the 2021
+International Conference on Wavelet Analysis and Pattern Recognition (ICWAPR), Adelaide, Australia, 4–5 December 2021; pp.
+1–6. https://doi.org/10.1109/icwapr54887.2021.9736189.
+58.
+Rahayu, M.I.; Nasihin, A. Design of Face Recognition Detection Using Local Binary Pattern (LBP) Method. J. Teknol. Inf. Dan
+Komun. 2020, 9, 48–54. https://doi.org/10.58761/jurtikstmikbandung.v9i1.145.
+59.
+Albiol, A.; Monzo, D.; Martin, A.; Sastre, J.; Albiol, A. Face recognition using HOG–EBGM. Pattern Recognit. Lett. 2008,
+29, 1537–1543.
+60.
+Kusniadi, I.; Setyanto, A. Fake Video Detection using Modified XceptionNet. In Proceedings of the 2021 4th International
+Conference on Information and Communications Technology (ICOIACT), Yogyakarta, Indonesia, 30–31 August 2021; pp. 104–107.
+https://doi.org/10.1109/ICOIACT53268.2021.9563923.
+61.
+Hastie, T.; Tibshirani, R.; Friedman, J. The Elements of Statistical Learning: Data Mining, Inference, and Prediction; Springer Series in
+Statistics; Springer: New York, NY, USA, 2009; Volume 1.
+62.
+Fawzi, A.; Fawzi, O.; Gana, M.F. Robustness of classifiers: From the theory to the real world. IEEE Trans. Neural Networks Learn.
+Syst. 2016, 28, 505–518.
+Disclaimer/Publisher’s Note: The statements, opinions and data contained in all publications are solely those of the individual
+author(s) and contributor(s) and not of MDPI and/or the editor(s). MDPI and/or the editor(s) disclaim responsibility for any injury to
+people or property resulting from any ideas, methods, instructions or products referred to in the content.

@@ -1,0 +1,4439 @@
+
+
+--- PAGE 1 ---
+
+Contents lists available at ScienceDirect
+Information Fusion
+journal homepage: www.elsevier.com/locate/inffus
+Full length article
+Advances in DeepFake detection algorithms: Exploring fusion techniques in
+single and multi-modal approach
+Ashish Kumar a, Divya Singh a, Rachna Jain b, Deepak Kumar Jain c,d
+,∗, Chenquan Gan e,
+Xudong Zhao c
+a School of Computer Science Engineering and Technology, Bennett University, Greater Noida, U.P., India
+b Bhagwan Parshuram Institute of Technology, New Delhi, India
+c Key Laboratory of Intelligent Control and Optimization for Industrial Equipment of Ministry of Education, Dalian University of Technology, Dalian 116024, China
+d Symbiosis Institute of Technology, Symbiosis International University, Pune 412115, India
+e School of Cyber Security and Information Law, Chongqing University of Posts and Telecommunications, Chongqing 400065, China
+A R T I C L E
+I N F O
+Keywords:
+DeepFake
+Artificial intelligence
+Generative adversarial network
+Fusion algorithms
+Transformer
+Detection
+A B S T R A C T
+In recent years, generative artificial intelligence has gained momentum and created extremely realistic
+synthetic multimedia content that can spread misinformation and mislead society. Deepfake detection is a
+technique consisting of frameworks, algorithms and approaches to predict manipulated contents namely, image,
+audio and video. To this end, we have analyzed and explored various deepfake detection frameworks by
+categorizing them as single-modal or multi-modal approaches. To provide better understanding and clarity,
+single-modal approaches are further categorized as conventional and advanced techniques. Conventional tech-
+niques extract complementary handcrafted features and classify them using machine-learning-based algorithms.
+On the other hand, advanced techniques adopt deep learning and hybrid algorithms to detect deepfakes.
+Multi-modal techniques utilize a mixture of two or more modalities for feature extraction and fuse them to
+obtain the final classification scores. These techniques are also categorized either as deep learning or hybrid
+techniques. The complementary features, multiple modalities, and deep learning models are fused adaptively
+using score-level or feature-level fusion. The advantages, features, practical applications, and limitations under
+each category are highlighted to address the challenges and determine future trends to counter deepfakes. In
+addition, recommendations are also elaborated to evaluate the potential of artificial intelligence in deepfake
+detection for providing a safer and more reliable digital world.
+1. Introduction
+With the advancement in digital media, the contamination and
+tampering in multimedia content such as images, videos, and audio
+have been a foremost concern nowadays [1]. The detection of alteration
+is paramount at an early stage to prevent the dissemination of fake
+and incorrect content to the general people with the use of social
+platforms such as Facebook, Instagram, and many other [2,3]. The
+fraudster’s content in the form of audio, video, and images are created
+with the help of artificial intelligence (AI)-based technology such as
+GANs (Generative adversarial networks) by altering the real content
+with false data and are popularly known as Deepfakes [4]. DeepFakes
+are technologically advanced content that superimposes fake and in-
+appropriate details on the original content to generate false authentic
+information.
+∗Corresponding author at: Key Laboratory of Intelligent Control and Optimization for Industrial Equipment of Ministry of Education, Dalian University of
+Technology, Dalian 116024, China.
+E-mail addresses: ashish.gupta14d@gmail.com (A. Kumar), divya.singh@bennett.edu.in (D. Singh), rachnabtec@gmail.com (R. Jain), dkj@ieee.org
+(D.K. Jain), gcq2010cqu@163.com (C. Gan), xudongzhao@dlut.edu.cn (X. Zhao).
+Deepfakes are artificially synthesized contents that require a large
+amount of training data for their generation [5]. Deepfakes generate
+fake and inappropriate images and videos by exchanging the faces of
+well-known personalities such as celebrities, and superstars. Deepfakes
+can produce fake pornographic material in the form of realistic videos
+and images using a person’s face without his/her permission [6].
+Also, the speech and voice content of politicians and world leaders
+can be modified to spread fake news and misinformation, impacting
+their visibility and political careers. Deepfakes can create confusion
+during military movements, misguide forensic investigations, tamper
+the satellite images, and cause religious tension too [7–10]. Hence,
+these contents not only deceive the individual people but are also a
+threat to society and nations worldwide. The detection of deepfakes is
+https://doi.org/10.1016/j.inffus.2025.102993
+Received 10 October 2024; Received in revised form 5 January 2025; Accepted 28 January 2025
+Information Fusion 118 (2025) 102993 
+Available online 5 February 2025 
+1566-2535/© 2025 Elsevier B.V. All rights are reserved, including those for text and data mining, AI training, and similar technologies. 
+
+
+--- PAGE 2 ---
+
+A. Kumar et al.
+essential to prevent their ill effect from penetrating the human being.
+Deepfakes are so realistic that they are difficult to identify with
+the naked eye or ears. It requires innovative and latest technology
+to differentiate the deepfakes from the original content. Recently AI-
+based algorithms have provided superior results in object detection
+in the presence of varying environmental conditions [11–15]. Also,
+these algorithms can predict critical diseases such as cancer and tumors
+at an early stage with enhanced accuracy [16–19]. These algorithms
+have a wide range of applications in detecting deepfakes in multimedia
+content such as audio, video, and images [20]. AI-based algorithms can
+utilize either the machine-learning (ML) approach [21–23] or the Deep
+learning (DL) approach [4,24–27] for detecting deepfakes. ML algo-
+rithms such as random forest (RF) [23,28], decision tree (DT) [28,29],
+XGBoost [28,30], support vector machine (SVM) [31,32], and many
+others [8,33] are utilized for classifying the content as real or fake.
+On the other hand, DL-models such as convolutional neural network
+(CNN) [34,35], ResNet [36], and EfficientNet [37] are exploited for
+learning robust features for deepfake detection. Also, transformers
+such as vision transformer (ViT) [38,39], Swim transformer [40], and
+student-teacher network [41] comprising encoder and decoder stages
+are efficient in deepfake detection. These models are data-hungry,
+computationally complex, and require high training time for feature
+extraction.
+To address the limitations of these advanced algorithms, hand-
+crafted features such as color, texture, and histogram of gradient (HOG)
+are extracted from image frames for detecting deepfakes [42–44]. Apart
+from these features, facial points, frame level features, set-level fea-
+tures, and feature distillation are also recommended for robust feature
+extraction [45–48]. These features are easier to extract and process.
+However, detection based on single features is not efficient enough and
+prone to produce false outcomes. Hence, multi-modal deepfake detec-
+tion models that can consider multiple modalities are demonstrated in
+this field [41,49,50]. The multiple modalities are extracted which can
+compensate for each other during the detection process. Multi-modal
+information is extracted by combining multiple inputs of multimedia
+data such as audio, video, and images for developing a robust deepfake
+detection model. These models learn features from different modalities
+in different dimensions. The features were integrated using DL models
+or ensembled approaches [51–53].
+1.1. Comparison with previous surveys
+Deepfake detection is one of the challenging and evolving domains
+of computer vision. A lot of survey papers have been published in the
+recent past with a special focus on deepfakes images or videos. A few
+had reviewed audio with images for deepfake detection in practical
+scenarios. In 2022, Rana et al. [54] reviewed and summarized the key
+algorithms in deepfake detection in four different categories namely,
+DL-based, ML-based, statistical, and blockchain-based algorithms from
+2018 to 2020. However, conventional techniques were not studied
+and discussed. The authors comprehensively analyzed the deepfake
+generation methods, and DL-based detection techniques along with a
+discussion of available datasets [2]. The authors also discussed the role
+of body motion reenactment and its technicality in generating deep-
+fake to explore the new directions in the domain. Similarly, authors
+analyzed and summarized the various DL-based deepfake creation and
+detection methods [55]. The discussion majorly described the tech-
+nicalities of detecting deepfakes using DL methods and the available
+public datasets only. However, studies with multi-modal information
+with audio as input features were limitedly included in the discussion.
+Patel et al. [1] studied the ML/DL methods for deepfake creation and
+the advanced encoder/decoder-based detection methods. The bene-
+fits and limitations of each method were elaborated and discussed.
+However, the study failed to examine the conventional and multi-
+modal deepfake detection approaches. On the other hand, authors have
+reviewed the potential of AI for automatic generation and detection
+of deepfakes [20]. ML/DL based methods, facial expressions, and face
+reenactment were elaborated for deepfakes generation along with the
+associated implementation changes. A lot of deepfake data is created
+and is available publicly, which not only stains one’s reputation but can
+also spread misinformation. Similarly, numerous deepfake detection
+algorithms have also been proposed to differentiate the fake from
+the real. To summarize the representative work for deepfake creation
+and detection, we have broadly categorized the algorithms into two
+categories in which single modality (Image/Video/Audio) or multi-
+modalities are exploited in the detection framework. Table 1 tabulates
+the key focus areas and limitations of the existing surveys to highlight
+the advantages and suitability of the proposed survey.
+1.2. Motivation
+The motivation of this review is to categorize the various deep-
+fake detection algorithms based on their feature extraction techniques
+and key algorithms utilized in detecting fake outcomes. Based on
+the input data, deepfake algorithms are categorized either as single-
+modal techniques or multi-modal techniques. Based on the extracted
+features, single-modal techniques are categorized either as conven-
+tional methods or advanced methods. Conventional methods extracted
+handcrafted features and processed them using DL models. On the
+other hand, ML-based conventional methods classified the deepfakes
+using ML classifiers in the final stage. Complementary handcrafted
+features were fused using either score level or feature level fusion to
+generate unified robust features for deepfake classification. Further-
+more, advanced methods categorized algorithms either as DL-based
+or hybrid. DL-based algorithms utilized DL approaches both at the
+feature extraction and processing stage. On the other hand, hybrid
+algorithms extracted features using DL approaches, fused and classified
+them using either ensembled ML or DL classifier. Nevertheless, multi-
+modal techniques are also categorized either as DL-based algorithms
+or ensembled algorithms based on the exploited feature extraction and
+processing methodologies. Ensembled algorithms fused the outcome
+from different DL models to generate robust features that can be fed to
+the classifier for deepfake classification. We believe that this is the first
+review of its kind which critically analyzed the representative work in
+the deepfake detection domain from different perspectives of exploited
+feature extraction and processing techniques.
+1.3. Significant contributions
+The key contributions of the paper are as follows:
+∙Firstly, the deepfake detection framework is broadly categorized
+into two classes as single-modal and multimodal detection ap-
+proaches. Single-modal approaches are further categorized as
+conventional and advanced techniques whereas multimodal ap-
+proaches into deep learning and ensembled fusion-based tech-
+niques to understand their salient features, similarities, differ-
+ences, and applications.
+∙Secondly, statistical analysis has been conducted to explore the
+current trends in single/multi-modal deepfake detection algo-
+rithms. Single-modal and multi-modal are further categorized to
+review the shifting trends in traditional, ensembled, and
+multimodal-based fusion methodologies.
+∙Thirdly, deepfake creation techniques are reviewed following
+the multimedia content namely, audio, images, and videos. The
+techniques are thoroughly investigated to understand the process
+of creation of realistic content in order to explore robust deepfake
+detection algorithms.
+∙Lastly, the recommendations, suggestions, and limitations are
+thoroughly examined to highlight the need for generalizability
+and explainability of advanced deepfake detection algorithms to
+deal with practical challenges involved in its detection.
+Information Fusion 118 (2025) 102993 
+2 
+
+
+--- PAGE 3 ---
+
+A. Kumar et al.
+Table 1
+Comparative analysis of the proposed survey with existing survey articles considering their key strengths and limitations.
+SN
+Survey papers
+Strength
+Limitations
+Comparison with the
+proposed survey
+1.
+Albahar and Almaki [56]
+Discussed various deepfake
+detection methods such as face
+detection, multimedia forensics,
+watermarking and CNN.
+Limited historical perspective and
+narrow discussion on the key
+benefits of deepfake detection
+methods.
+Statistical exploration of historical deepfake
+detection methods and categorization into multiple
+classes to exhibit clarity and identify potential
+research directions.
+2.
+Seow et al. [2]
+Comprehensive overview of
+deepfake detection and generation
+methods for facial images and
+videos.
+Limited focus on deepfake
+detection challenges in practical
+scenarios including audio in
+videos.
+Emphasize the robustness and reliability of
+deepfake detection algorithms to address societal,
+ethical, and privacy concerns.
+3.
+Rana et al. [54]
+Systematic review of deepfake
+detection videos under various
+categories.
+Lacked in discussion for the
+deepfake detection models
+generalizability, explainability
+and ethical implications.
+Detail the requirements of the deepfake detection
+model’s generalizability and explainability to
+address the real-time challenges in deepfake
+detection algorithms.
+4.
+Malik et al. [57]
+Categorized deepfake creation
+methods and discussed
+DNN-based deepfake detection
+methods.
+Discussed DNN methods for
+deepfake detection in facial
+images/videos only.
+Elaborate deepfake detection in various multimedia
+contents namely, audio, video and images with a
+wide range of methodologies namely,
+conventional, ML, DL and fusion-based approaches.
+5.
+Gupta et al. [58]
+Reviewed deepfake detection
+algorithms utilizing ML and
+modality fusion techniques.
+Analyzed deepfake video and
+images for detection, with limited
+discussion on deepfake creation.
+Review a wider perspective of multimedia content
+including audio with images/videos in detection
+and creation methodologies.
+6.
+Mary and Edison [59]
+Focused on DL-based models for
+detecting deepfake videos/images
+Discussed very limited DL-based
+approaches exploiting CNN, RNN
+and LSTM.
+Provide a wider perspective of deepfakes in DL
+methods including advanced approaches such as
+ViT, swim transformer, etc.
+7.
+Patel et al. [1]
+Discussed deepfake media content
+generation and detection methods
+based on ML, DL ensembles, and
+multimodal techniques.
+Limitedly discussed the
+handcrafted features-based
+methods for deepfake detection.
+Summarize the wider perspective of single-modal
+and multi-modal deepfake detection algorithms
+which are further categorized for better
+understanding and clarity.
+8.
+Passos et al. [55]
+Discussed DL-based deepfake
+detection methods in spatial and
+temporal domains under various
+categories for videos.
+Restricted to DL-based detection
+methodologies for deepfake
+videos with brief discussion for
+deepfake audio detection.
+Exhaustive discussion on deepfake detection
+algorithms for various media contents using
+conventional, ML, DL, ensembled, multimodal,
+fusion-based techniques for covering wider
+applications.
+9.
+Abbas and Taeihagh [20]
+Reviewed and categorized the
+deepfakes generation and
+detection techniques using ML,
+and DL with a special focus on
+GANs.
+Discussion on multi-modal
+approaches for realistic scenarios
+was not presented.
+Categorize single modal and multimodal deepfakes
+detection. Reviewed multimodal detection
+techniques as DL and ensembled fusion-based
+approaches.
+[ML: Machine learning, DL: Deep learning, CNN: Convolutional neural network, RNN: Recurrent neural network, LSTM: Long short-term memory, GANs: Generative adversarial
+networks, ViT: Vision Transformer].
+1.4. Paper organization
+The rest of the paper is divided into eight sections. Section 2 details
+the inclusion and exclusion strategy for selecting papers for this survey
+along with their statistical analysis. Deepfakes creation and detection
+methodologies are elaborated and categorized in Section 3. The details
+about the conventional and advanced techniques for deepfake detection
+are summarized in Sections 4 and 5, respectively. Section 6 reviews
+the existing work in the multi-modal deepfake detection category.
+The benefits, limitations, recommendations, and benchmarking of the
+proposed review are presented in Section 7. Lastly, the concluding
+remarks and future directions are provided in Section 8. For better
+clarity, the details about the organization of the paper are further
+illustrated in Fig. 1.
+2. Search strategy and statistical distribution of deepfake algo-
+rithms
+In this section, we have discussed the adopted search strategy for
+selecting the representative work for this literature review. We have
+also analyzed the statistical distribution of the selected publications
+to provide clarity of existing progress in the domain. The next section
+discusses the article selection strategy utilized in this work.
+2.1. PRISMA strategy for article selection
+A detailed search was conducted to select the most appropriate
+articles using various online platforms including IEEE, Sciencedirect,
+GoogleScholar, Springer, and other sources (MDPI, ArXiv, Research-
+Gate, etc.). The keywords utilized for exploring the articles were
+‘‘DL-based deepfake algorithms’’, ‘‘AI-based deepfake algorithms’’, ‘‘ML-
+based deepfake algorithms’’, ‘‘multi-modal deepfake detection
+approaches’’, ‘‘Handcrafted features based deepfake detection algo-
+rithms’’, ‘‘transformer-based deepfake detection algorithms’’, ‘‘hybrid
+multi-modal deepfake detection algorithms’’, and ‘‘ensembled deepfake
+detection algorithms’’. In addition, good impact factor journals and
+reputed conferences from the year 2019 to till date are searched for
+finding relevant and good articles written in English. Fig. 2 illustrates
+the PRISMA (Preferred Reporting Items for Systematic Reviews and
+Meta-Analysis) strategy along with adopted selection criteria to select
+critical studies for this work. Based on the above-mentioned criteria
+an exhaustive search was performed and a total of 6658 studies were
+identified. Duplicate articles were identified and removed by exploiting
+the ‘‘Find Duplicates’’ feature of EndNote software by Clarivate An-
+alytics. After this step, a total of 2860 studies were retained. Three
+exclusion criteria were selected as (i) E1: Non-significant articles (ii)
+E2: Non-relevant articles (iii) E3: Articles with insufficient data. E1
+excludes articles that did not utilize the considered methodologies
+and techniques utilized in this review. E2 removed those that were
+not related to the domain and E3 excluded those that did not have
+sufficient information in the discussion, processing data, and adopted
+methodologies. In addition, the articles from non-quality journals and
+conferences were also excluded from the mentioned exclusion criterion.
+The criteria that were considered for deciding the conference quality
+such as ranking, organizing institution, location, and previous records.
+Information Fusion 118 (2025) 102993 
+3 
+
+
+--- PAGE 4 ---
+
+A. Kumar et al.
+Fig. 1. Description of paper structure.
+Fig. 2. PRIMA search strategy for study selection.
+Information Fusion 118 (2025) 102993 
+4 
+
+
+--- PAGE 5 ---
+
+A. Kumar et al.
+Fig. 3. Statistical distribution of deepfake detection algorithms: (a) Literature review of selected studies from year 2019 to 2024, (b) Literature review analysis of single modal
+deepfake literature from year 2019 to 2024, (c) Publication analysis as per the publication type, and (d) Publication analysis as per publisher.
+Survey papers were also excluded from the literature review. Consider-
+ing all these conditions in all three steps, the number of articles selected
+for exclusion from the analysis was 1980, 660, and 132, respectively.
+Finally, a total of 88 most relevant and critical studies were selected
+for discussion in this study. The next section will detail the statistical
+distribution of the selected studies from different perspectives.
+2.2. Statistical distribution analysis of selected articles
+The study focussed on the analysis of existing work published for
+deepfake detection either as single-modal deepfake algorithms or multi-
+modal deepfake algorithms. It is necessary to investigate the progress
+in the domain from past to present to understand future trends. This
+assessment will help to determine the contribution of these algorithms
+to the field of deepfake detection algorithms.
+Fig. 3 depicts the statistical distribution of deepfake algorithms from
+the year 2019 to 2024. Fig. 3(a) illustrates that very few single deep-
+fake algorithms are published from 2019 to 2021. These algorithms
+regain popularity in the year 2024 again. Publication trends evident
+that multi-modal detection evolved in the past few years only. Multi-
+modal algorithms are published from 2022 to 2024. The publication
+trends in single modal detection algorithms are further analyzed and
+depicted in Fig. 3(b). The analysis infers that there is a steep rise
+in several publications under DL-based and hybrid models from the
+year 2019 to 2024. Publication trends show that a comparable number
+of handcrafted features based on deepfake detection are also pro-
+posed due to computationally easy feature extraction and processing.
+Fig. 3(c) analysis illustrates that the contribution of journal publication
+(68%) is quite high in comparison to conference publication (16%)
+and others (16%). Further, the contribution of journal publication is
+divided as Elsevier (48%) [2,6,25,31,36,55,60,61], Springer (3%), IEEE
+(8%), MDPI (9%) [52,62,63], Arxiv (11%) [29,53,64,65], and others
+(5%) [33,66,67] as shown in Fig. 3(d). The highest number of journal
+articles are published by Elsevier publishers and others include the
+open access journals [24,68] and publications published by university
+journals [26,33,69,70] and CVPR conferences [71,72].
+Statistical distribution of substantial parameters such as journal
+quality, number of datasets, model architectural parameters, and per-
+formance metrics from selected deepfake studies are illustrated in
+Fig. 4. Fig. 4(a) illustrates that most of the studies (41%) are published
+by various journals and conferences with low impact factor [22,28–30,
+51,53,73,74]. The journals with an impact factor from 2 to 4 contribute
+to 26% [24,52,62,63,67,68,75]. Studies (7%) are from journals above
+8 impact factor [39,50,76–78]. The analysis of exploited datasets by
+various studies is depicted in Fig. 4(b). Most of the studies (50%)
+utilized up to three datasets [10,38,43,72,75,77,79–82]. Only 2% of
+the studies exploited 5 or above 5 datasets for experimental evaluation
+of the model [33,52,61,71,78,83,84]. Fig. 4(c) analyses the considered
+model architectural parameters in the selected studies. Very few studies
+(3%) have discussed the model explainability in their analysis [6,29,75,
+85–87]. Model generalizability by experimenting with its performance
+on cross-datasets is evaluated by studies (19%) [21,24,33,40,51,53,65,
+77,82,88–91]. Only studies (11%) [25,33,47,61,65,72,77,91–94] have
+considered data augmentation techniques either for improving the
+dataset quality or expanding its training size. After this, the considered
+performance metrics parameters are statistically analyzed in Fig. 4(d).
+Most of the studies utilized accuracy (32%) [7,25,26,40,66,68,71,72,
+77,81,82,86,88,89,92,95–98] and area under the curve (23%) [3,9,
+24,32,40,45,47,60–62,68,70,72,77,91,98] for comparing model per-
+formance with other existing methods. Very few studies considered
+sensitivity (2%) [8,26,62,86,95] and specificity (2%) [8,26,62,63,86]
+as performance parameters in the analysis. Also, confusion matrix
+(6%) [8,9,24,25,39,40,61–63,68,85,89,95,98] and F1-score (12%) [8,
+22,24,26,36,38,49,50,62,67,68,70,74,85,86,88,97–100] are exploited
+by limited studies in their experimental evaluation. The next section
+will detail the deepfake creation and detection techniques.
+3. Deepfakes creation and detection
+In this section, deepfake generation and detection methods for vari-
+ous multimedia content namely, image, video, and audio are discussed.
+DL-based methods have a wide range of applications in creating high-
+quality, professional, and tough-to-detect deepfakes. The details of
+deepfake creation methods are as follows.
+3.1. DeepFake creation algorithms
+Fig. 5 illustrates the various deepfake creation methods in accor-
+dance with various multimedia contents. For generating deepfakes im-
+ages, DL-based networks such as GANs [101] and improved GANs [102,
+Information Fusion 118 (2025) 102993 
+5 
+
+
+--- PAGE 6 ---
+
+A. Kumar et al.
+Fig. 4. Statistical distribution of selected studies (a) Analysis based on journal’s impact factor, (b) Analysis based on the number of datasets utilized for performance comparison,
+(c) Analysis based on model architectural parameters utilized by selected studies, (d) analysis based on performance metrics utilized for performance comparison in the studies.
+Fig. 5. Different techniques for creating DeepFake contents [GAN: Generative adversarial network, MFCC: Mel-Frequency Cepstral Coefficient].
+103] are exploited. Lip sync, face swap, and motion reenactment
+methodologies are utilized for generating deepfake videos [55,104,
+105]. Deepfake audios are created using deep audio techniques, voice
+conversion, and impersonation [106–108].
+In [101], authors utilized super-resolution GAN for generating
+photo-realistic fake images. The model adopted ResNet with skip con-
+nection and perceptual loss function. This loss was generated from
+high-level feature maps of the VGG network invariant to change in pixel
+space. On the other hand, improved GANs namely AttGAN [102] and
+StyleGAN [103] were exploited by authors for generating high-quality
+and realistic photo images. AttGAN focussed on manipulating selected
+single or multiple facial points while keeping the other attributes the
+same. This network employed attribute classification constraint, re-
+construction learning, and adversarial learning for high-quality editing
+of facial attributes. Facial attributes were edited by analyzing the
+relationship between the selected attribute and the latent represen-
+tation of the face. On the other hand, StyleGAN studied variations
+in latent factors for generating high-quality fake images. High-level
+style features and stochastic effects were analyzed by StyleGAN in
+comparison to conventional GAN architecture for generating realistic
+fake images. Also, increasing the network depth not only improves
+image quality but also prevents the severity of separability loss.
+The most commonly utilized techniques for generating deepfake
+videos are face swapping [105,109], lip-syncing [104,110], and face
+reenactment [111,112]. In [105], authors performed face swapping by
+editing latent spaces for facial and hair regions independently. Visual
+attributes that were to be faked, identified, and replaced within the
+latent space representation of the face and hairs. The entire image
+was reconstructed automatically after performing the face swapping.
+Authors introduced DeepFaceLab for face swapping and generating
+high-quality deepfakes [109]. DeepFaceLab is an open-source, and
+flexible code that performs face detection and then determines facial
+landmarks for performing the alignment. After this segmentation was
+performed which was followed by a conversion step to perform the
+face swapping. The method generated cinema-quality results and high-
+quality forgery video clips. Lip-synching can be used for generating
+Information Fusion 118 (2025) 102993 
+6 
+
+
+--- PAGE 7 ---
+
+A. Kumar et al.
+dubbed voice videos, virtual assistance, and video conferencing. KR
+et al. [104] generated deepfake videos using speech-to-speech and face-
+to-face translations in a visual module known as LipGAN. This module
+generated realistic talking faces videos by performing lip synchroniza-
+tion translating talking faces into the target language automatically.
+Authors performed lip sync by representing audio, modeling faces, and
+generating natural talking faces [110]. Audio–visual synchronization
+was analyzed using SyncNet to produce realistic and high-quality talk-
+ing face videos. Another methodology for producing deepfake videos
+is face reenactment in which monocular videos were rendered with
+target videos for producing real-time deepfakes [111]. For performing
+reenactment, facial expressions were captured for both source and
+target using dense photometric consistency measure. Then, the target
+video was blended with the source for synthesizing the deepfake video
+stream. Zhang et al. [112] presented FReeNet for performing face reen-
+actment by transferring the facial expressions from selected reference
+videos to the target videos. The framework consisted of an encoder–
+decoder in a unified landmark converter and then finally, the reference
+was converted to a target using a geometry-aware generator. The model
+learned the appearance and geometry of the target from the source
+video for generating high-quality and realistic deepfake videos.
+Deepfake audios are created by superimposing reference audio on
+the target audio. Deep audio networks such as Char2Wav, Deep Vo-
+cie3, MelNet, and many others were analyzed for synthesizing fake
+audio [106]. These frameworks consisted of three modules namely,
+encoder, decoder, and converter. The encoder encoded text into key
+and value vectors as per timestep information. The decoder predicted
+the time-aligned mel-spectrogram from the key and value vectors of the
+audio samples using L1 and binary cross entropy loss. The converter
+stage computed the required parameters from the decoder for generat-
+ing the deepfake audio. In [107], authors discussed speech synthesis for
+voice conversion and impersonation. Artificial audio can be generated
+digitally by concatenating the speech samples of the reference speaker
+with the target speaker. This reassembling of voice signals produced
+high-quality deepfake audio. Waveform synthesis-based speech synthe-
+sis systems create natural and realistic deepfake audio in comparison
+to feature synthesis.
+To summarize, DL-based methods can create deepfakes from various
+multimedia content. These contents are generated for addressing the
+individual or system problems by manipulating the data in such a way
+that cannot be detected easily. With the advancement in technology,
+the negative and unauthorized use of deepfake content makes its detec-
+tion essential. It is challenging to classify the deepfakes from the real
+ones as the generated content resembles similar to the original content.
+Hence, deepfake detection is essential to protect the society from
+its adverse impact. The details about the various deepfake detection
+algorithms are as follows.
+3.2. DeepFake detection algorithms
+In this subsection, we have categorized the various deepfake de-
+tection methods either as single-modal or multi-modal. Single-modal
+detection methods are further classified as conventional techniques
+or advanced techniques. Based on the feature extraction methods
+and processing algorithms, conventional techniques are explored ei-
+ther as handcrafted feature-based algorithms [42–44,72,79,87] or ML-
+based algorithms [10,21,22,28,30,33,73,94]. On the other advanced
+techniques are categorized as DL-based algorithms [6,34–36,66,84,
+113,114] and ensembled algorithms [37,38,67,68,80,115–117]. Fur-
+ther, the multimodal detection methods are analyzed either as DL-
+based techniques [50,64,82,83,118] or hybrid techniques [39,49,51,
+93]. Fig. 6 illustrates the categorization of deepfake detection algo-
+rithms reviewed, analyzed, and detailed in this study.
+The key difference between the single-modal and multi-modal deep-
+fake detection techniques is the number of input modalities exploited
+in the detection model [39]. Single-modal deepfake detection algo-
+rithms consider individual modalities namely, image, audio and video
+for feature extraction to detect fake or manipulated content. On the
+other hand, multi-modal deepfake detection algorithms exploited the
+synchronization between audio and video, lip movement, facial move-
+ments, mouth shape dynamics, and spoken phenomics to detect false
+contents altogether. However, the deepfake creation techniques address
+this change efficiently by generating realistic videos in which it is
+hard to detect the difference between real and fake. Single modalities
+are not efficient enough to detect these inconsistencies whereas multi
+modalities deepfake detection models can analyze the variations in
+speech and facial characteristics effectively.
+In comparison to multi-modal deepfake detection techniques, single-
+modal deepfake detection algorithms have a wide range of applications.
+The reason could be the availability of public datasets, less computa-
+tional complexity, and generalizable models. However single modality-
+based models are easily deceivable. Multimodal deepfake detection
+algorithms can address the real-time challenges of deepfake detection
+efficiently, and are more accurate and robust. However, limited avail-
+ability and low-quality content in audio–visual multimodal deepfake
+datasets restrict their practical applicability [83]. Also, the existing
+multimodal deepfake datasets labeled the entire audio–visual pairs as
+fake which makes it tedious to detect the real part from it [119].
+These algorithms can perform emotional analysis, speech recognition,
+and facial analysis to compute the variations that are often present in
+deepfakes. The similarity between the perceived emotions between the
+two modalities i.e. audio and video in a video can be analyzed using
+multi-modal learning to detect deepfakes [120].
+Further to highlight the strengths and weaknesses of deepfake detec-
+tion algorithms under each category, the salient features are elaborated
+in Table 2. The various deepfake detection algorithms are compared
+based on the exploited methodology, feature extraction, data require-
+ments, data preprocessing, and many other substantial parameters.
+The similarities and differences of each category of deepfake detec-
+tion algorithms are tabulated in Table 3. In this, the algorithms are
+compared based on the utilized AI models, fusion strategy, data classi-
+fication stage, model explainability, cross-datasets evaluation for model
+generalizability, and many others.
+4. Single modal based conventional techniques for deepfake de-
+tection
+Fig. 7 illustrates the generalized framework of conventional tech-
+niques for deepfake detection. The preprocessing stage extracted frames
+from video using frame sequencing, and audio data was converted to an
+image by generating a spectrogram for extracting robust features for the
+processing stage. Based on the extracted features and processing stage
+conventional techniques are categorized as handcrafted features-based
+algorithms and ML-based algorithms. The details about the handcrafted
+features-based deepfake algorithms are discussed in the next section.
+4.1. Handcrafted features-based fusion algorithms
+Table 4 tabulates the salient features of representative work se-
+lected under the category of handcrafted feature-based approach. These
+approaches performed manual feature extraction to maintain the com-
+putational complexity of the model. The extracted features can be color,
+texture, HOG, computer vision (CV), etc.
+Handcrafted features are lightweight, less complex, and easier to ex-
+tract. In this direction, authors extracted texture features to analyze the
+irregularities in the different regions of the deepfakes [43]. The texture
+feature was extracted using the LBP (local binary pattern) approach.
+The feature was extracted for the facial region only which was detected
+using the MTCNN classifier. Gamma correction and inter-frame face
+similarity were also used for detecting facial regions in low-contract
+images. Similarly, Yang et al. [121] studied the difference between the
+Information Fusion 118 (2025) 102993 
+7 
+
+
+--- PAGE 8 ---
+
+A. Kumar et al.
+Fig. 6. Categorization of various deepfake detection algorithms.
+Table 2
+Salient features of various deepfake detection algorithms.
+SNo.
+Attributes
+SMD algorithms
+MMD algorithms
+1
+Methodology
+CT
+AT
+DLT
+HT
+2
+Feature extraction
+HC or DF
+HL
+DF
+DF or HIE
+3
+Data requirements
+Less
+High
+High
+High
+4
+Data preprocessing
+✓
+×
+×
+×
+5
+Performance
+Moderate
+High
+High
+High
+6
+Advantages
+Require less training data
+Automatic feature extraction
+Identified visual inconsistencies
+Suitable for real-world applications
+7
+Limitations
+Not suitable for real-time
+High training data
+High training data
+Slow processing
+8
+Computational complexity
+Less
+High
+Moderate
+High
+SMD: Single modal detection, MMD: Multi modal detection, CT: Conventional technique, AT: Advanced technique, DLT: DL technique, HT: Hybrid technique, HC: Handcrafted, DF:
+Deep features, HL: High-level, HIE: Hierarchical.
+Table 3
+Similarities/Differences between various deepfake detection techniques.
+SNo.
+Attributes
+CT
+AT
+DLT
+HT
+1
+AI-models
+ML
+DL and Transformer
+DL
+DL and Transformer
+2
+Fusion strategy
+✓
+✓
+×
+✓
+3
+Data classification
+ML-based
+DL-based
+DL-based
+ML or DL based
+4
+Multiple datasets
+✓
+✓
+✓
+✓
+5
+Statistical measures
+✓
+✓
+✓
+✓
+6
+Explainability
+×
+✓
+✓
+✓
+7
+Cross-dataset evaluation
+✓
+✓
+✓
+×
+8
+Interoperability
+×
+✓
+×
+✓
+DL: Deep learning, ML: Machine learning, CT: Conventional technique, AT: Advanced technique, DLT: Deep Learning technique, HT: Hybrid
+technique.
+texture of real and fake images in an image saliency map. Superpixel
+segmentation was utilized for computing the texture information. The
+Euclidean distance was computed between the corresponding regions
+using three different approaches RGB, CIELab, and LBP. The image was
+divided into multiple superpixels for creating the saliency. On the other
+hand, authors ensembled texture and artifact information for detecting
+the inconsistencies between the real and deepfakes [42]. Artifact refers
+to the random and synthesized noise disturbances present in the real
+and deepfakes. The cosine distance measured the similarity distance
+between the texture inconsistencies between real and fake. Score level
+fusion fused the texture inconsistencies score and artifacts to obtain the
+combined results for deepfake detection. Authors fused fisherface with
+LBP histogram features on the dimensionality reduced facial images
+for predicting deepfakes [26]. The noise in the images was removed
+using the Kalman filter and images were normalized for image contrast
+enhancement.
+Analysis of illumination variations is highly effective for detecting
+deepfakes. For this, Zhu et al. [84] extracted illumination inconsistency
+at the frame level along with multi-level feature enhancement for
+enhancing feature-level illumination. Features in the low-frequency
+domain were obtained by DCT (Discrete cosine transform) for capturing
+illumination changes in the frequency domain. Feature level fusion
+fused to obtain the final score for deepfake detection. In [79], the au-
+thor computed DCT values by dividing the detected face into a uniform
+block of 8 × 8. Once the face was localized then partly sign-altered
+value and partly sign-altered mean value was computed. Finally, deep-
+fakes were detected using mixed modulation techniques. However, the
+authors extracted spatial and frequency domain features and fused
+them within a knowledge distillation for classifying the deepfakes and
+real [78]. The features were extracted by applying DCT on raw as
+well as compressed images. The extracted features were fused in three
+phases namely, split, fuse, and select using SKAttention. Xu et al. [47]
+proposed joint distillation along with the knowledge transfer stage for
+deepfake detection. The feature importance was determined by explor-
+ing the relationship between gradient information and feature maps.
+The negative transfer in feature importance was adjusted using the
+exponential decay rule. Authors employed knowledge distillation along
+with representation learning for classifying deepfakes [72]. Features
+were represented using transfer learning to reduce the computational
+complexity of the base model. Adaptation learning was utilized for
+Information Fusion 118 (2025) 102993 
+8 
+
+
+--- PAGE 9 ---
+
+A. Kumar et al.
+Fig. 7. Generalized architecture of conventional techniques for deepfake detection.
+controlling the three loss functions namely, KD loss, cross-entropy
+loss, and feature-based square loss used for calculating the difference
+between real and fake.
+To determine the integrity of videos, authors proposed to extract the
+CV features from each video frame [81]. The rate of change between
+frames was computed for each feature to distinguish the deepfakes
+from the real. Similarly, Saravana et al. [46] also extracted multi-
+ple CV features but using fuzzy clustering algorithms. Images were
+pre-processed using the Gabor filter-based Gaussian rule to improve
+quality by eliminating noises. Deep belief network-based classifier for
+classifying the deepfakes from real by reducing the detection loss
+and improving the energy function. However, the authors extracted
+semantic and contextual information to detect deepfakes generated by
+the face-swapping technique [77]. Semantic information included the
+boundaries of facial regions whereas contextual features captured the
+face contexts such as hair, ear, etc.
+Biological and physiological features are considered to be the best
+visual descriptors for detecting deepfakes. In this direction, Elhassan
+et al. [45] utilized teeth and mouth movement for detecting the deep-
+fake videos. 68 landmarks on facial images with open mouth showing
+teeth acted as distinguished and lightweight features were identified
+for detecting the fake teeth. Mouth regions were cropped from facial
+images using mouth aspect ratio and mouth openness with 12 points for
+both upper and lower lips. Features were processed using multiple DL
+algorithms and deep fakes were classified using clustering algorithms.
+On the other hand, authors analyzed the change in skin color as a
+physiological feature in deepfake images using remote photoplethys-
+mography (rPPG) through camera [85]. rPPG were computed for the
+extracted region using the Chrom method which averages the RGB
+values. These features were converted to the frequency domain using
+the Fast Fourier transform and frequency composition was identified
+using power spectral density. This method effectively classified the
+deepfakes from the real.
+Spoofed audio and speech need to be determined to prevent de-
+ception and voice phishing. In order to determine spoofed audio,
+authors fused raw waveform signals with spectrograms as distinguished
+features [87]. The feature distribution of spoofed speech for explaining
+its likelihood was analyzed using the SHAP method of model explain-
+ability. Feature correlation in a high-frequency range was used for the
+classification of real and deepfake audio. On the other hand, Balles-
+teros et al. [92] extracted entropy-based handcrafted features from the
+audio recordings. These features were transformed into histograms for
+classifying deepfake audios from the real.
+To summarize, handcrafted features were extracted and processed
+for identifying deepfakes audio, video, and images. The differences
+and the variations between the real and the spoofed information were
+identified and compared for classification. Data was pre-processed not
+only to identify the region of interest but also to eliminate the impact of
+noise and improve contrast and resolution. The extracted information
+was processed and classified using either DL models or ML models.
+Handcrafted features based on conventional techniques are fast and
+suitable for real-time but with limited applicability.
+4.2. Machine learning-based algorithms
+In this subsection, ML-based deepfake detection techniques are de-
+tailed. The techniques are categorized as ML-based deepfake detection
+in which features are extracted using either a handcrafted approach or
+DL-based approaches but classified using various ML-based techniques.
+Table 5 tabulates the salient features of ML-based approaches for
+deepfake detection. ML-based approaches for deepfake detection can
+be trained easily and faster in providing the results. In this direction,
+Wang et al. [31] trained an RF classifier for detecting the deepfakes.
+Deepfakes have fewer facial point features in comparison to real ones
+which were efficiently classified with ML based classifier from a fused
+facial region descriptor. The facial region descriptor was generated by
+integrating various handcrafted features such as SIFT (Scale-invariant
+feature transform), SURF, FAST (Features from accelerated segment
+test) & BRIEF (Binary robust independent elementary features), ORB
+(Rotated BRIEF) and A-KAZE. RF also selected important features to im-
+prove the efficiency of the detection algorithm. On the other hand, the
+SVM classifier was utilized for detecting variations in facial regions con-
+sidering inconsistencies of texture features [10] and head poses [32].
+In [10], authors trained and classified the deepfake detection model
+using SVM. Texture feature maps were generated for both real and fake
+videos at three levels namely, pixel, block, and region. The statistical
+disparities were analyzed by extracting the color information from the
+R, G, B, V, and Y channels. However, the authors estimated the errors
+in 3D head poses of facial images for detecting deepfakes [32]. The
+facial landmark points were formulated as an optimization problem and
+solved using the Levenberg–Marquardt algorithm. SVM classifier was
+trained by estimating the difference between full facial landmarks and
+central facial region landmarks for classifying deepfakes from real.
+Multiple ML algorithms were trained to obtain better results for
+deepfake detection. In this direction, Hamza et al. [28] exploited
+RF, MLP (Multi-layer perceptron), DT, EXC (Extra tree classifier),
+LR (Logistic regression), Gaussian NB (Naïve Bayes), AdaBoost, GB
+(Gradient boosting), XGBoost, LDA (linear discriminant analysis, and
+QDA (Quadratic discriminant analysis). Overall, SVM outperformed
+the other ML algorithms and achieved the highest accuracy. Similarly,
+authors adopted six ML algorithms such as SVM, MLP, DT, LR, NB,
+and XGBoost for classifying the deepfake audio from real [30]. The
+processing for these classifiers by selecting important features for
+training using PCA (Principal component analysis). This model also
+Information Fusion 118 (2025) 102993 
+9 
+
+
+--- PAGE 10 ---
+
+A. Kumar et al.
+Table 4
+Single modal conventional fusion based deepfake detection techniques with handcrafted features.
+SN
+Citation
+Features
+Modality
+Fusion
+strategy
+Dataset
+Performance
+metrics
+Summary
+1.
+Hsu et al. [79]
+DCT
+Image
+Modulation
+CVG-UGR, Large
+Logo DB, and
+Large Logo DB
+PSNR, SSIM,
+BER, Loss and
+NCC
+∙Identified relative positions of
+modification in real images using
+temper detection mean value.
+∙Optimized network parameters
+using gray wolf optimizer.
+∙Adopted denoising mechanism
+for extracting watermark
+information.
+2.
+Zhu et al. [84]
+Frame-level
+illumination
+variations
+Image
+Attentional
+based feature
+fusion
+FaceForensics++,
+Celeb-DF and
+DFDC
+ACC and AUC
+∙Analyzed illumination
+inconsistencies in inter-frame for
+deepfake detection.
+∙Multi-level feature enhancement
+for enhancing inconsistencies at
+feature-level.
+∙Results of illumination
+decomposition not good in
+regions where hair were present.
+3.
+Leporoni et al.
+[44]
+RGB and Depth
+Image
+Attentional
+based feature
+fusion
+FaceForensics++
+ACC, AUC, and
+Heatmaps
+∙Extracted depth information
+from whole image frame using
+pre-trained model.
+∙Two parallel networks for depth
+features and one network for RGB
+extraction.
+∙Both features processed
+individually and stacked together
+using MobileNet v2.
+4.
+Wang et al. [78]
+Frequency
+domain and
+spatial-domain
+features
+Image
+Attentional
+based fusion
+FaceForensics++,
+and Celeb-DF
+ACC and AUC
+∙Fused the spatial and frequency
+domain features to improve
+detection ACC.
+∙Knowledge distillation at the
+classification step transferring
+knowledge for classifying
+deepfakes.
+∙Achieved highest ACC (98.98%)
+on Celeb-DF DB.
+5.
+Yu et al. [87]
+Raw waveform
+signals and
+spectrograms in
+vector stitching
+Audio
+Feature fusion
+ASVspoof 2019
+Loss rate and
+SHAP value
+distribution
+∙Fused extracted features using
+lighter feature level fusion
+techniques.
+∙Utilized explainability to
+determine feature contribution
+and importance.
+∙Analyzed feature correlation in
+high frequency range of the
+waveform.
+6.
+Gao et al. [42]
+Texture and
+artifact
+Video
+Score level
+fusion
+FaceForensics++,
+Celeb-DF,
+WildDF and
+DFDC
+ACC, AUC, and
+CM
+∙Texture artifacts detector to
+detect the inconsistencies between
+the real and fake.
+∙Multiple deformable
+convolutional stacks to separate
+between target and source using
+the soft trainable mask.
+∙Captured artifacts data using
+the shallow network.
+7.
+Kim et al. [72]
+TL-based feature
+representation
+Image
+Representation
+learning and KD
+FaceForensics++
+ACC, F1-score
+∙Extracted features presented in
+both source and target dataset.
+∙Experimented on a low-quality
+dataset to prove the model
+efficiency.
+∙Performance evaluated on a
+single small dataset and achieved
+86.97% (ACC).
+8.
+Kingra et al.
+[43]
+Texture
+Image
+Combining LBP
+with LBPNet
+Celeb-DF, DFDC,
+and
+DeeperForensic
+ACC, AUC, PR,
+and RE
+∙Utilized local binary pattern for
+extracting texture features from
+facial regions.
+∙Fully connected deep CNN as
+classification network for
+deepfake.
+∙DB augmentation for generating
+real-time images for deepfake
+classification.
+(continued on next page)
+Information Fusion 118 (2025) 102993 
+10 
+
+
+--- PAGE 11 ---
+
+A. Kumar et al.
+Table 4 (continued).
+9.
+Ni et al. [85]
+Physiological
+Video
+FFT
+DeepFakeTIMIT
+ACC, F1-score,
+CM and AUC
+∙Analyzed change in skin color
+using remote
+photoplethysmography signals.
+∙Extracted skin color information
+using chrom method.
+∙Generated matrix visualization
+heatmap using time–frequency
+domain analysis of signals.
+10.
+Lee and Kim
+[81]
+CV features:
+mse, psnr, ssim,
+rgb, hsv,
+histogram,
+luminance,
+variance,
+edge_density, dot
+Video
+Grouped the rate
+of change
+between frames
+FaceForensics++
+and DFDC
+ACC
+∙Detected the rate of change in
+the subsequent frame
+incorporated by GANs for
+generating deepfakes.
+∙Utilized multiple CV features for
+detection.
+∙Achieved avg. 96.53% (ACC) on
+multiple datasets.
+11.
+Nirkin et al.
+[77]
+Context and
+semantic
+Image
+Simple score
+concatenation
+FaceForensics++,
+Celeb-DF-v2,
+DFDC and SG
+DB
+ACC, AUC, FPR
+∙Compared changed context
+information in deepfake with real
+for detection.
+∙Trained face discrepancy
+network to compare the identity
+information in face and its
+context.
+∙Performed analysis on unseen
+data to determine model ACC.
+12.
+Yang et al. [121]
+Texture
+Image
+Guided filter
+combining linear
+relationship
+FaceForensics++
+ACC
+∙Detected deepfake by comparing
+the texture difference between
+the real and fake image.
+∙Guided filter to enhance texture
+information in the image saliency
+during pre-processing.
+∙Achieved detection ACC (95%)
+on benchmark dataset.
+13.
+Ballesteros et al.
+[92]
+Statistics,
+entropy and
+histogram
+features
+Audio
+CNN
+LJ Speech DB,
+and SG
+ACC, RE, PR and
+loss
+∙Transformed audio inputs into
+images such as spectrograms for
+classification.
+∙CNN with data augmentation
+and dropout for fake audio
+classification.
+14.
+Saravana et al.
+[46]
+CV features such
+as mse, PSNR,
+SSIM, rgb, hsv,
+histogram,
+luminance,
+variance,
+edge_density,
+DCT
+Video
+Contraceptive
+loss based
+pairwise learning
+FaceForensics++
+and DFDC
+ACC, PR, RE,
+AUC, error and
+loss
+∙Extracted CV features using
+fuzzy C-means clustering.
+∙Utilized stacked RBM layer in
+hidden layer along with sigmoid
+activation.
+∙Adopted contrastive loss for
+handling outputs during pairwise
+learning.
+∙Achieved global ACC (98.5%)
+across multiple DBs.
+15.
+Suganthi et al.
+[26]
+FF-LBPH
+Image
+FF-LBPH-DBN
+FFHQ,
+100K-Faces,
+DFFD, and
+CASIA-WebFace
+ACC, SPE, SEN,
+AUC, error rate
+and
+computational
+time
+∙Utilized DBN-RBM classifier for
+deepfake classification.
+∙Dimensionality reduction
+algorithms for feature extraction.
+∙Kalman filter for eliminating
+noise from the images.
+16.
+Xu et al. [47]
+Gradient guided
+distillation
+feature map
+Video
+Xception_6S
+FaceForensics++
+and Celeb-DF
+AUC, ACC,
+FLOPS, and
+Param
+∙Applied joint distillation loss
+function for transferring
+information from shallow to deep
+layers.
+∙Dimension alignment for
+relating teacher network with the
+student network.
+∙Analyzed model generalizability
+in cross-domain scenarios.
+(continued on next page)
+claimed that the SVM is superior and accurate in detecting real and
+fake video in a short time. Authors utilized multiple ML classifiers
+such as SVM, RF, extremely randomized tree, DT, MLP, Stochastic GB,
+and KNN for training the model for identifying deepfake videos [23].
+Multiple handcrafted features were extracted and fused to form a
+single deepfake feature vector before feeding to the ML classifier.
+However, no feature-selected approach was adopted to improve the
+model processing.
+In [71], authors extracted local features using expectation max-
+imization algorithms. This algorithm generated a feature vector by
+computing probability and estimating weights for each element. This
+feature vector was integrated with RGB channels for obtaining the
+final vector for detecting deepfakes generated by multiple GANs net-
+works. The deepfakes were classified using different ML algorithms
+Information Fusion 118 (2025) 102993 
+11 
+
+
+--- PAGE 12 ---
+
+A. Kumar et al.
+Table 4 (continued).
+17.
+Elhassan et al.
+[45]
+Teeth and mouth
+features
+Video
+CNN,
+DenseNet121,
+DenseNet169,
+EfficientNetB0,
+EfficientNetB7,
+InceptionV3,
+MobileNet,
+MobileNetV2,
+ResNet50,
+vgg16, vgg19
+and Xception
+Vid-TIMIT,
+Celeb-DF, and
+UADFV
+ACC, and AUC
+∙Model highly dependent on
+facial images with mouth open
+showing teeth.
+∙Multiple DL models for
+determining the model suitability
+for processing features.
+∙Utilized stochastic gradient for
+model optimization and faster
+convergence.
+∙Among all the DL models, CNN
+achieved the highest ACC and
+AUC.
+[DB: Dataset, ML: Machine learning, SG: Self-generated, KD: Knowledge distillation, FF: Fisher face, LBPH: Linear binary pattern histogram, ACC: Accuracy, PR: Precision, RE:
+Recall, AUC: Area under the curve, SPE: Specificity, SEN: Sensitivity, CV: Computer vision, GAN: Generative adversarial networks, mse: mean squared error, PSNR: peak signal to
+noise ratio, SSIM: structural similarity index measure, hsv: hue; saturation; value, DCT: Discrete cosine transform, FFT: Fast Fourier transform, BER: Bit error rate, NCC: normalized
+cross-correlation, DFDC: Deepfake detection challenge, DBN: Deep belief network, RBM: Restricted Boltzmann machine].
+such as SVM, LDA, and KNN. Authors utilized three ML algorithms
+namely, SVM, RF, and DT along with five DL algorithms for detecting
+tempering in medical imaging [94]. Five DL models were used for
+feature extraction from the augmented datasets. Classifiers were trained
+to detect the tempered medical images using different ML classifiers.
+Among all the ML classifiers, SVM achieves the highest training and test
+accuracy. Farid et al. [33] proposed to utilize ML-based classifiers for
+detecting deepfakes in audio, video, and images. The synthetic content
+generated through face swap, lip sync, and other methodologies were
+easily classified from real using ML classifiers such as SVM and RF.
+Further, authors utilized ML algorithms for detecting the deepfake
+images generated by face swapping algorithms [73]. The indicators
+such as skin details, color mismatch, temporal flickering, head posi-
+tions, resolution, eye blinking rate, face warping artifacts, and lipsync
+were considered to detect deepfakes. For achieving better performance,
+noise was introduced using Gaussian blur, exponential blur, Rayleigh
+blur, and random specific blur. The video frames were analyzed, and
+the video was classified as deepfake if 1% of the frames were modified.
+Mitra et al. [22] exploited multiple CNNs for feature extraction and
+ML-classifiers for the identification of deepfake videos. The model
+computational efficiency was improved by extracting the key frames
+from each video to determine its manipulated contents. Similarly,
+authors utilized multiple CNNs for feature extraction and a classifier
+for detecting manipulated videos [21]. The frames were extracted
+from the videos, and faces were detected, cropped, and resized before
+processing. The features were extracted and processed through a global
+average pooling2D with fully connected followed by softmax as the
+classifier network. On the other hand, similarity scores were fed to
+the classifier network for identifying the video content as fake or
+authentic [8]. LR was used for converting the high similarity score into
+likelihood ratio for better calibration of analysis obtaining misleading
+evidence. The method was able to identify fake videos generated by
+face swap techniques for a portrayed person. However, the limited
+dataset availability for multiple reference videos of the same person
+restricts the cross-validation of the method.
+To summarize, ML-based deepfake detection techniques are
+lightweight, interpretable, and understandable with less processing
+time. ML-based classifiers are easily trainable for detecting the deepfake
+contents generated using various creation techniques. Features were ex-
+tracted using conventional techniques or DL-models for developing the
+robust model. The feature selection and keyframe selection approaches
+were adopted to improve the fused feature vector before feeding it to
+the ML-classifier.
+5. Single modal-based advanced techniques for deepfake detec-
+tion
+In this section, advanced techniques for deepfake detection are
+elaborated using a single modality namely, image, audio, and videos.
+Advanced techniques utilized DL techniques for feature extraction,
+feature processing, and classification. Based on this approach, advanced
+techniques are categorized either as DL-based algorithms or hybrid
+algorithms. DL-based algorithms utilize DL approaches for feature ex-
+traction and feature classification whereas hybrid algorithms utilize
+multiple DL-approaches for feature extraction, processing, and classi-
+fication. Multiple ML-algorithms are exploited for classification with
+DL-models for classification in hybrid algorithms. Fig. 8 illustrates the
+various components of deepfake detection using advanced techniques.
+5.1. Deep learning-based algorithms
+In this section, various DL-based algorithms for deepfake detec-
+tion are discussed. Table 6 tabulates the representative work cate-
+gorized under this category of deepfake detection algorithms. These
+algorithms are suitable for detecting deepfakes in highly compressed
+low-quality videos. In this direction, Zhu et al. [27] extracted spatial-
+frequency features using spatio-temporal inconsistency in highly com-
+pressed deepfake video. The temporal correlation information and
+structural knowledge were processed using the temporal-contrastive
+distillation model based on a two-stage student-teacher (ST) network.
+Similarly, authors utilized a two-branch convolutional auto encoder
+for performing deepfake reconstruction and classification [61] video.
+The temporal correlation information and structural knowledge were
+processed using the temporal-contrastive distillation model based on
+a two-stage student-teacher (ST) network. Similarly, authors utilized
+a two-branch convolutional auto encoder for performing deepfake re-
+construction and classification [61]. Local and global information was
+combined and mapped the extracted features into latent space for
+improving the generalization ability. XceptionNet was exploited in the
+shared encoder branch and ReLu after each fully connected layer in
+the classifier network. Authors proposed convolutional ViT for deepfake
+video detection [65]. Convolutional Vit consisted of a CNN network for
+extracting learnable local and global features and ViT for processing
+these features. ViT utilized eight attentional mechanisms for categoriz-
+ing the video either as real or deepfake. A softmax layer was applied
+to restrict the final weights between 0 to 1 for deepfake detection.
+In [97], authors proposed a holistic DFD transformer for detecting
+deepfakes videos. Features namely, spatial, temporal, and spatiotempo-
+ral were extracted using 2D and 3D convolutional layers in the trans-
+former, respectively. Self-attention-based transformer encoders pro-
+cessed the extracted features and fused the feature vectors followed by
+softmax layers. A fully connected linear classifier was used for classi-
+fication using dropout and L2 regularization. Pu et al. [36] utilized a
+dual-level network for fusing the frame-level and video-level features.
+Spatial features were extracted using ResNet-50, pre-trained CNN. Tem-
+poral learning was performed using GRU nodes followed by average
+polling. After this, the frame level and video level classifier consisting of
+a fully connected layer classified the videos as deepfakes by minimizing
+the loss function. Similarly, authors extracted spatio-temporal features
+using 3D CNN by considering short sixteen consecutive frames from a
+Information Fusion 118 (2025) 102993 
+12 
+
+
+--- PAGE 13 ---
+
+A. Kumar et al.
+Table 5
+Single modal conventional deepfake detection techniques with machine learning-based algorithms.
+SN
+Citation
+Features
+Modality
+Technique
+Dataset
+Performance
+metrics
+Summary
+1.
+Wang et al. [31]
+Feature points
+from subdivided
+facial regions
+Image
+RF
+DeepfakeTIMIT,
+UADFV,
+FF++_DeepFake
+DFD, DFDC, and
+Celeb-DF_V2
+AUC and
+computational
+time
+∙Extracted multiple features from
+various facial points.
+∙Calculated feature Gini
+importance for identifying crucial
+features for detection.
+∙Training model RF quite faster
+in comparison to other
+techniques.
+2.
+Yang et al. [32]
+Head poses
+Image
+SVM classifier
+UADFV DB
+AUC
+∙Detected face and 2D facial
+landmarks in the image.
+∙Detected 68 facial landmarks
+using face detector DLib software
+package.
+∙Difference between the head
+projections of fake and real
+determined by alignment error.
+3.
+Xia et al. [10]
+Color and
+texture
+Video
+SVM classifier
+FaceForensics++
+and Celeb-DF
+AUC, ACC and
+computational
+time
+∙Extracted RGB color feature and
+texture feature from
+co-occurrence matrix.
+∙Designed three feature maps for
+capturing effective features.
+∙Trained SVM classifier for
+binary classification of deepfake
+videos.
+4.
+Farid [33]
+Low level
+(pixel-based) and
+high level
+(semantic
+features)
+Image, audio,
+video
+LR, SVM
+ASVSpoof,
+FaceForensics++,
+Celeb-DF-v2,
+DFDC and
+deepfake DB
+–
+∙Learning based detection
+algorithms classified real from
+fake content using ML classifiers.
+∙Extracted artifacts-based
+low-level and high-level features
+fed into classifiers for detecting
+deepfakes.
+5.
+Hamza et al.
+[28]
+MFCC
+Audio
+SVM, MLP, DT,
+ETC, LR, GNB,
+AB, GB,
+XGBoost, LDA,
+and QDA
+for-rece,
+for-2-sec,
+for-norm and
+for-original
+ACC
+∙Utilized ensembled feature
+approach, MFCC as the main
+feature.
+∙Compared different ML
+algorithms for detecting deepfake
+from the real.
+∙SVM outperformed other ML
+algorithms.
+6.
+Iqbal et al. [30]
+MFCC,
+spectral_rolloff,
+spectral_centroid,
+spectral_contrast,
+spec-
+tral_bandwidth
+and
+zero_crossing_rate
+features
+Audio
+SVM, MLP, DT,
+LR, GNB, and
+XGBoost
+Fake or real DB
+ACC
+∙Utilized data framing for
+converting audio signals to
+machine-readable form.
+∙Sliding window technique for
+extracting 270 features, and PCA
+technique to determine 65
+important features.
+∙XGBoost achieved average
+highest ACC (93%) compared to
+other ML models.
+7.
+Maksutov et al.
+[73]
+–
+Image
+ML algorithms
+Celeb-DF
+AUC
+∙Analyzed deepfake quality to
+classify fake and real.
+∙Analyzed color mismatch
+between fake and real for
+classification.
+∙Applied affine transformation on
+randomly cropped and resized
+images.
+8.
+Rana et al. [23]
+HOG, Haralic,
+Hu Moments,
+and CH
+Video
+SVM, RF, MLP,
+KNN, extremely
+randomized
+trees, DT, and
+Stochastic GB
+FaceForensics++,
+Celeb-DF, VDFD
+and DFDC
+ACC, AUC, PR,
+RE, F1-score,
+𝑝-value, F-test
+and Q-test
+∙Adopted feature selection
+techniques to reduce the model
+complexity.
+∙Extracted multiple features and
+fused them into a single vector.
+∙Utilized various ML classifiers
+for detecting deepfakes.
+9.
+Mitra et al. [22]
+Deep features
+Video
+ML classifier
+FaceForensics++
+and DFDC
+ACC, PR, RE,
+and F1-score
+∙Compressed videos to reduce
+the model complexity.
+∙Multiple DL models for
+extraction of robust features.
+∙Simple classifier for classifying
+videos either as fake or real.
+(continued on next page)
+Information Fusion 118 (2025) 102993 
+13 
+
+
+--- PAGE 14 ---
+
+A. Kumar et al.
+Table 5 (continued).
+10.
+Solaiyappan and
+Wen [94]
+Deep features
+Image
+SVM, RF, and
+DT
+CT DB,
+LIDC-IDRI and
+CT-GAN DB
+ACC, AUC, PR,
+RE and Loss
+∙Multiple DL models for feature
+extraction and multiple ML
+classifiers for classifying fake and
+real medical images.
+∙Utilized tempered and
+untampered DB to predict real
+and artificially modified medical
+images.
+∙SVM achieved highest
+classification ACC in comparison
+to other models.
+11.
+Mitra et al. [21]
+Deep features
+Video
+ML classifier
+FaceForensics++
+ACC
+∙Exploited TL for reducing time
+and computational complexity.
+∙Replaced last layer for
+connected end-to-end fine-tuning.
+∙Xception net-based features
+along with classifier achieved
+highest ACC (96%).
+12.
+Reis and Ribeiro
+[8]
+Deep CNN based
+feature
+extraction
+Video
+Threshold based
+classifier
+Celeb-DF (v2)
+and world leader
+DB
+ACC, AUC, PR,
+RE and F1-score
+∙Extracted similarity scores from
+real and fake videos.
+∙Threshold-based classification
+for classifying videos as fake or
+real.
+∙Applied LR to convert scores to
+likelihood for forensic analysis.
+13.
+Guarnera et al.
+[71]
+RGB and Local
+features using
+EM
+Image
+SVM, LDA and
+KNN
+CELEBA DB and
+five different
+GANs generated
+DB
+ACC
+∙Explored different kernel
+dimensions for detecting
+deepfakes.
+∙Used multiple GANs for
+generating deepfake images.
+∙Adhoc validation using different
+ML classifiers.
+DB: Dataset, SVM: Support vector machine, ML: Machine learning, MFCC: Mel-frequency cepstral coefficients, TL: Transfer learning, LR: Logistic regression, MLP: Multi-layer
+perceptron, DT: Decision tree, ETC: Extra tree classifier, GNB: Gaussian Naive Bayes, KNN: k-Nearest neighbor, PCA: Principle component analysis, AB: Ada Boost, GB: Gradient
+boosting, LDA: Linear discriminant analysis, HOG: Histogram of gradient, CH: Color histogram, QDA: Quadratic discriminant analysis, DFDC: Deepfake detection challenge, ASVSpoof:
+Automatic Speaker Verification Spoofing and Countermeasures challenge, AUC: Area under the curve.
+Fig. 8. Generalized architecture for deepfake detection using advanced techniques.
+video [35]. The extracted features were processed using CNN consisting
+of a convolutional layer, dropout, and fully connected layer followed
+by a softmax layer. The classifier classified the videos either as real or
+fake.
+The deepfakes videos and images generated using generative tech-
+niques are tedious to detect. To detect such manipulations, authors
+designed a multi-scale module consisting of CNN and ViT transformer
+for determining manipulations in facial regions [114]. Face details
+were captured using dilation convolution and depthwise separable
+convolution. ViT captured the global feature information using multi-
+head self-attention and utilized MLP for image classification as fake
+or real. Similarly, authors utilized MLP for learning the classification
+parameters for deepfake and real [113]. CNN extracted the facial
+landmarks consisting of temporal and shape features. The outcomes
+from the CNN and MLP concatenated using a fully connected layer
+with ReLU activation and a dense layer with a sigmoid activation
+function. In [88], authors utilized pre-trained model weights using
+a weight transfer technique for multi-class classification in the ViT
+framework. ViT comprised of attention mechanism, global content, and
+classification module for determining manipulations and alteration in
+low-quality datasets. On the other hand, Amin et al. [66] exploited a
+multi-transformer comprised of a SpectraVisionFusion transformer. The
+framework extracted features in the spatial and frequency domain from
+two different networks in the encoder. Weighted feature fusion mech-
+anisms were embedded to obtain fused feature vectors for performing
+the classification from the transformer decoder and classification head
+layer.
+Information Fusion 118 (2025) 102993 
+14 
+
+
+--- PAGE 15 ---
+
+A. Kumar et al.
+Table 6
+Single modal advanced deepfake detection techniques with deep learning-based algorithms.
+SN
+Citation
+Features
+Modality
+Technique
+Dataset
+Performance
+metrics
+Summary
+1.
+Khalid et al.
+[34]
+Deep features
+from
+convolutional
+layers
+Video
+Graph NN
+FaceForensics++,
+Celeb-DF, DFDC
+and World
+leaders DB
+ACC and AUC
+∙Determined features with
+smaller spatial sizes in the image
+frames.
+∙Constructed graphs by
+extracting edge information using
+K nearest neighbor.
+∙Cross-DB analysis to prove the
+generalizability of the method.
+2.
+Nguyen et al.
+[35]
+3D convolution
+kernels for
+extracting
+spatio-temporal
+features
+Video
+3D CNN
+FaceForensics++
+and VidTIMIT
+ACC
+∙Extracted spatial and temporal
+features from consecutive video
+frames.
+∙Utilized complex network
+models and different kernel sizes
+for network evaluation.
+∙Achieved highest ACC (99.7%)
+on VidTIMIT DB.
+3.
+Raza et al. [97]
+Spatial, temporal
+and
+spatio-temporal
+features using
+transformer
+Video
+Convolutional
+transformer
+FaceForensics++,
+Celeb-DF, and
+DFDC
+ACC, AUC and
+F1-score
+∙Combined different views of a
+video for analyzing deepfakes.
+∙Extracted suspected regions by
+extracting different features.
+∙Lightweight and fast model in
+comparison to existing
+state-of-the-art with fewer
+hyperparameters.
+4.
+Lin et al. [114]
+Dilation
+convolution and
+depthwise
+separable
+convolution
+Image
+ViT
+Celeb-DF, DFDC,
+FaceForensics++,
+and
+WildDeepfake
+ACC and AUC
+∙Extracted spatial domain
+information from facial regions.
+∙Integrated dual-subnet and
+multi-scale information for
+effective deepfake detection.
+∙Captured facial regions at
+multiple scales for enhancing
+model’s detection performance.
+5.
+Zhu et al. [27]
+Spatial frequency
+features
+Video
+ST-Transformer
+FaceForensics++,
+Celeb-DF, DFDC,
+DeeperForensics,
+and FaceShifter
+ACC and AUC
+∙Adopted two-stage
+spatiotemporal encoder for
+handling inconsistencies in highly
+compressed videos.
+∙Utilized knowledge distillation
+to represent structural
+information for deepfake
+detection.
+∙Temporal contrastive module to
+enhance temporal correlation
+information from videos.
+6.
+Liu et al. [76]
+Channel specific,
+channel
+differential and
+channel
+invariant
+features
+Audio
+BiLSTM
+ASVspoof2019,
+ASVspoof2021,
+and VSDC
+ACC, PR, RE,
+F1-score, and
+error rate
+∙Exploited multi-space channel
+representation learning for
+detecting audio deepfakes.
+∙Channel differential encoder for
+extracting features by calculating
+difference between two channels.
+∙Utilized orthogonal and mutual
+maximization loss information for
+channel-specific encoders.
+7.
+Amin et al. [66]
+CNN encoder
+based facial
+feature
+extraction
+Video
+SpectraVisionFu-
+sion Transformer
+FaceForensics+,
+DFDC,
+Celeb-DF-v2, and
+DeeperForensics-
+1.0
+ACC, AUC and
+PR
+∙Extracted spatial, frequency and
+statistical features for improved
+detection results.
+∙Weighted features embedding
+fusion for combining results from
+different networks.
+∙Squeezed convolution projection
+in the multistage convolutional
+token embedding layer.
+8.
+Gowrisankar and
+Thing [6]
+Saliency feature
+map using
+XceptionNet
+Video
+MesoNet
+FaceForensics++
+and Celeb-D
+ACC and
+computational
+time
+∙Selected and ranked important
+facial regions for deepfake
+detection.
+∙Generated adversarial video
+samples using NES with minimal
+noise difference from the original
+videos.
+∙Utilized multiple explainability
+tools to describe model’s black
+box design.
+(continued on next page)
+Information Fusion 118 (2025) 102993 
+15 
+
+
+--- PAGE 16 ---
+
+A. Kumar et al.
+Table 6 (continued).
+9.
+Pu et al. [36]
+Feature level
+and frame-level
+features
+Video
+ResNet50
+Celeb-DF (v2),
+Celeb-DF,
+FaceForensics++
+and DFDC
+ACC, AUC, PR,
+RE and F1-score
+∙Handled data imbalance by
+using sampling and data
+augmentation techniques.
+∙Utilized loss function to
+minimize the AUC error and
+cross-entropy loss.
+∙Two separate classifiers for
+classifying the feature level and
+frame level outcomes.
+10.
+Kolagati et al.
+[113]
+CNN based
+feature
+extraction
+Video
+MLP
+DFDC and Dessa
+DB
+ACC and AUC
+∙CNN based feature extraction
+for eye blink and lip, eye and
+nose shape.
+∙Utilized two-layered MLP
+architecture with dense and
+hidden layer ReLU activation
+function.
+∙Concatenated MLP and CNN
+output using fully connected
+dense layer followed by Sigmoid
+activation function.
+11.
+Arshed et al.
+[88]
+Pre-trained
+weights from
+ImageNet DB
+Image
+ViT
+Kaggle DB,
+Online DB,
+SFHQ, and SG
+DB
+ACC, PR, RE,
+F1-score, and
+support
+∙Focused on multi-class
+classification of deepfake images.
+∙Curated SG DB for supporting
+multi-class classification for better
+accuracy.
+∙Achieved detection ACC up to
+99% during model validation and
+testing.
+12.
+Awotunde et al.
+[95]
+Discriminant
+spatial features
+from DL model
+Video
+ReLU with CNN
+DeepFake DB,
+Face2Face DB,
+and First order
+motion DB
+ACC, RE, PR,
+F-Measure, error,
+SPE and CM
+∙Utilized CNN for extracting face
+regions from video frames.
+∙Enhanced CNN with ReLU for
+extracting spatial information
+used in identification of face
+artifacts.
+∙Fully connected layer with
+neural network regularization for
+model robustness.
+13.
+Ayman et al.
+[69]
+CNN based
+feature map
+Video
+VGG-16
+DFDC
+ACC
+∙Proposed deepfake generation
+and detection to understand the
+forgery regions.
+∙Binary cross entropy to
+determine the percentage of fake
+and real production.
+∙Achieved highest ACC (98%) in
+CNN.
+14.
+Badale et al.
+[96]
+Frame level
+features using
+dense CNN
+Image
+CNN
+SG
+ACC
+∙Detected pixel-level
+manipulations using CNN.
+∙Computed multiple ACC using
+different loss functions and
+optimizers.
+15.
+Coccomini et al.
+[40]
+Hierarchical
+feature
+representation
+with
+low-dimensional
+features using
+EfficientNet-V2
+CNN
+Video
+ViT, and Swim
+transformer
+Pristine DB, and
+SG
+ACC, CM, and
+AUC
+∙Compared capabilities of
+multiple DL models for detecting
+deepfakes using two different
+steps.
+∙ViT shown superiority in
+comparison to other models for
+generalizability.
+∙Inferred that scenario-specific
+DL-models perform better.
+16.
+Guo et al. [89]
+Hierarchical
+feature
+extraction for
+high-level
+features
+Image
+AMTENnet
+FaceForensics++
+and SG hybrid
+fake face DB
+ACC, CM and
+RER
+∙Learned manipulation traces
+adaptively using backpropagation
+method.
+∙Integrated AMTN with CNN for
+robust model representation.
+∙Applied post-processing
+techniques for simulating model
+under complex scenarios.
+(continued on next page)
+To provide a generalization set up for deepfakes detection, au-
+thors exploited three network architectures namely, CNN, ViT, and
+swim transformer [40]. The performance of these network architectures
+was analyzed and compared individually. CNN utilized EfficientNetV2-
+M and swim transformer to transform the hierarchical features into
+low-level features with attentional mechanisms. CNN showed efficient
+performance on limited training datasets whereas ViT showed superior
+results on large and diversified datasets. The swim transformer showed
+context-based generalized and promising results in both scenarios. Guo
+et al. [89] proposed adaptive manipulation traces using a convolutional
+Information Fusion 118 (2025) 102993 
+16 
+
+
+--- PAGE 17 ---
+
+A. Kumar et al.
+Table 6 (continued).
+17.
+Mcuba et al. [7]
+MFCC,
+Mel-spectrum,
+Chromagram,
+and spectrogram
+Audio
+Custom DL
+architecture
+Baidu Silicon
+Valley AI Lab DB
+ACC
+∙Used different optimizers with
+variable learning rate to
+determine model accuracy.
+∙Custom model achieved 100%
+ACC in complex scenarios.
+∙Smaller DB size restricted the
+generalizability of the model
+analysis.
+18.
+Lima et al. [75]
+Spatio-temporal
+features
+Video
+Recurrent CNN,
+ResNet-3D, C3D,
+ResNet Mixed
+3D-2D, ResNet
+(2+1)D and I3D
+Celeb-DF V2
+ACC, and AUC
+∙Applied random cropping and
+temporal jittering to all video
+frames for extracting important
+information.
+∙Exploited benefits of temporal
+features for deepfake
+classification.
+∙R3D achieved highest ACC
+(98.26%) in comparison to other
+networks.
+19.
+Yan et al. [61]
+Global features
+Video
+Convolutional
+autoencoder
+transformer
+UADFV,
+FaceForensics++,
+Celeb-DF v2,
+DFDC, and
+DeepfakeTIMIT
+AUC and CM
+∙Optimized encoder using back
+propagated information from
+various tasks.
+∙Utilized latent vectors in
+shallow linear network for
+prediction.
+∙Verified model generalizability
+with cross-domain validation.
+20.
+Wodajo et al.
+[65]
+CNN based
+feature
+extraction
+Video
+Convolution ViT
+DFDC
+ACC
+∙Combined the capabilities of
+both CNN and transformers.
+∙Local features learned from
+CNN whereas global and local
+features learned from ViT.
+∙Model achieved ACC (91.5%)
+on test dataset.
+DB: Dataset DFDC: Deepfake Detection Challenge LSTM: Long Short-Term Memory AMTE: Adaptive Manipulation Traces Extraction SFHQ: Synthetic Faces High Quality ViT: Vision
+Transformer ReLU: Rectified Linear Unit MLP: Multilayer Perceptron CNN: Convolutional Neural Network ACC: Accuracy AUC: Area Under the Curve PR: Precision RE: Recall SPE:
+Specificity CM: Confusion Matrix RER: Relative Error Reduction.
+layer for generalized fake face detection architecture. Maxpool, ReLU,
+layers, and batch normalization were utilized after each convolutional
+layer for introducing non-linearity and preventing model over-fitting.
+The classification network consisted of three fully connected layers for
+determining whether facial images as real or manipulated. In [96],
+the author extracted features using CNN by applying a 2D convolution
+operation on 9 pixels of image regions. The prediction was done by
+applying a classification model to determine the class of the image. On
+the other hand, Awotunde et al. [95] proposed a five-layered CNN for
+detecting deepfakes. Enhanced CNN with ReLU for extracting the robust
+features from the facial region. The classification model comprised
+of ADAM optimizer and mean square error to calculate the loss and
+improve model stability and accuracy.
+In another direction of research, Khalid et al. [34] utilized a graph
+neural network for deepfake detection. The network consisted of two
+stages namely GraphNet for updating and aggregating graph informa-
+tion, and FFN for linear transformation of the nodes. PReLU activation
+function for improving model performance and addressing vanishing
+gradient problem. The author proposed to generate a saliency map
+by segmenting the facial regions [6]. XceptionNet and MesoNet were
+utilized for training models and feature extraction, respectively. Ex-
+plainability tools interpreted the model architecture to estimate the
+parameters for the adversarial generated sample. In [69], authors gen-
+erated feature maps using CNN and processed the extracted features
+using VGG-16. CNN utilized a pooling layer for downsampling to re-
+duce the network parameters and a fully connected layer for final video
+classification as real or fake. Authors extracted spatial and temporal
+features for deepfake detection [75].
+Detecting deepfake audio is challenging as the cloned audios learn
+similar features and characteristics that are tough to recognize. To
+address this, Mcuba et al. [7] extracted audio features and repre-
+sented them using visual features namely, MFCC, Mel-spectrum, chro-
+matogram, 
+and 
+spectrogram. 
+The 
+performance 
+of 
+multiple
+DL-algorithms was analyzed and compared. It was observed that
+VGG16 performed better for MFCC audio features whereas custom
+architectures performed best for the rest of the features. However, au-
+thors proposed to detect deepfakes audio by representing the channel-
+specific, channel invariant, and channel differential features in multi-
+space channel [76]. The differences and commonalities between the
+two channels namely, the left and right audio were analyzed and clas-
+sified using BiLSTM and a fully connected layer. A dynamic weighted
+fusion was adopted for generating joint features in a multi-space
+feature aggregation module before being fed to the ADD classifier. This
+classifier consisted of 1D-CNN, a fully connected layer, and sigmoid
+activation for predicting fake speech. Spatial features were extracted
+using CNN whereas LSTM was for extracting temporal features. These
+features were processed using 3D CNN, ResNet (2+1)D, Inflated incep-
+tion V1, and RCNN. The results from these networks were compared to
+obtain an efficient network with better accuracy.
+To summarize, DL-based models for deepfake detection demon-
+strated satisfactory performance by extracting deep features. These
+features were processed either using DL-models or transformers. Pre-
+trained models are utilized for performing feature evaluation to im-
+prove the computational efficiency of the model. ViT transformer is
+one of the efficient networks consisting of an encoder layer and a
+decoding layer. The decoding layer is followed by a classification
+network for classifying the audio, video, and images as manipulated or
+real. Apart from this, Swim transformers have also shown efficient and
+accurate classification accuracy. The model efficiently processed and
+classified the various multimedia content and detected the discrepancy
+efficiently.
+5.2. Hybrid fusion-based algorithms
+Table 7 tabulates the representative work categorized as hybrid
+algorithms for deepfake detection. These algorithms utilized multiple
+Information Fusion 118 (2025) 102993 
+17 
+
+
+--- PAGE 18 ---
+
+A. Kumar et al.
+DL-model for feature extraction and processing. The classification mod-
+ule can utilize either the DL model or ML model for classifying various
+contents as real or fake. In this direction, Dincer et al. [37] utilized
+three pre-trained DL-models for feature extraction using transfer learn-
+ing and two capsule networks for feature processing and classification.
+A frame selection strategy was adopted to select the suitable feature
+frame for feature extraction to improve detection performance and
+processing time. The classification scores from each capsule network
+were integrated using the mean fusion strategy to obtain a fused score
+for classification decision-making. Authors proposed hybrid CNN for ex-
+tracting frame-level features from the selected video [70]. Hybrid CNN
+comprised two DL networks namely, InceptionResNet v2 with 22 con-
+volutional layers, and 5 pooling layers, and Xception with depth-wise
+separable convolutional layers. The InceptionResNet v2 was followed
+by Xception network for feature extraction from pre-processed videos
+and then the classification module generated classification results. Sim-
+ilarly, the author ensembled two pretrained CNNs and a bidirectional
+LSTM network for detecting deepfakes [80]. Frame-level features were
+extracted using a customized network consisting of InceptionResNet
+v1 and InceptionResNet v2. These features trained the BiLSTM for the
+classification of deepfake videos using the majority voting rule. The
+network performance was optimized using bio-inspired spotted hyena.
+Highly realistic fake videos that are hard to detect can be detected
+by adopting hybrid networks. For this, the authors proposed a hybrid
+approach by integrating you only look once (YOLO) v3, CNN, and
+XGBoost [62]. YOLO detected the facial regions from the video frames.
+Spatial features were extracted using pre-trained InceptionResNet v2
+CNN. The classifier module was constructed using an ML-based XG-
+Boost algorithm. Naskar et al. [68] presented a staking-based ensemble
+approach in which features were extracted using two DL networks
+namely, XceptionNet and EfficientNet-B7. Ranking based feature se-
+lection strategy was adopted to select the top-performing features.
+The classification module utilized a meta-learning approach based on
+MLP algorithms capturing non-linear relationships between features for
+improved classification accuracy. Xu et al. [48] proposed a set CNN for
+detecting facial manipulated videos using XceptionNet and MesoNet as
+backbone networks. Set reduce was utilized for aggregating the frame
+level and set level features. Multi-way backbone network branches were
+concatenated using a fusion module before classification.
+In order to improve the detection performance in low-quality im-
+ages, authors proposed to transform extracted features into higher-
+quality images using U-net [117]. Features were extracted using mod-
+ified EfficientNet and adversarial training along with a discriminator
+was adopted for determining the quality of transformed features. The
+classification module was constructed using CNN consisting of convo-
+lution and a fully connected layer followed by softmax activation. The
+authors analyzed the local and global context of the video using three
+transformers namely, dual attention ViT, Inception, and group propa-
+gation ViT [38]. Dual attention ViT extracted contextual information,
+the frequency spectrum was broadened using an Inception transformer,
+and high-resolution features were retained using group propagation
+ViT. The outcome of these transformers was fused using an MLP
+mixer and then passed through a dense layer for classification. Qadir
+et al. [24] proposed a hybrid network consisting of three networks as
+ResNet-Swish-Bidirectional LSTM. Spatiotemporal data was processed
+by integrating bidirectional LSTM in ResNet-18 architecture. The swish
+activation method optimized the network and improved its feature
+selection and recall capabilities.
+In [116], authors proposed a hybrid model for deepfake detection
+extracting face texture and naturalness degree. The texture was ex-
+tracted using CNN and the naturalness degree was built using deep
+neural networks. Critical 68 landmarks were identified from the fa-
+cial regions to extract these features. The model concatenated the
+outcome of all neurons from the naturalness degree model and used
+this for classification. Raza et al. [63] presented a hybrid approach
+of CNN-VGG16 along with transfer learning architecture for deep-
+fake detection. Transfer learning architecture such as Xception, Neural
+search architecture network, MobileNet, and VGG16 models for feature
+extraction. CNN was involved in extracting pixel-level information
+and fully connected layers were combined to classify the outcomes.
+Authors stacked multiple DL models such as MobileNet, ResNet101,
+Inception v3, DenseNet121, InceptionResNet v2, DenseNet169, and
+Xception using ImageNet weights for deep fake classification [86]. The
+outcome of these models was concatenated and passed through CNN
+based classifier for making predictions. On the other hand, the authors
+combined the strength of CNN and GAN in a two-step approach for
+obtaining efficient prediction results [25]. Initially, GAN identified the
+discriminative parts in the synthetic images followed by the CNN model
+to improve the classification accuracy for forged images. GAN-based
+discriminator consisted of five convolutional layers and a LeakyReLU
+activation function whereas CNN had two convolutional layers and a
+ReLU activation function. Fully connected layers acted as a classifier for
+obtaining the outcome. Similarly, Sharma et al. [98] ensembled CNN-
+GAN to determine the deepfake generated using generative modeling.
+GAN was trained using real image datasets whereas CNN was trained
+on merged datasets. After this, the DCGAN network was adopted con-
+sisting of a generator and discriminator along with cross entropy for
+distinguishing between fake and real images.
+Automatic reliable detection of deepfakes is essential to predict the
+forged content quickly. In this direction, Zhang et al. [91] ensem-
+bled 3D CNN and CNN-RNN (Recurrent neural network) for extracting
+discriminative spatial–temporal features and processing them for ef-
+ficient deepfake detection. The network performance was optimized
+using PSO (Particle swarm optimization). A weighted scheme was
+adopted for integrating the outcome from these networks and classi-
+fiers were selected for classifying the outcome. Authors segmented the
+various facial regions (68 landmarks) for extracting the features using
+OpenFace2 [60]. The multiple detection models namely, CNN, capsule
+network, and DSP-FWA were utilized for processing these features.
+These features were concatenated using two different fusion approaches
+namely, model fusion and feature fusion. The fusion approach was
+based on weighted fusion to obtain the final score fed to the classifier.
+In [9], authors utilized two networks namely CNN and LSTM for
+extracting spatial and temporal features. These features were exported
+to the training model and prediction was done on the testing model.
+Authors ensembled CNN models with SVM and KNN for obtaining
+the accurate classification accuracy [100]. Error level analysis was
+performed to determine the compression level of the processed image.
+Features were extracted using transfer learning from two CNN models
+namely AlexNet and ShuffleNet. The features were fed to the ML
+classifiers namely, SVM and KNN for obtaining the accuracy values.
+Determining the specific regions that were manipulated is challeng-
+ing and requires in-depth analysis. To analyze such regions, authors
+studied the boundaries of the input data and processed and classi-
+fied them using pre-trained DL model [115]. Acoustic features from
+frame-level boundaries were extracted using ResNet-1D and 1D-CNN
+networks. These features were classified using a backend classifier
+consisting of a transformer encoder and bidirectional LSTM. In other
+directions, Khochare et al. [67] ensembled DL models extracting im-
+age features and ML models extracting audio features for deepfake
+detection. Mel spectrogram images were generated from audio signals
+using two DL models namely, temporal CNN and spatial transformer
+network. Temporal CNN was used in classification networks with vary-
+ing kernel sizes, dropout, and batch normalization. For feature-based
+classification, 37 audio features were extracted and classified using ML
+algorithms namely, SVM, KNN, RF, XGBoost, and Light GB. DL-based
+models had shown better performance in comparison to ML-based
+models. To maintain the interpretability of the model for detecting
+deepfake audio, authors used three DL-models namely, CNN, CNN-
+LSTM, and CNN-LSTM-permuted [122]. The audio data was converted
+to mel spectrogram images and features were extracted using CNN.
+Information Fusion 118 (2025) 102993 
+18 
+
+
+--- PAGE 19 ---
+
+A. Kumar et al.
+Table 7
+Single modal advanced fusion-based deepfake detection techniques with hybrid algorithms.
+SN
+Citation
+Features
+Modality
+Fusion Strategy
+Dataset
+Performance
+metrics
+Summary
+1.
+Essa [38]
+Low frequency
+and
+high-resolution
+group features
+Video
+Dual attention
+ViT, Group
+propagation ViT,
+and Inception
+transformer
+FaceForensics++
+and Celeb-DF
+ACC, PR, RE,
+F1-score, and
+AUC
+∙Comprehensive analysis of
+videos using multiple ViT
+networks.
+∙Integrated features using MLP
+network to improve detection
+capabilities.
+∙Achieved highest ACC (97.72%)
+on benchmark DB.
+2.
+Cai and Li [115]
+ResNet-1D for
+frame-level
+features
+Audio
+Transformer and
+BiLSTM
+ADD2022-T2,
+ADD2023-T2,
+and PartialSpoof
+Error rate and
+F1-score
+∙Extracted diverse deep features
+from pre-trained models.
+∙Integrated results from multiple
+models for determining spoofed
+audio.
+∙Limited performance to
+generalize results on unseen and
+cross-domain DB.
+3.
+Jayashre and
+Amsaprabhaa
+[80]
+Deep features
+Video
+InceptionRes-
+NetV1,
+InceptionRes-
+NetV2, and
+BiLSTM
+Kaggle DB,
+FaceForensics++,
+and
+FakeAVCeleb
+ACC, PR, RE,
+F1-score, Loss
+and AUC
+∙Obtained fused feature by
+integrating hidden features
+extracted from InceptionResNetV1
+and InceptionResNetV2.
+∙Optimized network weights
+using spotted hyena optimizer.
+∙Utilized majority voting for
+classifying videos as fake or real.
+4.
+Dincer et al.
+[37]
+Feature
+extraction using
+VGG19,
+EfficientNet B0,
+and EfficientNet
+B4
+Video
+CapsuleNet and
+ArCapsNet
+Celeb-DF and
+DFDC-P
+ACC, PR, RE,
+F1-score, and
+AUC
+∙Frame selection by investigating
+golden ratio from the facial
+regions.
+∙Fused features extracted from
+multiple deep neural networks.
+∙Exploited two capsule networks
+in the classification models for
+detecting deepfakes.
+5.
+Khochare et al.
+[67]
+Feature-level
+extraction and
+image-level
+extraction
+Audio
+SVM, RF,
+XGBoost, KNN,
+LGBM, STN and
+TCN
+Fake or Real DB
+and
+self-generated
+audios
+ACC, PR, RE,
+F1-score
+∙Implemented feature-level
+extraction and image-level
+extraction for detecting deepfake
+audios.
+∙Feature-based approach utilized
+ML algorithms and image-level
+approach used DL methods.
+∙SVM achieved ACC (67%) and
+TCN acquired ACC (92%).
+6.
+Chew et al.
+[116]
+Texture and
+naturalness
+degree
+Image
+Deep CNN
+Flickr-Faces-HQ,
+StyleGan2,
+FaceForensics++,
+and Celeb-DFv2
+ACC, PR, RE,
+and F1-score
+∙Utilized hybrid model for
+extracting deep texture and
+naturalness degree from facial
+regions.
+∙Achieved highest ACC (99.7%)
+on benchmark DB.
+7.
+Zhang et al. [91]
+3D CNN
+extracting spatial
+and temporal
+features
+Video
+PSO optimized
+CNN-RNN and
+3D CNN
+Celeb-DFv2,
+FaceForensics++,
+and Deepfakes
+ACC, MCC, and
+AUC
+∙Exploited Inceptionv3-RNN
+network as encoder–decoder
+architecture.
+∙Inflated 3D ConvNet and MC3
+networks as 3D CNN for feature
+extraction.
+∙PSO optimized the network
+hyperparameters for video
+authenticity.
+8.
+Ke and Wang
+[117]
+Deep features
+using modified
+EfficientNet
+Images
+U-net and CNN
+DFDC, Celeb-DF,
+FaceForensics++,
+and Wild
+Deepfake
+ACC
+∙Utilized transforming module to
+improve the quality of the
+features extracted from degraded
+quality images.
+∙Assessed upgraded quality of
+the images using a discriminator.
+∙Utilized ML algorithms such as
+SVM and Bayes classifier for
+classifying the input data.
+(continued on next page)
+These features were processed using the LSTM network and attribution
+scores were calculated using integrated gradients. Model explainabil-
+ity was achieved using Taylor decomposition and speech was recon-
+structed using Griffin-Lim algorithms. Model detection performance
+was calibrated on multiple audio deepfake datasets.
+To summarize, hybrid approaches utilized multiple DL algorithms
+and transformer networks for extracting various frame-level and facial
+region features. The boundary level features were also analyzed to
+Information Fusion 118 (2025) 102993 
+19 
+
+
+--- PAGE 20 ---
+
+A. Kumar et al.
+Table 7 (continued).
+9.
+Naskar et al.
+[68]
+Dual CNN
+models
+Videos
+Ensembled
+Xception and
+EfficientNet-B7
+FaceForensics++
+and Celeb-DF V2
+ACC, PR, RE,
+AUC, F1-score,
+and CM
+∙Adopted feature selection
+strategy by averaging the feature
+importance scores.
+∙Arranged features in descending
+order to select the valuable
+features.
+∙Meta learning applied on
+stacked features along with MLP.
+10.
+Qadir et al. [24]
+Feature
+extraction from
+ResNet layers
+Video
+ResNet-Swish-
+BiLSTM
+FaceForensics++,
+Celeb-DF and
+DFDC
+ACC, PR, RE,
+AUC, F1-score,
+and CM
+∙Examined cross-compilation
+check among DB to determine
+model generalizability.
+∙Hybrid and optimized DL
+architecture based on BiLSTM and
+residual network for robust model
+architecture.
+∙Visual features in neurons to
+prevent the model from
+cyber-attacks.
+11.
+Raza et al. [63]
+Learned features
+from TL
+Image
+Hybrid VGG and
+CNN
+DF DB from
+Kaggle
+ACC, Loss, PR,
+RE, SPE,
+F1-score, CM,
+and GME
+∙TL-based models for comparing
+the outcomes of the proposed
+model.
+∙Tuned hyperparameters to
+determine fine-tune values.
+∙Computed performance on
+unseen DB from the 10% testing
+DB.
+12.
+Ikram et al. [70]
+InceptionRes-
+NetV2 CNN and
+Xception
+Video
+Hybrid CNN
+DFDC
+ACC, PR, RE,
+AUC, F1-score,
+and support
+∙Utilized InceptionResNetV2 and
+Xception in hybrid CNN model.
+∙Global average pooling and
+softmax layer in the final
+processing layer.
+∙Hybrid model achieved
+validation ACC (93%).
+13.
+Ismail et al. [62]
+InceptionRes-
+NetV2 CNN
+Video
+YOLO-CNN-
+XGBoost
+CelebDF-
+FaceForensics++
+ACC, AUC, PR,
+RE, SPE, SEN,
+F1-measure, and
+CM
+∙Spatial features extracted from
+CNN network classified using
+XGBoost.
+∙Stochastic gradient for
+optimizing the model for faster
+convergence.
+∙Validated the model
+generalizability with cross-domain
+DB.
+14.
+Rafique et al.
+[100]
+Deep CNN
+features
+Image
+AlexNet,
+ShuffleNet, KNN,
+and SVM
+Computational
+Intelligence
+Photography
+Lab, Yonsei
+University
+ACC, RE, PR,
+and F1-score
+∙Error level analysis to compare
+the compression of fake and real
+images.
+∙Utilized DL-models for feature
+extraction and ML for
+classification into real and fake.
+∙Achieved highest ACC (88.2%)
+in hybrid ShuffleNet and KNN
+model.
+15.
+Rana and Sung
+[86]
+Seven DL models
+Video
+CNN as meta
+learner
+classification
+FaceForensics++
+ACC, AUC, PR,
+RE, F1-score,
+SPE, and SEN
+∙Ensembled multiple DL-models
+as base learners for feature
+extraction.
+∙Utilized DeepFakeStackClassifier
+as meta learner before final
+prediction.
+∙Achieved ACC (99.6%) on
+exploited public dataset.
+16.
+Sadhna et al.
+[25]
+Hierarchical
+feature
+Image
+CNN and GAN
+Public DB
+ACC, Loss, and
+CM
+∙Compared between real and
+fake images along with
+machine-generated fake images.
+∙Hybrid model achieved ACC
+(94.4%).
+17.
+Sharma et al.
+[98]
+Deep features
+Image
+CNN and GAN
+DFDC
+ACC, AUC, PR,
+RE, F1-score,
+support, and CM
+∙Utilized transpose convolutional
+to reduce the features dimensions.
+∙Randomly cropped images
+normalized using batch
+normalization.
+∙Achieved ACC (98.67%) on
+Kaggle DB.
+(continued on next page)
+Information Fusion 118 (2025) 102993 
+20 
+
+
+--- PAGE 21 ---
+
+A. Kumar et al.
+Table 7 (continued).
+18.
+Tolosana et al.
+[60]
+Deep features
+from facial
+regions
+Video
+Xception,
+Capsule network,
+and DSP-FWA
+UADFV,
+FaceForensics++,
+Celeb-DF, and
+DFDC
+ACC, AUC, and
+error rate
+∙Extracted deep features from
+facial regions such as eyes, nose,
+mouth, etc.
+∙Fusion classification model
+using multiple DL models and
+face-level.
+∙Achieved 100% AUC on UADFV
+DB.
+19.
+Vamsi et al. [9]
+ResNext CNN for
+frame-level
+features
+Video
+ResNext CNN +
+LSTM
+Celeb-DFv2
+AUC and CM
+∙Feature extraction using ResNet
+and temporal analysis using
+LSTM.
+∙Achieved average ACC (91%).
+20.
+Xu et al. [48]
+XceptionNet
+Video
+XceptionNet and
+MesoNet
+TIMIT,
+FaceForensics++,
+and DFDC
+ACC, and AUC
+∙Utilized set reduce method for
+aggregating features of elements
+in a set.
+∙Statistical features for
+characterizing permutation
+invariance.
+∙Processed multiple video frames
+as a set for detecting manipulated
+videos.
+21.
+Lim et al. [122]
+CNN-based
+spectrogram-
+based features
+Audio
+CNN-LSTM-perm
+ASVspoof2021
+Logical Access
+DB, and
+LJSpeech DB
+Attribution score
+∙Interpreted attribution score of
+audios to identify deepfake.
+∙Focused on explainable model
+rather than model performance.
+∙Utilized Griffin-Lim algorithm
+for phase reconstruction-rule
+based vocoders.
+DB: Dataset, DL: Deep learning, ML: Machine learning, ViT: Vision transformer, LSTM: Long short-term memory, MLP: Multilayer perceptron, DFDC: Deepfake detection challenge,
+CNN: Convolutional neural network, RNN: Recurrent neural network, KNN: k-Nearest neighbor, SVM: Support vector machine, RF: Random forest, LGBM: Light gradient boosting
+machines, TCN: Temporal convolutional network, STN: Spatial transformer network, RNN: Recurrent neural network, PSO: Particle swarm optimization, GRU: Gated recurrent unit,
+BiLSTM: Bidirectional LSTM, TL: Transfer learning, ACC: Accuracy, PR: Precision, RE: Recall, GMS: Geometric mean score, MCC: Mean convergence curve, AUC: Area under the
+curve, CM: Confusion matrix, SPE: Specificity, SEN: Sensitivity.
+determine the manipulation in specific regions. The extracted features
+were processed and classified using DL-models or ML-models. Feature
+selection strategy was adopted to maintain the computational com-
+plexity of the model. Model explainability and interpretability were
+explored to determine the difference between the model prediction and
+human perception.
+6. Multimodal deepfake detection
+Multimodal deepfake detection emphasizes incorporating multiple
+modalities such as audio, video, images, and text in the input fea-
+tures for detecting manipulation in practical scenarios. Multimodal
+deepfake detection techniques can be categorized either as DL-based
+approaches or ensembled approaches. Synthetic-generated multimedia
+can be detected using DL architectures, transformers, and integrating
+the outcome using fusion approaches for classification. The generic
+architecture of multimodal deepfake detection algorithms is illustrated
+in Fig. 9. Table 8 tabulates the representative work categorized under
+this class of deepfake detection algorithms. The next section will detail
+the DL-models for deepfake detection.
+6.1. Deep learning-based techniques
+This subsection will detail the multi-modal deepfake detection al-
+gorithms in which DL-model was exploited for feature detection, pro-
+cessing, and classification. In this direction, Yoon et al. [50] processed
+triple modality namely, text, video, and audio using a multimodal
+transformer. The transformer comprised of two stages including feature
+extraction and representation along with residual connection and late
+fusion. The visual feature loss due to the interaction of three modalities
+was prevented using the ReLU activation function. The distillation
+tokens and multimodality data scores were extracted and fused to
+obtain classifier probability for detecting deepfakes. In [49], authors
+extracted features from multimodality, audio, and video and fused them
+using the Intramodality mixer layer and Intermodality mixer layer.
+Audio features were sampled and learned using residual blocks whereas
+multiple residual and pooling layers were used for extracting video
+frames. The mixed features were passed to multilabel prediction heads
+to learn patches for classification as real or fake.
+To prevent the uncertainties in models trained on fused multimodal
+data, authors proposed cross-modality and within-modality regulariza-
+tion learning [74]. Audio and visual were extracted separately using
+frame-level encoders and concatenated using AV-Hubert. Contrastive
+learning along with cosine similarity to determine the similarities
+between the audio and visual features. Within modality, regulariza-
+tion was achieved using modality-specific regularization consisting of
+margin-based regularization. Weighted cross entropy loss to optimize
+loss and detect deepfakes. On the other hand, authors generated intra-
+modal consistency loss and cross-modal consistency loss for detect-
+ing deepfakes [29]. Intra-modality loss determined the divergence be-
+tween the feature vectors from different modalities and generated
+similarity scores. Whereas cross-modality extracted motion inconsisten-
+cies learned various feature extractors and generated similarity scores.
+These two scores were summed to obtain the final score for deepfake
+detection.
+In [90], authors exploited pre-trained fine-tuned ViT for extracting
+video clips and audio spectrum from audio and visual data. Two
+additional modules adaptive forgery-aware injection and audio-distilled
+cross-modal interaction were stacked in each ViT for extracting intra-
+modal embeddings. The results were fed to the MLP-based classifier to
+detect the fake or real samples. On the other hand, authors proposed
+ViT with Xception network for learning the consistency in video and
+images from the entire facial regions [39]. The local features were
+extracted by combining ViT and self-attention module whereas global
+spatial features were extracted using deep CNN. These features were
+stacked, fused, and classified using a classification layer consisting of
+the ReLU activation function to generate the probability of classifying it
+as fake or real. Ilyas et al. [83] extracted hierarchical features using the
+Swim transformer module for representing the local and contextual in-
+formation from the video and audio modalities. The consecutive Swim
+Information Fusion 118 (2025) 102993 
+21 
+
+
+--- PAGE 22 ---
+
+A. Kumar et al.
+Fig. 9. Generic architecture of multi-modal deepfake detection algorithms.
+transformer blocks represented the ST network comprising of layer
+normalization, multi-head self-attention module, residual network, and
+MLP module. MLP was four layered modules consisting of two identical
+layers, ReLU and dropout along with a dense layer for classification.
+Also, the authors proposed an effective method that can detect
+multimodalities, audio, and videos together as well as can detect them
+individually in low-quality and corrupted videos [123]. The person
+of interest was identified, and discriminative features were learned
+using contrastive learning. The similarity indices were computed and
+fused linearly by averaging to obtain the fused scores for classifica-
+tion. Haq et al. [99] extracted emotions and psychological features
+for determining the inter and intra inconsistencies between the multi-
+modalities namely, audio and video. Emotions were identified and
+extracted using a DL network with multiple convolutional layers hav-
+ing ReLU, max pooling, and batch normalization. Speech emotions
+were recognized with seven basic emotions by tuning hyperparameters.
+Intra-modality reasoning computed the probability for two constitutive
+emotional states whereas inter-modality reasoning was determined by
+representing it in the arousal valence dimension. These modalities were
+classified by using probability labels for each reasoning module and
+explained using Grad-CAM. In [93], authors utilized the Xception net-
+work along with bidirectional LSTM for extracting multi-frame features.
+Audio waveforms were processed using SincNet and the detection task
+was processed using the final classifier. After this, a discrete Fourier
+transform was applied on images to extract the power spectrum for
+separating the fake from the real using a trained MLP classifier.
+To summarize, pre-trained DL networks and transformers were used
+for extracting the robust features from the considered multi-modalities.
+The intra-domain and inter-domain modalities were processed to deter-
+mine the inconsistencies between the modalities. The modalities score
+was fused using DL-based or MLP classifier for the classification of
+modalities as fake or real.
+6.2. Ensembled fusion-based techniques
+These techniques utilized multiple DL-models to extract robust fea-
+tures and multiple fusion modules to effectively utilize the extracted
+information. The results were ensembled to generate the final robust
+score for deepfake classification. In this direction, Yan et al. [53]
+utilized two GNN (Graph neural networks) to extract geometric en-
+hanced landmark features namely, spatial, frequency, and temporal.
+Multi-scale Xception network was used for extracting spatial features.
+Temporal information was encoded and inconsistencies between frames
+were determined by using a graph attention network at the video level.
+Unified features were generated from different frequencies and fused
+using a learnable weight matrix. Global and local temporal dependen-
+cies at the video level from each attentional module were concatenated
+using a weighted sum of attentional weights from each node feature.
+Cross-modal classifier along with loss functions was concatenated to
+reduce the inter-class noise for deepfakes detection [118]. The temporal
+and spatial encoders processed the sampled audio and video through
+patch data processing. The multimodal decoder fused the extracted
+features using their inherent relationship. The output of the multimodal
+decoder was computed through cross cross-modality classifier using
+contrastive, cross-entropy, and angular margin loss. These losses were
+fused linearly to obtain the final classifier outcome. Similarly, authors
+utilized two fusion strategies namely, feature fusion and score fusion
+before feeding to the four-class classification network [51]. The multi-
+task learning utilized fusing three loss functions namely, cross-entropy
+loss for audio, video, and four classes with different types of videos.
+Feature fusion generated a fused feature vector after extracting features
+from the capsule network and Swim transformer.
+Further, multimodal contrastive learning was utilized for extracting
+intra-frame and cross-modal for determining forgery clues [41]. Three
+modalities namely, audio, video, and images were extracted along with
+audio and images extracted for the cross-modality gap. Intra-modal
+similarities from the ST network were predicted using Jensen–Shannon
+divergence. The contrastive loss enhanced feature representation by
+concatenating the audio with video information. Noise-based adaptive
+feature augmentation to improve the model generalizability capabili-
+ties. Authors extracted facial features from the VGG-16 network and
+audio from a transformer encoder with a self-attentional network [64].
+The spatiotemporal dimensions were captured using tubelet embedding
+and simplified computing cross-attention between lip region and audio
+temporal synchronization. The classification module consisted of MLP
+to generate the final classification probability for real and fake.
+In other directions, authors utilized different networks for extract-
+ing multimodalities and different fusion strategies to detect the deep-
+fakes [52]. Visual modalities were extracted using modified ensembled
+EfficientNetB4 and audio modalities were extracted using pre-trained
+time-delay neural networks provided by SpeechBrain. The time consis-
+tency between both these feature vectors was recorded by extracting
+Information Fusion 118 (2025) 102993 
+22 
+
+
+--- PAGE 23 ---
+
+A. Kumar et al.
+Table 8
+Multi-modal deepfake detection techniques.
+SN
+Citation
+Features
+Modality
+Technique
+Dataset
+Performance
+metrics
+Summary
+1.
+Liu et al. [41]
+DL-based feature
+extraction
+Audio, image
+and video
+Multimodal
+contrastive
+learning
+DF-TIMIT,DFDC,
+FakeAVCeleb,
+KoDF
+AUC, ACC
+∙Adopted student–teacher
+network for extracting
+multi-modal features.
+∙Utilized noise-based adaptive
+feature augmentation for better
+generalizability.
+∙Calculated feature mapping
+using MLP.
+2.
+Yoon et al. [50]
+Transformer for
+extracting vision
+and audio
+features
+Vision, audio
+and text
+TMI-Former
+FakeAVCeleb
+ACC, F1-score
+∙Triple modalities processed in
+two stages consisting of visual
+and auditory features.
+∙Residual connections for
+handling the features from vision,
+audio, and text.
+∙Integrated the extracted
+multi-modalities using late-level
+fusion.
+3.
+Yang et al. [118]
+Temporal and
+spatial features
+Audio and video
+Multi-modal
+joint decoder
+DefakeAVMiT,
+FakeAVCeleb,
+DFDC
+AUC, ACC
+∙Generated DB by combining
+videos and audio from multiple
+different DB.
+∙Jointly learned the features
+extracted from different encoders.
+∙Cross-modal classifiers for
+identifying deepfake videos.
+4.
+Lewis et al. [82]
+Color visual
+embedding,
+spectral
+embedding,
+LipNet, and
+audio features
+Video and audio
+LSTM
+DFDC
+ACC
+∙Analyzed misalignment between
+audio and videos for deepfake
+detection.
+∙Utilized DCT for capturing
+spectral features in frequency
+domain.
+∙Inconsistencies between
+DeepSpeech2 and LipNet features
+explored using contrastive loss.
+5.
+Ganguly et al.
+[39]
+Deep CNN based
+features
+Image and Video
+ViT with
+XceptionNet
+FaceForensics++,
+Celeb-DF (V2),
+Deepfake DB
+ACC, AUC, PR,
+RE, F1-score, CM
+∙Patch-wise attentional module
+for learning local features.
+∙Pre-trained Xception network
+for extracting global spatial image
+features.
+∙Dense layer-based classification
+network for detecting deepfakes.
+6.
+Ilyas et al. [83]
+Dense
+hierarchical
+features
+Audio and video
+Swin transformer
+FakeAVCeleb,
+Celeb-DF,
+ASVSpoof-2019 LA,
+World Leaders DB,
+Presidential
+Deepfakes DB
+ACC, AUC, PR,
+RE, F1-score,
+error rate
+∙Extracted deep hierarchical
+features for robust representation
+of model.
+∙Adopted majority voting for
+classifying fake from real.
+∙Fully connected layer along
+with softmax activation in the
+output block.
+7.
+Lomnitz et al.
+[93]
+Xception
+Audio and video
+Ensembled
+model:
+EfficientNet,
+Xception,
+ResNet, SlowFast
+video-based
+network
+DFDC
+BCELoss
+∙Feature encoding using MTCNN
+and XceptionNet.
+∙Frame-by-frame feature
+extraction from single to multiple
+frames.
+∙MTCNN for ensembling different
+models for deepfake detection
+along with three 3D CNN.
+8.
+Nie et al. [90]
+Task-specific
+features
+including audio
+and visual
+Audio and
+Images
+Forgery aware
+audio distilled
+multimodal
+learning
+FakeAVCeleb,
+KoDF,
+DeAVMiT,
+DFDC
+AUC, ACC
+∙Utilized learnable parameters
+from ViT transformer.
+∙Audio-distilled cross-modal
+interaction for handling
+inconsistencies between audio
+and visuals.
+∙Experimental analysis to prove
+the model scalability for superior
+detection outcome.
+(continued on next page)
+them for equally spaced time instants on the same number of frames.
+Before classification, the feature vectors were fused using three strate-
+gies namely, late, mid, and early. In late fusion, separate classifiers for
+each feature vector and vector were averaged to obtain the final score.
+Similarly, separate classifiers were used in the mid fusion and results
+were merged using the dense layer. However, a unique classifier was
+considered in late fusion, and concatenated feature vectors were fed to
+it to obtain the final detection results.
+Information Fusion 118 (2025) 102993 
+23 
+
+
+--- PAGE 24 ---
+
+A. Kumar et al.
+Table 8 (continued).
+9.
+Muppala et al.
+[51]
+Capsule network
+and Swin
+transformer
+Audio and video
+Multi-task
+learning
+FakeAVCeleb,
+TMC DB
+AUC, ACC
+∙Extracted deep features to learn
+powerful features for model
+implementation.
+∙Utilized three loss functions in
+multi-task model learning.
+∙Four-class classification for
+detecting deepfakes.
+10.
+Kharel et al.
+[64]
+VGG16
+Audio and video
+Self
+attention-based
+transformer
+DFDC,
+DF-TIMIT,
+FakeAVCeleb DB
+AUC, F1-score
+∙Analyzed lip synchronization
+between audio and visual
+artifacts.
+∙Self-attention applied on video
+and cross-attention deployment
+for lip-video synchronization.
+∙Final class labels for
+classification were generated by
+MLP.
+11.
+Haq et al. [99]
+Pretrained facial
+expression
+recognition and
+speech emotion
+recognition
+Audio and video
+DL-based model
+DFDC,WLD
+ACC, CM
+∙Introduced biological signals to
+determine the emotion
+inconsistencies.
+∙Analyzed intra-modality and
+inter-modality reasoning for
+robust outcomes.
+∙Focused on explaining the
+model using DL-based
+explainability models.
+12.
+Cozzolino et al.
+[123]
+Contrastive
+based feature
+learning
+Audio and video
+POI-based
+detection
+pDFDC,
+DF-TIMIT,
+FakeAVCelebV2,
+KoDF
+AUC, ACC
+∙Analyzed moving face and
+audio as discriminative identity
+for deepfake detection.
+∙Robust model against
+low-quality or corrupted DB.
+∙Evaluated and analyzed model
+flexibility, robustness, and
+generalizability.
+13.
+Zou et al. [74]
+Frame-level
+audio-video
+features using
+encoders
+Audio and video
+Audio–visual
+transformer
+FakeAVCeleb
+AUC, ACC, PR,
+RE, F1-score
+∙Cross-modality regularization
+module for pairing audio-video
+signals and preserve modality
+distinctly.
+∙Target-specific modality to
+retain modality information.
+∙Cross-entropy loss function to
+optimize deepfake output.
+14.
+Yan et al. [53]
+Geometric
+enhanced
+landmark
+features
+Images and
+videos
+Graph attention
+network
+FaceForensic++,
+DeepfakeDetection,
+CelebDF
+AUC, ACC, error
+∙Multiple modalities extracted
+using two GANs.
+∙Highly complex model not
+suitable for real-time applications.
+∙Generalizability proved using
+cross-dataset assessment but
+limited to considered modalities
+only.
+15.
+Tian et al. [29]
+Consistency-
+based feature
+and joint
+features
+Audio and video
+Transformer
+VoxCeleb2,
+FakeAVCeleb,
+KoDF
+ACC, AUC
+∙Calculated cross-modal
+consistency loss from similarity
+matrix.
+∙Intra and cross-modality scores
+compared for classification.
+∙Model generalizability on
+multiple DB for adversarial
+attacks.
+16.
+Salvi et al. [52]
+High level
+pixel-level
+features from
+video and audio
+Audio and video
+Time aware
+neural network
+FaceForensics++,
+ASVspoof 2019,
+VidTIMIT,
+DeepfakeTIMIT,
+TIMIT- TTS
+AUC, CM
+∙Time series audio and video
+features extracted for analysis.
+∙Trained model on synthetic
+audio and video DB.
+∙Evaluated model performance
+on unseen DB for model
+generalizability.
+(continued on next page)
+To summarize, ensembled approaches utilized different DL net-
+works for extracting the different modalities of information from the
+datasets. In addition, multiple networks were also utilized for fusing
+the extracting information to generate final scores for classification.
+Different fusion strategies followed by classification module for gen-
+erating the hierarchical robust features for determining the modalities
+as real or fake. However, certain concerns should be addressed to
+ensure the enhanced detection accuracy and robustness of the en-
+sembled approaches. As this approach, integrates multiple DL models
+for improving the detection results, maintaining model computational
+complexity for real-time detection is a foremost concern. The number of
+overheads in terms of hyperparameters must be controlled to deal with
+the high computational requirements of the system. Reliable design
+and proper training of the model are crucial to prevent overfitting
+Information Fusion 118 (2025) 102993 
+24 
+
+
+--- PAGE 25 ---
+
+A. Kumar et al.
+Table 8 (continued).
+17.
+Raza and Malik
+[49]
+ResNet-1D for
+audio features
+and
+multi-layered 3D
+Resnet for video
+features
+Audio and video
+Multimodaltrace
+model
+FakeAVCeleb,
+PDD,
+WLD DB
+ACC, PR, RE,
+F1-score
+∙Combined channel extractors
+and mixers for analyzing inter
+and intra modalities.
+∙DL-based multi-label
+classification for deepfake
+detection in audio–visuals.
+∙DB augmentation by
+incorporating other DB to
+increase training size.
+DB: Dataset, DL: Deep learning, POI: Person of interest, DFDC: Deepfake detection challenge, KoDF: Korean deepfake DB, LSTM: Long short-term memory, ACC: Accuracy, BCE:
+Binary cross entropy, CM: Confusion matrix, AUC: Area under the curve, PR: Precision, RE: Recall, ViT: Vision transformer, MLP: Multi-layer perceptron.
+and ensure model generalizability in practical situations. The decision-
+making process must be transparent and trustworthy by ensuring model
+interpretability and explainability for quick and fast detection of deep-
+fakes. In addition, large and diverse multi-modal datasets must be
+provided to evaluate the performance and identify its limitations in
+deepfake detection.
+7. Critical discussion
+In this study, we have categorized deepfake detection algorithms as
+single-modal and multi-modal approaches based on the input modal-
+ities utilized in their model architecture. Single-modal architecture is
+focused on processing individual multimedia content namely, audio,
+video, or image only. Whereas multi-modal utilizes a combination
+of these modalities to generate a unified outcome for classifying the
+contents as fake or real. Deepfake detection comprises various steps
+that include feature extraction, feature processing, unified feature gen-
+eration, fusion strategies, and classification modules. All the techniques
+under each category follow these steps but exploit single or multiple
+feature extraction algorithms, classifiers, and fusion algorithms.
+Generally, conventional studies focus on extracting the handcrafted
+features and pre-trained DL models to reduce the computational com-
+plexity of the model in feature extraction [88]. The fine-tuning of the
+model is achieved by training the hyperparameters so that intrinsic
+aspects of the forged data can be captured efficiently. However, model
+efficiency is impacted when the performance is evaluated on unseen
+and real-time collected data. It is essential to compute the model with
+and without fine-tuning so that model effectiveness can be determined
+in real-time. Hybrid models combine several DL models for feature
+extraction and generate fused features for deepfake detection. The
+detection accuracy is improved but the model complexity needs to be
+addressed for faster processing of the content for deepfake detection.
+Further, complex networks consisting of encoders, decoders along
+with residual networks are adopted for feature extraction and process-
+ing for deepfake detection. ViT, Swim transformer, and ST networks
+have shown great potential and adaptability for deepfake classification
+by extracting local and global features. In [65], authors have pre-
+sented the ViT architecture along with CNN for detecting deepfakes
+with enhanced accuracy. The model consisted of two steps namely,
+feature learning and processing learned features into the sequence of
+image pixels for final detection. The feature learning involves seventeen
+convolutional layers, five max pooling, ReLU activation, and batch nor-
+malization. On the other hand, the authors utilized a ViT transformer
+with twelve transformer layers, 768 hidden layer components with
+GeLU activation function, and balanced datasets. Zhu et al. [27] utilized
+the ST network for extracting mutual information with temporal con-
+trastive distillation. The model was trained on eight GPUs, consisting
+of four stacked encoders each with eight attention heads. To add to
+the model complexity, the classification head consisted of two fully
+connected layers. The deepfake detection models are highly complex
+and the processing performance with computational time is ignored in
+most of the studies.
+For training deepfake detection models, a lot of benchmark datasets
+have been generated using DL techniques. The most popular and
+adopted datasets by most of the recent studies are UADFV [124],
+Deepfake-TIMIT [125], FaceForensics++ [126], DFDC (Deepfake detec-
+tion 
+challenge) 
+[127], 
+Celeb-DF 
+v1, 
+Celeb-DF 
+v2 
+[128],
+DeeperForensics-1.0 [129], WildDeepfake [130] and many more [32,
+131–133]. Apart from these visual datasets, there also exists bench-
+mark datasets for predicting deepfake audio. Some latest audio deep-
+fakes datasets are Asvspoof2019 [134], Arctic dataset [135], Css10
+dataset [136] and VoxForge dataset [137]. Also, a multimodal dataset
+exists which consists of an amalgamation of visual and audio record-
+ings [138]. Most of these datasets are either generated synthetically or
+noise is induced artificially to generate fake content. These datasets lack
+diversity and capture limited expression for deepfake detections. The
+authors introduced cross-dataset evaluation of the model to determine
+its capabilities in a variety of scenarios so that the model will not fail
+when implemented for real-time applications.
+7.1. Benchmarking table
+The proposed work is compared with existing studies in the area and
+the same is depicted by a benchmarking table (Table 9). Ten crucial
+and different attributes are identified and compared with eight other
+existing studies. The last row of the table represents the proposed study.
+The presence and absence of extracted unique and crucial attributes in
+the study are recorded by marking ‘’ and ‘’ in the table, respectively.
+It has been observed that only one study has followed the PRISMA
+strategy for article selection and elaborated the statistical distribution
+of the selected articles. Most of the studies discussed the deepfake
+detection algorithms without categorizing them to highlight the salient
+features. In addition, a limited number of studies were reviewed in
+their work ignoring the multimodal approach for deepfake detection.
+Most studies included feature extraction strategies for determining the
+spatial, and temporal features from the global and local information.
+The performance metrics for evaluating the model performance were
+elaborated by few of the studies. The strength of the proposed study
+is the categorization of deepfake detection algorithms as single-modal
+and multi-modal techniques. Further, salient features along with the
+advantages and disadvantages of each category for deepfake detection
+models provide future insights and trends to the researchers working
+in the domain. In addition, the adopted selection strategy, statistical
+distribution analysis along with elaboration of performance metrics
+further prove the robustness, efficiency, and potential of the proposed
+study.
+7.2. A short note on generalizability and explainability in deepfakes
+In order to ensure the modal performance in real-time and unseen
+situations, the generalizability of the model plays a crucial role. In
+addition, various DL-modal such as CNN, XceptionNet, ResNet, and
+many others with large numbers of convolutional layers, hidden layers,
+and filters were utilized for detecting deepfakes [139]. The prediction
+outcome of these complex models is opaque and uninterpretable. For
+a better understanding and interpretability of the model, it is essential
+to explore explainability in these models [140–143].
+Information Fusion 118 (2025) 102993 
+25 
+
+
+--- PAGE 26 ---
+
+A. Kumar et al.
+Table 9
+Benchmarking table for comparing the proposed work with existing studies.
+SN
+Citations
+Yeara
+PRISMAb
+DFCc
+FEd
+CDFe
+EDFf
+MDFg
+#SDFDh
+PMAi
+SAj
+1.
+Albahar and Almaki [56]
+2019
+×
+×
+×
+×
+×
+×
+15
+×
+×
+2.
+Seow et al. [2]
+2022
+×
+✓
+×
+✓
+×
+✓
+60
+×
+×
+3.
+Rana et al. [54]
+2022
+✓
+✓
+×
+×
+×
+×
+90
+×
+✓
+4.
+Malik et al. [57]
+2022
+×
+×
+✓
+×
+×
+×
+52
+×
+×
+5.
+Gupta et al. [58]
+2023
+×
+×
+✓
+×
+✓
+×
+67
+×
+×
+6.
+Mary and Edison [59]
+2023
+×
+×
+✓
+×
+×
+×
+20
+✓
+×
+7.
+Patel et al. [1]
+2023
+×
+×
+✓
+×
+✓
+✓
+68
+×
+×
+8.
+Passos et al. [55]
+2024
+×
+✓
+✓
+×
+×
+×
+101
+✓
+×
+9.
+Kumar et al. (the proposed)
+2024
+✓
+✓
+✓
+✓
+✓
+✓
+88
+✓
+✓
+PRISMAb: Preferred Reporting Items for Systematic Reviews and Meta-Analysis
+DFCc: Deepfake categorization
+FEd: Feature extraction
+CDFe: Conventional deepfake
+EDFf: Ensembled deepfake Fusion
+MDFg: Multimodal deepfakes
+#STDFh: Number of deepfake detection studies
+PMAi: Performance metric analysis SAj: Statistical analysis.
+In deepfake algorithms, cross-dataset evaluation is performed to
+prove the model’s generalizability. The cross-datasets analysis also ad-
+dresses the limitations of small and less diverse dataset. Cross-datasets
+are challenging due to diverse, unseen, and realistic scenarios for
+training and testing the model performance [66]. The cross-dataset
+evaluation settings are also effective in exhibiting the model perfor-
+mance for inter-class and intra-class instances which are distinguishable
+for enhancing the model evaluation parameters for deepfake detection.
+Next, explainability is one of the evolving technologies that provide
+a clear interpretation of DL networks by analyzing model architec-
+ture and parameters [144–147]. In deepfakes detection models, ex-
+plainability provided model transparency by using decomposition and
+data perturbations as post-hoc approaches [122]. Layer-wise relevance
+propagation, Deep Taylor, and integrated gradients were utilized for
+evaluating the model sensitivity, attribution, and input relevance. The
+collected relevance score is approximated to obtain the heatmap predic-
+tion for model explainability. Authors achieved model design explain-
+ability by analyzing intra-modal and cross-modal consistency loss [29].
+These losses can detect that portion of video which is inconsistent for
+detecting the video as real or fake. The model explainability in perform-
+ing decisions was achieved using Grad-CAM (Gradient class activation
+mapping) [99]. Gradcam is an attentional mechanism that can high-
+light certain regions in an image or video by generating heatmaps for
+deepfake detection. Apart from Grad-CAM, other tools such as SOBOL,
+XRAI (eXplanation with ranked area integrals), RISE (Random input
+sampling explanations), and LIME (Local interpretable model agnostic
+explanations) were also observed for evaluating model performance
+for different perturbations [6]. These tools analyzed model’s internal
+structure and worked based on the randomly selected input features.
+To summarize, generalizability and explainability are two essential
+and crucial features that must be present in the design and archi-
+tecture of deepfake detection models. These features ensure trust,
+transparency, robustness, and reliability in DL-based deepfake detec-
+tion algorithms. An explainable model ensures a clear understanding
+and interpretability of the model decision-making process. On the
+other hand, generalizability ensures the model’s suitability in practical
+scenarios. The presence of these two features in deepfakes detection
+algorithms embarks the transfer of common knowledge across domains.
+7.3. Discussion on evaluation metrics for performance analysis
+To ensure enhanced performance to detect disinformation in real-
+time, it is essential to utilize critical evaluation metrics to compute the
+performance of single-modal and multi-modal detection algorithms on
+public datasets. Exhaustive evaluation metrics such as accuracy, area
+under the curve (AUC), precision, recall, F1-score, confusion matrix,
+and error rate are exploited to determine model reliability and ro-
+bustness to detect fake from real [39,64,99,123]. Most of the articles
+utilized accuracy and AUC to measure the in-depth robustness and
+reliability of the model to detect deepfakes correctly [28,30,81,118].
+Accuracy computes the number of correctly detected instances with
+respect to the total number of instances provided to the model. The
+higher the accuracy better the model performance to detect fake from
+the real. AUC is another popular, scalar, and robust metric to com-
+pute the model’s functional performance. It considers all classification
+thresholds to measure the receiver operating characteristics in the AUC
+curve. Higher AUC values denote the better efficiency of the model to
+detect deepfakes.
+Apart from accuracy and AUC, other evaluation metrics are ex-
+ploited to prove model effectiveness and robustness of the detection
+model namely, specificity, sensitivity/recall, precision, f1-score, and
+confusion matrix. Specificity computes the ratio number of true nega-
+tives detected with respect to actual number of negative samples in the
+dataset. Sensitivity determines the ratio of the number of true positives
+detected with respect to the actual number of positives present in the
+datasets. On the other hand, precision defined the ratio of number
+of true positives detected by the algorithm to the total number of
+samples predicted by the modal. F1-score computes the harmonic mean
+of precision and recall for computing the detection performance of
+the algorithms. The confusion matrix diagrammatically represents the
+similarities between the misclassified classes of the samples which sup-
+ports to analysis of the areas that need to be considered for improved
+detection accuracy. These evaluation metrics are an indicator of model
+performance for both single-modal and multi-modal deepfake detection
+algorithms before the real-time deployment.
+7.4. A short note on ethical implications and societal impact of deepfakes
+detection
+The realistic generation of deepfake content has raised ethical con-
+cerns related to the privacy and security of the individual. The contents
+can impersonate an individual, distrust, and impact its public rep-
+utation. These contents have a negative societal impact which may
+harm many industrial applications such as film production, political
+campaigns, video games, and many others. Hence, it is crucial to design
+robust, accurate, and efficient deepfake detection algorithms to prevent
+the ill impacts of deepfakes from penetrating society.
+There exists a wide range of real-time examples where deepfake
+contents were created and circulated online to spread disinformation.
+Politics is one of the key areas where deepfake contents are circu-
+lated to discredit the image of politicians and leaders. One of the
+most popular deepfake videos represented the conversation between
+three American leaders Barak Obama, Donald Trump, and George W.
+Bush [148]. These individuals appeared to be talking with each other
+with accurate lip movements. However, no such conversation had
+Information Fusion 118 (2025) 102993 
+26 
+
+
+--- PAGE 27 ---
+
+A. Kumar et al.
+happened among these three ever. Another potentially manipulated
+deepfake video was circulated in which Barack Obama can be seen in-
+sulting Donald Trump [148]. Recently, a prominent deepfake campaign
+ad featuring the manipulated voice of Kamala Harris has escalated
+debate over the misuse of the technology [149].
+There is an exponential increase in crime against women using
+deepfakes. Most of the pornographic content featuring females is gen-
+erated using deepfakes [148]. These explicit videos unethically present
+the renowned and famous celebrities without their consent. These
+contents harass people sexually, mentally, and socially. Other notable
+crimes that can be committed using deepfakes are writing blackmail
+emails, sending phishing emails, and many other illegal activities. The
+dominance of highly reliable, accurate, and efficient deepfake detection
+algorithms is required to prohibit the bad effects of deepfakes on
+society.
+7.5. Recommendations and suggestions for future directions
+Based on the selected deepfake detection studies under each cate-
+gory, recommendations are being clustered to provide future insights
+into the upcoming research. Despite of availability of highly trained
+DL and transformer networks, the detection of highly realistic synthetic
+multimedia content is a challenge. The recommendations are (a) Robust
+system design (b) Diverse and real-time datasets (c) AI architectural
+vision and (d) detection in low-quality videos. The discussion of these
+recommendations is as follows (a) Robust system design: The system
+performance is degraded when the short-term features are extracted
+which are not suitable to maintain model performance on unseen
+data [27]. Hence, there is a requirement for a system that can ex-
+tract long-term robust and discriminative features from the considered
+deepfake contents. The success rate can be improved by capturing
+the fake pixels from the long-term temporal and contextual features.
+(b) Diverse and real-time datasets: Most of the available benchmark
+datasets consist of synthetic deepfake images for model training. The
+size of these datasets is not sufficiently large and the number of fake
+and real images with diversified facial expressions is also limited. Real-
+time scenarios consisting of both audio and video are not captured
+properly for tuning the model. (c) AI architectural vision: Various DL-
+models are adopted for feature extraction and classification. These
+models are highly complex with a sufficiently large number of con-
+volutional layers, pooling layers, and complicated loss and activation
+functions [65]. The training of these models requires large datasets
+and high computational modeling. Hence, the model training and
+processing should be analyzed to evaluate its capabilities for real-time
+predictions. Also, the model architecture should be efficient enough
+in terms of computations and processing. (d) Detection in low-quality
+videos: To reduce the storage requirements, the video images are highly
+compressed, and detection of deepfakes in such content is extremely
+tedious [66]. The deepfake detection model should be trained in such
+a way so that fake content can also be predicted in low-quality and
+poor-resolution videos. Detecting deepfakes in well-generated realistic
+synthetic content is a potential challenge in current scenarios.
+Nowadays deepfakes creation is quite easy, quick, and inexpen-
+sive [150]. Most of the deepfake creation tools are freely available,
+and open source and do not require any technical expertise for their
+operations and usage. The outcomes of these tools are quite fast and
+very realistic which is very tedious for the existing detection algorithms
+to identify. Most of the advanced deepfake detection tools have shown
+superior results in deepfake identification but their performance is
+limited in practical scenarios. There is a requirement for strong policies
+and countermeasures to prevent the negative impact of deepfakes on
+society. Datasets and detection tools must be standardized to design and
+develop reliable detection algorithms. Generally, the negative impact of
+deepfakes has prevailed through online platforms [20]. There is a need
+to design strict, convincing, and robust governing policies to stop their
+online propagation. The liability of social media and online platforms
+in terms of their responsibility and obligations should be regulated to
+prevent the dissemination of false information.
+There is a requirement for strict and flexible rules to mitigate the
+negative impacts of deepfakes on the community and society [58].
+The detection algorithms must be equipped with the latest AI-based
+technologies to identify forgery quickly and in real time. The deepfake
+detection algorithms should be improved in terms of generalizability
+and explainability. These features are critical to assess the detection
+algorithm’s performance on cross-datasets and unseen contents. The
+human intervention for detecting deepfakes is valuable to address
+the practical detection challenges. Embedding ethical, societal, and
+community aspects in deepfake detection is significantly important to
+mitigate its adverse impacts on humans.
+Further, the future requirements demand to protect the people from
+the dangerous impact of deepfakes. For this, it is essential to transform
+the deepfake algorithms into user-friendly applications and software.
+This application will be platform friendly which can be integrated eas-
+ily with social media platforms which can prevent users from deceiving
+by false content. In addition, the software can be open source which can
+also promote real-time detection of deepfakes.
+8. Conclusion
+In this study, we have extensively summarized the various deep-
+fakes detection frameworks under two categories namely, single-modal
+and multi-modal approaches. It has been analyzed that some contents
+are manipulated using deepfake creation techniques for fun and comic
+purposes. But generative AI advancements have created content for
+negative purposes that include generating pornographic material from
+popular celebs using face-swap, and augmenting audio of political
+leaders are few generic examples. These contents are harmful to society
+and nation, and hence, detection is essential to prevent the dangerous
+influence. In this study, we have categorized the deepfake detection
+frameworks based on the number of input features, methodology,
+fusion strategy, and classification module. Conventional deepfake de-
+tection algorithms are widely used due to low-level feature extraction
+and simple classification modules. On the other hand, deep learning
+and hybrid deepfake detection approaches utilize a lot of training
+data for evaluating model performance. On the other hand, multi-
+modal frameworks provide more realistic scenarios by using multiple
+modalities in the feature extraction module and fusing them to generate
+unified features for efficient deepfake classification. Models gener-
+alizability is computed and tested using cross-dataset evaluation. In
+addition, explainable models are also designed for better interpretable
+outcomes.
+CRediT authorship contribution statement
+Ashish Kumar: Writing – original draft, Methodology, Investiga-
+tion, Conceptualization. Divya Singh: Writing – review & editing,.
+Rachna Jain: Writing – review & editing. Deepak Kumar Jain: Writ-
+ing – review & editing, Validation, Supervision. Chenquan Gan: Writ-
+ing – review & editing, Supervision. Xudong Zhao: Writing – review &
+editing.
+Declaration of competing interest
+The authors declare that they have no known competing finan-
+cial interests or personal relationships that could have appeared to
+influence the work reported in this paper.
+Data availability
+Data will be made available on request.
+Information Fusion 118 (2025) 102993 
+27 
+
+
+--- PAGE 28 ---
+
+A. Kumar et al.
+References
+[1] Y. Patel, S. Tanwar, R. Gupta, P. Bhattacharya, I.E. Davidson, R. Nyameko,
+S. Aluvala, V. Vimal, Deepfake generation and detection: Case study and
+challenges, IEEE Access 11 (2023) 143296–143323, http://dx.doi.org/10.1109/
+ACCESS.2023.3342107.
+[2] J.W. Seow, M.K. Lim, R.C. Phan, J.K. Liu, A comprehensive overview of
+deepfake: Generation, detection, datasets, and opportunities, Neurocomputing
+513 (2022) 351–371.
+[3] K. Somoray, D.J. Miller, Providing detection strategies to improve human
+detection of deepfakes: An experimental study, Comput. Hum. Behav. 149
+(2023) 107917.
+[4] T.T. Nguyen, Q.V.H. Nguyen, D.T. Nguyen, D.T. Nguyen, T. Huynh-The, S.
+Nahavandi, C.M. Nguyen, Deep learning for deepfakes creation and detection:
+A survey, Comput. Vis. Image Underst. 223 (2022) 103525.
+[5] H.R. Hasan, K. Salah, R. Jayaraman, I. Yaqoob, M. Omar, NFTs for combating
+deepfakes and fake metaverse digital contents, Internet Things 25 (2024)
+101133.
+[6] B. Gowrisankar, V.L. Thing, An adversarial attack approach for explainable AI
+evaluation on deepfake detection models, Comput. Secur. 139 (2024) 103684.
+[7] M. Mcuba, A. Singh, R.A. Ikuesan, H. Venter, The effect of deep learning
+methods on deepfake audio detection for digital investigation, Procedia Comput.
+Sci. 219 (2023) 211–219.
+[8] P.M.G.I. Reis, R.O. Ribeiro, A forensic evaluation method for DeepFake detec-
+tion using DCNN-based facial similarity scores, Forensic Sci. Int. 358 (2024)
+111747.
+[9] V.V.V.N.S. Vamsi, S.S. Shet, S.S.M. Reddy, S.S. Rose, S.R. Shetty, S. Sathvika,
+S.P. Shankar, Deepfake detection in digital media forensics, Glob. Transitions
+Proc. 3 (1) (2022) 74–79.
+[10] Z. Xia, T. Qiao, M. Xu, N. Zheng, S. Xie, Towards deepfake video forensics
+based on facial textural disparities in multi-color channels, Inform. Sci. 607
+(2022) 654–669.
+[11] A. Kumar, Visual Object Tracking Using Deep Learning, CRC Press, 2023.
+[12] A. Kumar, P. Sarren, Raja, Deep learning-based multi-object tracking, in: Object
+Tracking Technology: Trends, Challenges and Applications, Springer, 2023, pp.
+183–199.
+[13] A. Kumar, R. Vohra, R. Jain, M. Li, C. Gan, D.K. Jain, Correlation filter based
+single object tracking: A review, Inf. Fusion (2024) 102562.
+[14] A. Kumar, G.S. Walia, K. Sharma, A novel approach for multi-cue feature fusion
+for robust object tracking, Appl. Intell. 50 (10) (2020) 3201–3218.
+[15] A. Kumar, G.S. Walia, K. Sharma, Robust object tracking based on adaptive
+multicue feature fusion, J. Electron. Imaging 29 (6) (2020) 063001–063001.
+[16] A. Kumar, V. Aelgani, R. Vohra, S.K. Gupta, M. Bhagawati, S. Paul, J.R. Laird,
+Artificial intelligence bias in medical system designs: A systematic review,
+Multimedia Tools Appl. 83 (6) (2024) 18005–18057.
+[17] A. Kumar, R. Jain, Behavioral prediction of cancer using machine learning, in:
+Cancer Prediction for Industrial IoT 4.0, Chapman and Hall/CRC, 2021, pp.
+91–105.
+[18] A. Kumar, R. Jain, M. Gupta, S.M. Islam, 6G-Enabled IoT and AI for Smart
+Healthcare: Challenges, Impact, and Analysis, CRC Press, 2023.
+[19] A. Kumar, P. Sareen, A. Arora, Healthcare engineering using AI and dis-
+tributed technologies, in: Smart Distributed Embedded Systems for Healthcare
+Applications, CRC Press, 2023, pp. 1–14.
+[20] F. Abbas, A. Taeihagh, Unmasking deepfakes: A systematic review of deepfake
+detection and generation techniques using artificial intelligence, Expert Syst.
+Appl. (2024) 124260.
+[21] A. Mitra, S.P. Mohanty, P. Corcoran, E. Kougianos, A novel machine learning
+based method for deepfake video detection in social media, in: 2020 IEEE
+International Symposium on Smart Electronic Systems (ISES) (Formerly INiS),
+2020, pp. 91–96, http://dx.doi.org/10.1109/iSES50453.2020.00031.
+[22] A. Mitra, S.P. Mohanty, P. Corcoran, E. Kougianos, A machine learning based
+approach for deepfake detection in social media through key video frame
+extraction, SN Comput. Sci. 2 (2) (2021) 98.
+[23] M.S. Rana, B. Murali, A.H. Sung, Deepfake detection using machine learn-
+ing algorithms, in: 2021 10th International Congress on Advanced Applied
+Informatics, IIAI-AAI, IEEE, 2021, pp. 458–463.
+[24] A. Qadir, R. Mahum, M.A. El-Meligy, A.E. Ragab, A. AlSalman, M. Awais, An
+efficient deepfake video detection using robust deep learning, Heliyon 10 (5)
+(2024).
+[25] P. Sadhana, N. Ravishankar, A. Ashok, R. Ravichandran, R. Paul, K. Murali,
+Enhancing fake image detection: A novel two-step approach combining GANs
+and CNNs, Procedia Comput. Sci. 235 (2024) 810–819.
+[26] S. Suganthi, M.U.A. Ayoobkhan, N. Bacanin, K. Venkatachalam, H. Štěpán, T.
+Pavel, Deep learning model for deep fake face recognition and detection, PeerJ
+Comput. Sci. 8 (2022).
+[27] Y. Zhu, C. Zhang, J. Gao, X. Sun, Z. Rui, X. Zhou, High-compressed deepfake
+video detection with contrastive spatiotemporal distillation, Neurocomputing
+565 (2024) 126872.
+[28] A. Hamza, A.R.R. Javed, F. Iqbal, N. Kryvinska, A.S. Almadhor, Z. Jalil, R.
+Borghol, Deepfake audio detection via MFCC features using machine learning,
+IEEE Access 10 (2022) 134018–134028.
+[29] M. Tian, M. Khayatkhoei, J. Mathai, W. AbdAlmageed, Unsupervised multi-
+modal deepfake detection using intra-and cross-modal inconsistencies, 2024,
+arXiv preprint arXiv:2311.17088.
+[30] F. Iqbal, A. Abbasi, A.R. Javed, Z. Jalil, J.N. Al-Karaki, Deepfake audio detection
+via feature engineering and machine learning, in: CIKM Workshops, 2022, pp.
+1–12.
+[31] G. Wang, Q. Jiang, X. Jin, X. Cui, FFR_FD: Effective and fast detection of
+DeepFakes via feature point defects, Inform. Sci. 596 (2022) 472–488.
+[32] X. Yang, Y. Li, S. Lyu, Exposing deep fakes using inconsistent head poses,
+in: ICASSP 2019-2019 IEEE International Conference on Acoustics, Speech and
+Signal Processing, ICASSP, IEEE, 2019, pp. 8261–8265.
+[33] H. Farid, Creating, using, misusing, and detecting deep fakes, J. Online Trust.
+Saf. 1 (4) (2022).
+[34] F. Khalid, A. Javed, H. Ilyas, A. Irtaza, DFGNN: An interpretable and generalized
+graph neural network for deepfakes detection, Expert Syst. Appl. 222 (2023)
+119843.
+[35] X. Nguyen, T. Tran, K. Nguyen, D.-T. Truong, Learning spatio-temporal features
+to detect manipulated facial videos created by the deepfake techniques, Forensic
+Sci. Int.: Digit. Investig. 36 (2021) 301108.
+[36] W. Pu, J. Hu, X. Wang, Y. Li, S. Hu, B. Zhu, S. Lyu, Learning a deep dual-level
+network for robust DeepFake detection, Pattern Recognit. 130 (2022) 108832.
+[37] S. Dincer, G. Ulutas, B. Ustubioglu, G. Tahaoglu, N. Sklavos, Golden ratio based
+deep fake video detection system with fusion of capsule networks, Comput.
+Electr. Eng. 117 (2024) 109234.
+[38] E. Essa, Feature fusion vision transformers using MLP-mixer for enhanced
+deepfake detection, Neurocomputing 598 (2024) 128128.
+[39] S. Ganguly, A. Ganguly, S. Mohiuddin, S. Malakar, R. Sarkar, ViXNet: Vision
+transformer with xception network for deepfakes based video and image forgery
+detection, Expert Syst. Appl. 210 (2022) 118423.
+[40] D. Coccomini, R. Caldelli, F. Falchi, C. Gennaro, On the generalization of deep
+learning models in video deepfake detection, J. Imaging 9 (5) (2023) 89.
+[41] X. Liu, Y. Yu, X. Li, Y. Zhao, Mcl: multimodal contrastive learning for deepfake
+detection, IEEE Trans. Circuits Syst. Video Technol. (2024).
+[42] J. Gao, M. Micheletto, G. Orrù, S. Concas, X. Feng, G. Marcialis, F. Roli, Texture
+and artifact decomposition for improving generalization in deep-learning-based
+deepfake detection, Eng. Appl. Artif. Intell. 133 (2024) 108450.
+[43] S. Kingra, N. Aggarwal, N. Kaur, LBPNet: Exploiting texture descriptor for
+deepfake detection, Forensic Sci. Int.: Digit. Investig. 42 (2022) 301452.
+[44] G. Leporoni, L. Maiano, L. Papa, I. Amerini, A guided-based approach for
+deepfake detection: RGB-depth integration via features fusion, Pattern Recognit.
+Lett. 181 (2024) 99–105.
+[45] A. Elhassan, M. Al-Fawa’reh, M. Jafar, M. Ababneh, S. Jafar, DFT-MF: Enhanced
+deepfake detection using mouth movement and transfer learning, SoftwareX 19
+(2022) 101115.
+[46] R. Saravana Ram, M. Vinoth Kumar, T. Al-shami, M. Masud, H. Aljuaid, M.
+Abouhawwash, Deep fake detection using computer vision-based deep neural
+network with pairwise learning, Intell. Autom. Soft Comput. 35 (2) (2023).
+[47] X. Xu, S. Tang, M. Zhu, P. He, S. Li, Y. Cao, A novel model compression
+method based on joint distillation for deepfake video detection, J. King Saud
+Univ. Comput. Inf. Sci. 35 (9) (2023) 101792.
+[48] Z. Xu, J. Liu, W. Lu, B. Xu, X. Zhao, B. Li, J. Huang, Detecting facial ma-
+nipulated videos based on set convolutional neural networks, J. Vis. Commun.
+Image Represent. 77 (2021) 103119.
+[49] M.A. Raza, K.M. Malik, Multimodaltrace: Deepfake detection using audiovi-
+sual representation learning, in: Proceedings of the IEEE/CVF Conference on
+Computer Vision and Pattern Recognition, 2023, pp. 993–1000.
+[50] J. Yoon, A. Panizo-LLedot, D. Camacho, C. Choi, Triple-modality interaction for
+deepfake detection on zero-shot identity, Inf. Fusion 109 (2024) 102424.
+[51] S. Muppalla, S. Jia, S. Lyu, Integrating audio-visual features for multimodal
+deepfake detection, in: 2023 IEEE MIT Undergraduate Research Technology
+Conference, URTC, IEEE, 2023, pp. 1–5.
+[52] D. Salvi, H. Liu, S. Mandelli, P. Bestagini, W. Zhou, W. Zhang, S. Tubaro, A
+robust approach to multimodal deepfake detection, J. Imaging 9 (6) (2023)
+122.
+[53] Z. Yan, P. Sun, Y. Lang, S. Du, S. Zhang, W. Wang, L. Liu, Multimodal graph
+learning for deepfake detection, 2022, arXiv preprint arXiv:2209.05419.
+[54] M. Rana, M. Nobi, B. Murali, A. Sung, Deepfake detection: A systematic
+literature review, IEEE Access 10 (2022) 25494–25513.
+[55] L. Passos, D. Jodas, K. Costa, L. Souza Júnior, D. Rodrigues, J. Del Ser, J. Papa,
+A review of deep learning-based approaches for deepfake content detection,
+Expert Syst. 41 (8) (2024) e13570.
+[56] M. Albahar, J. Almalki, Deepfakes: Threats and countermeasures systematic
+review, J. Theor. Appl. Inf. Technol. 97 (22) (2019) 3242–3250.
+[57] A. Malik, M. Kuribayashi, S.M. Abdullahi, A.N. Khan, DeepFake detection for
+human face images and videos: A survey, IEEE Access 10 (2022) 18757–18775.
+[58] G. Gupta, K. Raja, M. Gupta, T. Jan, S.T. Whiteside, M. Prasad, A comprehensive
+review of DeepFake detection using advanced machine learning and fusion
+methods, Electronics 13 (1) (2023) 95.
+Information Fusion 118 (2025) 102993 
+28 
+
+
+--- PAGE 29 ---
+
+A. Kumar et al.
+[59] A. Mary, A. Edison, Deep fake detection using deep learning techniques: A
+literature review, in: 2023 International Conference on Control, Communication
+and Computing, ICCC, IEEE, 2023, pp. 1–6.
+[60] R. Tolosana, S. Romero-Tapiador, R. Vera-Rodriguez, E. Gonzalez-Sosa, J.
+Fierrez, DeepFakes detection across generations: Analysis of facial regions,
+fusion, and performance evaluation, Eng. Appl. Artif. Intell. 110 (2022) 104673.
+[61] B. Yan, C.-T. Li, X. Lu, JRC: Deepfake detection via joint reconstruction and
+classification, Neurocomputing (2024) 127862.
+[62] A. Ismail, M. Elpeltagy, M. S. Zaki, K. Eldahshan, A new deep learning-based
+methodology for video deepfake detection using XGBoost, Sensors 21 (16)
+(2021) 5413.
+[63] A. Raza, K. Munir, M. Almutairi, A novel deep learning approach for deepfake
+image detection, Appl. Sci. 12 (19) (2022) 9820.
+[64] A. Kharel, M. Paranjape, A. Bera, DF-TransFusion: Multimodal deepfake detec-
+tion via lip-audio cross-attention and facial self-attention, 2023, arXiv preprint
+arXiv:2309.06511.
+[65] D. Wodajo, S. Atnafu, Deepfake video detection using convolutional vision
+transformer, 2021, arXiv preprint arXiv:2102.11126.
+[66] M.A. Amin, Y. Hu, C.-T. Li, B. Liu, Deepfake detection based on cross-domain
+local characteristic analysis with multi-domain transformer, Alex. Eng. J. 91
+(2024) 592–609.
+[67] J. Khochare, C. Joshi, B. Yenarkar, S. Suratkar, F. Kazi, A deep learning
+framework for audio deepfake detection, Arab. J. Sci. Eng. (2021) 1–12.
+[68] G. Naskar, S. Mohiuddin, S. Malakar, E. Cuevas, R. Sarkar, Deepfake detection
+using deep feature stacking and meta-learning, Heliyon 10 (4) (2024).
+[69] D.S. AbdElminaam, N. Sherif, Z. Ayman, M. Mohamed, M. Hazem, DeepFakeDG:
+A deep learning approach for deep fake detection and generation, J. Comput.
+Commun. 2 (2) (2023) 31–37.
+[70] S.T. Ikram, S. Chambial, D. Sood, et al., A performance enhancement of
+deepfake video detection through the use of a hybrid CNN deep learning model,
+Int. J. Electr. Comput. Eng. Syst. 14 (2) (2023) 169–178.
+[71] L. Guarnera, O. Giudice, S. Battiato, Deepfake detection by analyzing convolu-
+tional traces, in: Proceedings of the IEEE/CVF Conference on Computer Vision
+and Pattern Recognition Workshops, 2020, pp. 666–667.
+[72] M. Kim, S. Tariq, S.S. Woo, Fretal: Generalizing deepfake detection using
+knowledge distillation and representation learning, in: Proceedings of the
+IEEE/CVF Conference on Computer Vision and Pattern Recognition, 2021, pp.
+1001–1012.
+[73] A.A. Maksutov, V.O. Morozov, A.A. Lavrenov, A.S. Smirnov, Methods of
+deepfake detection based on machine learning, in: 2020 IEEE Conference of
+Russian Young Researchers in Electrical and Electronic Engineering, EIConRus,
+IEEE, 2020, pp. 408–411.
+[74] H. Zou, M. Shen, Y. Hu, C. Chen, E.S. Chng, D. Rajan, Cross-modality and
+within-modality regularization for audio-visual deepfake detection, in: ICASSP
+2024-2024 IEEE International Conference on Acoustics, Speech and Signal
+Processing, ICASSP, IEEE, 2024, pp. 4900–4904.
+[75] O. De Lima, S. Franklin, S. Basu, B. Karwoski, A. George, Deepfake detection
+using spatiotemporal convolutional networks, 2020, arXiv preprint arXiv:2006.
+14749.
+[76] R. Liu, J. Zhang, G. Gao, Multi-space channel representation learning for mono-
+to-binaural conversion based audio deepfake detection, Inf. Fusion 105 (2024)
+102257.
+[77] Y. Nirkin, L. Wolf, Y. Keller, T. Hassner, Deepfake detection based on discrep-
+ancies between faces and their context, IEEE Trans. Pattern Anal. Mach. Intell.
+44 (10) (2021) 6111–6121.
+[78] B. Wang, X. Wu, F. Wang, Y. Zhang, F. Wei, Z. Song, Spatial-frequency feature
+fusion based deepfake detection through knowledge distillation, Eng. Appl.
+Artif. Intell. 133 (2024) 108341.
+[79] L.-Y. Hsu, AI-assisted deepfake detection using adaptive blind image
+watermarking, J. Vis. Commun. Image Represent. 100 (2024) 104094.
+[80] K. Jayashre, M. Amsaprabhaa, Safeguarding media integrity: A hybrid optimized
+deep feature fusion based deepfake detection in videos, Comput. Secur. 142
+(2024) 103860.
+[81] G. Lee, M. Kim, Deepfake detection using the rate of change between frames
+based on computer vision, Sensors 21 (21) (2021) 7367.
+[82] J.K. Lewis, I.E. Toubal, H. Chen, V. Sandesera, M. Lomnitz, Z. Hampel-Arias,
+C. Prasad, K. Palaniappan, Deepfake video detection based on spatial, spectral,
+and temporal inconsistencies using multimodal deep learning, in: 2020 IEEE
+Applied Imagery Pattern Recognition Workshop, AIPR, IEEE, 2020, pp. 1–9.
+[83] H. Ilyas, A. Javed, K. Malik, AvFakeNet: A unified end-to-end dense swin
+transformer deep learning model for audio–visual deepfakes detection, Appl.
+Soft Comput. 136 (2023) 110124.
+[84] C. Zhu, B. Zhang, Q. Yin, C. Yin, W. Lu, Deepfake detection via inter-frame
+inconsistency recomposition and enhancement, Pattern Recognit. 147 (2024)
+110077.
+[85] Y. Ni, W. Zeng, P. Xia, G. Yang, R. Tan, A deepfake detection algorithm based
+on Fourier transform of biological signal, Comput. Mater. Contin. 79 (3) (2024).
+[86] M.S. Rana, A.H. Sung, Deepfakestack: A deep ensemble-based learning tech-
+nique for deepfake detection, in: 2020 7th IEEE International Conference on
+Cyber Security and Cloud Computing (CSCloud)/2020 6th IEEE International
+Conference on Edge Computing and Scalable Cloud, EdgeCom, IEEE, 2020, pp.
+70–75.
+[87] N. Yu, L. Chen, T. Leng, Z. Chen, X. Yi, An explainable deepfake of speech
+detection method with spectrograms and waveforms, J. Inf. Secur. Appl. 81
+(2024) 103720.
+[88] M. Arshed, S. Mumtaz, M. Ibrahim, C. Dewi, M. Tanveer, S. Ahmed, Multiclass
+AI-generated deepfake face detection using patch-wise deep learning model,
+Computers 13 (1) (2024) 31.
+[89] Z. Guo, G. Yang, J. Chen, X. Sun, Fake face detection via adaptive manipulation
+traces extraction network, Comput. Vis. Image Underst. 204 (2021) 103170.
+[90] F. Nie, J. Ni, J. Zhang, B. Zhang, W. Zhang, FRADE: Forgery-aware audio-
+distilled multimodal learning for deepfake detection, in: ACM Multimedia 2024,
+2024, pp. 1–10.
+[91] L. Zhang, D. Zhao, C. Lim, H. Asadi, H. Huang, Y. Yu, R. Gao, Video deep-
+fake classification using particle swarm optimization-based evolving ensemble
+models, Knowl.-Based Syst. 289 (2024) 111461.
+[92] D. Ballesteros, Y. Rodriguez-Ortega, D. Renza, G. Arce, Deep4SNet: deep
+learning for fake speech classification, Expert Syst. Appl. 184 (2021) 115465.
+[93] M. Lomnitz, Z. Hampel-Arias, V. Sandesara, S. Hu, Multimodal approach
+for deepfake detection, in: 2020 IEEE Applied Imagery Pattern Recognition
+Workshop, AIPR, IEEE, 2020, pp. 1–9.
+[94] S. Solaiyappan, Y. Wen, Machine learning based medical image deepfake
+detection: A comparative study, Mach. Learn. Appl. 8 (2022) 100298.
+[95] J. Awotunde, R. Jimoh, A. Imoize, A. Abdulrazaq, C.-T. Li, C.-C. Lee, An
+enhanced deep learning-based deepfake video detection and classification
+system, Electronics 12 (1) (2022) 87.
+[96] A. Badale, L. Castelino, C. Darekar, J. Gomes, Deep fake detection using neural
+networks, in: 15th IEEE International Conference on Advanced Video and Signal
+Based Surveillance, AVSS, 2018, pp. 1–6.
+[97] M. Raza, K. Malik, I. Haq, Holisticdfd: Infusing spatiotemporal transformer
+embeddings for deepfake detection, Inform. Sci. 645 (2023) 119352.
+[98] P. Sharma, M. Kumar, H. Sharma, GAN-CNN ensemble: A robust deepfake
+detection model of social media images using minimized catastrophic forgetting
+and generative replay technique, Procedia Comput. Sci. 235 (2024) 948–960.
+[99] I. Haq, K. Malik, K. Muhammad, Multimodal neurosymbolic approach for
+explainable deepfake detection, ACM Trans. Multimed. Comput. Commun. Appl.
+(2023).
+[100] R. Rafique, M. Nawaz, H. Kibriya, M. Masood, Deepfake detection using error
+level analysis and deep learning, in: 2021 4th International Conference on
+Computing & Information Sciences, ICCIS, IEEE, 2021, pp. 1–4.
+[101] C. Ledig, L. Theis, F. Huszár, J. Caballero, A. Cunningham, A. Acosta, Z. Wang,
+Photo-realistic single image super-resolution using a generative adversarial
+network, Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (2017).
+[102] Z. He, W. Zuo, M. Kan, S. Shan, X. Chen, Attgan: Facial attribute editing by
+only changing what you want, IEEE Trans. Image Process. 28 (11) (2019)
+5464–5478.
+[103] T. Karras, S. Laine, T. Aila, A style-based generator architecture for generative
+adversarial networks, in: Proceedings of the IEEE/CVF Conference on Computer
+Vision and Pattern Recognition, 2019.
+[104] P.K. R., R. Mukhopadhyay, A. Jha, V. Namboodiri, C. Jawahar, Towards au-
+tomatic face-to-face translation, in: Proceedings of the 27th ACM International
+Conference on Multimedia, 2019.
+[105] R. Natsume, T. Yatagawa, S. Morishima, Rsgan: face swapping and editing
+using face and hair representation in latent spaces, 2018, arXiv preprint arXiv:
+1804.03447.
+[106] Z. Khanjani, G. Watson, V. Janeja, How deep are the fakes? focusing on audio
+deepfake: A survey, 2021, arXiv preprint arXiv:2111.14203.
+[107] A. Khodabakhsh, C. Busch, R. Ramachandra, A taxonomy of audiovisual
+fake multimedia content creation technology, in: 2018 IEEE Conference on
+Multimedia Information Processing and Retrieval, MIPR, IEEE, 2018.
+[108] S. Salman, J. Shamsi, R. Qureshi, Deep fake generation and detection: Issues,
+challenges, and solutions, IT Prof. 25 (1) (2023) 52–59.
+[109] K. Liu, I. Perov, D. Gao, N. Chervoniy, W. Zhou, W. Zhang, Deepfacelab:
+Integrated, flexible and extensible face-swapping framework, Pattern Recognit.
+141 (2023) 109628.
+[110] Y. Wang, L. Song, W. Wu, C. Qian, R. He, C. Loy, Talking faces: Audio-to-video
+face generation, in: Handbook of digital face manipulation and detection: From
+deepfakes to morphing attacks, Springer International Publishing Cham, 2022,
+pp. 163–188.
+[111] J. Thies, M. Zollhofer, M. Stamminger, C. Theobalt, M. Nießner, Face2face:
+Real-time face capture and reenactment of rgb videos, in: Proceedings of
+the IEEE Conference on Computer Vision and Pattern Recognition, 2016, pp.
+2387–2395.
+[112] J. Zhang, X. Zeng, M. Wang, Y. Pan, Y. Liu, Y. Liu, C. Fan, Freenet: Multi-
+identity face reenactment, in: Proceedings of the IEEE/CVF Conference on
+Computer Vision and Pattern Recognition, 2020.
+Information Fusion 118 (2025) 102993 
+29 
+
+
+--- PAGE 30 ---
+
+A. Kumar et al.
+[113] S. Kolagati, T. Priyadharshini, V. Rajam, Exposing deepfakes using a deep
+multilayer perceptron–convolutional neural network model, Int. J. Inf. Manag.
+Data Insights 2 (1) (2022) 100054.
+[114] H. Lin, W. Huang, W. Luo, W. Lu, DeepFake detection with multi-scale
+convolution and vision transformer, Digit. Signal Process. 134 (2023) 103895.
+[115] Z. Cai, M. Li, Integrating frame-level boundary detection and deepfake detection
+for locating manipulated regions in partially spoofed audio forgery attacks,
+Comput. Speech Lang. 85 (2024) 101597.
+[116] C.-J. Chew, Y.-C. Lin, Y.-C. Chen, Y.-Y. Fan, J.-S. Lee, Preserving manipulated
+and synthetic deepfake detection through face texture naturalness, J. Inf. Secur.
+Appl. 83 (2024) 103798.
+[117] J. Ke, L. Wang, DF-UDetector: An effective method towards robust deepfake
+detection via feature restoration, Neural Netw. 160 (2023) 216–226.
+[118] W. Yang, X. Zhou, Z. Chen, B. Guo, Z. Ba, Z. Xia, K. Ren, Avoid-df: Audio-visual
+joint learning for detecting deepfake, IEEE Trans. Inf. Forensics Secur. 18 (2023)
+2015–2029.
+[119] H. Khalid, M. Kim, S. Tariq, S.S. Woo, Evaluation of an audio-video multimodal
+deepfake dataset using unimodal and multimodal detectors, in: Proceedings of
+the 1st Workshop on Synthetic Multimedia-Audiovisual Deepfake Generation
+and Detection, 2021, pp. 7–15.
+[120] T. Mittal, U. Bhattacharya, R. Chandra, A. Bera, D. Manocha, Emotions don’t lie:
+An audio-visual deepfake detection method using affective cues, in: Proceedings
+of the 28th ACM International Conference on Multimedia, 2020, pp. 2823–2832.
+[121] J. Yang, S. Xiao, A. Li, G. Lan, H. Wang, Detecting fake images by identifying
+potential texture difference, Future Gener. Comput. Syst. 125 (2021) 127–135.
+[122] S.-Y. Lim, D.-K. Chae, S.-C. Lee, Detecting deepfake voice using explainable
+deep learning techniques, Appl. Sci. 12 (8) (2022) 3926.
+[123] D. Cozzolino, A. Pianese, M. Nießner, L. Verdoliva, Audio-visual person-of-
+interest deepfake detection, in: Proceedings of the IEEE/CVF Conference on
+Computer Vision and Pattern Recognition, 2023, pp. 943–952.
+[124] C. Liy, L. InIctuOculi, Exposing AI-created fake videos by detecting eye blinking,
+in: 2018 IEEE International Workshop on Information Forensics and Security,
+WIFS, IEEE, 2018.
+[125] P. Korshunov, S. Marcel, D. Fakes, A New Threat to Face Recognition?
+Assessment and Detection, Cornell University, New York, NY, USA, 2018, pp.
+1–5.
+[126] A. Rossler, D. Cozzolino, L. Verdoliva, C. Riess, J. Thies, M. Nießner, Face-
+forensics++: Learning to detect manipulated facial images, Proc. IEEE/ CVF
+Int. Conf. Comput. Vis. (2019).
+[127] B. Dolhansky, The deepfake detection challenge (DFDC) pre view dataset, 2019,
+arXiv preprint arXiv:1910.08854.
+[128] Y. Li, X. Yang, P. Sun, H. Qi, S. Lyu, Celeb-DF: A large-scale challenging
+dataset for deepfake forensics, in: Proceedings of the IEEE/CVF Conference on
+Computer Vision and Pattern Recognition, 2020.
+[129] L. Jiang, R. Li, W. Wu, C. Qian, C. Loy, Deeperforensics-1.0: A large-scale
+dataset for real-world face forgery detection, in: Proceedings of the IEEE/CVF
+Conference on Computer Vision and Pattern Recognition, 2020.
+[130] B. Zi, M. Chang, J. Chen, X. Ma, Y.-G. Jiang, Wilddeepfake: A challenging
+real-world dataset for deepfake detection, in: Proceedings of the 28th ACM
+international conference on multimedia, 2020.
+[131] H. Dang, F. Liu, J. Stehouwer, X. Liu, A. Jain, On the detection of digital face
+manipulation, in: Proceedings of the IEEE/CVF Conference on Computer Vision
+and Pattern Recognition, 2020.
+[132] T.-N. Le, H.H. Nguyen, J. Yamagishi, I. Echizen, Openforensics: Large-scale
+challenging dataset for multi-face forgery detection and segmentation in-the-
+wild, in: Proceedings of the IEEE/CVF International Conference on Computer
+Vision, 2021, pp. 10117–10127.
+[133] A. Rössler, D. Cozzolino, L. Verdoliva, C. Riess, J. Thies, M. Nießner, Faceforen-
+sics: A large-scale video dataset for forgery detection in human faces, 2018,
+arXiv preprint arXiv:1803.09179.
+[134] J. Yamagishi, M. Todisco, M. Sahidullah, H. Delgado, X. Wang, N. Evans, T.
+Kinnunen, K.A. Lee, V. Vestman, A. Nautsch, Asvspoof 2019: The 3rd automatic
+speaker verification spoofing and countermeasures challenge database, 2019.
+[135] J. Kominek, A. Black, The CMU arctic speech databases, in: Fifth ISCA
+Workshop on Speech Synthesis, 2004, pp. 1–2.
+[136] K. Park, T. Mulc, CSS10: A collection of single speaker speech datasets for 10
+languages, 2019, arXiv preprint arXiv:1903.11269.
+[137] K. MacLean, Voxforge, 2018, http://www.voxforge.org/home, (Accessed on
+2012).
+[138] Z. Cai, S. Ghosh, A. Dhall, T. Gedeon, K. Stefanov, M. Hayat, Glitch in
+the matrix: A large scale benchmark for content driven audio–visual forgery
+detection and localization, Comput. Vis. Image Underst. 236 (2023) 103818.
+[139] M. Taeb, H. Chi, Comparison of deepfake detection techniques through deep
+learning, J. Cybersecur. Priv. 2 (1) (2022) 89–106.
+[140] M. Albahar, J. Almalki, Deepfakes: Threats and countermeasures systematic
+review, J. Theor. Appl. Inf. Technol. 97 (22) (2019) 3242–3250.
+[141] A. Kumar, R. Mamgai, R. Jain, Application of IoT-enabled CNN for natural lan-
+guage processing, in: IoT-Enabled Convolutional Neural Networks: Techniques
+and Applications, River Publishers, 2023, pp. 149–177.
+[142] A. Kumar, A. Mangotra, A. Ailawadi, R. Jain, M. Arora, Sentiment analysis on
+multilingual data: Hinglish, in: International Conference on Data Analytics &
+Management, Springer, 2023, pp. 607–620.
+[143] L. Mohanty, A. Kumar, V. Mehta, M. Agarwal, J. Suri, Pruning techniques for
+artificial intelligence networks: a deeper look at their engineering design and
+bias: the first review of its kind, Multimedia Tools Appl. (2024) 1–75.
+[144] S. Dong, J. Wang, J. Liang, H. Fan, R. Ji, Explaining deepfake detection
+by analysing image matching, in: European Conference on Computer Vision,
+Springer, 2022, pp. 18–35.
+[145] Z. Lin, M. Shafiee, S. Bochkarev, M. Jules, X. Wang, A. Wong, Do explanations
+reflect decisions? A machine-centric strategy to quantify the performance of
+explainability algorithms, 2019, arXiv preprint arXiv:1910.07387.
+[146] W. Samek, G. Montavon, A. Binder, S. Lapuschkin, K.-R. Müller, Interpreting the
+predictions of complex ml models by layer-wise relevance propagation, 2016,
+arXiv preprint arXiv:1611.08191.
+[147] C. Zhao, C. Wang, G. Hu, H. Chen, C. Liu, J. Tang, ISTVT: interpretable spatial-
+temporal video transformer for deepfake detection, IEEE Trans. Inf. Forensics
+Secur. 18 (2023) 1335–1348.
+[148] A. Smith, Deepfakes are the most dangerous crime of the future, researchers
+say, Indep. 5 (2020).
+[149] K. Tenbarge, Elon musk made a kamala harris deepfake ad go viral, sparking a
+debate about parody and free speech, NBCNews (2024) (Retrieved 12 October
+2024).
+[150] A. Kaur, A. Noori Hoshyar, V. Saikrishna, S. Firmin, F. Xia, Deepfake video
+detection: challenges and opportunities, Artif. Intell. Rev. 57 (6) (2024) 1–47.
+Information Fusion 118 (2025) 102993 
+30 
