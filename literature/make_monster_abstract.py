@@ -1,8 +1,9 @@
 from pathlib import Path
 import re
 
-TXT_DIR = Path("literature/txt")
-OUTPUT = Path("literature/monster_abstract.txt")
+LITERATURE_DIR = Path(__file__).resolve().parent
+TXT_DIR = LITERATURE_DIR / "txt"
+OUTPUT = LITERATURE_DIR / "monster_abstract.txt"
 missing_files = []
 
 def extract_abstract(text):

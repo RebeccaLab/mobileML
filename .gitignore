@@ -1,0 +1,5 @@
+# Keep large or access-controlled benchmark data out of GitHub.
+prepared_dataset/
+external_data/
+preprocessing/dataset_json/
+deepfake_datasets/
