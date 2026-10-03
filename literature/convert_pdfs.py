@@ -1,8 +1,9 @@
 from pathlib import Path
 import fitz
 
-PDF_DIR = Path("literature/pdfs")
-TXT_DIR = Path("literature/txt")
+LITERATURE_DIR = Path(__file__).resolve().parent
+PDF_DIR = LITERATURE_DIR / "pdfs"
+TXT_DIR = LITERATURE_DIR / "txt"
 
 TXT_DIR.mkdir(parents=True, exist_ok=True)
 
